@@ -26,8 +26,9 @@ export function AudioSystem() {
         }
         layersRef.current = layers;
         setInitialized(true);
-      } catch {
-        // Web Audio not available or user hasn't interacted yet
+      } catch (err) {
+        console.error('[AudioSystem] Failed to initialize Web Audio:', err);
+        throw err;
       }
     };
 

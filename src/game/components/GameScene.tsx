@@ -8,8 +8,9 @@ import {
 } from '@react-three/postprocessing';
 import { Physics } from '@react-three/rapier';
 import { BlendFunction } from 'postprocessing';
-import { Component, type ReactNode, Suspense, useLayoutEffect } from 'react';
+import { Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
+import { ErrorBoundary } from '../ErrorBoundary';
 import { useGameStore } from '../stores/gameStore';
 import { AudioSystem } from '../systems/AudioSystem';
 import { ChunkManager } from '../systems/ChunkManager';
@@ -19,177 +20,6 @@ import { FeatureSpawner } from '../systems/FeatureSpawner';
 import { InteractionSystem } from '../systems/InteractionSystem';
 import { PlayerController } from '../systems/PlayerController';
 import { QuestSystem } from '../systems/QuestSystem';
-
-// Error boundary with themed modal
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-  errorInfo: string;
-}
-
-class GameErrorBoundary extends Component<
-  { children: ReactNode },
-  ErrorBoundaryState
-> {
-  constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null, errorInfo: '' };
-  }
-
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('[GameErrorBoundary] Caught error:', error);
-    console.error('[GameErrorBoundary] Error info:', errorInfo);
-    this.setState({
-      errorInfo: errorInfo.componentStack || 'No stack trace available',
-    });
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(245, 241, 232, 0.95)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            fontFamily: 'Lora, serif',
-          }}
-        >
-          <div
-            style={{
-              background: '#ede8dc',
-              border: '2px solid #c4a747',
-              padding: '32px',
-              maxWidth: '600px',
-              maxHeight: '80vh',
-              overflow: 'auto',
-              color: '#3d3a34',
-            }}
-          >
-            <h1
-              style={{
-                color: '#d97963',
-                fontSize: '24px',
-                marginBottom: '16px',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-              }}
-            >
-              ⚠ Game Error
-            </h1>
-            <div
-              style={{
-                background: '#f5f1e8',
-                padding: '16px',
-                marginBottom: '16px',
-                border: '1px solid #d4cfc2',
-              }}
-            >
-              <p
-                style={{
-                  color: '#d97963',
-                  marginBottom: '8px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                {this.state.error?.message || 'Unknown error'}
-              </p>
-              <p
-                style={{
-                  color: '#8b8680',
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                }}
-              >
-                {this.state.error?.name}
-              </p>
-            </div>
-            <details style={{ marginBottom: '16px' }}>
-              <summary
-                style={{
-                  cursor: 'pointer',
-                  color: '#c4a747',
-                  marginBottom: '8px',
-                }}
-              >
-                Stack Trace
-              </summary>
-              <pre
-                style={{
-                  background: '#f5f1e8',
-                  padding: '12px',
-                  fontSize: '11px',
-                  overflow: 'auto',
-                  maxHeight: '200px',
-                  color: '#8b8680',
-                  border: '1px solid #d4cfc2',
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                }}
-              >
-                {this.state.error?.stack || 'No stack trace'}
-              </pre>
-            </details>
-            <details>
-              <summary
-                style={{
-                  cursor: 'pointer',
-                  color: '#c4a747',
-                  marginBottom: '8px',
-                }}
-              >
-                Component Stack
-              </summary>
-              <pre
-                style={{
-                  background: '#f5f1e8',
-                  padding: '12px',
-                  fontSize: '11px',
-                  overflow: 'auto',
-                  maxHeight: '200px',
-                  color: '#8b8680',
-                  border: '1px solid #d4cfc2',
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                }}
-              >
-                {this.state.errorInfo}
-              </pre>
-            </details>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              style={{
-                marginTop: '24px',
-                padding: '12px 24px',
-                background: 'linear-gradient(to bottom, #d97963, #c4695a)',
-                border: '1px solid #d97963',
-                color: '#fff',
-                fontFamily: 'Lora, serif',
-                fontSize: '14px',
-                cursor: 'pointer',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-              }}
-            >
-              Reload Game
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 // Initialize scene with warm pastoral sky background
 function SceneInit() {
@@ -273,7 +103,7 @@ function LoadingFallback() {
 
 export function GameScene() {
   return (
-    <GameErrorBoundary>
+    <ErrorBoundary source="GameScene">
       <Canvas
         shadows={{ type: THREE.PCFShadowMap }}
         dpr={[1, 1.5]}
@@ -319,6 +149,6 @@ export function GameScene() {
           fontFamily: 'Lora, serif',
         }}
       />
-    </GameErrorBoundary>
+    </ErrorBoundary>
   );
 }

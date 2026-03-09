@@ -1,9 +1,8 @@
 /**
  * Save/Load service — serializes ECS world state to/from expo-sqlite via Drizzle.
  *
- * This module provides platform-aware save/load functionality:
- * - On native (Expo): uses expo-sqlite + Drizzle ORM with a real game.db
- * - On web: falls back to localStorage (Rapier WASM precludes SQLite on web)
+ * expo-sqlite is cross-platform: uses native SQLite on iOS/Android,
+ * OPFS-backed SQLite on web. No fallbacks needed.
  *
  * The service is consumed by the MainMenu (load/continue) and pause menu (save).
  */
@@ -50,48 +49,6 @@ export interface SaveSlotSummary {
   savedAt: string;
   playTimeSeconds: number;
   level: number;
-}
-
-const MAX_SLOTS = 3;
-const STORAGE_PREFIX = 'kings-road-save-';
-
-/**
- * Web fallback: localStorage-based save/load.
- * Used until expo-sqlite is available (native builds).
- */
-export function saveToLocalStorage(slotId: number, data: SaveData): void {
-  if (slotId < 1 || slotId > MAX_SLOTS) return;
-  localStorage.setItem(`${STORAGE_PREFIX}${slotId}`, JSON.stringify(data));
-}
-
-export function loadFromLocalStorage(slotId: number): SaveData | null {
-  if (slotId < 1 || slotId > MAX_SLOTS) return null;
-  const raw = localStorage.getItem(`${STORAGE_PREFIX}${slotId}`);
-  if (!raw) return null;
-  return JSON.parse(raw) as SaveData;
-}
-
-export function listSaveSlotsFromLocalStorage(): SaveSlotSummary[] {
-  const slots: SaveSlotSummary[] = [];
-  for (let i = 1; i <= MAX_SLOTS; i++) {
-    const raw = localStorage.getItem(`${STORAGE_PREFIX}${i}`);
-    if (raw) {
-      const data = JSON.parse(raw) as SaveData;
-      slots.push({
-        slotId: i,
-        displayName: data.displayName,
-        seedPhrase: data.seedPhrase,
-        savedAt: data.savedAt,
-        playTimeSeconds: data.playTimeSeconds,
-        level: data.player.level,
-      });
-    }
-  }
-  return slots;
-}
-
-export function deleteSaveFromLocalStorage(slotId: number): void {
-  localStorage.removeItem(`${STORAGE_PREFIX}${slotId}`);
 }
 
 /**
