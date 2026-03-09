@@ -30,7 +30,7 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src"],
-  "exclude": ["src/components/next/*.jsx", "src/components/next/*.js"],
+  "include": ["src", "scripts"],
+  "exclude": [],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
