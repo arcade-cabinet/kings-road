@@ -100,7 +100,7 @@ function rollEncounterTable(
         const angle = ((i - (count - 1) / 2) * Math.PI) / 4;
         const dist = 6 + Math.random() * 3;
         monsters.push({
-          id: `enc-${Date.now()}-${i}`,
+          id: `enc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${i}`,
           archetype,
           position: [
             playerX + Math.sin(angle) * dist,
