@@ -177,7 +177,8 @@ function buildModularBuilding(
 
 export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   const { cx, cz, key, type, placedBuildings, npcBlueprints } = chunkData;
-  const hasConfigTown = type === 'TOWN' && placedBuildings && placedBuildings.length > 0;
+  const hasConfigTown =
+    type === 'TOWN' && placedBuildings && placedBuildings.length > 0;
   const _rng = useMemo(
     () => mulberry32(cyrb128(seedPhrase + key)),
     [seedPhrase, key],
@@ -477,15 +478,16 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
       />
 
       {/* Config-driven buildings */}
-      {hasConfigTown && placedBuildings?.map((b) => (
-        <Building
-          key={`bldg-${b.label}`}
-          archetype={b.archetype}
-          position={[b.worldX, 0, b.worldZ]}
-          rotation={b.rotation}
-          label={b.label}
-        />
-      ))}
+      {hasConfigTown &&
+        placedBuildings?.map((b) => (
+          <Building
+            key={`bldg-${b.label}`}
+            archetype={b.archetype}
+            position={[b.worldX, 0, b.worldZ]}
+            rotation={b.rotation}
+            label={b.label}
+          />
+        ))}
 
       {/* NPCs — use blueprints when available */}
       {npcBlueprints && npcBlueprints.length > 0

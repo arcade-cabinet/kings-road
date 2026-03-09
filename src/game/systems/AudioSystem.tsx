@@ -1,10 +1,10 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import * as Tone from 'tone';
-import { computeAmbientMix } from '../audio/ambient-mixer';
 import type { AudioZone } from '../audio/ambient-mixer';
-import { createAllLayers } from '../audio/layer-factory';
+import { computeAmbientMix } from '../audio/ambient-mixer';
 import type { AudioLayer } from '../audio/layer-factory';
+import { createAllLayers } from '../audio/layer-factory';
 import { useGameStore } from '../stores/gameStore';
 
 export function AudioSystem() {

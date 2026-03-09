@@ -10,7 +10,9 @@ export const FaceSchema = z.object({
   eyeColor: z.enum(['brown', 'blue', 'green', 'gray']).default('brown'),
   hairStyle: z.enum(['bald', 'short', 'long', 'hooded']).default('short'),
   hairColor: z.string().default('#4a3020'),
-  facialHair: z.enum(['none', 'stubble', 'full_beard', 'mustache']).default('none'),
+  facialHair: z
+    .enum(['none', 'stubble', 'full_beard', 'mustache'])
+    .default('none'),
 });
 export type Face = z.infer<typeof FaceSchema>;
 
@@ -25,11 +27,13 @@ export const NPCBehaviorSchema = z.object({
   walkNodes: z.boolean().default(false),
 });
 
-export const NPCDialogueSchema = z.object({
-  greeting: z.array(z.string()).optional(),
-  quest: z.array(z.string()).optional(),
-  idle: z.array(z.string()).optional(),
-}).optional();
+export const NPCDialogueSchema = z
+  .object({
+    greeting: z.array(z.string()).optional(),
+    quest: z.array(z.string()).optional(),
+    idle: z.array(z.string()).optional(),
+  })
+  .optional();
 
 export const NPCBlueprintSchema = z.object({
   id: z.string().min(1),

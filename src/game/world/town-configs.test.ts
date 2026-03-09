@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getTownConfig, resolveBuildingArchetype, resolveNPCBlueprint } from './town-configs';
-import { layoutTown } from './town-layout';
 import { generateBuildingGeometry } from '../factories/building-factory';
+import {
+  getTownConfig,
+  resolveBuildingArchetype,
+  resolveNPCBlueprint,
+} from './town-configs';
+import { layoutTown } from './town-layout';
 
 describe('town-configs', () => {
   it('returns Ashford config for chunk (0,0)', () => {

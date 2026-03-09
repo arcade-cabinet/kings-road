@@ -10,33 +10,48 @@ interface BuildingProps {
   label?: string;
 }
 
-export function Building({ archetype, position, rotation = 0, label }: BuildingProps) {
+export function Building({
+  archetype,
+  position,
+  rotation = 0,
+  label: _label,
+}: BuildingProps) {
   const materials = useMemo(() => getMaterials(), []);
-  const geometry = useMemo(() => generateBuildingGeometry(archetype), [archetype]);
+  const geometry = useMemo(
+    () => generateBuildingGeometry(archetype),
+    [archetype],
+  );
 
   const wallMaterial = useMemo(() => {
     switch (archetype.wallMaterial) {
-      case 'stone': return materials.dungeonWall;
-      case 'timber_frame': return materials.wood;
-      case 'brick': return materials.dungeonWall;
-      default: return materials.townWall;
+      case 'stone':
+        return materials.dungeonWall;
+      case 'timber_frame':
+        return materials.wood;
+      case 'brick':
+        return materials.dungeonWall;
+      default:
+        return materials.townWall;
     }
   }, [archetype.wallMaterial, materials]);
 
   const roofMaterial = useMemo(() => {
     switch (archetype.roofStyle) {
-      case 'slate': return materials.dungeonWall;
-      case 'flat': return materials.wood;
-      default: return materials.roof;
+      case 'slate':
+        return materials.dungeonWall;
+      case 'flat':
+        return materials.wood;
+      default:
+        return materials.roof;
     }
   }, [archetype.roofStyle, materials]);
 
   return (
     <group position={position} rotation={[0, (rotation * Math.PI) / 180, 0]}>
       {/* Wall segments */}
-      {geometry.walls.map((seg, i) => (
+      {geometry.walls.map((seg) => (
         <mesh
-          key={`wall-${seg.wall}-${i}`}
+          key={`wall-${seg.wall}-${seg.x}-${seg.y}-${seg.z}`}
           position={[seg.x, seg.y, seg.z]}
           castShadow
           receiveShadow
@@ -47,9 +62,9 @@ export function Building({ archetype, position, rotation = 0, label }: BuildingP
       ))}
 
       {/* Floor plates */}
-      {geometry.floors.map((floor, i) => (
+      {geometry.floors.map((floor) => (
         <mesh
-          key={`floor-${i}`}
+          key={`floor-${floor.x}-${floor.y}-${floor.z}`}
           position={[floor.x, floor.y, floor.z]}
           receiveShadow
         >
@@ -59,9 +74,9 @@ export function Building({ archetype, position, rotation = 0, label }: BuildingP
       ))}
 
       {/* Stairs */}
-      {geometry.stairs.map((step, i) => (
+      {geometry.stairs.map((step) => (
         <mesh
-          key={`stair-${i}`}
+          key={`stair-${step.x}-${step.y}-${step.z}`}
           position={[step.x, step.y, step.z]}
           castShadow
         >
@@ -71,9 +86,9 @@ export function Building({ archetype, position, rotation = 0, label }: BuildingP
       ))}
 
       {/* Doors */}
-      {geometry.doors.map((door, i) => (
+      {geometry.doors.map((door) => (
         <mesh
-          key={`door-${i}`}
+          key={`door-${door.x}-${door.y}-${door.z}`}
           position={[door.x, door.y, door.z]}
           rotation={[0, door.rotY, 0]}
         >
@@ -83,9 +98,9 @@ export function Building({ archetype, position, rotation = 0, label }: BuildingP
       ))}
 
       {/* Windows */}
-      {geometry.windows.map((win, i) => (
+      {geometry.windows.map((win) => (
         <mesh
-          key={`win-${i}`}
+          key={`win-${win.x}-${win.y}-${win.z}`}
           position={[win.x, win.y, win.z]}
           rotation={[0, win.rotY, 0]}
         >
@@ -96,11 +111,21 @@ export function Building({ archetype, position, rotation = 0, label }: BuildingP
 
       {/* Roof */}
       <mesh
-        position={[geometry.roofCenter.x, geometry.roofCenter.y, geometry.roofCenter.z]}
+        position={[
+          geometry.roofCenter.x,
+          geometry.roofCenter.y,
+          geometry.roofCenter.z,
+        ]}
         castShadow
       >
         {archetype.roofStyle === 'flat' ? (
-          <boxGeometry args={[geometry.roofSize.width + 0.4, 0.3, geometry.roofSize.depth + 0.4]} />
+          <boxGeometry
+            args={[
+              geometry.roofSize.width + 0.4,
+              0.3,
+              geometry.roofSize.depth + 0.4,
+            ]}
+          />
         ) : (
           <coneGeometry
             args={[

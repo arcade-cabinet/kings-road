@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
-export const WallMaterial = z.enum(['plaster', 'stone', 'timber_frame', 'brick']);
+export const WallMaterial = z.enum([
+  'plaster',
+  'stone',
+  'timber_frame',
+  'brick',
+]);
 export type WallMaterial = z.infer<typeof WallMaterial>;
 
 export const RoofStyle = z.enum(['thatch', 'slate', 'flat']);

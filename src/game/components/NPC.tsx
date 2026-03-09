@@ -161,7 +161,8 @@ export function NPC({ interactable, blueprint }: NPCProps) {
 
     // Head bob and tracking
     if (headRef.current) {
-      headRef.current.position.y = headY + Math.sin(t * 1.5 + idleOffset) * 0.02;
+      headRef.current.position.y =
+        headY + Math.sin(t * 1.5 + idleOffset) * 0.02;
 
       // Head looks at player when highlighted
       if (isHighlighted) {
@@ -209,7 +210,9 @@ export function NPC({ interactable, blueprint }: NPCProps) {
 
         {/* Body */}
         <mesh ref={bodyRef} position={[0, torsoY, 0]} castShadow>
-          <cylinderGeometry args={[torsoRadiusTop, torsoRadiusBottom, torsoHeight, 12]} />
+          <cylinderGeometry
+            args={[torsoRadiusTop, torsoRadiusBottom, torsoHeight, 12]}
+          />
           <meshStandardMaterial color={clothColor} roughness={0.8} />
         </mesh>
 
@@ -316,14 +319,21 @@ export function NPC({ interactable, blueprint }: NPCProps) {
               </mesh>
             )}
             {accessories.includes('hammer') && (
-              <group position={[0.45, legHeight + 0.15, 0]} rotation={[0.3, 0, -0.8]}>
+              <group
+                position={[0.45, legHeight + 0.15, 0]}
+                rotation={[0.3, 0, -0.8]}
+              >
                 <mesh castShadow>
                   <boxGeometry args={[0.08, 0.45, 0.08]} />
                   <meshStandardMaterial color="#4a3020" roughness={0.9} />
                 </mesh>
                 <mesh position={[0, 0.28, 0]} castShadow>
                   <boxGeometry args={[0.15, 0.12, 0.1]} />
-                  <meshStandardMaterial color="#555" metalness={0.8} roughness={0.3} />
+                  <meshStandardMaterial
+                    color="#555"
+                    metalness={0.8}
+                    roughness={0.3}
+                  />
                 </mesh>
               </group>
             )}
@@ -335,8 +345,20 @@ export function NPC({ interactable, blueprint }: NPCProps) {
             )}
             {accessories.includes('robes') && (
               <mesh position={[0, torsoY, 0]} castShadow>
-                <cylinderGeometry args={[torsoRadiusTop + 0.05, torsoRadiusBottom + 0.08, torsoHeight + 0.3, 12]} />
-                <meshStandardMaterial color={renderData.clothSecondary} roughness={0.9} transparent opacity={0.7} />
+                <cylinderGeometry
+                  args={[
+                    torsoRadiusTop + 0.05,
+                    torsoRadiusBottom + 0.08,
+                    torsoHeight + 0.3,
+                    12,
+                  ]}
+                />
+                <meshStandardMaterial
+                  color={renderData.clothSecondary}
+                  roughness={0.9}
+                  transparent
+                  opacity={0.7}
+                />
               </mesh>
             )}
             {accessories.includes('scroll') && (
@@ -363,11 +385,17 @@ export function NPC({ interactable, blueprint }: NPCProps) {
             {accessories.includes('shawl') && (
               <mesh position={[0, neckY + 0.05, 0.05]} castShadow>
                 <boxGeometry args={[0.5, 0.15, 0.2]} />
-                <meshStandardMaterial color={renderData.clothSecondary} roughness={0.8} />
+                <meshStandardMaterial
+                  color={renderData.clothSecondary}
+                  roughness={0.8}
+                />
               </mesh>
             )}
             {accessories.includes('holy_book') && (
-              <group position={[0.35, armY - 0.2, 0.1]} rotation={[0.2, 0, -0.3]}>
+              <group
+                position={[0.35, armY - 0.2, 0.1]}
+                rotation={[0.2, 0, -0.3]}
+              >
                 <mesh castShadow>
                   <boxGeometry args={[0.15, 0.2, 0.05]} />
                   <meshStandardMaterial color="#3a1a0a" roughness={0.8} />
@@ -375,12 +403,20 @@ export function NPC({ interactable, blueprint }: NPCProps) {
                 {/* Gold clasp */}
                 <mesh position={[0, 0, 0.03]} castShadow>
                   <boxGeometry args={[0.04, 0.12, 0.01]} />
-                  <meshStandardMaterial color="#c4a747" metalness={0.7} roughness={0.3} />
+                  <meshStandardMaterial
+                    color="#c4a747"
+                    metalness={0.7}
+                    roughness={0.3}
+                  />
                 </mesh>
               </group>
             )}
             {accessories.includes('walking_stick') && (
-              <mesh position={[0.5, legHeight * 0.65, 0]} rotation={[0.1, 0, -0.1]} castShadow>
+              <mesh
+                position={[0.5, legHeight * 0.65, 0]}
+                rotation={[0.1, 0, -0.1]}
+                castShadow
+              >
                 <cylinderGeometry args={[0.03, 0.04, legHeight * 2.5, 6]} />
                 <meshStandardMaterial color="#3a2a15" roughness={0.9} />
               </mesh>

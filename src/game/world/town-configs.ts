@@ -4,24 +4,22 @@
  * Ashford is anchored at chunk (0,0), the player's starting town.
  * Future towns can be added here by mapping their anchor coordinates.
  */
-import type { BuildingArchetype } from '../../schemas/building.schema';
-import type { NPCBlueprint } from '../../schemas/npc-blueprint.schema';
-import type { TownConfig } from '../../schemas/town.schema';
 
-// Static imports — bundled by Vite, no runtime fs access needed
-import ashfordTown from '../../../content/towns/ashford.json';
-
-import cottageBldg from '../../../content/buildings/cottage.json';
-import tavernBldg from '../../../content/buildings/tavern.json';
-import smithyBldg from '../../../content/buildings/smithy.json';
 import chapelBldg from '../../../content/buildings/chapel.json';
+import cottageBldg from '../../../content/buildings/cottage.json';
 import houseLargeBldg from '../../../content/buildings/house_large.json';
-
+import smithyBldg from '../../../content/buildings/smithy.json';
+import tavernBldg from '../../../content/buildings/tavern.json';
 import aldricNpc from '../../../content/npcs/aldric.json';
 import bessNpc from '../../../content/npcs/bess.json';
 import fatherCedricNpc from '../../../content/npcs/father-cedric.json';
-import oldTomasNpc from '../../../content/npcs/old-tomas.json';
 import goodwifeMaren from '../../../content/npcs/goodwife-maren.json';
+import oldTomasNpc from '../../../content/npcs/old-tomas.json';
+// Static imports — bundled by Vite, no runtime fs access needed
+import ashfordTown from '../../../content/towns/ashford.json';
+import type { BuildingArchetype } from '../../schemas/building.schema';
+import type { NPCBlueprint } from '../../schemas/npc-blueprint.schema';
+import type { TownConfig } from '../../schemas/town.schema';
 
 // Building archetype registry (keyed by archetype id)
 const BUILDING_ARCHETYPES: Record<string, BuildingArchetype> = {

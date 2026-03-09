@@ -6,7 +6,13 @@ export type LayoutStrategy = z.infer<typeof LayoutStrategy>;
 export const BoundaryType = z.enum(['palisade', 'stone_wall', 'hedge', 'none']);
 export type BoundaryType = z.infer<typeof BoundaryType>;
 
-export const ApproachType = z.enum(['meadow', 'meadow_stream', 'grove', 'bridge', 'open']);
+export const ApproachType = z.enum([
+  'meadow',
+  'meadow_stream',
+  'grove',
+  'bridge',
+  'open',
+]);
 export type ApproachType = z.infer<typeof ApproachType>;
 
 export const BuildingPlacementSchema = z.object({
@@ -14,11 +20,13 @@ export const BuildingPlacementSchema = z.object({
   label: z.string(),
   position: z.tuple([z.number(), z.number()]),
   rotation: z.number().default(0),
-  overrides: z.object({
-    stories: z.number().int().min(1).max(3).optional(),
-    wallMaterial: z.string().optional(),
-    roofStyle: z.string().optional(),
-  }).optional(),
+  overrides: z
+    .object({
+      stories: z.number().int().min(1).max(3).optional(),
+      wallMaterial: z.string().optional(),
+      roofStyle: z.string().optional(),
+    })
+    .optional(),
 });
 export type BuildingPlacement = z.infer<typeof BuildingPlacementSchema>;
 

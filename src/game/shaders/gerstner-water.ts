@@ -137,7 +137,9 @@ export function createWaterMaterial(config: WaterConfig): THREE.ShaderMaterial {
       amplitudes[i] = layer.amplitude;
       wavelengths[i] = layer.wavelength;
       speeds[i] = layer.speed;
-      directions.push(new THREE.Vector2(layer.direction[0], layer.direction[1]).normalize());
+      directions.push(
+        new THREE.Vector2(layer.direction[0], layer.direction[1]).normalize(),
+      );
     } else {
       amplitudes[i] = 0;
       wavelengths[i] = 1;

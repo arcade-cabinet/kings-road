@@ -1,8 +1,8 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import * as THREE from 'three';
-import { createWaterMaterial, getWaterPreset } from '../shaders/gerstner-water';
+import type * as THREE from 'three';
 import type { WaterConfig } from '../shaders/gerstner-water';
+import { createWaterMaterial, getWaterPreset } from '../shaders/gerstner-water';
 
 interface WaterBodyProps {
   position: [number, number, number];

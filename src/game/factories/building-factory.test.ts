@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { BuildingArchetype } from '../../schemas/building.schema';
 import {
-  generateWallSegments,
+  generateBuildingGeometry,
   generateFloorPlates,
   generateStairs,
-  generateBuildingGeometry,
+  generateWallSegments,
 } from './building-factory';
 
 describe('generateWallSegments', () => {

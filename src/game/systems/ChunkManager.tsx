@@ -3,7 +3,13 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { Chunk } from '../components/Chunk';
 import { useGameStore } from '../stores/gameStore';
-import type { AABB, ChunkData, Interactable, PlacedBuildingData, PlacedNPCData } from '../types';
+import type {
+  AABB,
+  ChunkData,
+  Interactable,
+  PlacedBuildingData,
+  PlacedNPCData,
+} from '../types';
 import { cyrb128, mulberry32 } from '../utils/random';
 import {
   BLOCK_SIZE,
@@ -14,7 +20,11 @@ import {
   getRandomNPCName,
   VIEW_DISTANCE,
 } from '../utils/worldGen';
-import { getTownConfig, resolveBuildingArchetype, resolveNPCBlueprint } from '../world/town-configs';
+import {
+  getTownConfig,
+  resolveBuildingArchetype,
+  resolveNPCBlueprint,
+} from '../world/town-configs';
 import { layoutTown } from '../world/town-layout';
 
 // Generate chunk data (colliders, interactables, etc.)
@@ -230,22 +240,30 @@ function generateChunkData(
       let npcZ = oZTown + CHUNK_SIZE / 2;
 
       if (npcPlacement.building && placedBuildings) {
-        const bldg = placedBuildings.find((b) => b.label === npcPlacement.building);
+        const bldg = placedBuildings.find(
+          (b) => b.label === npcPlacement.building,
+        );
         if (bldg) {
           // Place NPC just outside the building's front
           npcX = bldg.worldX;
-          npcZ = bldg.worldZ + (bldg.archetype.footprint.depth * BLOCK_SIZE) / 2 + 2;
+          npcZ =
+            bldg.worldZ + (bldg.archetype.footprint.depth * BLOCK_SIZE) / 2 + 2;
         }
       } else if (npcPlacement.position) {
         npcX = oXTown + npcPlacement.position[0] * BLOCK_SIZE;
         npcZ = oZTown + npcPlacement.position[1] * BLOCK_SIZE;
       }
 
-      const npcType = (['blacksmith', 'innkeeper', 'merchant', 'wanderer'].includes(npcPlacement.archetype)
-        ? npcPlacement.archetype
-        : 'wanderer') as Interactable['type'];
+      const npcType = (
+        ['blacksmith', 'innkeeper', 'merchant', 'wanderer'].includes(
+          npcPlacement.archetype,
+        )
+          ? npcPlacement.archetype
+          : 'wanderer'
+      ) as Interactable['type'];
 
-      const greeting = blueprint.dialogue?.greeting?.[0] ?? 'Well met, traveller.';
+      const greeting =
+        blueprint.dialogue?.greeting?.[0] ?? 'Well met, traveller.';
 
       const interactable: Interactable = {
         id: `${key}-bp-${npcPlacement.id}`,

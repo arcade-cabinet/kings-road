@@ -12,11 +12,27 @@ describe('TownConfigSchema', () => {
       approach: 'meadow_stream',
       center: [0, 0],
       buildings: [
-        { archetype: 'cottage', label: 'Your Home', position: [0, 2], rotation: 15 },
-        { archetype: 'tavern', label: 'The Golden Meadow', position: [-3, 0], overrides: { stories: 2 } },
+        {
+          archetype: 'cottage',
+          label: 'Your Home',
+          position: [0, 2],
+          rotation: 15,
+        },
+        {
+          archetype: 'tavern',
+          label: 'The Golden Meadow',
+          position: [-3, 0],
+          overrides: { stories: 2 },
+        },
       ],
       npcs: [
-        { id: 'aldric', archetype: 'blacksmith', fixed: true, building: "Aldric's Forge", name: 'Aldric' },
+        {
+          id: 'aldric',
+          archetype: 'blacksmith',
+          fixed: true,
+          building: "Aldric's Forge",
+          name: 'Aldric',
+        },
       ],
     };
     expect(() => TownConfigSchema.parse(ashford)).not.toThrow();

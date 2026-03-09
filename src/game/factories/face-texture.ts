@@ -62,7 +62,7 @@ export function generateFaceTexture(face: Face): THREE.CanvasTexture {
     ctx.fillStyle = face.hairColor;
     ctx.fillRect(40, 84, 48, 8);
   } else if (face.facialHair === 'stubble') {
-    ctx.fillStyle = face.hairColor + '44';
+    ctx.fillStyle = `${face.hairColor}44`;
     for (let i = 0; i < 60; i++) {
       const sx = 32 + ((i * 7) % 64);
       const sy = 80 + ((i * 11) % 40);

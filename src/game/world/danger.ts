@@ -9,7 +9,11 @@ import type { ChunkType } from '../types';
  * Tier 3 (dangerous): Deep wild (|cx| >= 3) — monsters, undead
  * Tier 4 (extreme):   Dungeon interior — bosses, guardians
  */
-export function getDangerTier(cx: number, _cz: number, chunkType: ChunkType): number {
+export function getDangerTier(
+  cx: number,
+  _cz: number,
+  chunkType: ChunkType,
+): number {
   if (chunkType === 'TOWN') return 0;
   if (chunkType === 'DUNGEON') return 4;
   if (cx === 0) return 0; // On the King's Road
@@ -25,11 +29,17 @@ export function getDangerTier(cx: number, _cz: number, chunkType: ChunkType): nu
  */
 export function getEncounterChance(tier: number): number {
   switch (tier) {
-    case 0: return 0;
-    case 1: return 0.001;
-    case 2: return 0.005;
-    case 3: return 0.01;
-    case 4: return 0.02;
-    default: return 0;
+    case 0:
+      return 0;
+    case 1:
+      return 0.001;
+    case 2:
+      return 0.005;
+    case 3:
+      return 0.01;
+    case 4:
+      return 0.02;
+    default:
+      return 0;
   }
 }

@@ -1,6 +1,12 @@
 import * as Tone from 'tone';
 
-export type LayerName = 'wind' | 'birds' | 'insects' | 'crickets' | 'water' | 'vegetation';
+export type LayerName =
+  | 'wind'
+  | 'birds'
+  | 'insects'
+  | 'crickets'
+  | 'water'
+  | 'vegetation';
 
 export interface AudioLayer {
   name: LayerName;
@@ -44,12 +50,17 @@ export function createBirdsLayer(): AudioLayer {
     source: synth,
     gain,
     start: () => {
-      intervalId = setInterval(() => {
-        if (gain.gain.value > 0.01) {
-          const note = ['C5', 'E5', 'G5', 'A5'][Math.floor(Math.random() * 4)];
-          synth.triggerAttackRelease(note, '16n');
-        }
-      }, 800 + Math.random() * 2000);
+      intervalId = setInterval(
+        () => {
+          if (gain.gain.value > 0.01) {
+            const note = ['C5', 'E5', 'G5', 'A5'][
+              Math.floor(Math.random() * 4)
+            ];
+            synth.triggerAttackRelease(note, '16n');
+          }
+        },
+        800 + Math.random() * 2000,
+      );
     },
     stop: () => {
       if (intervalId) clearInterval(intervalId);

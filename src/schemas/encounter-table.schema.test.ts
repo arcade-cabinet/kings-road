@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { EncounterTableSchema, LootTableSchema } from './encounter-table.schema';
+import {
+  EncounterTableSchema,
+  LootTableSchema,
+} from './encounter-table.schema';
 
 describe('EncounterTableSchema', () => {
   it('accepts a valid tier-1 encounter table', () => {

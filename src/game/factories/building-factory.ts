@@ -339,7 +339,7 @@ export function generateBuildingGeometry(
     walls.push(...storyWalls);
 
     if (!openFront) {
-      const frontZ = (d / 2) - WALL_T / 2;
+      const frontZ = d / 2 - WALL_T / 2;
 
       if (story === 0 && features.includes('door')) {
         doors.push({

@@ -52,16 +52,18 @@ export function layoutTown(
     // Add organic jitter for organic layout
     if (config.layout === 'organic') {
       // Simple deterministic jitter from position
-      const hash = Math.abs(Math.sin(bx * 12.9898 + bz * 78.233) * 43758.5453) % 1;
+      const hash =
+        Math.abs(Math.sin(bx * 12.9898 + bz * 78.233) * 43758.5453) % 1;
       worldX += (hash - 0.5) * 4; // +/-2 units
       worldZ += (Math.abs(Math.sin(hash * 100)) - 0.5) * 4;
     }
 
     const rotation = building.rotation ?? 0;
     // Add organic rotation jitter
-    const finalRotation = config.layout === 'organic'
-      ? rotation + (Math.sin(bx * 7 + bz * 13) * 5) // +/-5 deg extra jitter
-      : rotation;
+    const finalRotation =
+      config.layout === 'organic'
+        ? rotation + Math.sin(bx * 7 + bz * 13) * 5 // +/-5 deg extra jitter
+        : rotation;
 
     placed.push({
       archetype: building.archetype,
@@ -94,15 +96,19 @@ export function generateBoundary(
   // Estimate town radius from building positions
   let maxDist = 20; // minimum radius
   for (const b of config.buildings) {
-    const dist = Math.sqrt(b.position[0] ** 2 + b.position[1] ** 2) * TILE_SIZE + 12;
+    const dist =
+      Math.sqrt(b.position[0] ** 2 + b.position[1] ** 2) * TILE_SIZE + 12;
     if (dist > maxDist) maxDist = dist;
   }
   const radius = maxDist;
 
   const segments: BoundarySegment[] = [];
-  const height = config.boundary === 'stone_wall' ? 4.0
-    : config.boundary === 'palisade' ? 3.0
-    : 1.5; // hedge
+  const height =
+    config.boundary === 'stone_wall'
+      ? 4.0
+      : config.boundary === 'palisade'
+        ? 3.0
+        : 1.5; // hedge
 
   // Posts/segments around perimeter
   const postSpacing = config.boundary === 'hedge' ? 3.0 : 2.0;

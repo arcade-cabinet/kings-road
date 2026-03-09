@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 // Mock Tone.js since it requires Web Audio API
 // Must use function() constructors (not arrows) so they can be called with `new`
 vi.mock('tone', () => {
-  const mockConnect = () => ({ connect: mockConnect, start: vi.fn(), stop: vi.fn() });
   return {
     Noise: vi.fn(function () {
       this.connect = vi.fn().mockReturnThis();
@@ -35,7 +34,11 @@ vi.mock('tone', () => {
   };
 });
 
-import { createAllLayers, createWindLayer, createWaterLayer } from './layer-factory';
+import {
+  createAllLayers,
+  createWaterLayer,
+  createWindLayer,
+} from './layer-factory';
 
 describe('layer-factory', () => {
   it('creates wind layer with correct name', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { computeAmbientMix } from './ambient-mixer';
 import type { AudioZone } from './ambient-mixer';
+import { computeAmbientMix } from './ambient-mixer';
 
 describe('computeAmbientMix', () => {
   it('always has wind', () => {
