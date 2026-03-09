@@ -29,6 +29,151 @@ interface GemData {
   z: number;
 }
 
+interface MeshData {
+  townWall: MeshInstance[];
+  dungeonWall: MeshInstance[];
+  wood: MeshInstance[];
+  roof: MeshInstance[];
+  door: MeshInstance[];
+  windowGlow: MeshInstance[];
+  crate: MeshInstance[];
+  barrel: MeshInstance[];
+  pineTrunk: MeshInstance[];
+  pineLeaves: MeshInstance[];
+  boulder: MeshInstance[];
+  gems: GemData[];
+}
+
+// Helper function to build a modular building
+function buildModularBuilding(
+  data: MeshData,
+  bx: number,
+  bz: number,
+  buildingType: string,
+  localRng: () => number,
+) {
+  let w = 2,
+    d = 2,
+    h = 1;
+  if (buildingType === 'inn') {
+    w = 3;
+    d = 4;
+    h = 2;
+  }
+  if (buildingType === 'blacksmith') {
+    w = 2;
+    d = 2;
+    h = 1;
+  }
+  if (buildingType === 'house') {
+    h = 1 + Math.floor(localRng() * 2);
+  }
+
+  const centerX = bx + (w * BLOCK_SIZE) / 2;
+  const centerZ = bz + (d * BLOCK_SIZE) / 2;
+
+  // Stone foundation
+  data.dungeonWall.push({
+    x: centerX,
+    y: 0.25,
+    z: centerZ,
+    sx: w,
+    sy: 0.1,
+    sz: d,
+  });
+
+  for (let fl = 0; fl < h; fl++) {
+    const py = fl * BLOCK_SIZE + BLOCK_SIZE / 2;
+    const overhang = buildingType === 'inn' && fl > 0 ? 0.2 : 0;
+
+    for (let ix = 0; ix < w; ix++) {
+      for (let iz = 0; iz < d; iz++) {
+        const px = bx + ix * BLOCK_SIZE + BLOCK_SIZE / 2;
+        const pz = bz + iz * BLOCK_SIZE + BLOCK_SIZE / 2;
+        const isPerimeter =
+          ix === 0 || ix === w - 1 || iz === 0 || iz === d - 1;
+
+        if (isPerimeter) {
+          // Timber frame corners
+          data.wood.push({
+            x: px - BLOCK_SIZE / 2,
+            y: py,
+            z: pz - BLOCK_SIZE / 2,
+            sx: 1,
+            sy: 1,
+            sz: 1,
+          });
+          data.wood.push({
+            x: px + BLOCK_SIZE / 2,
+            y: py,
+            z: pz + BLOCK_SIZE / 2,
+            sx: 1,
+            sy: 1,
+            sz: 1,
+          });
+
+          // Open front for blacksmith
+          if (buildingType === 'blacksmith' && fl === 0 && iz === d - 1)
+            continue;
+
+          // Door
+          if (fl === 0 && iz === d - 1 && ix === Math.floor(w / 2)) {
+            data.door.push({ x: px, y: BLOCK_SIZE / 4, z: pz });
+          } else {
+            data.townWall.push({
+              x: px,
+              y: py,
+              z: pz,
+              sx: 1 + overhang,
+              sz: 1 + overhang,
+            });
+
+            // Windows
+            if (localRng() > 0.5) {
+              let wz = pz,
+                wx = px;
+              if (iz === d - 1) wz = pz + BLOCK_SIZE / 2 + 0.05;
+              else if (iz === 0) wz = pz - BLOCK_SIZE / 2 - 0.05;
+              if (ix === w - 1) wx = px + BLOCK_SIZE / 2 + 0.05;
+              else if (ix === 0) wx = px - BLOCK_SIZE / 2 - 0.05;
+
+              if (wz !== pz || wx !== px) {
+                data.windowGlow.push({ x: wx, y: py, z: wz });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Roof
+  data.roof.push({
+    x: centerX,
+    y: h * BLOCK_SIZE + BLOCK_SIZE * 0.6,
+    z: centerZ,
+    sx: w * 0.75,
+    sz: d * 0.75,
+  });
+
+  // Clutter
+  if (buildingType === 'blacksmith') {
+    data.barrel.push({
+      x: centerX + BLOCK_SIZE / 2,
+      y: BLOCK_SIZE * 0.25,
+      z: centerZ + BLOCK_SIZE / 2,
+    });
+  } else if (buildingType === 'inn') {
+    for (let i = 0; i < 4; i++) {
+      data.crate.push({
+        x: bx - BLOCK_SIZE / 2 + localRng() * 2,
+        y: BLOCK_SIZE * 0.2,
+        z: centerZ + localRng() * 4,
+      });
+    }
+  }
+}
+
 export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   const { cx, cz, key, type } = chunkData;
   const _rng = useMemo(
@@ -42,20 +187,7 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
 
   // Generate all mesh data for this chunk
   const meshData = useMemo(() => {
-    const data: {
-      townWall: MeshInstance[];
-      dungeonWall: MeshInstance[];
-      wood: MeshInstance[];
-      roof: MeshInstance[];
-      door: MeshInstance[];
-      windowGlow: MeshInstance[];
-      crate: MeshInstance[];
-      barrel: MeshInstance[];
-      pineTrunk: MeshInstance[];
-      pineLeaves: MeshInstance[];
-      boulder: MeshInstance[];
-      gems: GemData[];
-    } = {
+    const data: MeshData = {
       townWall: [],
       dungeonWall: [],
       wood: [],
@@ -226,137 +358,7 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     }
 
     return data;
-  }, [cx, key, type, oX, oZ, seedPhrase, buildModularBuilding]);
-
-  // Helper function to build a modular building
-  function buildModularBuilding(
-    data: typeof meshData,
-    bx: number,
-    bz: number,
-    buildingType: string,
-    localRng: () => number,
-  ) {
-    let w = 2,
-      d = 2,
-      h = 1;
-    if (buildingType === 'inn') {
-      w = 3;
-      d = 4;
-      h = 2;
-    }
-    if (buildingType === 'blacksmith') {
-      w = 2;
-      d = 2;
-      h = 1;
-    }
-    if (buildingType === 'house') {
-      h = 1 + Math.floor(localRng() * 2);
-    }
-
-    const centerX = bx + (w * BLOCK_SIZE) / 2;
-    const centerZ = bz + (d * BLOCK_SIZE) / 2;
-
-    // Stone foundation
-    data.dungeonWall.push({
-      x: centerX,
-      y: 0.25,
-      z: centerZ,
-      sx: w,
-      sy: 0.1,
-      sz: d,
-    });
-
-    for (let fl = 0; fl < h; fl++) {
-      const py = fl * BLOCK_SIZE + BLOCK_SIZE / 2;
-      const overhang = buildingType === 'inn' && fl > 0 ? 0.2 : 0;
-
-      for (let ix = 0; ix < w; ix++) {
-        for (let iz = 0; iz < d; iz++) {
-          const px = bx + ix * BLOCK_SIZE + BLOCK_SIZE / 2;
-          const pz = bz + iz * BLOCK_SIZE + BLOCK_SIZE / 2;
-          const isPerimeter =
-            ix === 0 || ix === w - 1 || iz === 0 || iz === d - 1;
-
-          if (isPerimeter) {
-            // Timber frame corners
-            data.wood.push({
-              x: px - BLOCK_SIZE / 2,
-              y: py,
-              z: pz - BLOCK_SIZE / 2,
-              sx: 1,
-              sy: 1,
-              sz: 1,
-            });
-            data.wood.push({
-              x: px + BLOCK_SIZE / 2,
-              y: py,
-              z: pz + BLOCK_SIZE / 2,
-              sx: 1,
-              sy: 1,
-              sz: 1,
-            });
-
-            // Open front for blacksmith
-            if (buildingType === 'blacksmith' && fl === 0 && iz === d - 1)
-              continue;
-
-            // Door
-            if (fl === 0 && iz === d - 1 && ix === Math.floor(w / 2)) {
-              data.door.push({ x: px, y: BLOCK_SIZE / 4, z: pz });
-            } else {
-              data.townWall.push({
-                x: px,
-                y: py,
-                z: pz,
-                sx: 1 + overhang,
-                sz: 1 + overhang,
-              });
-
-              // Windows
-              if (localRng() > 0.5) {
-                let wz = pz,
-                  wx = px;
-                if (iz === d - 1) wz = pz + BLOCK_SIZE / 2 + 0.05;
-                else if (iz === 0) wz = pz - BLOCK_SIZE / 2 - 0.05;
-                if (ix === w - 1) wx = px + BLOCK_SIZE / 2 + 0.05;
-                else if (ix === 0) wx = px - BLOCK_SIZE / 2 - 0.05;
-
-                if (wz !== pz || wx !== px) {
-                  data.windowGlow.push({ x: wx, y: py, z: wz });
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Roof
-    data.roof.push({
-      x: centerX,
-      y: h * BLOCK_SIZE + BLOCK_SIZE * 0.6,
-      z: centerZ,
-      sx: w * 0.75,
-      sz: d * 0.75,
-    });
-
-    // Clutter
-    if (buildingType === 'blacksmith') {
-      data.barrel.push({
-        x: centerX + BLOCK_SIZE / 2,
-        y: BLOCK_SIZE * 0.25,
-        z: centerZ + BLOCK_SIZE / 2,
-      });
-    } else if (buildingType === 'inn') {
-      for (let i = 0; i < 4; i++) {
-        data.crate.push({
-          x: bx - BLOCK_SIZE / 2 + localRng() * 2,
-          y: BLOCK_SIZE * 0.2,
-          z: centerZ + localRng() * 4,
-        });
-      }
-    }
-  }
+  }, [cx, key, type, oX, oZ, seedPhrase]);
 
   // Ground material based on type
   const groundMaterial =

@@ -50,7 +50,7 @@ export function NPC({ interactable }: NPCProps) {
   const accentColor = TYPE_ACCENTS[npcType] || TYPE_ACCENTS.wanderer;
 
   // Memoized colors based on NPC type
-  const { skinColor, clothColor, hairColor, eyeColor } = useMemo(() => {
+  const { skinColor, clothColor, hairColor } = useMemo(() => {
     const seed = npcId.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
     const skinIdx = seed % SKIN_COLORS.length;
     const clothOptions = CLOTH_COLORS[npcType] || CLOTH_COLORS.wanderer;

@@ -7,6 +7,16 @@ import { updateWindowEmissive } from '../utils/textures';
 
 const DAY_DURATION = 600.0; // 10 real minutes = 1 game day
 
+// Pre-computed cloud configurations to avoid array index keys
+const cloudConfigs = Array.from({ length: 10 }, (_, i) => ({
+  id: `cloud-${i}`,
+  x: Math.sin(i * 0.6 + 0.3) * 180,
+  y: 45 + (i % 3) * 15,
+  z: Math.cos(i * 0.6 + 0.3) * 180,
+  speed: 0.08 + (i % 3) * 0.02,
+  scale: 25 + (i % 4) * 10,
+}));
+
 // Sky color gradient for different times of day
 const skyColorsGradient = [
   { pct: 0.0, c: new THREE.Color(0x050510) }, // Midnight
@@ -217,17 +227,13 @@ export function SkyDome() {
 
       {/* Atmospheric clouds that follow player */}
       <group position={[playerX, 0, playerZ]}>
-        {[...Array(10)].map((_, i) => (
+        {cloudConfigs.map((cfg) => (
           <Cloud
-            key={i}
-            position={[
-              Math.sin(i * 0.6 + 0.3) * 180,
-              45 + (i % 3) * 15,
-              Math.cos(i * 0.6 + 0.3) * 180,
-            ]}
-            speed={0.08 + (i % 3) * 0.02}
+            key={cfg.id}
+            position={[cfg.x, cfg.y, cfg.z]}
+            speed={cfg.speed}
             opacity={isNight ? 0.15 : isDusk || isDawn ? 0.7 : 0.4}
-            scale={25 + (i % 4) * 10}
+            scale={cfg.scale}
             segments={15}
             color={isDusk ? '#ffccaa' : isDawn ? '#ffddcc' : '#ffffff'}
           />

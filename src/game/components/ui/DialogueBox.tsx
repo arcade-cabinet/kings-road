@@ -81,7 +81,11 @@ function DialogueCorner({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
         isLeft ? '-left-px' : '-right-px',
       )}
     >
-      <svg viewBox="0 0 24 24" className="w-full h-full text-yellow-700">
+      <svg
+        viewBox="0 0 24 24"
+        className="w-full h-full text-yellow-700"
+        aria-hidden="true"
+      >
         <path
           d={
             isTop
@@ -148,9 +152,15 @@ export function DialogueBox() {
       )}
     >
       {/* Darkened backdrop with vignette */}
+      {/* biome-ignore lint/a11y/useSemanticElements: full-screen backdrop overlay, not a semantic button */}
       <div
         className="absolute inset-0 pointer-events-auto cursor-pointer"
+        role="button"
+        tabIndex={0}
         onClick={handleClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') handleClose();
+        }}
         style={{
           background:
             'radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%)',
@@ -158,6 +168,7 @@ export function DialogueBox() {
       />
 
       {/* Dialogue box */}
+      {/* biome-ignore lint/a11y/useSemanticElements: dialogue container with click-to-skip, not a semantic button */}
       <div
         className={cn(
           'absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 w-[95%] md:w-[700px] max-w-[800px] pointer-events-auto transition-all duration-200',
@@ -166,7 +177,12 @@ export function DialogueBox() {
             : 'translate-y-0 opacity-100 scale-100',
           isClosing && 'translate-y-4 opacity-0 scale-95',
         )}
+        role="button"
+        tabIndex={0}
         onClick={handleClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') handleClick();
+        }}
       >
         <div className="relative bg-gradient-to-b from-amber-50/98 to-yellow-50/98 border border-yellow-700/40 shadow-2xl backdrop-blur-sm">
           {/* Top accent line */}

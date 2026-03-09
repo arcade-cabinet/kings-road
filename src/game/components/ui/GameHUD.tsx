@@ -8,7 +8,6 @@ function StatBar({
   maxValue = 100,
   color,
   glowColor,
-  label,
   showLabel = false,
   icon,
 }: {
@@ -16,7 +15,6 @@ function StatBar({
   maxValue?: number;
   color: string;
   glowColor: string;
-  label?: string;
   showLabel?: boolean;
   icon?: React.ReactNode;
 }) {
@@ -62,9 +60,9 @@ function StatBar({
 
         {/* Tick marks */}
         <div className="absolute inset-0 flex">
-          {[...Array(4)].map((_, i) => (
+          {['q1', 'q2', 'q3', 'q4'].map((id) => (
             <div
-              key={i}
+              key={id}
               className="flex-1 border-r border-stone-700/30 last:border-r-0"
             />
           ))}
@@ -82,6 +80,9 @@ function StatBar({
 // Compass component
 function Compass({ yaw }: { yaw: number }) {
   const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const compassItems = (['a', 'b', 'c'] as const).flatMap((group) =>
+    directions.map((dir) => ({ key: `${group}-${dir}`, dir })),
+  );
   const normalizedYaw = ((((-yaw * 180) / Math.PI) % 360) + 360) % 360;
 
   return (
@@ -92,9 +93,9 @@ function Compass({ yaw }: { yaw: number }) {
           transform: `translateX(${-normalizedYaw * 0.55 + 40}px)`,
         }}
       >
-        {[...directions, ...directions, ...directions].map((dir, i) => (
+        {compassItems.map(({ key, dir }) => (
           <span
-            key={i}
+            key={key}
             className={cn(
               'w-10 text-center',
               dir === 'N'

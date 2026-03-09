@@ -20,23 +20,13 @@
       "recommended": true,
       "correctness": {
         "noUnusedVariables": "warn",
-        "noUnusedImports": "warn",
-        "noUnusedFunctionParameters": "warn",
-        "useExhaustiveDependencies": "warn"
+        "noUnusedImports": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "off",
-        "noArrayIndexKey": "warn",
-        "noAssignInExpressions": "off"
+        "noExplicitAny": "off"
       },
       "style": {
         "noNonNullAssertion": "off"
-      },
-      "a11y": {
-        "noSvgWithoutTitle": "warn",
-        "useKeyWithClickEvents": "warn",
-        "noStaticElementInteractions": "warn",
-        "useButtonType": "warn"
       }
     }
   },

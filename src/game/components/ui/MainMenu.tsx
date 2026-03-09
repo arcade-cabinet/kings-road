@@ -106,7 +106,11 @@ function CornerOrnament({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
       )}
       style={{ transform: transforms[position] }}
     >
-      <svg viewBox="0 0 32 32" className="w-full h-full text-yellow-700/40">
+      <svg
+        viewBox="0 0 32 32"
+        className="w-full h-full text-yellow-700/40"
+        aria-hidden="true"
+      >
         <path d="M0 0 L12 0 L12 2 L2 2 L2 12 L0 12 Z" fill="currentColor" />
         <path
           d="M0 0 L8 0 L8 1 L1 1 L1 8 L0 8 Z"
@@ -192,6 +196,7 @@ export function MainMenu() {
           viewBox="0 0 200 200"
           className="w-full h-full animate-spin"
           style={{ animationDuration: '120s' }}
+          aria-hidden="true"
         >
           <circle
             cx="100"
@@ -218,18 +223,20 @@ export function MainMenu() {
             stroke="#c4a747"
             strokeWidth="0.5"
           />
-          {[...Array(12)].map((_, i) => (
-            <line
-              key={i}
-              x1="100"
-              y1="5"
-              x2="100"
-              y2="25"
-              stroke="#c4a747"
-              strokeWidth="0.5"
-              transform={`rotate(${i * 30} 100 100)`}
-            />
-          ))}
+          {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(
+            (angle) => (
+              <line
+                key={`line-${angle}`}
+                x1="100"
+                y1="5"
+                x2="100"
+                y2="25"
+                stroke="#c4a747"
+                strokeWidth="0.5"
+                transform={`rotate(${angle} 100 100)`}
+              />
+            ),
+          )}
         </svg>
       </div>
 

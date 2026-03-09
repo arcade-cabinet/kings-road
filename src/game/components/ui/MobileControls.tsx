@@ -188,6 +188,7 @@ export function MobileControls() {
         {/* Interact Button */}
         {currentInteractable && !inDialogue && (
           <button
+            type="button"
             onTouchStart={handleInteract}
             className={cn(
               'relative w-[72px] h-[72px] rounded-full overflow-hidden',
@@ -218,6 +219,7 @@ export function MobileControls() {
 
         {/* Jump Button */}
         <button
+          type="button"
           onTouchStart={handleJump}
           className={cn(
             'relative w-[72px] h-[72px] rounded-full overflow-hidden',
@@ -244,6 +246,7 @@ export function MobileControls() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
+              aria-hidden="true"
             >
               <path d="M12 19V5M5 12l7-7 7 7" className="text-yellow-700" />
             </svg>
