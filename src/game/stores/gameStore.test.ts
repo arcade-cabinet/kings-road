@@ -360,14 +360,10 @@ describe('useGameStore', () => {
 
     it('handles edge case with undefined arrays passed to add/remove', () => {
       // Test defensive coding for undefined inputs
-      // @ts-expect-error Testing defensive coding
-      useGameStore.getState().addGlobalAABBs(undefined);
-      // @ts-expect-error Testing defensive coding
-      useGameStore.getState().removeGlobalAABBs(undefined);
-      // @ts-expect-error Testing defensive coding
-      useGameStore.getState().addGlobalInteractables(undefined);
-      // @ts-expect-error Testing defensive coding
-      useGameStore.getState().removeGlobalInteractables(undefined);
+      useGameStore.getState().addGlobalAABBs(undefined as any);
+      useGameStore.getState().removeGlobalAABBs(undefined as any);
+      useGameStore.getState().addGlobalInteractables(undefined as any);
+      useGameStore.getState().removeGlobalInteractables(undefined as any);
 
       // Should not have crashed
       expect(useGameStore.getState().globalAABBs).toBeDefined();
