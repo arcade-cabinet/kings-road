@@ -2,6 +2,8 @@
  * Core game type definitions
  */
 import type * as THREE from 'three';
+import type { BuildingArchetype } from '../schemas/building.schema';
+import type { NPCBlueprint } from '../schemas/npc-blueprint.schema';
 
 /** Axis-Aligned Bounding Box for collision detection */
 export interface AABB {
@@ -28,6 +30,21 @@ export interface Interactable {
 /** Chunk terrain types */
 export type ChunkType = 'WILD' | 'TOWN' | 'DUNGEON' | 'ROAD';
 
+/** A building placed in the world via the town layout system */
+export interface PlacedBuildingData {
+  archetype: BuildingArchetype;
+  label: string;
+  worldX: number;
+  worldZ: number;
+  rotation: number;
+}
+
+/** An NPC with a blueprint placed in the world */
+export interface PlacedNPCData {
+  interactable: Interactable;
+  blueprint: NPCBlueprint;
+}
+
 /** Data for a single world chunk */
 export interface ChunkData {
   cx: number;
@@ -38,6 +55,10 @@ export interface ChunkData {
   collidables: AABB[];
   interactables: Interactable[];
   collectedGems: Set<number>;
+  /** Buildings placed by the config-driven town layout system */
+  placedBuildings?: PlacedBuildingData[];
+  /** NPCs with blueprint data for config-driven rendering */
+  npcBlueprints?: PlacedNPCData[];
 }
 
 /** Player input state */

@@ -4,6 +4,7 @@ import type { ChunkData } from '../types';
 import { cyrb128, mulberry32 } from '../utils/random';
 import { getMaterials } from '../utils/textures';
 import { BLOCK_SIZE, CHUNK_SIZE } from '../utils/worldGen';
+import { Building } from './Building';
 import { NPC } from './NPC';
 import { Relic } from './Relic';
 
@@ -175,7 +176,8 @@ function buildModularBuilding(
 }
 
 export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
-  const { cx, cz, key, type } = chunkData;
+  const { cx, cz, key, type, placedBuildings, npcBlueprints } = chunkData;
+  const hasConfigTown = type === 'TOWN' && placedBuildings && placedBuildings.length > 0;
   const _rng = useMemo(
     () => mulberry32(cyrb128(seedPhrase + key)),
     [seedPhrase, key],
@@ -218,8 +220,8 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         }
       }
 
-      if (type === 'TOWN') {
-        // Build modular buildings
+      if (type === 'TOWN' && !hasConfigTown) {
+        // Legacy instanced buildings — only for towns without a config
         buildModularBuilding(data, oX + 20, oZ + 20, 'inn', localRng);
         buildModularBuilding(
           data,
@@ -246,6 +248,15 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
 
         // Town decorations
         for (let i = 0; i < 8; i++) {
+          data.barrel.push({
+            x: oX + 30 + localRng() * 60,
+            y: BLOCK_SIZE * 0.25,
+            z: oZ + 30 + localRng() * 60,
+          });
+        }
+      } else if (type === 'TOWN' && hasConfigTown) {
+        // Config-driven town — add barrels/crates as decorations only
+        for (let i = 0; i < 6; i++) {
           data.barrel.push({
             x: oX + 30 + localRng() * 60,
             y: BLOCK_SIZE * 0.25,
@@ -358,7 +369,7 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     }
 
     return data;
-  }, [cx, key, type, oX, oZ, seedPhrase]);
+  }, [cx, key, type, oX, oZ, seedPhrase, hasConfigTown]);
 
   // Ground material based on type
   const groundMaterial =
@@ -465,10 +476,29 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         material={materials.boulder}
       />
 
-      {/* NPCs */}
-      {chunkData.interactables?.map((npc) =>
-        npc ? <NPC key={npc.id} interactable={npc} /> : null,
-      )}
+      {/* Config-driven buildings */}
+      {hasConfigTown && placedBuildings?.map((b) => (
+        <Building
+          key={`bldg-${b.label}`}
+          archetype={b.archetype}
+          position={[b.worldX, 0, b.worldZ]}
+          rotation={b.rotation}
+          label={b.label}
+        />
+      ))}
+
+      {/* NPCs — use blueprints when available */}
+      {npcBlueprints && npcBlueprints.length > 0
+        ? npcBlueprints.map((npcData) => (
+            <NPC
+              key={npcData.interactable.id}
+              interactable={npcData.interactable}
+              blueprint={npcData.blueprint}
+            />
+          ))
+        : chunkData.interactables?.map((npc) =>
+            npc ? <NPC key={npc.id} interactable={npc} /> : null,
+          )}
 
       {/* Collectible Artifacts */}
       {meshData.gems?.map((gem) =>

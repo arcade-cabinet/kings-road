@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { Chunk } from '../components/Chunk';
 import { useGameStore } from '../stores/gameStore';
-import type { AABB, ChunkData, Interactable } from '../types';
+import type { AABB, ChunkData, Interactable, PlacedBuildingData, PlacedNPCData } from '../types';
 import { cyrb128, mulberry32 } from '../utils/random';
 import {
   BLOCK_SIZE,
@@ -14,6 +14,8 @@ import {
   getRandomNPCName,
   VIEW_DISTANCE,
 } from '../utils/worldGen';
+import { getTownConfig, resolveBuildingArchetype, resolveNPCBlueprint } from '../world/town-configs';
+import { layoutTown } from '../world/town-layout';
 
 // Generate chunk data (colliders, interactables, etc.)
 function generateChunkData(
@@ -24,7 +26,7 @@ function generateChunkData(
 ): ChunkData {
   const key = `${cx},${cz}`;
   const type = getChunkType(cx, cz, seedPhrase);
-  const name = getChunkName(cx, cz, type, seedPhrase);
+  let name = getChunkName(cx, cz, type, seedPhrase);
   const rng = mulberry32(cyrb128(seedPhrase + key));
 
   const collidables: AABB[] = [];
@@ -178,6 +180,91 @@ function generateChunkData(
     }
   }
 
+  // Config-driven town: if a town config is anchored at these coords, overlay it
+  let placedBuildings: PlacedBuildingData[] | undefined;
+  let npcBlueprints: PlacedNPCData[] | undefined;
+
+  const townConfig = getTownConfig(cx, cz);
+  if (townConfig && type === 'TOWN') {
+    const oXTown = cx * CHUNK_SIZE;
+    const oZTown = cz * CHUNK_SIZE;
+    const placed = layoutTown(townConfig, oXTown, oZTown);
+
+    placedBuildings = placed
+      .map((p) => {
+        const archetype = resolveBuildingArchetype(
+          p.archetype,
+          p.overrides as Record<string, unknown> | undefined,
+        );
+        if (!archetype) return null;
+        return {
+          archetype,
+          label: p.label,
+          worldX: p.worldX,
+          worldZ: p.worldZ,
+          rotation: p.rotation,
+        };
+      })
+      .filter((b): b is PlacedBuildingData => b !== null);
+
+    // Add building collision AABBs
+    for (const b of placedBuildings) {
+      const fw = b.archetype.footprint.width * BLOCK_SIZE;
+      const fd = b.archetype.footprint.depth * BLOCK_SIZE;
+      collidables.push({
+        minX: b.worldX - fw / 2,
+        maxX: b.worldX + fw / 2,
+        minZ: b.worldZ - fd / 2,
+        maxZ: b.worldZ + fd / 2,
+      });
+    }
+
+    // Resolve NPC blueprints and create interactables for them
+    npcBlueprints = [];
+    for (const npcPlacement of townConfig.npcs) {
+      const blueprint = resolveNPCBlueprint(npcPlacement.id);
+      if (!blueprint) continue;
+
+      // Find the building this NPC is attached to, for position
+      let npcX = oXTown + CHUNK_SIZE / 2;
+      let npcZ = oZTown + CHUNK_SIZE / 2;
+
+      if (npcPlacement.building && placedBuildings) {
+        const bldg = placedBuildings.find((b) => b.label === npcPlacement.building);
+        if (bldg) {
+          // Place NPC just outside the building's front
+          npcX = bldg.worldX;
+          npcZ = bldg.worldZ + (bldg.archetype.footprint.depth * BLOCK_SIZE) / 2 + 2;
+        }
+      } else if (npcPlacement.position) {
+        npcX = oXTown + npcPlacement.position[0] * BLOCK_SIZE;
+        npcZ = oZTown + npcPlacement.position[1] * BLOCK_SIZE;
+      }
+
+      const npcType = (['blacksmith', 'innkeeper', 'merchant', 'wanderer'].includes(npcPlacement.archetype)
+        ? npcPlacement.archetype
+        : 'wanderer') as Interactable['type'];
+
+      const greeting = blueprint.dialogue?.greeting?.[0] ?? 'Well met, traveller.';
+
+      const interactable: Interactable = {
+        id: `${key}-bp-${npcPlacement.id}`,
+        position: new THREE.Vector3(npcX, 0, npcZ),
+        radius: 4.0,
+        type: npcType,
+        name: npcPlacement.name ?? blueprint.name ?? npcPlacement.id,
+        dialogueText: greeting,
+        actionVerb: blueprint.behavior?.interactionVerb ?? 'TALK',
+      };
+
+      interactables.push(interactable);
+      npcBlueprints.push({ interactable, blueprint });
+    }
+
+    // Override the name with the town config name
+    name = townConfig.name;
+  }
+
   return {
     cx,
     cz,
@@ -187,6 +274,8 @@ function generateChunkData(
     collidables,
     interactables,
     collectedGems,
+    placedBuildings,
+    npcBlueprints,
   };
 }
 
