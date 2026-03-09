@@ -9,3 +9,5 @@ export * from './world.schema';
 export { BuildingArchetypeSchema, type BuildingArchetype, WallMaterial, RoofStyle } from './building.schema';
 export { TownConfigSchema, type TownConfig, LayoutStrategy, BoundaryType, ApproachType } from './town.schema';
 export { NPCBlueprintSchema, type NPCBlueprint, FaceSchema, type Face } from './npc-blueprint.schema';
+export { MonsterArchetypeSchema, type MonsterArchetype } from './monster.schema';
+export { EncounterTableSchema, type EncounterTable, LootTableSchema, type LootTable } from './encounter-table.schema';
