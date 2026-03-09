@@ -1,0 +1,15 @@
+{
+  "id": "basilisk",
+  "name": "Basilisk",
+  "bodyType": "serpent",
+  "size": 2.0,
+  "colorScheme": {
+    "primary": "#3a5a3a",
+    "secondary": "#556b2f",
+    "accent": "#ffd700"
+  },
+  "dangerTier": 3,
+  "health": 90,
+  "damage": 18,
+  "lootTable": "loot-tier-3"
+}

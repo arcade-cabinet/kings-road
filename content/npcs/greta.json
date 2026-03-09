@@ -1,0 +1,35 @@
+{
+  "id": "greta",
+  "name": "Greta",
+  "archetype": "innkeeper",
+  "fixed": true,
+  "bodyBuild": { "height": 0.95, "width": 1.2 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "blue",
+    "hairStyle": "long",
+    "hairColor": "#c4a882",
+    "facialHair": "none"
+  },
+  "accessories": ["apron", "tankard", "iron_keys"],
+  "clothPalette": { "primary": "#7a4a2a", "secondary": "#d4a56a" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Come in, come in — quickly now, before the patrol passes. You look like you need a warm meal.",
+      "Welcome to the Raven's Rest. The ale is thin but the hearth is warm, and that's more than most have here.",
+      "Sit down, dear. You're safe enough in here... for now."
+    ],
+    "quest": [
+      "There are families hiding in the cellar — women and children whose husbands spoke against Ashwick. I need supplies smuggled in without the guards noticing. Can you help?"
+    ],
+    "idle": [
+      "I keep my head down and my doors open. It's all I can do.",
+      "The town wasn't always like this. Before Ashwick... well, that was a long time ago."
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "id": "ashwick_ledger",
+  "name": "Ashwick Ledger",
+  "description": "A leather-bound ledger filled with Lord Ashwick's private accounts. Columns of figures and cryptic annotations hint at dealings best kept from public scrutiny.",
+  "type": "key_item",
+  "stackable": false
+}

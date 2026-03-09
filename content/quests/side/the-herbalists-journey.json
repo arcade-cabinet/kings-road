@@ -1,0 +1,152 @@
+{
+  "id": "side-the-herbalists-journey",
+  "tier": "macro",
+  "title": "The Herbalist's Journey",
+  "estimatedMinutes": 60,
+  "anchorAffinity": "anchor-01",
+  "trigger": { "type": "anchor", "anchorId": "anchor-01" },
+  "prerequisites": ["main-chapter-01"],
+  "branches": {
+    "A": {
+      "label": "Follow the old herbalist's teachings",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "healer",
+          "dialogue": "You have a keen eye, traveller. Not many notice the meadowsweet growing by the River Mill. I was an herbalist once, before my hands grew too stiff to gather. There are five rare herbs along the King's Road, each blooming only in its own soil. Bring them to me and I will teach you the healer's art that saved more lives on this road than any sword ever did.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "fetch",
+          "itemId": "silverleaf",
+          "description": "Gather silverleaf from the damp meadows near the River Mill at Millbrook. It grows in clusters along the bank where the current slows beneath the old stone bridge."
+        },
+        {
+          "id": "a-03",
+          "type": "travel",
+          "destination": "millbrook-forests",
+          "description": "Journey into the dense Millbrook Forests between Millbrook and Thornfield Ruins to search for the second herb."
+        },
+        {
+          "id": "a-04",
+          "type": "fetch",
+          "itemId": "shadowmoss",
+          "description": "Collect shadowmoss from the moss-covered roots in the deepest part of the Millbrook Forests, where the canopy blocks all sunlight."
+        },
+        {
+          "id": "a-05",
+          "type": "travel",
+          "destination": "thornfield-hills",
+          "description": "Continue along the King's Road through the Thornfield Hills toward Ravensgate, searching the rocky outcrops for highland herbs."
+        },
+        {
+          "id": "a-06",
+          "type": "fetch",
+          "itemId": "windcrown",
+          "description": "Harvest windcrown from the exposed ridgeline above Thornfield Ruins, where the constant gales have shaped it into a hardy spiral."
+        },
+        {
+          "id": "a-07",
+          "type": "travel",
+          "destination": "ravensgate-moors",
+          "description": "Press onward past Ravensgate into the misty moors, where the rarest herbs survive in the boggy hollows."
+        },
+        {
+          "id": "a-08",
+          "type": "fetch",
+          "itemId": "boglantern",
+          "description": "Gather boglantern from the peat pools of the Ravensgate Moors. Its pale glow is visible only at dusk, flickering among the standing stones."
+        },
+        {
+          "id": "a-09",
+          "type": "travel",
+          "destination": "grailsend-highlands",
+          "description": "Make the final journey to the Grailsend Highlands to find the last and rarest herb near the sacred stones."
+        },
+        {
+          "id": "a-10",
+          "type": "fetch",
+          "itemId": "grailbloom",
+          "description": "Pluck the grailbloom from a crevice beside the sacred stones in the Grailsend Highlands. Legend says it grows only where holy ground meets mountain air."
+        },
+        {
+          "id": "a-11",
+          "type": "dialogue",
+          "npcArchetype": "healer",
+          "dialogue": "All five. You truly walked the length of the King's Road for these. With the silverleaf and grailbloom I can brew a tincture that closes wounds in moments. The shadowmoss draws poison, the windcrown steadies a faltering heart, and the boglantern soothes a troubled mind. You have earned the healer's gift, child. Use it wisely on the road ahead.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "unlock", "unlockId": "healer-craft-traditional" }
+    },
+    "B": {
+      "label": "Study under the monastery's apothecary",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "The brothers at the Pilgrim's Rest monastery keep an apothecary garden, but their stores run low. They seek the same five rare herbs that grow wild along the road. If you bring the herbs to Brother Anselm instead, he will teach you the monastic tradition of healing — slower perhaps, but with deeper knowledge of which ailments each remedy truly cures.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "fetch",
+          "itemId": "silverleaf",
+          "description": "Gather silverleaf from the damp meadows near the River Mill at Millbrook. Mark the location carefully so the monastery can cultivate it in future seasons."
+        },
+        {
+          "id": "b-03",
+          "type": "travel",
+          "destination": "millbrook-forests",
+          "description": "Travel deep into the Millbrook Forests to find the second herb for the monastery's apothecary."
+        },
+        {
+          "id": "b-04",
+          "type": "fetch",
+          "itemId": "shadowmoss",
+          "description": "Carefully scrape shadowmoss from the ancient roots in the darkest glades of the Millbrook Forests, preserving the root stock for regrowth."
+        },
+        {
+          "id": "b-05",
+          "type": "fetch",
+          "itemId": "windcrown",
+          "description": "Climb the windswept ridges of the Thornfield Hills and harvest windcrown where it clings to the rocky outcrops above the ruins."
+        },
+        {
+          "id": "b-06",
+          "type": "fetch",
+          "itemId": "boglantern",
+          "description": "Wade into the peat pools of the Ravensgate Moors at twilight and gather the glowing boglantern that rises from the dark water."
+        },
+        {
+          "id": "b-07",
+          "type": "fetch",
+          "itemId": "grailbloom",
+          "description": "Ascend to the sacred stones in the Grailsend Highlands and harvest the grailbloom, taking care to replant seeds in the crevice for future pilgrims."
+        },
+        {
+          "id": "b-08",
+          "type": "travel",
+          "destination": "anchor-04",
+          "description": "Carry all five herbs to the Pilgrim's Rest monastery and deliver them to Brother Anselm in the apothecary garden."
+        },
+        {
+          "id": "b-09",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "Five specimens, each one pristine. You have a gatherer's patience, which is half of what makes a true healer. The other half is knowing when a remedy will help and when it will only prolong suffering. Stay a while and study our texts. I will teach you the apothecary's discipline — the art of diagnosis before cure. This knowledge will serve you well beyond the King's Road.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "unlock", "unlockId": "healer-craft-apothecary" }
+    }
+  },
+  "reward": { "type": "modifier", "modifierId": "herbalist-trained" }
+}

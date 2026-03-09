@@ -1,0 +1,38 @@
+{
+  "id": "side-the-missing-manuscript",
+  "tier": "micro",
+  "title": "The Missing Manuscript",
+  "estimatedMinutes": 10,
+  "anchorAffinity": "anchor-04",
+  "trigger": { "type": "anchor", "anchorId": "anchor-04" },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "dialogue",
+      "npcArchetype": "scholar",
+      "dialogue": "Traveller, I am in a terrible state. A manuscript I was studying has gone missing from my reading desk — an illuminated treatise on the Grail knights, centuries old and irreplaceable. I locked the library last night as always, yet this morning the desk was bare. I suspect it has been misplaced rather than stolen, but my eyes are too weary to search every shelf. Would you help me look?",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    },
+    {
+      "id": "s-02",
+      "type": "investigate",
+      "description": "Search the monastery library methodically — check the upper shelves, the reading alcoves, and the stack of unsorted volumes near the south window."
+    },
+    {
+      "id": "s-03",
+      "type": "fetch",
+      "itemId": "grail_treatise",
+      "description": "Retrieve the illuminated treatise from behind a row of prayer books on the topmost shelf, where it was shelved by mistake."
+    },
+    {
+      "id": "s-04",
+      "type": "dialogue",
+      "npcArchetype": "scholar",
+      "dialogue": "Behind the prayer books — of course! Brother Thomas must have reshelved it after vespers without reading the spine. Thank the saints it is undamaged. You have saved weeks of work, friend. Take this ink-stamp as thanks. The monks use it to mark safe passages along the Road and it may open a door or two before journey's end.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "item", "itemId": "monastery_ink_stamp" }
+}

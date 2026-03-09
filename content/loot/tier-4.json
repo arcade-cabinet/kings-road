@@ -1,0 +1,12 @@
+{
+  "id": "loot-tier-4",
+  "entries": [
+    { "itemId": "pilgrim_medallion", "weight": 0.1, "quantity": [1, 1] },
+    { "itemId": "grail_key", "weight": 0.05, "quantity": [1, 1] },
+    { "itemId": "healing_staff", "weight": 0.25, "quantity": [1, 1] },
+    { "itemId": "travel_cloak", "weight": 0.2, "quantity": [1, 1] },
+    { "itemId": "health_potion", "weight": 0.4, "quantity": [1, 2] },
+    { "itemId": "antidote", "weight": 0.3, "quantity": [1, 1] },
+    { "itemId": "map_fragment_3", "weight": 0.08, "quantity": [1, 1] }
+  ]
+}

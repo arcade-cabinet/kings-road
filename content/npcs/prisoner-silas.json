@@ -1,0 +1,35 @@
+{
+  "id": "prisoner-silas",
+  "name": "Prisoner Silas",
+  "archetype": "scholar",
+  "fixed": true,
+  "bodyBuild": { "height": 1.05, "width": 0.75 },
+  "face": {
+    "skinTone": 0,
+    "eyeColor": "gray",
+    "hairStyle": "long",
+    "hairColor": "#9a9a9a",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["torn_robes", "shackles"],
+  "clothPalette": { "primary": "#5a5a5a", "secondary": "#3a3020" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "A visitor? Then the healer's message reached someone after all. Come closer — the guards change watch soon.",
+      "Don't pity me. I chose knowledge over silence, and Ashwick chose chains over truth.",
+      "You have the look of a pilgrim. Perhaps the Grail's road has led you here for a reason."
+    ],
+    "quest": [
+      "Before my imprisonment, I hid a manuscript in the library — proof of Ashwick's treachery against the old lord. Retrieve it, and the people of Ravensgate will have cause to rise."
+    ],
+    "idle": [
+      "The stones remember what men forget. This tower has held prisoners before Ashwick, and will after.",
+      "I count the days by the light through the arrow slit. Forty-seven, now."
+    ]
+  }
+}

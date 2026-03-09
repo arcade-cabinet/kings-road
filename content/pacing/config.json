@@ -1,0 +1,11 @@
+{
+  "walkSpeed": 4,
+  "sprintSpeed": 7,
+  "ambientInterval": [30, 90],
+  "minorInterval": [120, 300],
+  "majorInterval": [600, 1200],
+  "questMicroInterval": [300, 600],
+  "questMesoInterval": [900, 1800],
+  "questMacroInterval": [3600, 7200],
+  "anchorInterval": [4000, 8000]
+}

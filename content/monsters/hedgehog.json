@@ -1,0 +1,13 @@
+{
+  "id": "hedgehog",
+  "name": "Hedgehog",
+  "bodyType": "quadruped",
+  "size": 0.3,
+  "colorScheme": {
+    "primary": "#6b5b4a",
+    "secondary": "#d4c5a9"
+  },
+  "dangerTier": 0,
+  "health": 4,
+  "damage": 0
+}

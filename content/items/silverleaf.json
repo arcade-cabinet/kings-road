@@ -1,0 +1,7 @@
+{
+  "id": "silverleaf",
+  "name": "Silverleaf",
+  "description": "A rare herb whose slender leaves shimmer like polished silver in the sunlight. It is prized by healers for its gentle restorative properties.",
+  "type": "quest_item",
+  "stackable": false
+}

@@ -4,6 +4,7 @@ import { DialogueBox } from './components/ui/DialogueBox';
 import { GameHUD } from './components/ui/GameHUD';
 import { MainMenu } from './components/ui/MainMenu';
 import { MobileControls } from './components/ui/MobileControls';
+import { QuestLog } from './components/ui/QuestLog';
 import {
   useKeyboardInput,
   useMouseInput,
@@ -46,6 +47,7 @@ export function Game() {
       <MainMenu />
       <GameHUD />
       <DialogueBox />
+      <QuestLog />
       <MobileControls />
     </div>
   );

@@ -1,0 +1,32 @@
+{
+  "id": "side-wounded-soldier",
+  "tier": "micro",
+  "title": "The Wounded Soldier",
+  "estimatedMinutes": 6,
+  "anchorAffinity": "anchor-02",
+  "trigger": { "type": "roadside", "distanceRange": [13000, 16000] },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "dialogue",
+      "npcArchetype": "knight",
+      "dialogue": "Stay your hand, I mean no harm. I was set upon by brigands on the hillside pass and my leg is badly cut. If you have any salve or clean cloth I would be in your debt. Otherwise I fear this wound will fester before I reach shelter.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    },
+    {
+      "id": "s-02",
+      "type": "investigate",
+      "description": "Tend to the soldier's wound using herbs from the nearby hillside, binding the gash with a strip of clean linen torn from his own cloak."
+    },
+    {
+      "id": "s-03",
+      "type": "dialogue",
+      "npcArchetype": "knight",
+      "dialogue": "You have a steady hand and a good heart. I serve the garrison at Ravensgate, though I wonder what that service is worth these days. Take my old blade, it has seen better years but the steel is still true. You will need it on the road ahead.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "item", "itemId": "iron_sword" }
+}

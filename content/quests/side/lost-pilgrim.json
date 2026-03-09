@@ -1,0 +1,32 @@
+{
+  "id": "side-lost-pilgrim",
+  "tier": "micro",
+  "title": "The Lost Pilgrim",
+  "estimatedMinutes": 7,
+  "anchorAffinity": "home",
+  "trigger": { "type": "roadside", "distanceRange": [2000, 5000] },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "dialogue",
+      "npcArchetype": "pilgrim",
+      "dialogue": "Thank the saints, a kind face at last. I set out from Ashford at dawn but the path split three ways and I have been walking in circles ever since. The meadow tracks all look the same once the morning mist rolls in. Could you lead me back to the nearest town? I fear I shall never find the road again on my own.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    },
+    {
+      "id": "s-02",
+      "type": "escort",
+      "description": "Guide the lost pilgrim safely back to the nearest settlement along the King's Road."
+    },
+    {
+      "id": "s-03",
+      "type": "dialogue",
+      "npcArchetype": "pilgrim",
+      "dialogue": "Bless you, traveller. I can see the town gates from here and my old legs will carry me the rest of the way. Take this small token of thanks. The road ahead grows wilder, so keep your wits about you and may the saints light your path.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "currency", "amount": 15 }
+}

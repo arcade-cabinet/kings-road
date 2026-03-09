@@ -1,0 +1,37 @@
+{
+  "id": "the-guardian",
+  "name": "The Guardian",
+  "archetype": "knight",
+  "fixed": true,
+  "bodyBuild": { "height": 1.4, "width": 1.5 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "gray",
+    "hairStyle": "long",
+    "hairColor": "#d0d0d0",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["plate_armor", "greatsword", "tattered_tabard"],
+  "clothPalette": { "primary": "#b0b0b0", "secondary": "#f5d742" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "CHALLENGE",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Halt, pilgrim. None pass beyond this threshold without answering for the road behind them.",
+      "I have stood at this gate since before your grandfather drew breath. State your purpose, or turn back.",
+      "The Grail does not call the timid. Speak, and let me judge whether the Road has forged you or broken you."
+    ],
+    "quest": [
+      "Many have walked the King's Road believing the Grail awaits the strongest arm or the cleverest tongue. They lie in unmarked graves along the way. Tell me — what mercy did you show at Ravensgate? What did you sacrifice at the Pilgrim's Rest? The Grail remembers what you have done, even if you do not.",
+      "I was the last knight of the Grail company. My brothers fell to pride, to despair, to the slow forgetting of why we set out. I alone remain, not because I was the greatest, but because I never stopped asking whether I was worthy. That question is the only key to this door."
+    ],
+    "idle": [
+      "The wind through these ruins carries voices. Some days I hear my brothers singing the old hymns.",
+      "I have refused kings and saints alike. The Grail's standard is not rank, but readiness.",
+      "You linger. Good. The impatient never pass."
+    ]
+  }
+}

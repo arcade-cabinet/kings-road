@@ -1,0 +1,33 @@
+{
+  "id": "side-aldrics-missing-hammer",
+  "tier": "micro",
+  "title": "Aldric's Missing Hammer",
+  "estimatedMinutes": 5,
+  "anchorAffinity": "home",
+  "trigger": { "type": "anchor", "anchorId": "home" },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "dialogue",
+      "npcArchetype": "blacksmith",
+      "dialogue": "I cannot forge a single nail without my good hammer and the blasted thing has gone missing. I had it leaning by the anvil yesterday evening but when I came in at dawn it was nowhere to be found. Old Tomas says he saw a fox dragging something shiny toward the forest edge. Would you search the tree line for me? I would go myself but orders are piling up.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    },
+    {
+      "id": "s-02",
+      "type": "fetch",
+      "itemId": "aldrics_hammer",
+      "description": "Search the forest edge near Ashford for Aldric's hammer, likely dragged there by a fox."
+    },
+    {
+      "id": "s-03",
+      "type": "dialogue",
+      "npcArchetype": "blacksmith",
+      "dialogue": "Ha, there she is! Good as new, not a scratch on the head. You have saved me a week of work and the village a week without horseshoes. Take this blade I finished this morning. It is honest steel and will serve you well on the road ahead. Come back any time you need something mended.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "item", "itemId": "iron_sword" }
+}

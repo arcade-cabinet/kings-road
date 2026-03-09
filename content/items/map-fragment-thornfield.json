@@ -1,0 +1,7 @@
+{
+  "id": "map-fragment-thornfield",
+  "name": "Cartographer's Map: Thornfield",
+  "description": "A cartographer's rendering of the Thornfield region, its ink still crisp. Hedgerows, standing stones, and the outlines of ruined walls are marked with scholarly precision.",
+  "type": "key_item",
+  "stackable": false
+}

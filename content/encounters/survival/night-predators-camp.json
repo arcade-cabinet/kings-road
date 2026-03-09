@@ -1,0 +1,13 @@
+{
+  "id": "night-predators-camp",
+  "name": "Night Predators at Camp",
+  "type": "survival",
+  "difficulty": 6,
+  "description": "The wounded knight's blood has drawn every predator for miles. Wolves circle the dying campfire, their eyes gleaming in pairs just beyond the ring of light. You must feed the flames through the long night while guarding the knight's motionless form. Every time the fire dips, they creep closer.",
+  "rewards": [
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "torch", "chance": 0.5 },
+    { "itemId": "ration", "chance": 0.4 }
+  ],
+  "failureConsequence": "The wolves scatter your campfire and lunge for the knight. You drive them back, but not before their jaws find flesh. The knight's wounds reopen and the night becomes a blur of blood and firelight."
+}

@@ -1,0 +1,7 @@
+{
+  "id": "grail_key",
+  "name": "Key of the Grail",
+  "description": "A slender iron key wrought in the shape of a chalice. Forged in ages past, it alone can unseal the inner sanctum of the Grailsend temple.",
+  "type": "key_item",
+  "stackable": false
+}

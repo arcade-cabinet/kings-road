@@ -3,6 +3,7 @@
  */
 import type * as THREE from 'three';
 import type { BuildingArchetype } from '../schemas/building.schema';
+import type { MonsterArchetype } from '../schemas/monster.schema';
 import type { NPCBlueprint } from '../schemas/npc-blueprint.schema';
 
 /** Axis-Aligned Bounding Box for collision detection */
@@ -72,6 +73,19 @@ export interface InputState {
   space: boolean;
   shift: boolean;
   action: boolean;
+}
+
+/** A monster spawned from an encounter */
+export interface SpawnedMonster {
+  id: string;
+  archetype: MonsterArchetype;
+  position: [number, number, number];
+}
+
+/** An active encounter with spawned monsters */
+export interface ActiveEncounter {
+  tier: number;
+  monsters: SpawnedMonster[];
 }
 
 /** Chunk modification tracking */

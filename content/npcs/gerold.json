@@ -1,0 +1,35 @@
+{
+  "id": "gerold",
+  "name": "Gerold",
+  "archetype": "merchant",
+  "fixed": true,
+  "bodyBuild": { "height": 0.95, "width": 0.9 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "gray",
+    "hairStyle": "short",
+    "hairColor": "#3a3a3a",
+    "facialHair": "mustache"
+  },
+  "accessories": ["coin_purse", "ledger"],
+  "clothPalette": { "primary": "#2e3d50", "secondary": "#c9a84c" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TRADE",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Ah, a customer! You have the look of someone with coin to spend.",
+      "Everything has a price, friend. Lucky for you, mine are fair.",
+      "Gerold's Goods — finest wares between Ashford and the capital."
+    ],
+    "quest": [
+      "I've a shipment stuck at the ford. Bandits, they say. Retrieve it and I'll make it worth your while."
+    ],
+    "idle": [
+      "These figures don't add up...",
+      "The wool from Wynn's farm fetches less each season."
+    ]
+  }
+}

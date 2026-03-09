@@ -1,0 +1,35 @@
+{
+  "id": "highland-watchman",
+  "name": "Brennan of the Watch",
+  "archetype": "watchman",
+  "fixed": true,
+  "bodyBuild": { "height": 1.1, "width": 1.15 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "gray",
+    "hairStyle": "short",
+    "hairColor": "#9a9a9a",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["lantern", "worn_cloak", "signal_horn"],
+  "clothPalette": { "primary": "#5a6a4a", "secondary": "#3a3a2a" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "The fires have gone cold. Thirty years I kept them burning and now look at them.",
+      "You have the look of someone still walking toward something. I envy that.",
+      "These old eyes have watched the highland road longer than most folk have been alive."
+    ],
+    "quest": [
+      "Three towers along the ridge. Three braziers gone dark. If we do not light them before nightfall the darkness owns this stretch of road."
+    ],
+    "idle": [
+      "The wind is picking up. That is never a good sign this high.",
+      "I can still name every stone in every tower. That is all I have left."
+    ]
+  }
+}

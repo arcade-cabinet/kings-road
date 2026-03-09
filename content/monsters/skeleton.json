@@ -1,0 +1,13 @@
+{
+  "id": "skeleton",
+  "name": "Shambling Skeleton",
+  "bodyType": "biped",
+  "size": 1.0,
+  "colorScheme": {
+    "primary": "#d4cfc4",
+    "secondary": "#a89f8e"
+  },
+  "dangerTier": 1,
+  "health": 15,
+  "damage": 4
+}

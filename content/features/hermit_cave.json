@@ -1,0 +1,9 @@
+{
+  "id": "hermit_cave",
+  "tier": "major",
+  "name": "Hermit's Cave",
+  "description": "A shallow cave mouth gapes in the hillside, screened by hanging roots. A thin trail of smoke curls from within, and crude wind-charms dangle from the entrance.",
+  "visualType": "cave_dwelling_with_smoke",
+  "interactable": true,
+  "dialogueOnInteract": "A ragged figure emerges from the shadows, eyes bright with unsettling clarity. 'Another seeker on the road,' the hermit rasps. 'I once walked your path. The Grail does not reward the bold — it rewards the true. Remember that when the road asks you to choose.'"
+}

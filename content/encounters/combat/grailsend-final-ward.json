@@ -1,0 +1,14 @@
+{
+  "id": "grailsend-final-ward",
+  "name": "The Final Ward",
+  "type": "combat",
+  "difficulty": 9,
+  "description": "The air itself resists you as you approach the Grail's resting place. A lattice of golden light coalesces into a seraph of living flame, its wings filling the vaulted chamber. It does not speak — it simply raises a hand, and the world narrows to a single, searing test of will and steel.",
+  "rewards": [
+    { "itemId": "grail_key", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 0.9 },
+    { "itemId": "healing_staff", "chance": 0.3 },
+    { "itemId": "stamina_draught", "chance": 0.7 }
+  ],
+  "failureConsequence": "The seraph's radiance overwhelms you, and you are borne gently but irresistibly back through the temple halls. You awake outside, unharmed but deeply shaken, the Grail still beyond your grasp."
+}

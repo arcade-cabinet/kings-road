@@ -1,0 +1,30 @@
+{
+  "id": "side-bandit-ambush",
+  "tier": "micro",
+  "title": "Bandit Ambush",
+  "estimatedMinutes": 8,
+  "anchorAffinity": "anchor-01",
+  "trigger": { "type": "roadside", "distanceRange": [7000, 10000] },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "encounter",
+      "encounterId": "roadside-bandit-ambush",
+      "description": "A band of highwaymen springs from the treeline, blocking the road with drawn blades and demanding your coin."
+    },
+    {
+      "id": "s-02",
+      "type": "investigate",
+      "description": "Search the bandits' makeshift camp hidden among the forest undergrowth for stolen goods and a crude map of ambush points along the King's Road."
+    },
+    {
+      "id": "s-03",
+      "type": "dialogue",
+      "npcArchetype": "wanderer",
+      "dialogue": "You cleared those wretches out, did you? I saw their fire smoke from the ridge and feared the worst. They have been preying on travellers for weeks now. The map you found should be taken to the next town guard. Here, take what little coin I can spare for your trouble.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "currency", "amount": 25 }
+}

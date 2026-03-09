@@ -1,0 +1,38 @@
+{
+  "id": "thornfield-scholar",
+  "name": "Scholar Eadmund",
+  "archetype": "scholar",
+  "fixed": true,
+  "bodyBuild": { "height": 0.95, "width": 0.85 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "green",
+    "hairStyle": "short",
+    "hairColor": "#5a4a3a",
+    "facialHair": "stubble"
+  },
+  "accessories": ["ink-stained_robe", "reading_spectacles", "satchel_of_scrolls"],
+  "clothPalette": { "primary": "#2c3e6b", "secondary": "#8b7d6b" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Mind your step — I have fragments laid out on every surface. Each one is a piece of a puzzle older than this road.",
+      "Ah, another traveller! Tell me, have you seen any carved stones along the road? I am cataloguing every inscription I can find.",
+      "The ruins here speak to those who know how to listen. I have spent three years learning their language."
+    ],
+    "quest": [
+      "Beneath the collapsed scriptorium there is a sealed chamber. The monks who built this place hid something there — something they believed too dangerous to destroy and too precious to lose. I need someone brave enough to clear the rubble.",
+      "I have translated seven of the nine tablets, but the last two were carried off by bandits who mistook them for valuables. They would have made camp somewhere east of here, near the old quarry.",
+      "The ancient texts describe a ritual performed at the standing stones during the equinox. If my translation is correct, it reveals the true path to the Grail. But I need someone to verify the stone alignments."
+    ],
+    "idle": [
+      "This ink is fading faster than I can copy it. Another century and these words will be dust.",
+      "The monks wrote in a cipher I have only just begun to crack. Fascinating, truly fascinating.",
+      "I sometimes hear echoes in the lower chambers. Probably just the wind, but one can never be certain."
+    ]
+  }
+}

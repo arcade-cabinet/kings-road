@@ -29,6 +29,31 @@ const TYPE_ACCENTS: Record<string, string> = {
   wanderer: '#88aacc',
 };
 
+// Display titles for all archetypes
+const DISPLAY_TITLES: Record<string, string> = {
+  blacksmith: 'Master Smith',
+  innkeeper: 'Innkeeper',
+  merchant: 'Merchant',
+  wanderer: 'Wanderer',
+  healer: 'Healer',
+  knight: 'Knight',
+  hermit: 'Hermit',
+  farmer: 'Farmer',
+  priest: 'Priest',
+  noble: 'Noble',
+  bandit: 'Bandit',
+  scholar: 'Scholar',
+  pilgrim: 'Pilgrim',
+  captain: 'Guard Captain',
+  guard: 'Town Guard',
+  herbalist: 'Herbalist',
+  lord: 'Lord',
+  miller: 'Miller',
+  jailer: 'Jailer',
+  stablehand: 'Stablehand',
+  watchman: 'Watchman',
+};
+
 export function NPC({ interactable, blueprint }: NPCProps) {
   const groupRef = useRef<THREE.Group>(null);
   const bodyRef = useRef<THREE.Mesh>(null);
@@ -542,10 +567,7 @@ export function NPC({ interactable, blueprint }: NPCProps) {
               anchorY="middle"
               font="/fonts/Lora-Bold.ttf"
             >
-              {npcType === 'blacksmith' && 'Master Smith'}
-              {npcType === 'innkeeper' && 'Innkeeper'}
-              {npcType === 'merchant' && 'Merchant'}
-              {npcType === 'wanderer' && 'Wanderer'}
+              {DISPLAY_TITLES[npcType] ?? npcType}
             </Text>
           </group>
         </Billboard>

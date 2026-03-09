@@ -1,0 +1,88 @@
+{
+  "id": "side-the-fallen-knight",
+  "tier": "meso",
+  "title": "The Fallen Knight",
+  "estimatedMinutes": 22,
+  "anchorAffinity": "anchor-05",
+  "trigger": { "type": "roadside", "distanceRange": [23000, 26000] },
+  "branches": {
+    "A": {
+      "label": "Carry his final message to the camp",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "Traveller. Please. I cannot rise. My horse bolted in the night when the wolves came and I took a blow meant for another man who fled without a word of thanks. I do not ask you to save me. I ask only that you carry a letter to the pilgrim camp beyond the pine ridge. My daughter waits there. Tell her that her father kept his oath to the last.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "fetch",
+          "description": "Take the knight's sealed letter and his signet ring as proof of your errand.",
+          "itemId": "old_lords_signet"
+        },
+        {
+          "id": "a-03",
+          "type": "travel",
+          "description": "Follow the highland trail eastward through dense pine groves toward the pilgrim camp. The path is narrow and the light fades quickly."
+        },
+        {
+          "id": "a-04",
+          "type": "investigate",
+          "description": "Search the pilgrim camp for the knight's daughter among the shelters and cookfires."
+        },
+        {
+          "id": "a-05",
+          "type": "dialogue",
+          "npcArchetype": "pilgrim",
+          "dialogue": "His ring. I know this ring. He wore it the day he left us to ride north with the vanguard. All these months I feared the worst and prayed against it. Thank you for bringing me his words. I will carry them the rest of the way to Grailsend. He would have wanted that. Please, take this. He would want his courage to travel onward even if he cannot.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "knights-honor" }
+    },
+    "B": {
+      "label": "Stay and tend his wounds",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "Traveller. Please. I cannot rise. My horse bolted in the night when the wolves came and I took a blow meant for another man who fled without a word of thanks. I do not ask you to save me. I ask only that you carry a letter to the pilgrim camp beyond the pine ridge. My daughter waits there. Tell her that her father kept his oath to the last.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "investigate",
+          "description": "Examine the knight's wounds. The gash along his side is deep but clean. With the right herbs and steady hands, he might yet survive."
+        },
+        {
+          "id": "b-03",
+          "type": "fetch",
+          "description": "Search the surrounding hillside for wild comfrey and yarrow to make a poultice for the knight's wounds.",
+          "itemId": "wild_comfrey"
+        },
+        {
+          "id": "b-04",
+          "type": "encounter",
+          "encounterId": "night-predators-camp",
+          "description": "Keep the campfire burning through the night as wolves circle closer, drawn by the scent of blood. Protect the wounded knight until dawn."
+        },
+        {
+          "id": "b-05",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "You stayed. By all the saints, you actually stayed. Most would have taken the letter and counted themselves virtuous. I owe you a debt I may never repay. When I can walk again I will find my daughter myself and tell her that good people still walk the King's Road. Take my shield. It has saved my life more times than I deserve.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "item", "itemId": "wooden_shield" }
+    }
+  },
+  "reward": { "type": "currency", "amount": 45 }
+}

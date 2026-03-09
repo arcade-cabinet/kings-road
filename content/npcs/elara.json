@@ -1,0 +1,35 @@
+{
+  "id": "elara",
+  "name": "Elara",
+  "archetype": "healer",
+  "fixed": true,
+  "bodyBuild": { "height": 0.9, "width": 0.85 },
+  "face": {
+    "skinTone": 0,
+    "eyeColor": "green",
+    "hairStyle": "long",
+    "hairColor": "#8b4513",
+    "facialHair": "none"
+  },
+  "accessories": ["herb_satchel", "mortar_pestle"],
+  "clothPalette": { "primary": "#4a6741", "secondary": "#f5f0e8" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Hush now, keep your voice low. The guards have ears everywhere.",
+      "You look weary from the road. Come, let me tend those scrapes — and listen closely.",
+      "Bless you for stopping by. I haven't had a kind face visit in weeks."
+    ],
+    "quest": [
+      "There is a man in the tower — a scholar named Silas. He does not deserve his fate. If you could slip him this tincture, it would ease his suffering... and perhaps he could tell you things Lord Ashwick wishes buried."
+    ],
+    "idle": [
+      "These herbs are all that stand between the people and despair.",
+      "Lord Ashwick took the last true physician. I do what I can."
+    ]
+  }
+}

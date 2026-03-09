@@ -1,0 +1,15 @@
+{
+  "id": "giant_spider",
+  "name": "Giant Spider",
+  "bodyType": "quadruped",
+  "size": 1.2,
+  "colorScheme": {
+    "primary": "#1a1a1a",
+    "secondary": "#4d4d4d",
+    "accent": "#6b0f0f"
+  },
+  "dangerTier": 2,
+  "health": 35,
+  "damage": 11,
+  "lootTable": "loot-tier-2"
+}

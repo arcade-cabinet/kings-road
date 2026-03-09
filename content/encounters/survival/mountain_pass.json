@@ -1,0 +1,13 @@
+{
+  "id": "mountain_pass",
+  "name": "Mountain Pass",
+  "type": "survival",
+  "difficulty": 6,
+  "description": "A narrow mountain pass cuts between sheer rock faces where the wind howls like a living thing. The ledges crumble underfoot and loose scree slides toward a drop that vanishes into mist. One false step, one gust too strong, and the highland swallows you whole. Move carefully, keep low, and trust your footing more than your courage.",
+  "rewards": [
+    { "itemId": "stamina_draught", "chance": 0.7 },
+    { "itemId": "ration", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 0.3 }
+  ],
+  "failureConsequence": "The wind catches you mid-stride and drives you to your knees. You claw at the rock face as scree cascades past, losing your pack's contents to the abyss below. You reach the far side bruised and shaken, lighter than when you started."
+}

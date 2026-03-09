@@ -1,0 +1,11 @@
+{
+  "id": "purified-ring",
+  "name": "Purified Ring",
+  "description": "A silver ring once bound by a dark enchantment, now cleansed through prayer and blessed water. It gleams with a quiet, steadfast light that wards the wearer from harm.",
+  "type": "equipment",
+  "effect": {
+    "stat": "defense",
+    "value": 3
+  },
+  "stackable": false
+}

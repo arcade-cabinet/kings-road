@@ -1,0 +1,35 @@
+{
+  "id": "thornton",
+  "name": "Thornton",
+  "archetype": "merchant",
+  "fixed": true,
+  "bodyBuild": { "height": 0.95, "width": 1.15 },
+  "face": {
+    "skinTone": 3,
+    "eyeColor": "brown",
+    "hairStyle": "bald",
+    "hairColor": "#4a3020",
+    "facialHair": "none"
+  },
+  "accessories": ["coin_purse", "ledger"],
+  "clothPalette": { "primary": "#6b5b4a", "secondary": "#3a2a1a" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TRADE",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Please, keep your voice down. I— I have goods, yes, but... Lord Ashwick's taxes leave little to sell.",
+      "A customer? Oh, thank the saints. But if the guard asks, you never spoke to me.",
+      "I don't want trouble. Buy something or move along before Roderick's men notice."
+    ],
+    "quest": [
+      "I had a shipment seized at the gate — medicines, cloth, nothing illegal. If you could convince the guard captain to release it, I would pay handsomely."
+    ],
+    "idle": [
+      "Another tax collector came by this morning. There will be nothing left to sell come winter.",
+      "I should have left Ravensgate when I had the chance."
+    ]
+  }
+}

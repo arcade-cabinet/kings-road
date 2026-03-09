@@ -1,0 +1,78 @@
+{
+  "id": "side-the-deserter",
+  "tier": "meso",
+  "title": "The Deserter",
+  "estimatedMinutes": 20,
+  "anchorAffinity": "anchor-01",
+  "trigger": { "type": "roadside", "distanceRange": [5000, 8000] },
+  "branches": {
+    "A": {
+      "label": "Help the soldier escape",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "Please, I beg you, do not raise the alarm. I am no criminal, just a man who cannot bear another day under Lord Ashwick's banner. His orders grow crueller by the week. I only wish to reach the coast and start anew. Will you help me slip past the patrol on the north road?",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "fetch",
+          "itemId": "peasant-disguise",
+          "description": "Find a set of peasant clothes from a nearby farmstead to disguise the soldier."
+        },
+        {
+          "id": "a-03",
+          "type": "escort",
+          "description": "Guide the disguised soldier along a hidden forest path that bypasses the patrol checkpoint on the north road."
+        },
+        {
+          "id": "a-04",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "I will not forget this kindness, stranger. If ever you find yourself on the western coast, ask for Edric at the dockyards. I owe you a debt that coin alone cannot repay. May the road treat you gently.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "merciful-heart" }
+    },
+    "B": {
+      "label": "Turn the soldier in to his captain",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "Please, I beg you, do not raise the alarm. I am no criminal, just a man who cannot bear another day under Lord Ashwick's banner. His orders grow crueller by the week. I only wish to reach the coast and start anew. Will you help me slip past the patrol on the north road?",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "travel",
+          "destination": "patrol-camp",
+          "description": "Lead the soldier toward the patrol camp under the pretense of helping him, then alert the guards."
+        },
+        {
+          "id": "b-03",
+          "type": "encounter",
+          "encounterId": "deserter-struggle",
+          "description": "The soldier realises your betrayal and fights desperately to escape before the guards arrive."
+        },
+        {
+          "id": "b-04",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "Well done, traveller. Desertion is a rot that spreads if left unchecked. Lord Ashwick will hear of your service. Take this purse and know that the law stands because good folk uphold it, even when the choice is hard.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "currency", "amount": 50 }
+    }
+  },
+  "reward": { "type": "modifier", "modifierId": "road-judge" }
+}

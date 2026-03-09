@@ -1,0 +1,35 @@
+{
+  "id": "peddler",
+  "name": "Peddler",
+  "archetype": "wanderer",
+  "fixed": false,
+  "bodyBuild": { "height": 0.95, "width": 1.1 },
+  "face": {
+    "skinTone": 3,
+    "eyeColor": "green",
+    "hairStyle": "short",
+    "hairColor": "#3a2a1a",
+    "facialHair": "mustache"
+  },
+  "accessories": ["merchant_pack", "coin_pouch", "wide_hat"],
+  "clothPalette": { "primary": "#8b6b3e", "secondary": "#4a6b2e" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TRADE",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Ho there, friend! Care to see my wares? Finest goods between Ashford and the coast!",
+      "I've trinkets from the south and curiosities from the north. Something for everyone!",
+      "The roads are dangerous for a merchant travelling alone, but the coin makes it worthwhile."
+    ],
+    "quest": [
+      "I had a crate of goods stolen by bandits near the old oak. Bring it back and I'll let you pick anything from my stock."
+    ],
+    "idle": [
+      "Buy low, sell high... if only the bandits would cooperate.",
+      "I should raise my prices. The roads get worse every season."
+    ]
+  }
+}

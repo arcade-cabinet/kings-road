@@ -1,0 +1,15 @@
+{
+  "id": "shadow_knight",
+  "name": "Shadow Knight",
+  "bodyType": "biped",
+  "size": 1.4,
+  "colorScheme": {
+    "primary": "#191970",
+    "secondary": "#0d0d3b",
+    "accent": "#c0c0c0"
+  },
+  "dangerTier": 3,
+  "health": 70,
+  "damage": 20,
+  "lootTable": "loot-tier-3"
+}

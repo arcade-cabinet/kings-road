@@ -1,0 +1,35 @@
+{
+  "id": "guard-marcus",
+  "name": "Guard Marcus",
+  "archetype": "knight",
+  "fixed": true,
+  "bodyBuild": { "height": 1.25, "width": 1.2 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "blue",
+    "hairStyle": "short",
+    "hairColor": "#6b4423",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["spear", "chain_mail", "worn_tabard"],
+  "clothPalette": { "primary": "#3a3a3a", "secondary": "#1a0a2e" },
+  "behavior": {
+    "idleStyle": "patrolling",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Move along. I— look, just don't cause any trouble and we'll both be fine.",
+      "You're not from here. Good. Take my advice: don't stay long.",
+      "I serve Lord Ashwick's guard. That's... that's all I have to say."
+    ],
+    "quest": [
+      "I'm not supposed to say this, but... there's a prisoner in the tower who shouldn't be there. If someone happened to leave a key near the east wall tonight, well, I wouldn't notice."
+    ],
+    "idle": [
+      "I swore an oath to protect this town. Not to terrorize it.",
+      "Roderick watches my every move. I have to be careful."
+    ]
+  }
+}

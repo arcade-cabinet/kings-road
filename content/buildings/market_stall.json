@@ -1,0 +1,15 @@
+{
+  "id": "market_stall",
+  "stories": 1,
+  "footprint": { "width": 2, "depth": 1 },
+  "wallMaterial": "timber_frame",
+  "roofStyle": "thatch",
+  "openFront": true,
+  "features": ["awning", "counter", "sign"],
+  "interiorSlots": [
+    { "type": "counter", "position": [1, 0.5] },
+    { "type": "crate", "position": [0.5, 0.5] },
+    { "type": "crate", "position": [1.5, 0.5] }
+  ],
+  "npcSlot": { "archetype": "merchant", "position": [1, 0.5] }
+}

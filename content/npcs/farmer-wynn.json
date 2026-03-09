@@ -1,0 +1,35 @@
+{
+  "id": "farmer-wynn",
+  "name": "Farmer Wynn",
+  "archetype": "farmer",
+  "fixed": true,
+  "bodyBuild": { "height": 0.9, "width": 1.2 },
+  "face": {
+    "skinTone": 4,
+    "eyeColor": "brown",
+    "hairStyle": "short",
+    "hairColor": "#5c4033",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["pitchfork", "straw_hat"],
+  "clothPalette": { "primary": "#6b7c3f", "secondary": "#c2a366" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Eh? Oh, didn't see you there. Mind the furrows.",
+      "The soil's been strange this season. Something's not right.",
+      "If you're looking for the inn, it's back up the lane."
+    ],
+    "quest": [
+      "My crops are withering despite good rain. Brother Thomas thinks it's a blight from the old barrow. Could you investigate?"
+    ],
+    "idle": [
+      "The wheat should be taller by now...",
+      "Maybe I should ask Gerold about that new fertiliser."
+    ]
+  }
+}

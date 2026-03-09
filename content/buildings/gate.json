@@ -1,0 +1,13 @@
+{
+  "id": "gate",
+  "stories": 1,
+  "footprint": { "width": 4, "depth": 1 },
+  "wallMaterial": "stone",
+  "roofStyle": "flat",
+  "openFront": true,
+  "features": ["archway", "portcullis", "torch_bracket", "crenellations"],
+  "interiorSlots": [
+    { "type": "torch_bracket", "position": [0.5, 0.5] },
+    { "type": "torch_bracket", "position": [3.5, 0.5] }
+  ]
+}

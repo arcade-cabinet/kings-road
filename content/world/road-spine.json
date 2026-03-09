@@ -55,5 +55,42 @@
       "description": "The final temple where the Holy Grail awaits the worthy.",
       "features": ["temple_entrance", "guardian"]
     }
+  ],
+  "regions": [
+    {
+      "id": "ashford-meadows",
+      "name": "Ashford Meadows",
+      "biome": "MEADOW",
+      "anchorRange": ["home", "anchor-01"],
+      "terrainFeatures": ["rolling_hills", "wildflower_fields", "stone_walls", "grazing_pastures"]
+    },
+    {
+      "id": "millbrook-forests",
+      "name": "Millbrook Forests",
+      "biome": "FOREST",
+      "anchorRange": ["anchor-01", "anchor-02"],
+      "terrainFeatures": ["dense_canopy", "moss_covered_roots", "forest_clearings", "fallen_logs"]
+    },
+    {
+      "id": "thornfield-hills",
+      "name": "Thornfield Hills",
+      "biome": "HILLS",
+      "anchorRange": ["anchor-02", "anchor-03"],
+      "terrainFeatures": ["rocky_outcrops", "windswept_ridges", "heather_slopes", "ancient_cairns"]
+    },
+    {
+      "id": "ravensgate-moors",
+      "name": "Ravensgate Moors",
+      "biome": "MOOR",
+      "anchorRange": ["anchor-03", "anchor-04"],
+      "terrainFeatures": ["boggy_hollows", "standing_stones", "mist_banks", "peat_pools"]
+    },
+    {
+      "id": "grailsend-highlands",
+      "name": "Grailsend Highlands",
+      "biome": "HILLS",
+      "anchorRange": ["anchor-04", "anchor-05"],
+      "terrainFeatures": ["steep_cliffs", "mountain_streams", "pine_groves", "sacred_stones"]
+    }
   ]
 }

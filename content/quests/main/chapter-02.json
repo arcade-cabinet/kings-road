@@ -1,0 +1,99 @@
+{
+  "id": "main-chapter-02",
+  "tier": "macro",
+  "title": "The Ruins Speak",
+  "estimatedMinutes": 45,
+  "anchorAffinity": "anchor-02",
+  "trigger": { "type": "anchor", "anchorId": "anchor-02" },
+  "prerequisites": ["main-chapter-01"],
+  "branches": {
+    "A": {
+      "label": "Break through by force",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "These ruins are sealed by ancient stonework, but no wall stands forever. I can see the mortar has weakened along the eastern face. With enough force we could bring the passage open, though whatever sleeps within may not welcome the disturbance.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "encounter",
+          "encounterId": "ruins-guardian-stone-golem",
+          "description": "Battle the awakened stone golem guarding the collapsed eastern passage."
+        },
+        {
+          "id": "a-03",
+          "type": "investigate",
+          "description": "Search the shattered antechamber for the mechanism that opens the inner sanctum."
+        },
+        {
+          "id": "a-04",
+          "type": "encounter",
+          "encounterId": "ruins-guardian-spectral-warden",
+          "description": "Defeat the spectral warden roused by the forced entry into the sanctum."
+        },
+        {
+          "id": "a-05",
+          "type": "puzzle",
+          "description": "Align the broken seal fragments to unlock the reliquary containing the second map fragment."
+        },
+        {
+          "id": "a-06",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "The map fragment speaks of Ravensgate, a walled town to the north. Its lord once served as custodian of the Grail road, but the inscriptions suggest he has turned from that sacred duty. We must go there next and learn what he knows, willing or not.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "ruins-breaker" }
+    },
+    "B": {
+      "label": "Solve the riddles with Brother Thomas's knowledge",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "I have studied texts that speak of Thornfield's builders. They were scholars who valued wisdom above brute strength. The entrance responds to an old liturgical cipher, one I learned from a manuscript in our chapel library. Let me try the inscription here.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "puzzle",
+          "description": "Decipher the liturgical inscription on the ruins entrance using Brother Thomas's knowledge of the old texts."
+        },
+        {
+          "id": "b-03",
+          "type": "investigate",
+          "description": "Explore the peacefully opened corridors, reading wall carvings that reveal the history of the Grail road's custodians."
+        },
+        {
+          "id": "b-04",
+          "type": "puzzle",
+          "description": "Solve the three-part riddle of the inner sanctum: the riddle of the pilgrim, the riddle of the road, and the riddle of the cup."
+        },
+        {
+          "id": "b-05",
+          "type": "encounter",
+          "encounterId": "ruins-guardian-trial-of-worth",
+          "description": "Face the trial of worth — a guardian spirit tests your resolve through a ritual combat that rewards wisdom over aggression."
+        },
+        {
+          "id": "b-06",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "The second map fragment is ours, and with it comes a troubling revelation. These carvings name Lord Ashwick of Ravensgate as the last appointed custodian of this very shrine. Yet the wards were sealed against him. Something dark has taken root in that town, and we must go there to learn the truth.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "ruins-scholar" }
+    }
+  },
+  "reward": { "type": "item", "itemId": "map-fragment-02" }
+}

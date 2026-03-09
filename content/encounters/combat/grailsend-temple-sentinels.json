@@ -1,0 +1,13 @@
+{
+  "id": "grailsend-temple-sentinels",
+  "name": "Sentinels of the Inner Sanctum",
+  "type": "combat",
+  "difficulty": 7,
+  "description": "Twin suits of armour flank the passage to the inner sanctum, their visors dark and empty. As you step between them, they stir to life with a groan of ancient iron, drawing swords that have not tasted air in centuries. They move in perfect, silent unison.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 0.7 },
+    { "itemId": "stamina_draught", "chance": 0.5 }
+  ],
+  "failureConsequence": "The sentinels drive you back with relentless precision, sealing the passage with crossed blades. The inner sanctum remains beyond your reach."
+}

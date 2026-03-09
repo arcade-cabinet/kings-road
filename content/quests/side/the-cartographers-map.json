@@ -1,0 +1,180 @@
+{
+  "id": "side-the-cartographers-map",
+  "tier": "macro",
+  "title": "The Cartographer's Map",
+  "estimatedMinutes": 75,
+  "anchorAffinity": "home",
+  "trigger": { "type": "anchor", "anchorId": "home" },
+  "prerequisites": ["main-chapter-01"],
+  "branches": {
+    "A": {
+      "label": "Chart the road through direct exploration",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "I am Gerold, once the royal cartographer. The old maps of the King's Road were burned during the wars, and now pilgrims walk blind into danger. I am too old to make the journey myself, but if you carry my instruments and sketch what you see at each landmark, I can piece together a true map. Visit every anchor along the road and record what you find there.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "investigate",
+          "description": "Survey Ashford and its surroundings using Gerold's cartography instruments. Record the position of the tavern, blacksmith, and the hill paths leading to the King's Road."
+        },
+        {
+          "id": "a-03",
+          "type": "travel",
+          "destination": "anchor-01",
+          "description": "Follow the King's Road north through the Ashford Meadows to Millbrook, noting terrain features, river crossings, and landmarks along the way."
+        },
+        {
+          "id": "a-04",
+          "type": "investigate",
+          "description": "Chart Millbrook's layout from the high ground above the River Mill crossing. Mark the market square, chapel, and the road's fork toward the forests."
+        },
+        {
+          "id": "a-05",
+          "type": "travel",
+          "destination": "anchor-02",
+          "description": "Push deeper along the road through the Millbrook Forests to the Thornfield Ruins, recording the forest trails and ancient waymarkers."
+        },
+        {
+          "id": "a-06",
+          "type": "investigate",
+          "description": "Map the Thornfield Ruins and their surroundings. Sketch the dungeon entrance, the camp perimeter, and the crumbling walls that mark the old settlement boundary."
+        },
+        {
+          "id": "a-07",
+          "type": "travel",
+          "destination": "anchor-03",
+          "description": "Traverse the Thornfield Hills toward Ravensgate, charting the winding road through heather slopes and rocky passes."
+        },
+        {
+          "id": "a-08",
+          "type": "investigate",
+          "description": "Sketch Ravensgate's walls, gate, and tower from a vantage point on the eastern ridge. Note the prison tower and the road that passes through the town centre."
+        },
+        {
+          "id": "a-09",
+          "type": "travel",
+          "destination": "anchor-04",
+          "description": "Cross the Ravensgate Moors to reach the Pilgrim's Rest monastery, marking the standing stones and mist-prone hollows on the map."
+        },
+        {
+          "id": "a-10",
+          "type": "investigate",
+          "description": "Document the Pilgrim's Rest monastery grounds — the chapel, garden, library, and the road's continuation toward the highlands."
+        },
+        {
+          "id": "a-11",
+          "type": "travel",
+          "destination": "anchor-05",
+          "description": "Make the final ascent through the Grailsend Highlands to the temple at Grailsend, charting the steep mountain paths and pine groves."
+        },
+        {
+          "id": "a-12",
+          "type": "investigate",
+          "description": "Complete the map with a survey of Grailsend — the temple entrance, the guardian's chamber, and the sacred stones that mark the end of the King's Road."
+        },
+        {
+          "id": "a-13",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "Every anchor, every crossing, every ruin — you have given me more than enough to restore the true map of the King's Road. And look here, your sketches reveal paths the old maps never showed. Hidden trails through the forests, a cave system beneath the moors, a forgotten shrine in the highlands. This map will guide pilgrims safely for generations. You have my deepest gratitude.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "unlock", "unlockId": "world-map-explorer" }
+    },
+    "B": {
+      "label": "Recover the lost map fragments from each region",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "There is another way, perhaps faster. The old royal map was not destroyed entirely — it was torn into six pieces and hidden by the last custodians before the wars reached them. One fragment was left at each anchor along the King's Road. Find them all and I can restore the original, which showed not just the road but every secret path and hidden place between Ashford and Grailsend.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "fetch",
+          "itemId": "map-fragment-ashford",
+          "description": "Search beneath the hearthstone in the old cartographer's study in Ashford. Gerold recalls the first fragment was hidden there before the fires came."
+        },
+        {
+          "id": "b-03",
+          "type": "travel",
+          "destination": "anchor-01",
+          "description": "Travel to Millbrook and seek the second fragment hidden somewhere in the town."
+        },
+        {
+          "id": "b-04",
+          "type": "puzzle",
+          "description": "Solve the inscription on the chapel's foundation stone in Millbrook to reveal a hollow compartment containing the second map fragment."
+        },
+        {
+          "id": "b-05",
+          "type": "travel",
+          "destination": "anchor-02",
+          "description": "Journey to the Thornfield Ruins to find the third fragment somewhere among the ancient stonework."
+        },
+        {
+          "id": "b-06",
+          "type": "fetch",
+          "itemId": "map-fragment-thornfield",
+          "description": "Retrieve the third fragment from inside a sealed reliquary in the Thornfield Ruins, hidden behind a wall carving of the pilgrim's road."
+        },
+        {
+          "id": "b-07",
+          "type": "travel",
+          "destination": "anchor-03",
+          "description": "Make your way to Ravensgate to recover the fourth fragment from within the walled town."
+        },
+        {
+          "id": "b-08",
+          "type": "investigate",
+          "description": "Search the old records room beneath Ravensgate's gatehouse for the fourth map fragment, hidden among tax scrolls that no one has read in decades."
+        },
+        {
+          "id": "b-09",
+          "type": "travel",
+          "destination": "anchor-04",
+          "description": "Continue to the Pilgrim's Rest monastery to find the fifth fragment."
+        },
+        {
+          "id": "b-10",
+          "type": "fetch",
+          "itemId": "map-fragment-monastery",
+          "description": "Ask the monastery librarian about old documents. The fifth fragment is pressed between the pages of an illuminated manuscript in the restricted archive."
+        },
+        {
+          "id": "b-11",
+          "type": "travel",
+          "destination": "anchor-05",
+          "description": "Ascend to Grailsend for the final fragment, said to be sealed within the temple's outer wall."
+        },
+        {
+          "id": "b-12",
+          "type": "fetch",
+          "itemId": "map-fragment-grailsend",
+          "description": "Pry the sixth and final fragment from a niche in the temple wall at Grailsend, sealed with wax bearing the old royal cartographer's sigil."
+        },
+        {
+          "id": "b-13",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "All six fragments, and the seals still intact. When I piece them together the old map reveals everything — every hidden cave, forgotten shrine, and smuggler's trail along the entire King's Road. This is worth more than gold. The secrets it holds will serve you well in the journey ahead. Take this copy I have made for you, and may it light your path.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "unlock", "unlockId": "world-map-antiquarian" }
+    }
+  },
+  "reward": { "type": "modifier", "modifierId": "master-cartographer" }
+}

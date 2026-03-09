@@ -1,0 +1,13 @@
+{
+  "id": "riddle_door",
+  "name": "Riddle Door",
+  "type": "puzzle",
+  "difficulty": 5,
+  "description": "A weathered stone door bars the path, carved with a riddling verse in old script. Three symbols gleam faintly in the rock — sun, moon, and star — and the inscription demands the traveller choose wisely or not at all.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 0.7 },
+    { "itemId": "stamina_draught", "chance": 0.4 }
+  ],
+  "failureConsequence": "The wrong symbol flares hot beneath your palm. The door remains sealed and the path ahead is blocked, forcing a long and weary detour through the bramble."
+}

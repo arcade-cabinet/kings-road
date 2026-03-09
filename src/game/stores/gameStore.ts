@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { create } from 'zustand';
 import type {
   AABB,
+  ActiveEncounter,
   ChunkData,
   ChunkDelta,
   ChunkType,
@@ -46,6 +47,10 @@ interface GameState {
   timeOfDay: number;
   gemsCollected: number;
 
+  // Combat state
+  inCombat: boolean;
+  activeEncounter: ActiveEncounter | null;
+
   // Current interaction
   currentInteractable: Interactable | null;
   dialogueName: string;
@@ -85,6 +90,9 @@ interface GameState {
 
   setTimeOfDay: (time: number) => void;
   collectGem: (chunkKey: string, gemId: number) => void;
+
+  startCombat: (encounter: ActiveEncounter) => void;
+  endCombat: () => void;
 
   setCurrentInteractable: (interactable: Interactable | null) => void;
   openDialogue: (name: string, text: string) => void;
@@ -173,6 +181,9 @@ export const useGameStore = create<GameState>((set, _get) => ({
   timeOfDay: 8 / 24, // Start at 8 AM
   gemsCollected: 0,
 
+  inCombat: false,
+  activeEncounter: null,
+
   currentInteractable: null,
   dialogueName: '',
   dialogueText: '',
@@ -216,6 +227,8 @@ export const useGameStore = create<GameState>((set, _get) => ({
       globalInteractables: [],
       timeOfDay: 8 / 24,
       gemsCollected: 0,
+      inCombat: false,
+      activeEncounter: null,
       currentInteractable: null,
       dialogueName: '',
       dialogueText: '',
@@ -243,6 +256,8 @@ export const useGameStore = create<GameState>((set, _get) => ({
       globalInteractables: [],
       timeOfDay: 8 / 24,
       gemsCollected: 0,
+      inCombat: false,
+      activeEncounter: null,
       currentInteractable: null,
       dialogueName: '',
       dialogueText: '',
@@ -335,6 +350,10 @@ export const useGameStore = create<GameState>((set, _get) => ({
         gemsCollected: state.gemsCollected + 1,
       };
     }),
+
+  startCombat: (encounter) =>
+    set({ inCombat: true, activeEncounter: encounter }),
+  endCombat: () => set({ inCombat: false, activeEncounter: null }),
 
   setCurrentInteractable: (interactable) =>
     set({ currentInteractable: interactable }),

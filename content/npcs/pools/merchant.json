@@ -1,0 +1,42 @@
+{
+  "id": "merchant-pool",
+  "archetype": "merchant",
+  "personality": "Affable, shrewd, always appraising. Speaks with practiced charm and an eye on profit.",
+  "displayTitle": "Travelling Merchant",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.85, 1.0], "widthRange": [0.9, 1.1] },
+    "clothPalette": {
+      "primary": "#5a3070",
+      "secondary": "#c0a040",
+      "variations": ["#4a2060", "#6a4080"]
+    },
+    "signatureAccessories": ["coin_purse", "travel_pack"],
+    "optionalAccessories": ["weighing_scales", "silk_scarf", "jeweled_ring", "ledger"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 4],
+    "eyeColors": ["brown", "green", "blue"],
+    "hairStyles": ["short", "bald"],
+    "hairColors": ["#1a1a1a", "#4a3020", "#888888"],
+    "facialHairOptions": ["mustache", "none", "stubble"]
+  },
+  "behavior": { "idleStyle": "idle", "interactionVerb": "TRADE", "walkNodes": false },
+  "namePool": [
+    "Aldous",
+    "Margery",
+    "Tybalt",
+    "Constance",
+    "Reynard",
+    "Orland",
+    "Sybilla"
+  ],
+  "greetingPool": [
+    { "text": "Fine goods from every corner of the realm! Have a look, friend." },
+    { "text": "I deal in quality, not quantity. Tell me what you seek and I shall name a fair price." },
+    { "text": "Business has been slow on the road of late. Perhaps you have coin to spare?" }
+  ],
+  "idlePool": [
+    { "text": "These Ravensgate silks are worth triple once you reach the northern towns. Location is everything." },
+    { "text": "A merchant who stops counting coin is a merchant who will soon have none to count." }
+  ]
+}

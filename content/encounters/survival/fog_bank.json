@@ -1,0 +1,13 @@
+{
+  "id": "fog_bank",
+  "name": "Fog Bank",
+  "type": "survival",
+  "difficulty": 5,
+  "description": "A wall of fog rolls up from the lowlands and swallows the road in grey silence. Landmarks vanish within arm's reach. Sound warps and echoes strangely so that your own footsteps seem to come from every direction. You must navigate by memory, by the slope of the ground beneath your boots, and by whatever faint sounds pierce the murk.",
+  "rewards": [
+    { "itemId": "torch", "chance": 0.8 },
+    { "itemId": "ration", "chance": 0.6 },
+    { "itemId": "stamina_draught", "chance": 0.3 }
+  ],
+  "failureConsequence": "You wander in circles for hours, each step less certain than the last. When the fog finally thins you find yourself far from the road, exhausted and disoriented, with precious daylight wasted."
+}

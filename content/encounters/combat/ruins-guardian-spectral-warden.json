@@ -1,0 +1,13 @@
+{
+  "id": "ruins-guardian-spectral-warden",
+  "name": "Spectral Warden of the Ruins",
+  "type": "combat",
+  "difficulty": 6,
+  "description": "A translucent figure in tarnished armour drifts through the broken hall, its sword trailing wisps of blue flame. The warden's voice echoes like wind through a bell tower — it speaks of oaths unbroken and trespassers unwelcome.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "pilgrim_medallion", "chance": 0.2 }
+  ],
+  "failureConsequence": "The warden's spectral blade passes through your guard and chills you to the marrow. You flee the ruins shivering, unable to return until the cold leaves your bones."
+}

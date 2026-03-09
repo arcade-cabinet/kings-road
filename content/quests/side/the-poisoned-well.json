@@ -1,0 +1,88 @@
+{
+  "id": "side-the-poisoned-well",
+  "tier": "meso",
+  "title": "The Poisoned Well",
+  "estimatedMinutes": 25,
+  "anchorAffinity": "anchor-01",
+  "trigger": { "type": "anchor", "anchorId": "anchor-01" },
+  "branches": {
+    "A": {
+      "label": "Confront the herbalist",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "farmer",
+          "dialogue": "Something is wrong with our water, stranger. Half the folk along Mill Lane have taken ill this past week — fevers, shaking, a terrible wasting. Old Agnes says it started the same day that new herbalist set up shop near the well. Nobody wants to accuse her outright, but the timing is too neat to ignore. Would you look into it before more of us fall sick?",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "investigate",
+          "description": "Examine the town well for signs of contamination and speak with the sick villagers to learn when their symptoms began."
+        },
+        {
+          "id": "a-03",
+          "type": "fetch",
+          "itemId": "rare_herb",
+          "description": "Search the herbalist's garden for the distinctive purple nightveil plant whose roots produce the toxin found in the well water."
+        },
+        {
+          "id": "a-04",
+          "type": "encounter",
+          "encounterId": "merchant_negotiation",
+          "description": "Confront the herbalist with the evidence. She insists it was an accident — her compost heap leached into the groundwater — but her defensive manner suggests otherwise."
+        },
+        {
+          "id": "a-05",
+          "type": "dialogue",
+          "npcArchetype": "farmer",
+          "dialogue": "So it was her doing after all. Whether by carelessness or design, she has much to answer for. The reeve will deal with her now. You have done Millbrook a great service, traveller. The market folk have gathered a purse for you, and I have added my best laying hen's weight in silver besides.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "item", "itemId": "antidote" }
+    },
+    "B": {
+      "label": "Trace the poison source upstream",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "farmer",
+          "dialogue": "Something is wrong with our water, stranger. Half the folk along Mill Lane have taken ill this past week — fevers, shaking, a terrible wasting. The well draws from the River Mill, and I reckon whatever foulness plagues us flows down from upstream. Would you follow the water and find the source before the whole town sickens?",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "investigate",
+          "description": "Follow the River Mill upstream from the town well, testing the water at intervals and searching for signs of contamination."
+        },
+        {
+          "id": "b-03",
+          "type": "travel",
+          "destination": "upstream-cave",
+          "description": "Trek through the forested riverbank to reach a cave where a foul runoff seeps into the current from an old mineral deposit disturbed by recent rains."
+        },
+        {
+          "id": "b-04",
+          "type": "puzzle",
+          "description": "Redirect the cave's drainage channel using loose stones and fallen timber to divert the contaminated runoff away from the river."
+        },
+        {
+          "id": "b-05",
+          "type": "dialogue",
+          "npcArchetype": "farmer",
+          "dialogue": "The water already runs clearer, I can see it from the bridge. You found the true source and mended it with your own hands. The herbalist sends her thanks as well — she was afraid the town would turn on her next. Take this tonic she brewed. She says it will ward off any lingering poison in your blood.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "item", "itemId": "health_potion" }
+    }
+  },
+  "reward": { "type": "modifier", "modifierId": "millbrook-healer" }
+}

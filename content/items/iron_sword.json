@@ -1,0 +1,11 @@
+{
+  "id": "iron_sword",
+  "name": "Iron Sword",
+  "description": "A sturdy blade forged by the smiths of Ashford. Its edge holds true against common foes along the King's Road.",
+  "type": "equipment",
+  "effect": {
+    "stat": "attack",
+    "value": 5
+  },
+  "stackable": false
+}

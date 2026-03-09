@@ -1,0 +1,35 @@
+{
+  "id": "travelling-bard",
+  "name": "Travelling Bard",
+  "archetype": "wanderer",
+  "fixed": false,
+  "bodyBuild": { "height": 1.1, "width": 0.85 },
+  "face": {
+    "skinTone": 4,
+    "eyeColor": "blue",
+    "hairStyle": "long",
+    "hairColor": "#1a0e08",
+    "facialHair": "none"
+  },
+  "accessories": ["lute", "feathered_cap", "travel_cloak"],
+  "clothPalette": { "primary": "#6b2e5a", "secondary": "#d4a840" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "A fellow wanderer! Sit a moment — I'll trade you a song for a story.",
+      "I've sung in every tavern from Ashford to the marshes. Each town has its melody.",
+      "Listen well, friend. The road speaks through those who walk it, and I am its voice."
+    ],
+    "quest": [
+      "I'm composing a ballad about the Grail road, but I need a final verse. Seek the old stone marker past the bridge — there's an inscription I cannot reach alone."
+    ],
+    "idle": [
+      "Hmm, that chord needs work... la la la...",
+      "The best songs are the ones nobody asked for."
+    ]
+  }
+}

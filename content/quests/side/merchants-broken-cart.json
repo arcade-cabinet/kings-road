@@ -1,0 +1,38 @@
+{
+  "id": "side-merchants-broken-cart",
+  "tier": "micro",
+  "title": "The Merchant's Broken Cart",
+  "estimatedMinutes": 8,
+  "anchorAffinity": "anchor-03",
+  "trigger": { "type": "roadside", "distanceRange": [18000, 20000] },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "dialogue",
+      "npcArchetype": "merchant",
+      "dialogue": "Oh, what rotten luck. The axle snapped clean through on that last rut and now my wares are scattered across the moorland. I cannot lift the cart alone and every moment my goods sit in the damp they lose their worth. Would you lend your strength, friend?",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    },
+    {
+      "id": "s-02",
+      "type": "fetch",
+      "description": "Search the nearby copse for a sturdy branch that can serve as a replacement axle for the merchant's damaged cart.",
+      "itemId": "sturdy-branch"
+    },
+    {
+      "id": "s-03",
+      "type": "investigate",
+      "description": "Fit the branch beneath the cart and secure the wheel, working alongside the merchant to lever the cart upright and reload the scattered goods."
+    },
+    {
+      "id": "s-04",
+      "type": "dialogue",
+      "npcArchetype": "merchant",
+      "dialogue": "Marvellous work, truly marvellous. The wheel turns true again and my silks are no worse for their tumble. Take your pick from my wares as payment. A merchant never forgets a kindness on the road, and I travel this way often.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "item", "itemId": "travel_cloak" }
+}

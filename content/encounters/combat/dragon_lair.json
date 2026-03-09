@@ -1,0 +1,15 @@
+{
+  "id": "dragon_lair",
+  "name": "Dragon Lair",
+  "type": "combat",
+  "difficulty": 10,
+  "description": "The mountain opens into a vast cavern where gold and bone lie in equal measure. Ancient beyond reckoning, the dragon uncurls from its hoard with terrible grace, scales like hammered bronze catching the glow of its own inner fire. The air itself bows before its presence.",
+  "rewards": [
+    { "itemId": "healing_staff", "chance": 0.6 },
+    { "itemId": "travel_cloak", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 1.0 },
+    { "itemId": "iron_sword", "chance": 0.4 },
+    { "itemId": "pilgrim_medallion", "chance": 0.2 }
+  ],
+  "failureConsequence": "Dragon fire sears the cavern walls as you scramble for the exit. You escape with your life but little else, bearing burns that mark you as one who dared challenge a wyrm and failed."
+}

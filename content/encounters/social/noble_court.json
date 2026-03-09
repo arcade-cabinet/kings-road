@@ -1,0 +1,14 @@
+{
+  "id": "noble_court",
+  "name": "Noble Court",
+  "type": "social",
+  "difficulty": 7,
+  "description": "A minor lord holds court beneath a faded pavilion, dispensing judgment to those who seek his favour. Courtiers whisper behind painted fans, and every word carries the weight of alliance or exile. Only the most eloquent will leave with honour intact.",
+  "rewards": [
+    { "itemId": "travel_cloak", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "stamina_draught", "chance": 0.5 },
+    { "itemId": "pilgrim_medallion", "chance": 0.1 }
+  ],
+  "failureConsequence": "Your words falter before the assembled court. The lord dismisses you with a wave, and his guards escort you roughly from the pavilion. Whispers of your disgrace will precede you down the road."
+}

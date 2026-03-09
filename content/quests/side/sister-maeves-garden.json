@@ -1,0 +1,45 @@
+{
+  "id": "side-sister-maeves-garden",
+  "tier": "micro",
+  "title": "Sister Maeve's Garden",
+  "estimatedMinutes": 12,
+  "anchorAffinity": "anchor-04",
+  "trigger": { "type": "anchor", "anchorId": "anchor-04" },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "dialogue",
+      "npcArchetype": "healer",
+      "dialogue": "Bless you for stopping, traveller. The abbey's herb garden keeps us supplied through most seasons, but the frost came early this year and three of my most vital plants have wilted. I need fresh cuttings of yarrow, comfrey, and wild thyme from the hills beyond the monastery walls. They grow among the rocky slopes where the moorland meets the highland grass. Could you gather them before nightfall?",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    },
+    {
+      "id": "s-02",
+      "type": "fetch",
+      "itemId": "wild_yarrow",
+      "description": "Gather a bundle of wild yarrow from the sunny ledges on the hillside east of the monastery, where it grows in pale clusters among the loose stones."
+    },
+    {
+      "id": "s-03",
+      "type": "fetch",
+      "itemId": "wild_comfrey",
+      "description": "Collect fresh comfrey leaves from the damp hollow beside the stream that runs down from the highlands, just north of the abbey walls."
+    },
+    {
+      "id": "s-04",
+      "type": "fetch",
+      "itemId": "wild_thyme",
+      "description": "Pick sprigs of wild thyme from the windswept ridge above the monastery, where the moorland heather gives way to highland grass."
+    },
+    {
+      "id": "s-05",
+      "type": "dialogue",
+      "npcArchetype": "healer",
+      "dialogue": "All three, and in fine condition too. The yarrow will staunch wounds, the comfrey will mend broken bones, and the thyme will keep fever at bay through the winter months. You have done the abbey a kindness that will outlast your visit, friend. Take this salve for the road ahead — I brewed it fresh this morning and it will close a wound faster than any prayer alone.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "item", "itemId": "healing_salve" }
+}

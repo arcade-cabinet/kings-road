@@ -1,0 +1,103 @@
+{
+  "id": "main-chapter-05",
+  "tier": "macro",
+  "title": "The Grail",
+  "estimatedMinutes": 40,
+  "anchorAffinity": "anchor-05",
+  "trigger": { "type": "anchor", "anchorId": "anchor-05" },
+  "prerequisites": ["main-chapter-04"],
+  "branches": {
+    "A": {
+      "label": "Pass the Guardian's trials of wisdom, mercy, and sacrifice",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "You stand before the threshold of Grailsend, the last temple on the King's Road. I am its Guardian, bound here since before your grandfather's grandfather drew breath. Three trials await you within, and none may be overcome by the sword alone. Tell me, pilgrim, are you prepared to be judged?",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "puzzle",
+          "description": "The Trial of Wisdom: answer the Guardian's three riddles drawn from the history of the King's Road. Each riddle references events from Ashford, Thornfield, and Ravensgate that you witnessed on your journey."
+        },
+        {
+          "id": "a-03",
+          "type": "encounter",
+          "encounterId": "grailsend-trial-of-mercy",
+          "description": "The Trial of Mercy: a wounded enemy begs for help. Choose to heal them rather than strike, proving compassion over vengeance."
+        },
+        {
+          "id": "a-04",
+          "type": "puzzle",
+          "description": "The Trial of Sacrifice: the temple demands you surrender your most valued possession — the map fragments that guided you here — to unseal the inner sanctum."
+        },
+        {
+          "id": "a-05",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "You have passed all three trials. Few have walked this far, and fewer still have proven worthy. The sanctum is open to you now. Seek the Oracle within, for she holds the final truth of the Grail. Go with my blessing, and know that the road remembers your choices.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-06",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "You came seeking a golden cup, did you not? The Grail is no vessel of gold. It is the ancient covenant between the land and those who tend it. Your journey along the King's Road has already restored it. Every act of wisdom, mercy, and sacrifice renewed the bond. The land will heal now, pilgrim. Ashford will bloom again.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "grail-worthy" }
+    },
+    "B": {
+      "label": "Fight through the temple guardians by force",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "You stand before the threshold of Grailsend. I am its Guardian, and I will not step aside for bluster or steel. If you refuse the trials, you must prove your worth the old way. Raise your weapon, pilgrim, and let the stones judge whether your cause is just.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "encounter",
+          "encounterId": "grailsend-guardian-battle",
+          "description": "Battle the ancient Guardian, a towering knight wreathed in spectral light who has guarded the temple for centuries."
+        },
+        {
+          "id": "b-03",
+          "type": "encounter",
+          "encounterId": "grailsend-temple-sentinels",
+          "description": "Fight through the temple sentinels — stone warriors that animate from the corridor walls as you force your way deeper into the sanctum."
+        },
+        {
+          "id": "b-04",
+          "type": "investigate",
+          "description": "Navigate the shattered inner corridors, using brute strength to clear collapsed archways and force open sealed doors that the trials would have opened peacefully."
+        },
+        {
+          "id": "b-05",
+          "type": "encounter",
+          "encounterId": "grailsend-final-ward",
+          "description": "Defeat the final ward — a spectral echo of every Guardian who served before, rising as one last defence of the Grail's secret."
+        },
+        {
+          "id": "b-06",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "So you have come by force. The Guardian lies broken and the wards are shattered. Very well, hear the truth you have fought so hard to reach. The Grail is no golden cup. It is the covenant between land and people, and you have damaged it further by your violence here. The land may yet heal, but the road ahead will be harder for what you have done.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "grail-breaker" }
+    }
+  },
+  "reward": { "type": "item", "itemId": "grail-covenant" }
+}

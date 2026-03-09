@@ -1,0 +1,13 @@
+{
+  "id": "millbrook-river-bandits",
+  "name": "River Bandits at the Mill Crossing",
+  "type": "combat",
+  "difficulty": 3,
+  "description": "Three rough men lounge on the mossy stones of Millbrook's river crossing, toll-collectors of their own devising. The mill wheel turns lazily behind them as their leader flicks a knife between his fingers and grins.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.3 },
+    { "itemId": "ration", "chance": 0.8 },
+    { "itemId": "torch", "chance": 0.5 }
+  ],
+  "failureConsequence": "The bandits relieve you of your supplies and shove you into the shallows. You drag yourself onto the far bank, soaked and lighter of purse."
+}

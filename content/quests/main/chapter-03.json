@@ -1,0 +1,106 @@
+{
+  "id": "main-chapter-03",
+  "tier": "macro",
+  "title": "The Iron Gate",
+  "estimatedMinutes": 40,
+  "anchorAffinity": "anchor-03",
+  "trigger": { "type": "anchor", "anchorId": "anchor-03" },
+  "prerequisites": ["main-chapter-02"],
+  "branches": {
+    "A": {
+      "label": "Work with Elara to infiltrate Ravensgate through diplomacy and deception",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "healer",
+          "dialogue": "The gate guards answer only to Lord Ashwick, and he turns away all strangers. But there is a merchant caravan expected at dusk, and I have arranged passage for you among their number. Once inside, seek the prison tower on the northern wall. Silas is held in the upper cell. Take this healer's token to explain your presence if questioned.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "encounter",
+          "encounterId": "ravensgate-caravan-infiltration",
+          "description": "Blend in with the merchant caravan and pass through the gate without raising suspicion from Ashwick's guards."
+        },
+        {
+          "id": "a-03",
+          "type": "investigate",
+          "description": "Navigate the narrow streets of Ravensgate after dark, following Elara's directions to the prison tower on the northern wall."
+        },
+        {
+          "id": "a-04",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "You came from the healer? Then listen well, for we have little time. The third map fragment is hidden beneath the hearthstone in the manor library. Ashwick does not know its true significance. He imprisoned me for speaking against his rule, not for the fragment. Take it and flee before the dawn watch. The eastern postern gate is rarely guarded.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-05",
+          "type": "encounter",
+          "encounterId": "ravensgate-library-stealth",
+          "description": "Steal into Ashwick's manor library under cover of night and retrieve the map fragment from beneath the hearthstone without alerting the household guard."
+        },
+        {
+          "id": "a-06",
+          "type": "dialogue",
+          "npcArchetype": "healer",
+          "dialogue": "You have the fragment? Good. The eastern postern is unlatched as I promised. Go now, while the mist still clings to the moors. Silas will remain my burden to bear, but knowing the Grail road continues gives us both hope. The next sign points north to a monastery the pilgrims call the Pilgrim's Rest.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "shadow-diplomat" }
+    },
+    "B": {
+      "label": "Confront Lord Ashwick directly and take the fragment by force",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "Ravensgate is closed to outsiders by order of Lord Ashwick. Turn back the way you came, pilgrim, or face the consequences. These walls have stood for three hundred years, and no wanderer from the road will breach them while I draw breath.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "encounter",
+          "encounterId": "ravensgate-gate-assault",
+          "description": "Storm the gatehouse and fight through Ashwick's guards to force entry into the walled town."
+        },
+        {
+          "id": "b-03",
+          "type": "dialogue",
+          "npcArchetype": "noble",
+          "dialogue": "You dare storm my gates and march through my town like some conquering hero? I am the lord of Ravensgate, and you are nothing but a trespasser. Guards, seize this fool and throw them in the tower with the other wretch. Let the stones teach them respect.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-04",
+          "type": "encounter",
+          "encounterId": "ravensgate-manor-battle",
+          "description": "Battle Lord Ashwick's personal guard in the manor courtyard and defeat his captain to reach the prison tower."
+        },
+        {
+          "id": "b-05",
+          "type": "investigate",
+          "description": "Break open Silas's cell in the prison tower and search the manor library for the map fragment hidden beneath the hearthstone."
+        },
+        {
+          "id": "b-06",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "So Ashwick has fallen at last. I knew his tyranny would draw a reckoning. The third map fragment lies beneath the hearthstone in the manor library. I hid it there before my arrest. Take it quickly. With Ashwick defeated, the townsfolk will help us reach the eastern road. The next sign points north to the Pilgrim's Rest.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "gate-breaker" }
+    }
+  },
+  "reward": { "type": "item", "itemId": "map-fragment-03" }
+}

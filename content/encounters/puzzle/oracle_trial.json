@@ -1,0 +1,15 @@
+{
+  "id": "oracle_trial",
+  "name": "Oracle Trial",
+  "type": "puzzle",
+  "difficulty": 8,
+  "description": "Three stone basins stand before a crumbling shrine, each filled with a different liquid — clear water, dark wine, and shimmering quicksilver. The Oracle's voice echoes from nowhere, demanding you pour the truth into the vessel of worth. The wrong offering will shatter more than stone.",
+  "rewards": [
+    { "itemId": "healing_staff", "chance": 0.3 },
+    { "itemId": "travel_cloak", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.7 },
+    { "itemId": "antidote", "chance": 0.5 },
+    { "itemId": "pilgrim_medallion", "chance": 0.15 }
+  ],
+  "failureConsequence": "The quicksilver hisses and the basins crack. The Oracle's voice turns cold, declaring you unworthy. A creeping doubt settles in your mind that lingers long after you leave the ruined shrine."
+}

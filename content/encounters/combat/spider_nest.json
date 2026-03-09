@@ -1,0 +1,14 @@
+{
+  "id": "spider_nest",
+  "name": "Spider Nest",
+  "type": "combat",
+  "difficulty": 7,
+  "description": "Thick webs choke the hollow between the trees, glistening with venom in the pale light. Giant spiders scuttle across their silken domain, each the size of a hunting hound. At the centre of the nest, something ancient and bloated shifts in the shadows.",
+  "rewards": [
+    { "itemId": "antidote", "chance": 0.8 },
+    { "itemId": "rare_herb", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "leather_armor", "chance": 0.3 }
+  ],
+  "failureConsequence": "Venom courses through your veins as the spiders bind you in silk. You barely cut free before the paralysis takes hold, but the poison lingers for days."
+}

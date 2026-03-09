@@ -66,11 +66,12 @@ export function PlayerController() {
   const joystickVector = useGameStore((state) => state.joystickVector);
   const joystickDist = useGameStore((state) => state.joystickDist);
   const inDialogue = useGameStore((state) => state.inDialogue);
+  const inCombat = useGameStore((state) => state.inCombat);
   const gameActive = useGameStore((state) => state.gameActive);
   const globalAABBs = useGameStore((state) => state.globalAABBs);
 
   useFrame((_, delta) => {
-    if (!gameActive || inDialogue) return;
+    if (!gameActive || inDialogue || inCombat) return;
 
     const dt = Math.min(delta, 0.1);
     const state = useGameStore.getState();

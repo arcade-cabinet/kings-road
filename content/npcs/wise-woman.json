@@ -1,0 +1,35 @@
+{
+  "id": "wise-woman",
+  "name": "Wise Woman",
+  "archetype": "hermit",
+  "fixed": true,
+  "bodyBuild": { "height": 0.8, "width": 0.85 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "brown",
+    "hairStyle": "long",
+    "hairColor": "#e0d0c0",
+    "facialHair": "none"
+  },
+  "accessories": ["crystal_pendant", "woven_shawl", "carved_bowl"],
+  "clothPalette": { "primary": "#4a2a5a", "secondary": "#c0a060" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "CONSULT",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "I've been expecting you. The water told me someone would come today.",
+      "Sit, child. You carry a burden heavier than you know.",
+      "The road brought you here for a reason. Nothing on this path is chance."
+    ],
+    "quest": [
+      "Bring me three stones from the river — one white, one black, one red. With them I can read your fate, and perhaps... change it."
+    ],
+    "idle": [
+      "The threads of fate tangle and untangle. All I do is watch.",
+      "The Grail is closer than anyone suspects. But not in the way they imagine."
+    ]
+  }
+}

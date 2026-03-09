@@ -1,0 +1,38 @@
+{
+  "id": "side-father-cedrics-lost-hymnal",
+  "tier": "micro",
+  "title": "Father Cedric's Lost Hymnal",
+  "estimatedMinutes": 8,
+  "anchorAffinity": "home",
+  "trigger": { "type": "anchor", "anchorId": "home" },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "dialogue",
+      "npcArchetype": "priest",
+      "dialogue": "Bless you, child. I wonder if you might help an old man with a small mystery. My illuminated hymnal has vanished from the lectern. I have searched the nave and the vestry twice over but it is nowhere to be found. The chapel attic has not been swept in years and I fear my knees will not survive the ladder. Would you have a look up there for me?",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    },
+    {
+      "id": "s-02",
+      "type": "investigate",
+      "description": "Climb into the dusty chapel attic and search among old crates, moth-eaten vestments, and cobwebs for Father Cedric's missing hymnal."
+    },
+    {
+      "id": "s-03",
+      "type": "fetch",
+      "itemId": "lost_hymnal",
+      "description": "Retrieve the illuminated hymnal from behind the stack of old sermon scrolls in the attic."
+    },
+    {
+      "id": "s-04",
+      "type": "dialogue",
+      "npcArchetype": "priest",
+      "dialogue": "Oh, wonderful, you found it tucked behind the scrolls. A crow must have carried it up through the belfry window. The pages are a little dusty but the gold leaf still shines. The saints smile upon you, traveller. Take this blessing for the road. It will keep the dark at bay when the night grows long.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "item", "itemId": "pilgrim_medallion" }
+}

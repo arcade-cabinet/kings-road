@@ -1,0 +1,13 @@
+{
+  "id": "ravensgate-library-stealth",
+  "name": "The Library Heist",
+  "type": "stealth",
+  "difficulty": 5,
+  "description": "Ravensgate's library is a tall, narrow tower of honeyed stone, its shelves guarded by a sharp-eared archivist and a pair of sleepless clerks. The documents you seek lie in a locked cabinet on the upper gallery, and every footstep on the old oak floor carries like a drumbeat.",
+  "rewards": [
+    { "itemId": "stolen_manuscript", "chance": 0.5 },
+    { "itemId": "torch", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.3 }
+  ],
+  "failureConsequence": "The archivist catches you rifling through the cabinet and raises the alarm. You are escorted from the tower under guard and barred from the library until you can explain yourself."
+}

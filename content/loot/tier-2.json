@@ -1,0 +1,11 @@
+{
+  "id": "loot-tier-2",
+  "entries": [
+    { "itemId": "health_potion", "weight": 0.6, "quantity": [1, 2] },
+    { "itemId": "stamina_draught", "weight": 0.4, "quantity": [1, 1] },
+    { "itemId": "iron_sword", "weight": 0.2, "quantity": [1, 1] },
+    { "itemId": "leather_armor", "weight": 0.15, "quantity": [1, 1] },
+    { "itemId": "wooden_shield", "weight": 0.15, "quantity": [1, 1] },
+    { "itemId": "ration", "weight": 0.3, "quantity": [1, 2] }
+  ]
+}

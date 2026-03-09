@@ -1,0 +1,42 @@
+{
+  "id": "watchman-pool",
+  "archetype": "watchman",
+  "personality": "Alert, taciturn, sharp-eyed. Speaks in terse observations from long hours scanning the horizon.",
+  "displayTitle": "Tower Watchman",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.95, 1.15], "widthRange": [0.85, 1.0] },
+    "clothPalette": {
+      "primary": "#3a5a30",
+      "secondary": "#5a4a30",
+      "variations": ["#2a4a20", "#4a6a40"]
+    },
+    "signatureAccessories": ["longbow"],
+    "optionalAccessories": ["quiver", "spyglass", "signal_horn", "green_cloak"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["green", "gray", "brown"],
+    "hairStyles": ["short", "hooded"],
+    "hairColors": ["#3b3b3b", "#5a4a30", "#6b5a40"],
+    "facialHairOptions": ["stubble", "none", "mustache"]
+  },
+  "behavior": { "idleStyle": "patrolling", "interactionVerb": "TALK", "walkNodes": true },
+  "namePool": [
+    "Aldhelm",
+    "Dunstan",
+    "Sigric",
+    "Wulfnoth",
+    "Leofstan",
+    "Herewin",
+    "Beorn"
+  ],
+  "greetingPool": [
+    { "text": "Nothing moves on the road without my knowing. State your purpose." },
+    { "text": "I've watched from this tower since dawn. The road is clear, for now." },
+    { "text": "Sharp eyes keep folk safe. If you've seen anything amiss, tell me now." }
+  ],
+  "idlePool": [
+    { "text": "Smoke rising from the eastern wood again. Could be charcoal burners. Could be trouble." },
+    { "text": "My eyes are the first line of defence. By the time the guards draw steel, I have already seen it coming." }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "wolf_pack",
+  "name": "Wolf Pack",
+  "type": "combat",
+  "difficulty": 4,
+  "description": "Grey shapes circle through the mist, low growls rumbling like distant thunder. A pack of gaunt wolves has caught your scent, and hunger has driven them past their fear of men. Their alpha watches from a ridge, waiting for the right moment to strike.",
+  "rewards": [
+    { "itemId": "leather_armor", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.5 },
+    { "itemId": "ration", "chance": 0.7 }
+  ],
+  "failureConsequence": "The wolves drag you down and maul your legs before the pack leader calls them off. You limp away with deep gashes that slow your journey for days."
+}

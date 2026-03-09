@@ -1,0 +1,15 @@
+{
+  "id": "wyvern",
+  "name": "Greenscale Wyvern",
+  "bodyType": "quadruped",
+  "size": 2.2,
+  "colorScheme": {
+    "primary": "#2d5a27",
+    "secondary": "#1a3a15",
+    "accent": "#c9a800"
+  },
+  "dangerTier": 3,
+  "health": 75,
+  "damage": 18,
+  "lootTable": "loot-tier-3"
+}

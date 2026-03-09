@@ -1,0 +1,14 @@
+{
+  "id": "ravensgate-manor-battle",
+  "name": "Battle in Ashwick Manor",
+  "type": "combat",
+  "difficulty": 7,
+  "description": "The great hall of Ashwick Manor rings with steel as the steward's household guard closes ranks around the dais. Tapestries billow in the draught from shattered windows, and candlelight throws wild shadows across the flagstones. This is the heart of Ravensgate's power.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.6 },
+    { "itemId": "leather_armor", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.7 },
+    { "itemId": "stamina_draught", "chance": 0.5 }
+  ],
+  "failureConsequence": "The guards overwhelm you and drag you before the steward. You are cast from the manor with a warning that the next trespass will end less gently."
+}

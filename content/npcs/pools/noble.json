@@ -1,0 +1,42 @@
+{
+  "id": "noble-pool",
+  "archetype": "noble",
+  "personality": "Haughty, well-spoken, acutely aware of rank. Speaks with practiced elegance and subtle condescension.",
+  "displayTitle": "Landed Noble",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.95, 1.15], "widthRange": [0.85, 1.0] },
+    "clothPalette": {
+      "primary": "#6b1040",
+      "secondary": "#c8a850",
+      "variations": ["#5a0830", "#7b2050"]
+    },
+    "signatureAccessories": ["signet_ring"],
+    "optionalAccessories": ["embroidered_cloak", "jeweled_brooch", "riding_gloves", "gold_chain"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 2],
+    "eyeColors": ["blue", "green", "gray"],
+    "hairStyles": ["long", "short"],
+    "hairColors": ["#1a1a1a", "#4a3020", "#c8a870"],
+    "facialHairOptions": ["none", "mustache"]
+  },
+  "behavior": { "idleStyle": "idle", "interactionVerb": "TALK", "walkNodes": false },
+  "namePool": [
+    "Lord Edric",
+    "Lady Isolde",
+    "Lord Mortimer",
+    "Lady Gwendolyn",
+    "Lord Hastings",
+    "Lady Elowen",
+    "Lord Beaumont"
+  ],
+  "greetingPool": [
+    { "text": "You stand before a lord of this realm. Speak plainly and waste not my time." },
+    { "text": "Ah, a commoner from the road. I trust you bring news of some importance?" },
+    { "text": "I govern these lands by right and duty. What matter brings you to my hall?" }
+  ],
+  "idlePool": [
+    { "text": "The tapestries in the east wing need replacing. Flemish work, nothing less will do." },
+    { "text": "One must maintain appearances, even on the frontier. Standards are what separate us from beasts." }
+  ]
+}

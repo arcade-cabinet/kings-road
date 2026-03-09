@@ -1,0 +1,43 @@
+{
+  "id": "pilgrim-pool",
+  "archetype": "pilgrim",
+  "personality": "Devout, road-worn, quietly hopeful. Speaks with gentle reverence about sacred places and the journey itself.",
+  "displayTitle": "Wayfaring Pilgrim",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.85, 1.05], "widthRange": [0.8, 1.0] },
+    "clothPalette": {
+      "primary": "#b8a890",
+      "secondary": "#8a7a68",
+      "variations": ["#a89880", "#c8b8a0"]
+    },
+    "signatureAccessories": ["walking_staff", "pilgrim_badge"],
+    "optionalAccessories": ["prayer_beads", "scallop_shell", "water_gourd", "worn_sandals"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 4],
+    "eyeColors": ["brown", "blue", "gray"],
+    "hairStyles": ["hooded", "short", "bald"],
+    "hairColors": ["#6b5030", "#8b7050", "#aaaaaa"],
+    "facialHairOptions": ["none", "stubble", "full_beard"]
+  },
+  "behavior": { "idleStyle": "idle", "interactionVerb": "TALK", "walkNodes": true },
+  "namePool": [
+    "Brother Simeon",
+    "Sister Agnes",
+    "Pilgrim Hector",
+    "Sister Colette",
+    "Brother Aldwyn",
+    "Pilgrim Marta",
+    "Brother Elias"
+  ],
+  "greetingPool": [
+    { "text": "Blessings upon you, fellow traveller. I walk this road in search of the holy spring — they say its waters carry the grace of saints long departed." },
+    { "text": "The road to the shrine is long, but each step is a prayer. Will you walk a while with me?" },
+    { "text": "I have left hearth and home to seek what cannot be found within four walls. The sacred places call to those who listen." },
+    { "text": "A kind face on a pilgrim road is worth more than silver. God keep you, friend." }
+  ],
+  "idlePool": [
+    { "text": "My feet ache but my spirit is light. The shrine cannot be more than a day's walk now." },
+    { "text": "I have carried this prayer from my village. When I reach the holy place, I will lay it down at last." }
+  ]
+}

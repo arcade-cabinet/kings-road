@@ -1,0 +1,14 @@
+{
+  "id": "ancient_lock",
+  "name": "Ancient Lock",
+  "type": "puzzle",
+  "difficulty": 6,
+  "description": "An iron-banded chest sits half-buried in the roots of a dead oak, its lock a cunning mechanism of interlocking rings and sliding pins. No key exists for this device — only patience and sharp wits will coax it open.",
+  "rewards": [
+    { "itemId": "leather_armor", "chance": 0.5 },
+    { "itemId": "iron_sword", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "rare_herb", "chance": 0.3 }
+  ],
+  "failureConsequence": "A hidden spring snaps shut, driving a thin needle into your thumb. The lock resets with a mocking click, and the venom leaves your hand numb and throbbing for hours."
+}

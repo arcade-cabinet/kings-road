@@ -1,0 +1,14 @@
+{
+  "id": "troll_bridge",
+  "name": "Troll Bridge",
+  "type": "combat",
+  "difficulty": 6,
+  "description": "A massive troll squats beneath the old stone bridge, its mossy hide blending with the riverbank. It rises to its full height as you approach, cracking knuckles the size of flagstones. The stench alone could fell a lesser traveller.",
+  "rewards": [
+    { "itemId": "wooden_shield", "chance": 0.6 },
+    { "itemId": "health_potion", "chance": 0.7 },
+    { "itemId": "iron_sword", "chance": 0.4 },
+    { "itemId": "stamina_draught", "chance": 0.5 }
+  ],
+  "failureConsequence": "The troll hurls you into the river with a contemptuous swat. You wash up downstream, battered and half-drowned, forced to find another crossing."
+}

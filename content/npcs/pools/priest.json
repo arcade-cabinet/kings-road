@@ -1,0 +1,42 @@
+{
+  "id": "priest-pool",
+  "archetype": "priest",
+  "personality": "Compassionate, solemn, quietly fervent. Speaks with measured piety and genuine concern for souls.",
+  "displayTitle": "Parish Priest",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.9, 1.1], "widthRange": [0.85, 1.0] },
+    "clothPalette": {
+      "primary": "#3a2a1a",
+      "secondary": "#c0a040",
+      "variations": ["#2a1a0a", "#4a3a2a"]
+    },
+    "signatureAccessories": ["holy_book"],
+    "optionalAccessories": ["prayer_beads", "tonsure_cap", "wooden_cross", "candle"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["brown", "blue", "gray"],
+    "hairStyles": ["bald", "short"],
+    "hairColors": ["#3b3b3b", "#6b5030", "#888888"],
+    "facialHairOptions": ["none", "stubble"]
+  },
+  "behavior": { "idleStyle": "idle", "interactionVerb": "PRAY", "walkNodes": false },
+  "namePool": [
+    "Father Dunstan",
+    "Brother Ailred",
+    "Sister Winifred",
+    "Father Ambrose",
+    "Brother Simeon",
+    "Sister Dymphna",
+    "Father Oswin"
+  ],
+  "greetingPool": [
+    { "text": "Peace be upon you, child. The chapel doors are always open to the weary." },
+    { "text": "The Lord watches over all who walk the road in faith. How may I counsel you?" },
+    { "text": "Come, rest your spirit here. The world beyond these walls is full of trials." }
+  ],
+  "idlePool": [
+    { "text": "The vespers bell will ring soon. There is comfort in the rhythm of prayer, day after day." },
+    { "text": "I must copy these psalms before the ink fades. The old manuscripts grow more fragile each year." }
+  ]
+}

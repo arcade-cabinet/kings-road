@@ -1,0 +1,9 @@
+{
+  "id": "dragon_bones",
+  "tier": "major",
+  "name": "Dragon Bones",
+  "description": "The bleached skeleton of a great wyrm sprawls across a clearing, its ribcage arching high enough to walk beneath. Wildflowers grow through the eye sockets.",
+  "visualType": "dragon_skeleton_monument",
+  "interactable": true,
+  "dialogueOnInteract": "You press your hand against the massive skull and feel a vibration deep in the bone. Visions flicker — fire across the sky, a knight with a shining lance, the beast's final roar echoing through these hills. An inscription on a fang reads: 'Here fell Cyndrath, last of the old fire.'"
+}

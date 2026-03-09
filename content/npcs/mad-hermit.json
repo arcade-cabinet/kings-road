@@ -1,0 +1,35 @@
+{
+  "id": "mad-hermit",
+  "name": "Mad Hermit",
+  "archetype": "hermit",
+  "fixed": true,
+  "bodyBuild": { "height": 0.75, "width": 0.75 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "gray",
+    "hairStyle": "bald",
+    "hairColor": "#808080",
+    "facialHair": "stubble"
+  },
+  "accessories": ["tattered_rags", "strange_talisman"],
+  "clothPalette": { "primary": "#4a4a3a", "secondary": "#2a2a20" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Hee hee! You see them too, don't you? The lights in the stones? NO? Then you're blind!",
+      "Go away! Or stay. It makes no difference. The road remembers either way.",
+      "I knew you'd come. The crows told me. They tell me everything."
+    ],
+    "quest": [
+      "The voices say there's something buried beneath the crooked tree — the one that grows sideways. Dig it up! DIG IT UP! Then... then they'll stop screaming."
+    ],
+    "idle": [
+      "Three kings, three cups, three lies... no, that's not right...",
+      "Shh! Did you hear that? The ground is breathing again."
+    ]
+  }
+}

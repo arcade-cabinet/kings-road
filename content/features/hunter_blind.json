@@ -1,0 +1,9 @@
+{
+  "id": "hunter_blind",
+  "tier": "minor",
+  "name": "Hunter's Blind",
+  "description": "Branches woven between two trees form a rough shelter, the ground beneath scattered with feathers and snare cord.",
+  "visualType": "hunter_blind",
+  "interactable": true,
+  "dialogueOnInteract": "Inside the blind you find dried venison wrapped in cloth and a handful of iron arrowheads. The hunter will return — but the offering feels deliberate, left for a fellow traveller."
+}

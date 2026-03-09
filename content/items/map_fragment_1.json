@@ -1,0 +1,7 @@
+{
+  "id": "map_fragment_1",
+  "name": "Map Fragment — Ashford",
+  "description": "A weathered parchment bearing the first section of an ancient map. It depicts the lands around Ashford and the road leading east toward the ruins.",
+  "type": "key_item",
+  "stackable": false
+}

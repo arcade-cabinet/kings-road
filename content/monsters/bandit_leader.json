@@ -1,0 +1,15 @@
+{
+  "id": "bandit_leader",
+  "name": "Bandit Leader",
+  "bodyType": "biped",
+  "size": 1.1,
+  "colorScheme": {
+    "primary": "#4a2e14",
+    "secondary": "#7a5c3a",
+    "accent": "#c9a84c"
+  },
+  "dangerTier": 2,
+  "health": 45,
+  "damage": 12,
+  "lootTable": "loot-tier-2"
+}

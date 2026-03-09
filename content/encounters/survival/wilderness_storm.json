@@ -1,0 +1,13 @@
+{
+  "id": "wilderness_storm",
+  "name": "Wilderness Storm",
+  "type": "survival",
+  "difficulty": 4,
+  "description": "Black clouds boil over the moors and the wind turns savage. Rain lashes the road to mud, lightning splits an oak on the hillside, and the temperature plummets. Finding shelter and keeping a fire alive may be the difference between life and a frozen end.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.7 },
+    { "itemId": "torch", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 0.3 }
+  ],
+  "failureConsequence": "The cold sinks into your bones and the rain extinguishes your last torch. You stumble on through the dark, arriving at shelter soaked and shivering, losing precious supplies to the downpour."
+}

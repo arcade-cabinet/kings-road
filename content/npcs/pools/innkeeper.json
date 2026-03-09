@@ -1,0 +1,42 @@
+{
+  "id": "innkeeper-pool",
+  "archetype": "innkeeper",
+  "personality": "Warm, gossipy, shrewdly hospitable. Speaks with boisterous cheer and a keen eye for coin.",
+  "displayTitle": "Innkeeper",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.85, 1.0], "widthRange": [1.05, 1.25] },
+    "clothPalette": {
+      "primary": "#8b5a30",
+      "secondary": "#c8a870",
+      "variations": ["#7a4a20", "#9b6a40"]
+    },
+    "signatureAccessories": ["dish_towel", "apron"],
+    "optionalAccessories": ["tankard", "ladle", "key_ring"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["brown", "blue", "green"],
+    "hairStyles": ["short", "bald"],
+    "hairColors": ["#6b4020", "#8b6040", "#b8a080"],
+    "facialHairOptions": ["none", "mustache", "full_beard"]
+  },
+  "behavior": { "idleStyle": "working", "interactionVerb": "TRADE", "walkNodes": false },
+  "namePool": [
+    "Mabel",
+    "Godwin",
+    "Hilda",
+    "Barret",
+    "Nan",
+    "Ulfberht",
+    "Rosalind"
+  ],
+  "greetingPool": [
+    { "text": "Welcome, welcome! Rest your feet and warm your belly. Ale or cider?" },
+    { "text": "You look road-weary, friend. I have a bowl of stew and a clean bed waiting." },
+    { "text": "Come in from the cold! Every traveller deserves a warm hearth and honest company." }
+  ],
+  "idlePool": [
+    { "text": "The new batch of cider should be ready by week's end. Best I have brewed in years." },
+    { "text": "That merchant from Ravensgate left without paying. I never forget a debt, or a face." }
+  ]
+}

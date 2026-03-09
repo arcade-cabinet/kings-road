@@ -1,0 +1,99 @@
+{
+  "id": "main-chapter-00",
+  "tier": "macro",
+  "title": "The Call",
+  "estimatedMinutes": 25,
+  "anchorAffinity": "home",
+  "trigger": { "type": "anchor", "anchorId": "home" },
+  "branches": {
+    "A": {
+      "label": "Accept the quest eagerly, inspired by the legend",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "pilgrim",
+          "dialogue": "Please, traveller, come closer. I was bound for Grailsend, walking the old King's Road as my father did before me. But my strength has failed. The Grail still waits at the road's end, and someone must carry word to the scholar in your village. Promise me you will seek him out.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "investigate",
+          "description": "Search the dying pilgrim's belongings and find a weathered map fragment bearing ancient waypoint markings."
+        },
+        {
+          "id": "a-03",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "This map fragment is genuine. I have spent decades studying the old texts, and I recognise these waypoint glyphs. The Holy Grail lies beyond Grailsend at the road's end. Many have sought it and failed, but the pilgrim's map changes everything. You must follow the King's Road north.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-04",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "Old Tomas speaks the truth. I have read the parish records, and they tell of knights who walked this very road in search of the Grail. Go with my blessing, child. The saints will watch over you, and I shall pray for your safe return to Ashford.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-05",
+          "type": "travel",
+          "destination": "anchor-01",
+          "description": "Set out from Ashford along the King's Road, heading north toward Millbrook with the pilgrim's map fragment in hand."
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "eager-pilgrim" }
+    },
+    "B": {
+      "label": "Reluctantly agree after the village comes under threat",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "pilgrim",
+          "dialogue": "Please, traveller, come closer. I was bound for Grailsend, walking the old King's Road as my father did before me. But my strength has failed. The Grail still waits at the road's end, and someone must carry word to the scholar in your village. Promise me you will seek him out.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "investigate",
+          "description": "Search the dying pilgrim's belongings and find a weathered map fragment bearing ancient waypoint markings."
+        },
+        {
+          "id": "b-03",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "I feared this day would come. Dark riders were seen on the moors beyond Millbrook, and the harvest has been failing for three seasons now. These are the signs the old texts warned of. The land itself is dying because the Grail covenant has been broken. Unless someone restores it, Ashford will fall.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-04",
+          "type": "encounter",
+          "encounterId": "ashford-wolves-at-the-gate",
+          "description": "Wolves driven mad by the failing land attack the village outskirts. Defend the farmsteads with the other villagers."
+        },
+        {
+          "id": "b-05",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "You saw what happened. The wolves have never come this close to the village before. Old Tomas is right, the land grows sick and only the Grail can heal it. I know you did not ask for this burden, but Ashford needs you. Will you walk the King's Road for our sake?",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-06",
+          "type": "travel",
+          "destination": "anchor-01",
+          "description": "Leave Ashford reluctantly, driven by duty to save the village, heading north along the King's Road toward Millbrook."
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "reluctant-hero" }
+    }
+  },
+  "reward": { "type": "item", "itemId": "map-fragment-01" }
+}

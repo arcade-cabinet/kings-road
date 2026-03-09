@@ -12,9 +12,16 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BuildingArchetypeSchema } from '../src/schemas/building.schema';
+import { DungeonLayoutSchema } from '../src/schemas/dungeon.schema';
+import { EncounterDefinitionSchema } from '../src/schemas/encounter.schema';
+import { EncounterTableSchema, LootTableSchema } from '../src/schemas/encounter-table.schema';
 import { FeatureDefinitionSchema } from '../src/schemas/feature.schema';
+import { GameConfigSchema } from '../src/schemas/game-config.schema';
+import { ItemDefinitionSchema } from '../src/schemas/item.schema';
+import { MonsterArchetypeSchema } from '../src/schemas/monster.schema';
 import { NPCBlueprintSchema } from '../src/schemas/npc-blueprint.schema';
 import { NPCDefinitionSchema } from '../src/schemas/npc.schema';
+import { PacingConfigSchema } from '../src/schemas/pacing.schema';
 import { QuestDefinitionSchema } from '../src/schemas/quest.schema';
 import { TownConfigSchema } from '../src/schemas/town.schema';
 import { RoadSpineSchema } from '../src/schemas/world.schema';
@@ -88,6 +95,9 @@ function getSchemaForFile(
   // Normalize path separators
   const normalized = relPath.replace(/\\/g, '/');
 
+  if (normalized === 'game-config.json') {
+    return { schema: GameConfigSchema, contentType: 'game-config' };
+  }
   if (normalized.startsWith('world/')) {
     return { schema: RoadSpineSchema, contentType: 'road-spine' };
   }
@@ -116,11 +126,32 @@ function getSchemaForFile(
   if (normalized.startsWith('buildings/')) {
     return { schema: BuildingArchetypeSchema, contentType: 'building' };
   }
+  if (normalized.startsWith('dungeons/')) {
+    return { schema: DungeonLayoutSchema, contentType: 'dungeon' };
+  }
   if (normalized.startsWith('towns/')) {
     return { schema: TownConfigSchema, contentType: 'town' };
   }
   if (normalized.startsWith('features/')) {
     return { schema: FeatureDefinitionSchema, contentType: 'feature' };
+  }
+  if (normalized.startsWith('items/')) {
+    return { schema: ItemDefinitionSchema, contentType: 'item' };
+  }
+  if (normalized.startsWith('monsters/')) {
+    return { schema: MonsterArchetypeSchema, contentType: 'monster' };
+  }
+  if (normalized.startsWith('encounters/combat/') || normalized.startsWith('encounters/puzzle/') || normalized.startsWith('encounters/social/') || normalized.startsWith('encounters/stealth/') || normalized.startsWith('encounters/survival/')) {
+    return { schema: EncounterDefinitionSchema, contentType: 'encounter-definition' };
+  }
+  if (normalized.startsWith('encounters/')) {
+    return { schema: EncounterTableSchema, contentType: 'encounter-table' };
+  }
+  if (normalized.startsWith('loot/')) {
+    return { schema: LootTableSchema, contentType: 'loot-table' };
+  }
+  if (normalized.startsWith('pacing/')) {
+    return { schema: PacingConfigSchema, contentType: 'pacing' };
   }
 
   return null;

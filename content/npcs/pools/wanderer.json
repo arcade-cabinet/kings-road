@@ -1,0 +1,42 @@
+{
+  "id": "wanderer-pool",
+  "archetype": "wanderer",
+  "personality": "Free-spirited, world-weary, full of stories. Speaks with easy warmth and road-earned philosophy.",
+  "displayTitle": "Drifter",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.95, 1.15], "widthRange": [0.8, 0.95] },
+    "clothPalette": {
+      "primary": "#6b5a40",
+      "secondary": "#4a6a3a",
+      "variations": ["#5b4a30", "#7b6a50"]
+    },
+    "signatureAccessories": ["walking_stick", "hooded_cloak"],
+    "optionalAccessories": ["bedroll", "tin_cup", "worn_map", "whittling_knife"]
+  },
+  "faceSlots": {
+    "skinToneRange": [1, 4],
+    "eyeColors": ["green", "brown", "gray"],
+    "hairStyles": ["hooded", "long"],
+    "hairColors": ["#4a3020", "#6b5030", "#888888"],
+    "facialHairOptions": ["stubble", "full_beard", "none"]
+  },
+  "behavior": { "idleStyle": "idle", "interactionVerb": "TALK", "walkNodes": true },
+  "namePool": [
+    "Tam",
+    "Lirael",
+    "Dusty Jack",
+    "Orla",
+    "Fenn",
+    "Wren",
+    "Farrow"
+  ],
+  "greetingPool": [
+    { "text": "The road has been long but the company is welcome. Where are you headed, friend?" },
+    { "text": "I have walked this road three times over and still it surprises me. Stay a while?" },
+    { "text": "No home but the sky above and the dirt below. That suits me well enough." }
+  ],
+  "idlePool": [
+    { "text": "I saw the strangest light over the marshes last night. Foxfire, most likely. Or worse." },
+    { "text": "Three years on the road and I still cannot sleep under a roof. The stars are ceiling enough." }
+  ]
+}

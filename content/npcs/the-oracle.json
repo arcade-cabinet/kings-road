@@ -1,0 +1,37 @@
+{
+  "id": "the-oracle",
+  "name": "The Oracle",
+  "archetype": "scholar",
+  "fixed": true,
+  "bodyBuild": { "height": 0.95, "width": 0.8 },
+  "face": {
+    "skinTone": 0,
+    "eyeColor": "blue",
+    "hairStyle": "hooded",
+    "hairColor": "#ffffff",
+    "facialHair": "none"
+  },
+  "accessories": ["hooded_robe", "lantern", "ancient_tome"],
+  "clothPalette": { "primary": "#1a1a3e", "secondary": "#c9b458" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "CONSULT",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "You have come to the end of the Road, and so the Road begins again. Sit. Listen.",
+      "I knew you would arrive. Not because I foresaw it, but because the Grail always finds its seeker.",
+      "The Guardian tested your worth. I shall test your understanding. They are not the same thing."
+    ],
+    "quest": [
+      "The Grail is not a cup, nor a stone, nor a relic hidden in some forgotten chapel. It is the covenant between the land and those who tend it. When the Road was built, the first pilgrims poured their hope into its stones, and that hope took form. What you seek has been with you since you set foot on the King's Road — in every stranger you aided, every wrong you tried to right.",
+      "Take this truth back along the Road. The villages you passed through are the Grail's true keepers. Ashford's hearth, Millbrook's mill, even Ravensgate's broken towers — they are the vessels. Tend them, and the land will heal. That is the Grail's final secret, and now it is yours."
+    ],
+    "idle": [
+      "The answer was always simpler than the question. That is why it takes so long to find.",
+      "I have sat in this temple since the first stone was laid. Or perhaps I am the temple. It is difficult to say.",
+      "Others sought gold, or glory, or eternal life. You sought the truth. That is why you are here."
+    ]
+  }
+}

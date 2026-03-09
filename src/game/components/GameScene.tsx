@@ -12,9 +12,12 @@ import * as THREE from 'three';
 import { useGameStore } from '../stores/gameStore';
 import { AudioSystem } from '../systems/AudioSystem';
 import { ChunkManager } from '../systems/ChunkManager';
+import { EncounterSystem } from '../systems/EncounterSystem';
 import { DayNightCycle, Fog, SkyDome } from '../systems/Environment';
+import { FeatureSpawner } from '../systems/FeatureSpawner';
 import { InteractionSystem } from '../systems/InteractionSystem';
 import { PlayerController } from '../systems/PlayerController';
+import { QuestSystem } from '../systems/QuestSystem';
 
 // Error boundary with themed modal
 interface ErrorBoundaryState {
@@ -244,6 +247,9 @@ function SceneContent() {
           {/* Systems */}
           <PlayerController />
           <InteractionSystem />
+          <EncounterSystem />
+          <FeatureSpawner />
+          <QuestSystem />
           <AudioSystem />
 
           {/* Post Processing */}

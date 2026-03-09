@@ -1,0 +1,42 @@
+{
+  "id": "healer-pool",
+  "archetype": "healer",
+  "personality": "Gentle, perceptive, quietly resolute. Speaks with calm authority about ailments and remedies.",
+  "displayTitle": "Village Healer",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.8, 0.95], "widthRange": [0.8, 1.0] },
+    "clothPalette": {
+      "primary": "#8fae8b",
+      "secondary": "#e8e0d0",
+      "variations": ["#7a9e76", "#a0be9c"]
+    },
+    "signatureAccessories": ["herb_pouch"],
+    "optionalAccessories": ["shawl", "mortar_and_pestle", "linen_bandages", "wooden_bowl"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 4],
+    "eyeColors": ["green", "brown", "gray"],
+    "hairStyles": ["long", "short"],
+    "hairColors": ["#8b6840", "#b8a080", "#d0c0a0"],
+    "facialHairOptions": ["none", "stubble"]
+  },
+  "behavior": { "idleStyle": "working", "interactionVerb": "HEAL", "walkNodes": false },
+  "namePool": [
+    "Miriel",
+    "Leofric",
+    "Ysabel",
+    "Theron",
+    "Anneth",
+    "Gwyneth",
+    "Ealric"
+  ],
+  "greetingPool": [
+    { "text": "Let me see your wounds, traveller. The herbs will do their work if you hold still." },
+    { "text": "The land provides all the healing one needs. Come, tell me what ails you." },
+    { "text": "You carry weariness in your bones. Rest here a moment and let me tend to you." }
+  ],
+  "idlePool": [
+    { "text": "The comfrey poultice needs another hour to steep. Patience is half the cure." },
+    { "text": "Three cases of marsh fever this week. The damp season takes its toll on everyone." }
+  ]
+}

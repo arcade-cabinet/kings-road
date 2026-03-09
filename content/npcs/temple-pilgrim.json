@@ -1,0 +1,37 @@
+{
+  "id": "temple-pilgrim",
+  "name": "Pilgrim Margery",
+  "archetype": "pilgrim",
+  "fixed": true,
+  "bodyBuild": { "height": 0.85, "width": 0.8 },
+  "face": {
+    "skinTone": 0,
+    "eyeColor": "brown",
+    "hairStyle": "long",
+    "hairColor": "#8b6914",
+    "facialHair": "none"
+  },
+  "accessories": ["walking_staff", "pilgrim_badge", "prayer_beads"],
+  "clothPalette": { "primary": "#d4c5a9", "secondary": "#8b7355" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "I walked the whole King's Road to reach this place. Every step was a prayer. And you?",
+      "The temple is real. I half believed it was only a story until I saw those golden stones.",
+      "Be reverent, traveller. Whatever waits inside is older than any church I've ever prayed in."
+    ],
+    "quest": [
+      "I cannot enter. The Guardian turned me back — said I hadn't earned the right. Perhaps you'll fare better. You have a look about you, like the Road has tested you properly.",
+      "I'll wait here and tend the camp fire. If you find the Grail... well, I don't know what I expect. Just come back and tell me it's real."
+    ],
+    "idle": [
+      "The sunsets here are like nothing I've seen. Gold and rose, as if the sky is blessing this place.",
+      "I've met three other pilgrims since I arrived. None of them were allowed to enter.",
+      "The Guardian spoke to me with such sadness. I think he's been alone a very long time."
+    ]
+  }
+}

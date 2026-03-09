@@ -1,0 +1,35 @@
+{
+  "id": "retired-knight",
+  "name": "Retired Knight",
+  "archetype": "hermit",
+  "fixed": true,
+  "bodyBuild": { "height": 1.2, "width": 1.3 },
+  "face": {
+    "skinTone": 3,
+    "eyeColor": "blue",
+    "hairStyle": "short",
+    "hairColor": "#b0a090",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["old_sword", "dented_shield", "campfire_kit"],
+  "clothPalette": { "primary": "#5a5a6a", "secondary": "#8a3030" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "I've fought in wars you've never heard of, lad. Sit. Rest your legs.",
+      "Another young fool heading north to seek glory? I did the same, once.",
+      "These old bones have earned their rest. But if you need counsel, I'll not refuse."
+    ],
+    "quest": [
+      "I buried my commander's sword at the foot of the watchtower, years ago. His son deserves to have it. Would you carry it to Ravensgate for me? My knees won't make the journey."
+    ],
+    "idle": [
+      "I dream of battles I wish I could forget.",
+      "The fire keeps the wolves away. And the memories."
+    ]
+  }
+}

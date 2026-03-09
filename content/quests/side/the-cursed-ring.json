@@ -1,0 +1,81 @@
+{
+  "id": "side-the-cursed-ring",
+  "tier": "meso",
+  "title": "The Cursed Ring",
+  "estimatedMinutes": 22,
+  "anchorAffinity": "anchor-02",
+  "trigger": { "type": "roadside", "distanceRange": [10000, 13000] },
+  "branches": {
+    "A": {
+      "label": "Find the witch who cursed the ring",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "That ring I sold you, I am sorry. I did not know it was cursed when I bought it from the old woman in the hills. Strange things have followed me since I handled it — crows circling, milk souring, a shadow at my door. Please, find the witch and make her undo this wretched hex.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "investigate",
+          "description": "Follow the trail of withered flowers and dead songbirds into the thornwood to locate the witch's dwelling."
+        },
+        {
+          "id": "a-03",
+          "type": "puzzle",
+          "description": "Solve the witch's three-part ward puzzle to gain entry to her cottage without triggering the protective hexes."
+        },
+        {
+          "id": "a-04",
+          "type": "dialogue",
+          "npcArchetype": "hermit",
+          "dialogue": "So you found me. That ring was never meant for clumsy merchants. It binds itself to the worthy and tests their resolve. You passed through my wards without violence, which tells me enough. Give it here and I shall lift the curse. Consider it a lesson about buying trinkets from strangers.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "hex-breaker" }
+    },
+    "B": {
+      "label": "Destroy the ring at the standing stones",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "That ring I sold you, I am sorry. I did not know it was cursed when I bought it from the old woman in the hills. Strange things have followed me since I handled it — crows circling, milk souring, a shadow at my door. There must be some way to destroy the wretched thing.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "investigate",
+          "description": "Seek out the ancient standing stones on the hilltop, said to be a place where cursed objects can be unmade."
+        },
+        {
+          "id": "b-03",
+          "type": "encounter",
+          "encounterId": "cursed-ring-shade",
+          "description": "The ring's curse manifests as a shade that rises from the stone circle, fighting to preserve its vessel."
+        },
+        {
+          "id": "b-04",
+          "type": "puzzle",
+          "description": "Place the ring upon the altar stone and align the moonlight through the standing stones to channel enough sacred energy to shatter the curse."
+        },
+        {
+          "id": "b-05",
+          "type": "dialogue",
+          "npcArchetype": "wanderer",
+          "dialogue": "I saw the light from the stones half a league away. Whatever you did up there, the air feels cleaner for it. The old folk say those stones were placed to burn away wickedness. Seems they still have some power left in them after all these ages.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "curse-shatterer" }
+    }
+  },
+  "reward": { "type": "item", "itemId": "purified-ring" }
+}

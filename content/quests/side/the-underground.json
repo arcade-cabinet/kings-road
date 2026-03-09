@@ -1,0 +1,85 @@
+{
+  "id": "side-the-underground",
+  "tier": "meso",
+  "title": "The Underground",
+  "estimatedMinutes": 25,
+  "anchorAffinity": "anchor-03",
+  "trigger": { "type": "anchor", "anchorId": "anchor-03" },
+  "branches": {
+    "A": {
+      "label": "Join the resistance openly",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "innkeeper",
+          "dialogue": "Keep your voice down, stranger. You have been asking questions that draw the wrong kind of attention in Ravensgate. If you truly wish to help, come to the cellar of the Black Raven after the midnight bell. Knock three times and ask for the old vintage. But know this — once you walk through that door, there is no walking back out.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "investigate",
+          "description": "Wait for nightfall and descend into the cellar beneath the Black Raven tavern. Find the hidden passage behind the wine casks that leads to the resistance meeting hall."
+        },
+        {
+          "id": "a-03",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "So Greta vouches for you. That is no small thing. We are soldiers, merchants, healers — ordinary folk who have suffered enough under Ashwick's boot. We need someone from outside these walls, someone the captain's spies do not yet know. Will you carry a message to our allies in the moors? The guards search everyone at the gate, but a pilgrim on the King's Road might pass unnoticed.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-04",
+          "type": "travel",
+          "destination": "ravensgate-moors",
+          "description": "Smuggle the coded message past the gate guards and deliver it to the resistance contact camped in the moors beyond Ravensgate's walls."
+        },
+        {
+          "id": "a-05",
+          "type": "dialogue",
+          "npcArchetype": "innkeeper",
+          "dialogue": "The message reached them safely. You have done more for Ravensgate in one night than we have managed in months of whispering. The resistance is stronger now, and when the time comes to act, you will have a place among us. Take this — it belonged to the old lord, before Ashwick seized the manor. Wear it and our people will know you as a friend.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "item", "itemId": "resistance_token" }
+    },
+    "B": {
+      "label": "Infiltrate the resistance as a spy",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "You have sharp eyes, traveller. I have noticed the same things you have — the whispers in the tavern, the strangers who arrive after dark and leave before dawn. Lord Ashwick's captain pays well for information about dissidents. If you could get inside their little conspiracy and bring me names, I will see that you are richly rewarded. Thornton always pays his debts.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "investigate",
+          "description": "Pose as a sympathiser and gain the trust of the tavern regulars at the Black Raven. Listen for talk of secret meetings and coded phrases."
+        },
+        {
+          "id": "b-03",
+          "type": "encounter",
+          "encounterId": "merchant_negotiation",
+          "description": "Attend a resistance gathering in the cellar beneath the tavern and memorise the faces and plans discussed without arousing suspicion."
+        },
+        {
+          "id": "b-04",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "Six names and a meeting place — you have earned every coin of this. The captain will be most pleased. But between you and me, do not linger in Ravensgate once the arrests begin. Ashwick's gratitude has a short memory, and those who know too much often end up in the Oubliette alongside the people they betrayed.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "currency", "amount": 60 }
+    }
+  },
+  "reward": { "type": "modifier", "modifierId": "ravensgate-insider" }
+}

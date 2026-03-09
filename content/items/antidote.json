@@ -1,0 +1,12 @@
+{
+  "id": "antidote",
+  "name": "Antidote",
+  "description": "A pungent green elixir compounded from charcoal and wild garlic. It purges venom and halts the spread of poison.",
+  "type": "consumable",
+  "effect": {
+    "stat": "poisonResist",
+    "value": 100,
+    "duration": 30
+  },
+  "stackable": true
+}

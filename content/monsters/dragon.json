@@ -1,0 +1,15 @@
+{
+  "id": "dragon",
+  "name": "Ember Dragon",
+  "bodyType": "quadruped",
+  "size": 4.0,
+  "colorScheme": {
+    "primary": "#8b0000",
+    "secondary": "#4a0000",
+    "accent": "#ffa500"
+  },
+  "dangerTier": 4,
+  "health": 180,
+  "damage": 40,
+  "lootTable": "loot-tier-4"
+}

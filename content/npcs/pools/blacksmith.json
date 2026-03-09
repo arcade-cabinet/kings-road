@@ -1,0 +1,42 @@
+{
+  "id": "blacksmith-pool",
+  "archetype": "blacksmith",
+  "personality": "Gruff, practical, proud of craft. Speaks in clipped sentences about metal and fire.",
+  "displayTitle": "Master Smith",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.85, 1.0], "widthRange": [1.1, 1.3] },
+    "clothPalette": {
+      "primary": "#4a3020",
+      "secondary": "#2b1d12",
+      "variations": ["#3a2515", "#5a4030"]
+    },
+    "signatureAccessories": ["leather_apron"],
+    "optionalAccessories": ["hammer", "tongs", "bandana"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 4],
+    "eyeColors": ["brown", "gray"],
+    "hairStyles": ["bald", "short"],
+    "hairColors": ["#1a1a1a", "#4a3020", "#888888"],
+    "facialHairOptions": ["stubble", "full_beard"]
+  },
+  "behavior": { "idleStyle": "working", "interactionVerb": "TRADE", "walkNodes": false },
+  "namePool": [
+    "Cedric",
+    "Haldric",
+    "Brynn",
+    "Osric",
+    "Wulfgar",
+    "Ingrid",
+    "Torben"
+  ],
+  "greetingPool": [
+    { "text": "The forge runs hot today. What brings you to my anvil, traveller?" },
+    { "text": "Steel speaks truer than words. Tell me what you need shaped." },
+    { "text": "Mind the sparks, friend. I can mend what ails your gear, if the coin is right." }
+  ],
+  "idlePool": [
+    { "text": "This blade needs three more heats before it sings properly on the whetstone." },
+    { "text": "The iron sings when you get the temperature just right, you know." }
+  ]
+}

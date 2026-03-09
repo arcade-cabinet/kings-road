@@ -1,0 +1,42 @@
+{
+  "id": "lord-pool",
+  "archetype": "lord",
+  "personality": "Imperious, calculating, burdened by station. Speaks with measured authority and veiled impatience.",
+  "displayTitle": "Lord of the Manor",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [1.0, 1.15], "widthRange": [0.95, 1.1] },
+    "clothPalette": {
+      "primary": "#6b1030",
+      "secondary": "#c0a040",
+      "variations": ["#7b2040", "#5b0820"]
+    },
+    "signatureAccessories": ["signet_ring", "fur_collar"],
+    "optionalAccessories": ["jeweled_brooch", "ceremonial_dagger", "gold_chain", "velvet_cape"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 2],
+    "eyeColors": ["blue", "gray", "brown"],
+    "hairStyles": ["short", "bald"],
+    "hairColors": ["#1a1a1a", "#4a3a2a", "#888888"],
+    "facialHairOptions": ["none", "mustache", "full_beard"]
+  },
+  "behavior": { "idleStyle": "sitting", "interactionVerb": "PETITION", "walkNodes": false },
+  "namePool": [
+    "Aldric",
+    "Pemberton",
+    "Hereward",
+    "Godfrey",
+    "Thurstan",
+    "Ealdred",
+    "Adeliza"
+  ],
+  "greetingPool": [
+    { "text": "You stand in the presence of the lord of this domain. Speak your piece." },
+    { "text": "These lands are under my protection. I trust you bring no trouble." },
+    { "text": "A traveller on the King's Road. You may rest here, but mind our laws." }
+  ],
+  "idlePool": [
+    { "text": "The northern holdings owe three months of tithe. My patience with Lord Fenwick grows thin." },
+    { "text": "A lord must balance mercy and justice on a blade's edge. Today the edge is sharp." }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "thornbeast",
+  "name": "Thornbeast",
+  "bodyType": "amorphous",
+  "size": 2.8,
+  "colorScheme": {
+    "primary": "#3e2723",
+    "secondary": "#1b0f00",
+    "accent": "#556b2f"
+  },
+  "dangerTier": 4,
+  "health": 160,
+  "damage": 22,
+  "lootTable": "loot-tier-4"
+}

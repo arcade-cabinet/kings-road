@@ -1,0 +1,17 @@
+{
+  "id": "stable",
+  "stories": 1,
+  "footprint": { "width": 3, "depth": 2 },
+  "wallMaterial": "timber_frame",
+  "roofStyle": "thatch",
+  "openFront": false,
+  "features": ["door", "hay_loft", "trough"],
+  "interiorSlots": [
+    { "type": "hay_bale", "position": [0.5, 0.5] },
+    { "type": "hay_bale", "position": [0.5, 1.5] },
+    { "type": "trough", "position": [1.5, 0.5] },
+    { "type": "stall", "position": [2.5, 0.5] },
+    { "type": "stall", "position": [2.5, 1.5] }
+  ],
+  "npcSlot": { "archetype": "stablehand", "position": [1.5, 1.5] }
+}

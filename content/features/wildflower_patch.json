@@ -1,0 +1,8 @@
+{
+  "id": "wildflower_patch",
+  "tier": "ambient",
+  "name": "Wildflower Patch",
+  "description": "A sun-dappled carpet of cornflowers and poppies spills across the roadside, humming with the drowsy murmur of bees.",
+  "visualType": "wildflower_patch",
+  "interactable": false
+}

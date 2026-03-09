@@ -1,0 +1,12 @@
+{
+  "id": "encounter-tier-2",
+  "dangerTier": 2,
+  "entries": [
+    { "monsterId": "dire_wolf", "weight": 0.25, "count": [1, 2] },
+    { "monsterId": "bandit_leader", "weight": 0.2, "count": [1, 1] },
+    { "monsterId": "giant_spider", "weight": 0.2, "count": [1, 3] },
+    { "monsterId": "wraith", "weight": 0.15, "count": [1, 1] },
+    { "monsterId": "troll", "weight": 0.2, "count": [1, 1] }
+  ],
+  "lootTable": "loot-tier-2"
+}

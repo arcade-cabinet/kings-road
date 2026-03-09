@@ -1,0 +1,9 @@
+{
+  "id": "fairy_circle",
+  "tier": "minor",
+  "name": "Fairy Circle",
+  "description": "A perfect ring of pale mushrooms grows in the shade of an elm, the grass within unnaturally green and soft.",
+  "visualType": "fairy_circle",
+  "interactable": true,
+  "dialogueOnInteract": "You step inside the ring and the air hums with a faint melody just below hearing. The light seems to bend. When you step out again, the sun has moved — though it felt like only a moment."
+}

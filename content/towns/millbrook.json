@@ -1,0 +1,28 @@
+{
+  "id": "millbrook",
+  "name": "Millbrook",
+  "anchorId": "anchor-01",
+  "layout": "road",
+  "boundary": "hedge",
+  "approach": "bridge",
+  "center": [0, 0],
+  "buildings": [
+    { "archetype": "tavern", "label": "The Bridge & Barrel", "position": [-4, -1], "rotation": 0, "overrides": { "stories": 2 } },
+    { "archetype": "market_stall", "label": "Gerold's Dry Goods", "position": [3, -1], "rotation": 0 },
+    { "archetype": "market_stall", "label": "Spice & Thread", "position": [5, -1], "rotation": 0 },
+    { "archetype": "market_stall", "label": "Wynn's Produce", "position": [7, -1], "rotation": 0 },
+    { "archetype": "chapel", "label": "Chapel of the Wayfarer", "position": [-6, 1], "rotation": 0 },
+    { "archetype": "guard_post", "label": "Bridge Watch", "position": [-8, -1], "rotation": 0 },
+    { "archetype": "house_large", "label": "Miller's House", "position": [3, 1], "rotation": 0, "overrides": { "stories": 2 } },
+    { "archetype": "house_large", "label": "Merchant's Hall", "position": [6, 1], "rotation": 0, "overrides": { "stories": 2 } },
+    { "archetype": "stable", "label": "Millbrook Stables", "position": [9, -1], "rotation": 0 }
+  ],
+  "npcs": [
+    { "id": "martha", "archetype": "innkeeper", "fixed": true, "building": "The Bridge & Barrel", "name": "Martha" },
+    { "id": "gerold", "archetype": "merchant", "fixed": true, "building": "Gerold's Dry Goods", "name": "Gerold" },
+    { "id": "brother-thomas", "archetype": "priest", "fixed": true, "building": "Chapel of the Wayfarer", "name": "Brother Thomas" },
+    { "id": "captain-hale", "archetype": "knight", "fixed": true, "building": "Bridge Watch", "name": "Captain Hale" },
+    { "id": "farmer-wynn", "archetype": "farmer", "fixed": true, "building": "Wynn's Produce", "name": "Farmer Wynn" },
+    { "id": "lucy", "archetype": "wanderer", "fixed": false, "name": "Lucy" }
+  ]
+}

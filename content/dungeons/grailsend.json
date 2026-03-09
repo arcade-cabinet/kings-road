@@ -1,0 +1,155 @@
+{
+  "id": "grailsend-temple",
+  "name": "Grailsend Temple",
+  "anchorId": "anchor-05",
+  "description": "The ancient temple at the end of the King's Road, where the Holy Grail awaits those who prove themselves through three sacred trials. Honey-gold stone walls glow with an inner light, and the air hums with a presence older than memory.",
+  "recommendedLevel": 10,
+  "entranceRoomId": "temple-narthex",
+  "bossRoomId": "guardian-arena",
+  "rooms": [
+    {
+      "id": "temple-narthex",
+      "name": "Temple Narthex",
+      "type": "entrance",
+      "description": "A vaulted entrance hall of warm limestone, its pillars carved with scenes of pilgrims bearing offerings. Three archways lead deeper into the temple, each inscribed with a single word: Wisdom, Mercy, Sacrifice. Candles burn without melting along the walls.",
+      "connections": [
+        { "to": "hall-of-echoes", "direction": "west" },
+        { "to": "penitents-passage", "direction": "north" },
+        { "to": "pilgrim-descent", "direction": "east" }
+      ]
+    },
+    {
+      "id": "hall-of-echoes",
+      "name": "Hall of Echoes",
+      "type": "corridor",
+      "description": "A long gallery where every footstep returns tenfold. Faded tapestries depict scholars debating before a radiant cup. The air smells of old parchment and beeswax, and faint whispers seem to recite forgotten verses.",
+      "traps": [
+        {
+          "type": "poison_gas",
+          "difficulty": 6,
+          "damage": 10,
+          "description": "Censers concealed behind the tapestries release a soporific incense when a false flagstone is disturbed. Only the alert avoid breathing deeply."
+        }
+      ],
+      "connections": [
+        { "to": "temple-narthex", "direction": "east" },
+        { "to": "trial-of-wisdom", "direction": "west" }
+      ]
+    },
+    {
+      "id": "trial-of-wisdom",
+      "name": "Trial of Wisdom",
+      "type": "puzzle",
+      "description": "A circular chamber whose domed ceiling displays a map of stars that shift when observed. Three stone basins stand before an altar, each demanding a different offering. The Oracle's voice fills the room, posing questions that cut to the heart of what is true.",
+      "encounterId": "oracle_trial",
+      "lootTableId": "loot-tier-3",
+      "connections": [
+        { "to": "hall-of-echoes", "direction": "east" },
+        { "to": "convergence-hall", "direction": "north" }
+      ]
+    },
+    {
+      "id": "penitents-passage",
+      "name": "Penitent's Passage",
+      "type": "corridor",
+      "description": "A narrow corridor lined with stone confessionals. The faces of carved saints watch from alcoves, their expressions shifting between sorrow and hope depending on the angle of the candlelight. The floor slopes gently downward.",
+      "traps": [
+        {
+          "type": "pressure_plate",
+          "difficulty": 5,
+          "damage": 8,
+          "description": "A worn flagstone triggers iron bars to slam down from the ceiling, caging the unwary in a stone confessional until they speak a truth aloud."
+        }
+      ],
+      "connections": [
+        { "to": "temple-narthex", "direction": "south" },
+        { "to": "trial-of-mercy", "direction": "north" }
+      ]
+    },
+    {
+      "id": "trial-of-mercy",
+      "name": "Trial of Mercy",
+      "type": "chamber",
+      "description": "A warm chamber lit by a hearth that burns without fuel. A robed figure kneels in supplication, pleading for compassion. The walls bear murals of kings pardoning enemies and healers tending the wounded. Every word spoken here carries the weight of judgment.",
+      "encounterId": "noble_court",
+      "lootTableId": "loot-tier-3",
+      "connections": [
+        { "to": "penitents-passage", "direction": "south" },
+        { "to": "convergence-hall", "direction": "east" }
+      ]
+    },
+    {
+      "id": "pilgrim-descent",
+      "name": "Pilgrim's Descent",
+      "type": "corridor",
+      "description": "A steep stairway carved into living rock, each step worn smooth by centuries of bare feet. Torch sconces shaped like open hands line the walls, and the temperature drops with every step downward into the earth.",
+      "traps": [
+        {
+          "type": "pit_fall",
+          "difficulty": 7,
+          "damage": 15,
+          "description": "Several steps are hinged to collapse under weight, dropping the careless into a shallow cistern of frigid water far below."
+        }
+      ],
+      "connections": [
+        { "to": "temple-narthex", "direction": "west" },
+        { "to": "trial-of-sacrifice", "direction": "down" }
+      ]
+    },
+    {
+      "id": "trial-of-sacrifice",
+      "name": "Trial of Sacrifice",
+      "type": "chamber",
+      "description": "A stark chamber deep beneath the temple, bitterly cold and stripped of all ornament. A stone altar stands at the centre, scored with ancient blade-marks. The trial demands something freely given — strength, comfort, or a treasured possession — and the walls close in on those who offer nothing.",
+      "encounterId": "wilderness_storm",
+      "lootTableId": "loot-tier-4",
+      "connections": [
+        { "to": "pilgrim-descent", "direction": "up" },
+        { "to": "convergence-hall", "direction": "west" }
+      ]
+    },
+    {
+      "id": "convergence-hall",
+      "name": "Hall of Convergence",
+      "type": "corridor",
+      "description": "The three trial paths reunite in a grand rotunda. Mosaic floors depict three streams flowing into a single river of gold. The air thrums with gathered purpose, and ahead, massive bronze doors stand closed, bearing the image of a chalice wreathed in light.",
+      "connections": [
+        { "to": "trial-of-wisdom", "direction": "south" },
+        { "to": "trial-of-mercy", "direction": "west" },
+        { "to": "trial-of-sacrifice", "direction": "east" },
+        { "to": "guardian-arena", "direction": "north", "locked": true, "keyId": "three-trials-seal" }
+      ]
+    },
+    {
+      "id": "guardian-arena",
+      "name": "The Guardian's Arena",
+      "type": "boss",
+      "description": "A vast arena beneath a dome of living starlight. At its centre coils the Temple Guardian, an ancient wyrm of bronze and flame set to guard the Grail from the unworthy. The ground is scorched black in concentric rings, and the bones of failed seekers line the walls.",
+      "encounterId": "dragon_lair",
+      "lootTableId": "loot-tier-4",
+      "connections": [
+        { "to": "convergence-hall", "direction": "south" },
+        { "to": "grail-chamber", "direction": "north" }
+      ]
+    },
+    {
+      "id": "reliquary-of-saints",
+      "name": "Reliquary of Saints",
+      "type": "treasure",
+      "description": "A hidden side-chapel accessible only to those who listen to the whispers in the Hall of Echoes. Crystal reliquaries hold fragments of bone and cloth, and golden votives spill from overflowing offering-bowls. The faithful are rewarded here.",
+      "lootTableId": "loot-tier-4",
+      "connections": [
+        { "to": "hall-of-echoes", "direction": "east", "secret": true, "secretHint": "Behind the largest tapestry, a faint golden light pulses in rhythm with the whispered verses." }
+      ]
+    },
+    {
+      "id": "grail-chamber",
+      "name": "The Grail Chamber",
+      "type": "shrine",
+      "description": "A small, perfectly round chamber of white stone. A single beam of golden light falls from an oculus high above, illuminating a simple wooden cup resting on a plain stone pedestal. The air is warm and still, and all sound from the world outside falls away. The Holy Grail awaits.",
+      "connections": [
+        { "to": "guardian-arena", "direction": "south" }
+      ]
+    }
+  ]
+}

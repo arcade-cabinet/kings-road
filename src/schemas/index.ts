@@ -4,6 +4,7 @@ export {
   RoofStyle,
   WallMaterial,
 } from './building.schema';
+export * from './dungeon.schema';
 export * from './encounter.schema';
 export {
   type EncounterTable,

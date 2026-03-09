@@ -1,0 +1,42 @@
+{
+  "id": "herbalist-pool",
+  "archetype": "herbalist",
+  "personality": "Gentle, meticulous, deeply connected to growing things. Speaks in botanical metaphors.",
+  "displayTitle": "Herbalist",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.8, 0.95], "widthRange": [0.8, 0.95] },
+    "clothPalette": {
+      "primary": "#5a7a50",
+      "secondary": "#8aaa7a",
+      "variations": ["#4a6a40", "#6b8b5b"]
+    },
+    "signatureAccessories": ["herb_basket"],
+    "optionalAccessories": ["garden_shears", "seed_pouch", "flower_crown", "clay_pots"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["green", "brown"],
+    "hairStyles": ["long", "short"],
+    "hairColors": ["#8b6840", "#c8a870", "#5a3a20"],
+    "facialHairOptions": ["none", "stubble"]
+  },
+  "behavior": { "idleStyle": "working", "interactionVerb": "TRADE", "walkNodes": false },
+  "namePool": [
+    "Hazel",
+    "Rowan",
+    "Sage",
+    "Primrose",
+    "Bryony",
+    "Yarrow",
+    "Linnea"
+  ],
+  "greetingPool": [
+    { "text": "The garden speaks to those who listen. Can I prepare something for you?" },
+    { "text": "Comfrey for wounds, lavender for rest, thyme for courage. What ails you?" },
+    { "text": "Mind where you step — that yarrow took all summer to coax into bloom." }
+  ],
+  "idlePool": [
+    { "text": "The foxglove is coming in beautifully this year. Deadly and lovely in equal measure." },
+    { "text": "I must dry these chamomile heads before the dew settles or they will lose their potency." }
+  ]
+}

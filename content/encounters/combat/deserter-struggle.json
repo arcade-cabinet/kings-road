@@ -1,0 +1,13 @@
+{
+  "id": "deserter-struggle",
+  "name": "The Desperate Deserter",
+  "type": "combat",
+  "difficulty": 3,
+  "description": "A wild-eyed soldier in torn livery stumbles from the hedgerow, sword shaking in his fist. He has fled his lord's levy and fears pursuit more than death. He demands your cloak and provisions, too frightened to parley, too desperate to back down.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.4 },
+    { "itemId": "ration", "chance": 0.8 },
+    { "itemId": "torch", "chance": 0.5 }
+  ],
+  "failureConsequence": "The deserter lands a lucky blow and snatches your pack before bolting into the woods. You are left with a bruised jaw and a lighter load."
+}
