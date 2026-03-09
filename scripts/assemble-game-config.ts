@@ -82,10 +82,12 @@ if (!result.success) {
 }
 
 const outPath = path.join(contentDir, 'game-config.json');
-fs.writeFileSync(outPath, JSON.stringify(config, null, 2) + '\n');
+fs.writeFileSync(outPath, `${JSON.stringify(config, null, 2)}\n`);
 console.log(`Wrote ${outPath}`);
 console.log(`  Main quest chapters: ${mainQuest.length}`);
-console.log(`  Side quests — macro: ${sideQuests.macro.length}, meso: ${sideQuests.meso.length}, micro: ${sideQuests.micro.length}`);
+console.log(
+  `  Side quests — macro: ${sideQuests.macro.length}, meso: ${sideQuests.meso.length}, micro: ${sideQuests.micro.length}`,
+);
 console.log(`  NPCs: ${npcs.length}`);
 console.log(`  Features: ${features.length}`);
 console.log(`  Items: ${items.length}`);

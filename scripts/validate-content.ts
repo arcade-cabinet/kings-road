@@ -52,8 +52,14 @@ function routeContent(relPath: string): string | null {
   if (n.startsWith('monsters/')) return 'monsters';
   if (n.startsWith('buildings/')) return 'buildings';
   if (n.startsWith('features/')) return 'features';
-  if (n.startsWith('quests/') || n.startsWith('main-quest/') || n.startsWith('side-quests/')) return 'quests';
-  if (n.match(/^encounters\/(combat|puzzle|social|stealth|survival)\//)) return 'encounter-def';
+  if (
+    n.startsWith('quests/') ||
+    n.startsWith('main-quest/') ||
+    n.startsWith('side-quests/')
+  )
+    return 'quests';
+  if (n.match(/^encounters\/(combat|puzzle|social|stealth|survival)\//))
+    return 'encounter-def';
   if (n.startsWith('encounters/')) return 'encounter-table';
   if (n.startsWith('loot/')) return 'loot';
   if (n.startsWith('dungeons/')) return 'dungeons';
@@ -103,7 +109,8 @@ function buildIndex(contentDir: string): IdIndex {
       case 'npc-pool':
       case 'npcs':
         if (id) index.npcIds.add(id);
-        if (typeof data.archetype === 'string') index.npcArchetypes.add(data.archetype);
+        if (typeof data.archetype === 'string')
+          index.npcArchetypes.add(data.archetype);
         break;
       case 'monsters':
         if (id) index.monsters.add(id);
@@ -158,7 +165,9 @@ function buildIndex(contentDir: string): IdIndex {
 // Cross-reference checks
 // ---------------------------------------------------------------------------
 
-function collectQuestSteps(data: Record<string, unknown>): Array<Record<string, unknown>> {
+function collectQuestSteps(
+  data: Record<string, unknown>,
+): Array<Record<string, unknown>> {
   const steps: Array<Record<string, unknown>> = [];
   if (Array.isArray(data.steps)) {
     steps.push(...(data.steps as Array<Record<string, unknown>>));
@@ -182,7 +191,10 @@ function checkTown(
 ): void {
   if (Array.isArray(data.buildings)) {
     for (const b of data.buildings as Array<Record<string, unknown>>) {
-      if (typeof b.archetype === 'string' && !index.buildings.has(b.archetype)) {
+      if (
+        typeof b.archetype === 'string' &&
+        !index.buildings.has(b.archetype)
+      ) {
         errors.push({
           file: relPath,
           message: `Building archetype "${b.archetype}" not found in content/buildings/`,
@@ -192,7 +204,10 @@ function checkTown(
   }
   if (Array.isArray(data.npcs)) {
     for (const npc of data.npcs as Array<Record<string, unknown>>) {
-      if (typeof npc.archetype === 'string' && !index.npcArchetypes.has(npc.archetype)) {
+      if (
+        typeof npc.archetype === 'string' &&
+        !index.npcArchetypes.has(npc.archetype)
+      ) {
         errors.push({
           file: relPath,
           message: `NPC archetype "${npc.archetype}" not found in content/npcs/`,
@@ -216,7 +231,10 @@ function checkQuest(
 ): void {
   const steps = collectQuestSteps(data);
   for (const step of steps) {
-    if (typeof step.npcArchetype === 'string' && !index.npcArchetypes.has(step.npcArchetype)) {
+    if (
+      typeof step.npcArchetype === 'string' &&
+      !index.npcArchetypes.has(step.npcArchetype)
+    ) {
       errors.push({
         file: relPath,
         message: `Quest step "${step.id}" references unknown NPC archetype "${step.npcArchetype}"`,
@@ -243,12 +261,18 @@ function checkQuest(
   if (Array.isArray(data.prerequisites)) {
     for (const prereq of data.prerequisites) {
       if (typeof prereq === 'string' && !index.quests.has(prereq)) {
-        errors.push({ file: relPath, message: `Prerequisite quest "${prereq}" not found` });
+        errors.push({
+          file: relPath,
+          message: `Prerequisite quest "${prereq}" not found`,
+        });
       }
     }
   }
 
-  if (typeof data.anchorAffinity === 'string' && !index.anchors.has(data.anchorAffinity)) {
+  if (
+    typeof data.anchorAffinity === 'string' &&
+    !index.anchors.has(data.anchorAffinity)
+  ) {
     errors.push({
       file: relPath,
       message: `Anchor affinity "${data.anchorAffinity}" not found in road spine`,
@@ -257,13 +281,21 @@ function checkQuest(
 
   const trigger = data.trigger as Record<string, unknown> | undefined;
   if (trigger) {
-    if (trigger.type === 'anchor' && typeof trigger.anchorId === 'string' && !index.anchors.has(trigger.anchorId)) {
+    if (
+      trigger.type === 'anchor' &&
+      typeof trigger.anchorId === 'string' &&
+      !index.anchors.has(trigger.anchorId)
+    ) {
       errors.push({
         file: relPath,
         message: `Trigger anchor "${trigger.anchorId}" not found in road spine`,
       });
     }
-    if (trigger.type === 'prerequisite' && typeof trigger.questId === 'string' && !index.quests.has(trigger.questId)) {
+    if (
+      trigger.type === 'prerequisite' &&
+      typeof trigger.questId === 'string' &&
+      !index.quests.has(trigger.questId)
+    ) {
       errors.push({
         file: relPath,
         message: `Trigger prerequisite quest "${trigger.questId}" not found`,
@@ -273,8 +305,11 @@ function checkQuest(
 
   // Check reward item references
   const rewards: Array<Record<string, unknown>> = [];
-  if (data.reward && typeof data.reward === 'object') rewards.push(data.reward as Record<string, unknown>);
-  const branches = data.branches as Record<string, Record<string, unknown>> | undefined;
+  if (data.reward && typeof data.reward === 'object')
+    rewards.push(data.reward as Record<string, unknown>);
+  const branches = data.branches as
+    | Record<string, Record<string, unknown>>
+    | undefined;
   if (branches?.A?.reward && typeof branches.A.reward === 'object') {
     rewards.push(branches.A.reward as Record<string, unknown>);
   }
@@ -282,7 +317,11 @@ function checkQuest(
     rewards.push(branches.B.reward as Record<string, unknown>);
   }
   for (const reward of rewards) {
-    if (reward.type === 'item' && typeof reward.itemId === 'string' && !index.items.has(reward.itemId)) {
+    if (
+      reward.type === 'item' &&
+      typeof reward.itemId === 'string' &&
+      !index.items.has(reward.itemId)
+    ) {
       errors.push({
         file: relPath,
         message: `Reward references unknown item "${reward.itemId}"`,
@@ -299,7 +338,10 @@ function checkEncounterTable(
 ): void {
   if (Array.isArray(data.entries)) {
     for (const entry of data.entries as Array<Record<string, unknown>>) {
-      if (typeof entry.monsterId === 'string' && !index.monsters.has(entry.monsterId)) {
+      if (
+        typeof entry.monsterId === 'string' &&
+        !index.monsters.has(entry.monsterId)
+      ) {
         errors.push({
           file: relPath,
           message: `Encounter table entry references unknown monster "${entry.monsterId}"`,
@@ -307,7 +349,10 @@ function checkEncounterTable(
       }
     }
   }
-  if (typeof data.lootTable === 'string' && !index.lootTables.has(data.lootTable)) {
+  if (
+    typeof data.lootTable === 'string' &&
+    !index.lootTables.has(data.lootTable)
+  ) {
     errors.push({
       file: relPath,
       message: `Encounter table references unknown loot table "${data.lootTable}"`,
@@ -323,7 +368,10 @@ function checkEncounterDef(
 ): void {
   if (Array.isArray(data.rewards)) {
     for (const reward of data.rewards as Array<Record<string, unknown>>) {
-      if (typeof reward.itemId === 'string' && !index.items.has(reward.itemId)) {
+      if (
+        typeof reward.itemId === 'string' &&
+        !index.items.has(reward.itemId)
+      ) {
         errors.push({
           file: relPath,
           message: `Encounter reward references unknown item "${reward.itemId}"`,
@@ -357,7 +405,10 @@ function checkMonster(
   index: IdIndex,
   errors: XRefError[],
 ): void {
-  if (typeof data.lootTable === 'string' && !index.lootTables.has(data.lootTable)) {
+  if (
+    typeof data.lootTable === 'string' &&
+    !index.lootTables.has(data.lootTable)
+  ) {
     errors.push({
       file: relPath,
       message: `Monster references unknown loot table "${data.lootTable}"`,
@@ -381,7 +432,10 @@ function checkDungeon(
   const dungeonId = typeof data.id === 'string' ? data.id : '';
   const roomIds = index.dungeonRooms.get(dungeonId) ?? new Set<string>();
 
-  if (typeof data.entranceRoomId === 'string' && !roomIds.has(data.entranceRoomId)) {
+  if (
+    typeof data.entranceRoomId === 'string' &&
+    !roomIds.has(data.entranceRoomId)
+  ) {
     errors.push({
       file: relPath,
       message: `Dungeon entranceRoomId "${data.entranceRoomId}" not found in rooms`,
@@ -408,7 +462,10 @@ function checkDungeon(
           message: `Room "${roomId}" references unknown encounter "${room.encounterId}"`,
         });
       }
-      if (typeof room.lootTableId === 'string' && !index.lootTables.has(room.lootTableId)) {
+      if (
+        typeof room.lootTableId === 'string' &&
+        !index.lootTables.has(room.lootTableId)
+      ) {
         errors.push({
           file: relPath,
           message: `Room "${roomId}" references unknown loot table "${room.lootTableId}"`,
@@ -443,7 +500,10 @@ function checkBuilding(
 ): void {
   if (data.npcSlot && typeof data.npcSlot === 'object') {
     const slot = data.npcSlot as Record<string, unknown>;
-    if (typeof slot.archetype === 'string' && !index.npcArchetypes.has(slot.archetype)) {
+    if (
+      typeof slot.archetype === 'string' &&
+      !index.npcArchetypes.has(slot.archetype)
+    ) {
       errors.push({
         file: relPath,
         message: `Building npcSlot archetype "${slot.archetype}" not found in content/npcs/`,
@@ -563,7 +623,9 @@ function main() {
   if (schemaErrors > 0) {
     console.log(`\n  ${schemaErrors} file(s) failed schema validation.`);
   } else {
-    console.log(`  \x1b[32m\u2713\x1b[0m All ${troveReport.summary.totalFiles} files pass schema validation.`);
+    console.log(
+      `  \x1b[32m\u2713\x1b[0m All ${troveReport.summary.totalFiles} files pass schema validation.`,
+    );
   }
 
   // Phase 2: Cross-reference checking

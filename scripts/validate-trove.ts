@@ -11,21 +11,24 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { z } from 'zod';
 import { BuildingArchetypeSchema } from '../src/schemas/building.schema';
 import { DungeonLayoutSchema } from '../src/schemas/dungeon.schema';
 import { EncounterDefinitionSchema } from '../src/schemas/encounter.schema';
-import { EncounterTableSchema, LootTableSchema } from '../src/schemas/encounter-table.schema';
+import {
+  EncounterTableSchema,
+  LootTableSchema,
+} from '../src/schemas/encounter-table.schema';
 import { FeatureDefinitionSchema } from '../src/schemas/feature.schema';
 import { GameConfigSchema } from '../src/schemas/game-config.schema';
 import { ItemDefinitionSchema } from '../src/schemas/item.schema';
 import { MonsterArchetypeSchema } from '../src/schemas/monster.schema';
-import { NPCBlueprintSchema } from '../src/schemas/npc-blueprint.schema';
 import { NPCDefinitionSchema } from '../src/schemas/npc.schema';
+import { NPCBlueprintSchema } from '../src/schemas/npc-blueprint.schema';
 import { PacingConfigSchema } from '../src/schemas/pacing.schema';
 import { QuestDefinitionSchema } from '../src/schemas/quest.schema';
 import { TownConfigSchema } from '../src/schemas/town.schema';
 import { RoadSpineSchema } from '../src/schemas/world.schema';
-import type { z } from 'zod';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -101,7 +104,10 @@ function getSchemaForFile(
   if (normalized.startsWith('world/')) {
     return { schema: RoadSpineSchema, contentType: 'road-spine' };
   }
-  if (normalized.startsWith('main-quest/') || normalized.startsWith('quests/')) {
+  if (
+    normalized.startsWith('main-quest/') ||
+    normalized.startsWith('quests/')
+  ) {
     return { schema: QuestDefinitionSchema, contentType: 'quest' };
   }
   if (normalized.startsWith('side-quests/macro/')) {
@@ -118,7 +124,11 @@ function getSchemaForFile(
   }
   if (normalized.startsWith('npcs/')) {
     // Distinguish blueprint files from pool files by checking for bodyBuild field
-    if (data && typeof data === 'object' && 'bodyBuild' in (data as Record<string, unknown>)) {
+    if (
+      data &&
+      typeof data === 'object' &&
+      'bodyBuild' in (data as Record<string, unknown>)
+    ) {
       return { schema: NPCBlueprintSchema, contentType: 'npc-blueprint' };
     }
     return { schema: NPCDefinitionSchema, contentType: 'npc' };
@@ -141,8 +151,17 @@ function getSchemaForFile(
   if (normalized.startsWith('monsters/')) {
     return { schema: MonsterArchetypeSchema, contentType: 'monster' };
   }
-  if (normalized.startsWith('encounters/combat/') || normalized.startsWith('encounters/puzzle/') || normalized.startsWith('encounters/social/') || normalized.startsWith('encounters/stealth/') || normalized.startsWith('encounters/survival/')) {
-    return { schema: EncounterDefinitionSchema, contentType: 'encounter-definition' };
+  if (
+    normalized.startsWith('encounters/combat/') ||
+    normalized.startsWith('encounters/puzzle/') ||
+    normalized.startsWith('encounters/social/') ||
+    normalized.startsWith('encounters/stealth/') ||
+    normalized.startsWith('encounters/survival/')
+  ) {
+    return {
+      schema: EncounterDefinitionSchema,
+      contentType: 'encounter-definition',
+    };
   }
   if (normalized.startsWith('encounters/')) {
     return { schema: EncounterTableSchema, contentType: 'encounter-table' };
@@ -207,7 +226,9 @@ function estimateStepMinutes(step: Record<string, unknown>): number {
   return STEP_DURATION_MINUTES[type] ?? 2;
 }
 
-function getAllSteps(quest: Record<string, unknown>): Array<Record<string, unknown>> {
+function getAllSteps(
+  quest: Record<string, unknown>,
+): Array<Record<string, unknown>> {
   const steps: Array<Record<string, unknown>> = [];
   if (Array.isArray(quest.steps)) {
     steps.push(...(quest.steps as Array<Record<string, unknown>>));
@@ -223,21 +244,29 @@ function getAllSteps(quest: Record<string, unknown>): Array<Record<string, unkno
   return steps;
 }
 
-export function estimateQuestDuration(quest: Record<string, unknown>): DurationEstimate {
+export function estimateQuestDuration(
+  quest: Record<string, unknown>,
+): DurationEstimate {
   const steps = getAllSteps(quest);
-  const estimatedMinutes = steps.reduce((sum, step) => sum + estimateStepMinutes(step), 0);
-  const declaredMinutes = typeof quest.estimatedMinutes === 'number' ? quest.estimatedMinutes : 0;
-  const deviationPercent = declaredMinutes > 0
-    ? Math.abs(estimatedMinutes - declaredMinutes) / declaredMinutes * 100
-    : 0;
+  const estimatedMinutes = steps.reduce(
+    (sum, step) => sum + estimateStepMinutes(step),
+    0,
+  );
+  const declaredMinutes =
+    typeof quest.estimatedMinutes === 'number' ? quest.estimatedMinutes : 0;
+  const deviationPercent =
+    declaredMinutes > 0
+      ? (Math.abs(estimatedMinutes - declaredMinutes) / declaredMinutes) * 100
+      : 0;
 
   return {
     estimatedMinutes: Math.round(estimatedMinutes * 10) / 10,
     declaredMinutes,
     deviationPercent: Math.round(deviationPercent),
-    warning: deviationPercent > 50
-      ? `Duration deviation ${Math.round(deviationPercent)}%: estimated ${estimatedMinutes.toFixed(1)} min vs declared ${declaredMinutes} min`
-      : null,
+    warning:
+      deviationPercent > 50
+        ? `Duration deviation ${Math.round(deviationPercent)}%: estimated ${estimatedMinutes.toFixed(1)} min vs declared ${declaredMinutes} min`
+        : null,
   };
 }
 
@@ -278,7 +307,9 @@ function collectUniqueNPCs(quest: Record<string, unknown>): Set<string> {
 
 const SUBSTANCE_THRESHOLD = 10; // minimum dialogue words per step
 
-export function calculateSubstanceScore(quest: Record<string, unknown>): SubstanceScore {
+export function calculateSubstanceScore(
+  quest: Record<string, unknown>,
+): SubstanceScore {
   const steps = getAllSteps(quest);
   const totalDialogueWords = collectDialogueWords(quest);
   const uniqueNPCs = collectUniqueNPCs(quest);
@@ -298,7 +329,9 @@ export function calculateSubstanceScore(quest: Record<string, unknown>): Substan
 // A/B branch coverage check
 // ---------------------------------------------------------------------------
 
-export function checkQuestBranches(quest: Record<string, unknown>): string | null {
+export function checkQuestBranches(
+  quest: Record<string, unknown>,
+): string | null {
   const tier = quest.tier as string;
   if (tier === 'micro') return null; // micro quests don't need branches
 
@@ -352,8 +385,10 @@ function buildContentIndex(contentDir: string): ContentIndex {
       ) {
         if (typeof data.id === 'string') index.questIds.add(data.id);
       } else if (relPath.startsWith('npcs/')) {
-        if (typeof data.archetype === 'string') index.npcArchetypes.add(data.archetype);
-        if (typeof data.id === 'string') index.npcArchetypes.add(data.archetype);
+        if (typeof data.archetype === 'string')
+          index.npcArchetypes.add(data.archetype);
+        if (typeof data.id === 'string')
+          index.npcArchetypes.add(data.archetype);
       } else if (relPath.startsWith('features/')) {
         if (typeof data.id === 'string') index.featureIds.add(data.id);
       }
@@ -375,8 +410,14 @@ export function checkReferentialIntegrity(
   // Check prerequisites reference existing quest IDs
   if (Array.isArray(quest.prerequisites)) {
     for (const prereq of quest.prerequisites) {
-      if (typeof prereq === 'string' && index.questIds.size > 0 && !index.questIds.has(prereq)) {
-        warnings.push(`Quest "${questId}" references unknown prerequisite "${prereq}"`);
+      if (
+        typeof prereq === 'string' &&
+        index.questIds.size > 0 &&
+        !index.questIds.has(prereq)
+      ) {
+        warnings.push(
+          `Quest "${questId}" references unknown prerequisite "${prereq}"`,
+        );
       }
     }
   }
@@ -384,7 +425,9 @@ export function checkReferentialIntegrity(
   // Check anchorAffinity references existing anchor IDs
   if (typeof quest.anchorAffinity === 'string' && index.anchorIds.size > 0) {
     if (!index.anchorIds.has(quest.anchorAffinity)) {
-      warnings.push(`Quest "${questId}" references unknown anchor "${quest.anchorAffinity}"`);
+      warnings.push(
+        `Quest "${questId}" references unknown anchor "${quest.anchorAffinity}"`,
+      );
     }
   }
 
@@ -393,13 +436,17 @@ export function checkReferentialIntegrity(
   for (const step of steps) {
     if (typeof step.encounterId === 'string' && index.encounterIds.size > 0) {
       if (!index.encounterIds.has(step.encounterId)) {
-        warnings.push(`Quest "${questId}" step "${step.id}" references unknown encounter "${step.encounterId}"`);
+        warnings.push(
+          `Quest "${questId}" step "${step.id}" references unknown encounter "${step.encounterId}"`,
+        );
       }
     }
     // Check NPC archetypes
     if (typeof step.npcArchetype === 'string' && index.npcArchetypes.size > 0) {
       if (!index.npcArchetypes.has(step.npcArchetype)) {
-        warnings.push(`Quest "${questId}" step "${step.id}" references unknown NPC archetype "${step.npcArchetype}"`);
+        warnings.push(
+          `Quest "${questId}" step "${step.id}" references unknown NPC archetype "${step.npcArchetype}"`,
+        );
       }
     }
   }
@@ -428,7 +475,9 @@ export function validateFile(
       file: relPath,
       contentType: 'unknown',
       status: 'fail',
-      errors: [`Failed to parse JSON: ${err instanceof Error ? err.message : String(err)}`],
+      errors: [
+        `Failed to parse JSON: ${err instanceof Error ? err.message : String(err)}`,
+      ],
       warnings: [],
     };
   }
@@ -458,7 +507,9 @@ export function validateFile(
   } catch (err) {
     result.status = 'fail';
     if (err && typeof err === 'object' && 'issues' in err) {
-      const zodErr = err as { issues: Array<{ message: string; path: Array<string | number> }> };
+      const zodErr = err as {
+        issues: Array<{ message: string; path: Array<string | number> }>;
+      };
       for (const issue of zodErr.issues) {
         result.errors.push(`[${issue.path.join('.')}] ${issue.message}`);
       }
@@ -483,7 +534,7 @@ export function validateFile(
     }
     if (substance.belowThreshold) {
       result.warnings.push(
-        `Low substance score: ${substance.density} words/step (threshold: ${SUBSTANCE_THRESHOLD})`
+        `Low substance score: ${substance.density} words/step (threshold: ${SUBSTANCE_THRESHOLD})`,
       );
     }
     if (branchWarning) {
@@ -516,14 +567,20 @@ export function validateFile(
 function formatReport(report: TroveReport): string {
   const lines: string[] = [];
   lines.push('');
-  lines.push('=== King\'s Road Content Trove Validation Report ===');
+  lines.push("=== King's Road Content Trove Validation Report ===");
   lines.push(`Timestamp: ${report.timestamp}`);
   lines.push(`Content dir: ${report.contentDir}`);
   lines.push('');
 
   for (const r of report.results) {
-    const icon = r.status === 'pass' ? '\u2713' : r.status === 'warn' ? '!' : '\u2717';
-    const color = r.status === 'pass' ? '\x1b[32m' : r.status === 'warn' ? '\x1b[33m' : '\x1b[31m';
+    const icon =
+      r.status === 'pass' ? '\u2713' : r.status === 'warn' ? '!' : '\u2717';
+    const color =
+      r.status === 'pass'
+        ? '\x1b[32m'
+        : r.status === 'warn'
+          ? '\x1b[33m'
+          : '\x1b[31m';
     lines.push(`  ${color}${icon}\x1b[0m ${r.file} [${r.contentType}]`);
 
     for (const err of r.errors) {
@@ -535,8 +592,12 @@ function formatReport(report: TroveReport): string {
     if (r.questDetails) {
       for (const qd of r.questDetails) {
         lines.push(`    Quest: ${qd.questId}`);
-        lines.push(`      Duration: estimated ${qd.duration.estimatedMinutes} min, declared ${qd.duration.declaredMinutes} min (${qd.duration.deviationPercent}% deviation)`);
-        lines.push(`      Substance: ${qd.substance.density} words/step, ${qd.substance.uniqueNPCs} unique NPCs, ${qd.substance.totalDialogueWords} total words`);
+        lines.push(
+          `      Duration: estimated ${qd.duration.estimatedMinutes} min, declared ${qd.duration.declaredMinutes} min (${qd.duration.deviationPercent}% deviation)`,
+        );
+        lines.push(
+          `      Substance: ${qd.substance.density} words/step, ${qd.substance.uniqueNPCs} unique NPCs, ${qd.substance.totalDialogueWords} total words`,
+        );
         lines.push(`      Branches: ${qd.hasBranches ? 'A + B' : 'none'}`);
       }
     }
@@ -553,9 +614,15 @@ function formatReport(report: TroveReport): string {
   lines.push('');
   lines.push('--- Summary ---');
   lines.push(`Total files: ${report.summary.totalFiles}`);
-  lines.push(`Passed: ${report.summary.passed}  Failed: ${report.summary.failed}  Warned: ${report.summary.warned}`);
-  lines.push(`Total quests: ${report.summary.totalQuests} (${report.summary.questsWithBranches} with A/B branches)`);
-  lines.push(`Estimated total play time: ${report.summary.totalEstimatedMinutes} min`);
+  lines.push(
+    `Passed: ${report.summary.passed}  Failed: ${report.summary.failed}  Warned: ${report.summary.warned}`,
+  );
+  lines.push(
+    `Total quests: ${report.summary.totalQuests} (${report.summary.questsWithBranches} with A/B branches)`,
+  );
+  lines.push(
+    `Estimated total play time: ${report.summary.totalEstimatedMinutes} min`,
+  );
   lines.push('');
 
   return lines.join('\n');
@@ -591,7 +658,7 @@ export function runValidation(contentDir: string): TroveReport {
   const referentialIntegrity: string[] = [];
   for (const r of results) {
     if (r.questDetails) {
-      for (const qd of r.questDetails) {
+      for (const _qd of r.questDetails) {
         // Already included in per-file warnings
       }
     }
@@ -644,9 +711,11 @@ function main() {
 }
 
 // Only run when executed directly (not when imported for testing)
-const isMainModule = typeof process !== 'undefined' &&
+const isMainModule =
+  typeof process !== 'undefined' &&
   process.argv[1] &&
-  (process.argv[1].endsWith('validate-trove.ts') || process.argv[1].endsWith('validate-trove'));
+  (process.argv[1].endsWith('validate-trove.ts') ||
+    process.argv[1].endsWith('validate-trove'));
 
 if (isMainModule) {
   main();
