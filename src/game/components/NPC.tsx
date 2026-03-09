@@ -2,11 +2,14 @@ import { Billboard, Float, Text } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import type { NPCBlueprint } from '../../schemas/npc-blueprint.schema';
+import { buildNPCRenderData } from '../factories/npc-factory';
 import { useGameStore } from '../stores/gameStore';
 import type { Interactable } from '../types';
 
 interface NPCProps {
   interactable: Interactable;
+  blueprint?: NPCBlueprint;
 }
 
 // Color palettes for NPCs
@@ -26,7 +29,7 @@ const TYPE_ACCENTS: Record<string, string> = {
   wanderer: '#88aacc',
 };
 
-export function NPC({ interactable }: NPCProps) {
+export function NPC({ interactable, blueprint }: NPCProps) {
   const groupRef = useRef<THREE.Group>(null);
   const bodyRef = useRef<THREE.Mesh>(null);
   const headRef = useRef<THREE.Mesh>(null);
@@ -49,8 +52,27 @@ export function NPC({ interactable }: NPCProps) {
   const isHighlighted = currentInteractable?.id === npcId && npcId !== '';
   const accentColor = TYPE_ACCENTS[npcType] || TYPE_ACCENTS.wanderer;
 
-  // Memoized colors based on NPC type
-  const { skinColor, clothColor, hairColor } = useMemo(() => {
+  // Memoized render data: use blueprint factory or fallback to random generation
+  const renderData = useMemo(() => {
+    if (blueprint) {
+      const data = buildNPCRenderData(blueprint);
+      return {
+        skinColor: data.skinColor,
+        clothColor: data.clothPrimary,
+        clothSecondary: data.clothSecondary,
+        hairColor: '#4a3020', // hair rendered via face texture when blueprint present
+        faceTexture: data.faceTexture,
+        torsoHeight: data.torsoHeight,
+        torsoRadiusTop: data.torsoRadiusTop,
+        torsoRadiusBottom: data.torsoRadiusBottom,
+        headRadius: data.headRadius,
+        legHeight: data.legHeight,
+        armLength: data.armLength,
+        accessories: data.accessories,
+      };
+    }
+
+    // Legacy random generation
     const seed = npcId.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
     const skinIdx = seed % SKIN_COLORS.length;
     const clothOptions = CLOTH_COLORS[npcType] || CLOTH_COLORS.wanderer;
@@ -59,11 +81,42 @@ export function NPC({ interactable }: NPCProps) {
     return {
       skinColor: SKIN_COLORS[skinIdx],
       clothColor: clothOptions[clothIdx],
+      clothSecondary: clothOptions[clothIdx],
       hairColor:
         seed % 3 === 0 ? '#1a1a1a' : seed % 3 === 1 ? '#4a3020' : '#8a7060',
-      eyeColor: seed % 2 === 0 ? '#4488cc' : '#44aa66',
+      faceTexture: null as THREE.CanvasTexture | null,
+      torsoHeight: 0.7,
+      torsoRadiusTop: 0.25,
+      torsoRadiusBottom: 0.22,
+      headRadius: 0.28,
+      legHeight: 0.55,
+      armLength: 0.45,
+      accessories: [] as string[],
     };
-  }, [npcId, npcType]);
+  }, [npcId, npcType, blueprint]);
+
+  const {
+    skinColor,
+    clothColor,
+    hairColor,
+    faceTexture,
+    torsoHeight,
+    torsoRadiusTop,
+    torsoRadiusBottom,
+    headRadius,
+    legHeight,
+    armLength,
+    accessories,
+  } = renderData;
+
+  // Derived positions based on body proportions
+  const torsoY = legHeight + torsoHeight / 2;
+  const neckY = torsoY + torsoHeight / 2 - 0.05;
+  const headY = neckY + headRadius + 0.05;
+  const armY = torsoY + torsoHeight * 0.15;
+
+  // Whether to use blueprint-based accessories vs legacy type-based
+  const useBlueprint = !!blueprint;
 
   // Animation state
   useFrame((state, delta) => {
@@ -108,7 +161,7 @@ export function NPC({ interactable }: NPCProps) {
 
     // Head bob and tracking
     if (headRef.current) {
-      headRef.current.position.y = 1.35 + Math.sin(t * 1.5 + idleOffset) * 0.02;
+      headRef.current.position.y = headY + Math.sin(t * 1.5 + idleOffset) * 0.02;
 
       // Head looks at player when highlighted
       if (isHighlighted) {
@@ -155,56 +208,64 @@ export function NPC({ interactable }: NPCProps) {
         </mesh>
 
         {/* Body */}
-        <mesh ref={bodyRef} position={[0, 0.85, 0]} castShadow>
-          <cylinderGeometry args={[0.25, 0.22, 0.7, 12]} />
+        <mesh ref={bodyRef} position={[0, torsoY, 0]} castShadow>
+          <cylinderGeometry args={[torsoRadiusTop, torsoRadiusBottom, torsoHeight, 12]} />
           <meshStandardMaterial color={clothColor} roughness={0.8} />
         </mesh>
 
         {/* Collar/neck detail */}
-        <mesh position={[0, 1.15, 0]} castShadow>
+        <mesh position={[0, neckY, 0]} castShadow>
           <cylinderGeometry args={[0.12, 0.18, 0.1, 12]} />
           <meshStandardMaterial color={clothColor} roughness={0.8} />
         </mesh>
 
         {/* Head */}
-        <mesh ref={headRef} position={[0, 1.35, 0]} castShadow>
-          <sphereGeometry args={[0.28, 16, 16]} />
-          <meshStandardMaterial color={skinColor} roughness={0.6} />
+        <mesh ref={headRef} position={[0, headY, 0]} castShadow>
+          <sphereGeometry args={[headRadius, 16, 16]} />
+          {faceTexture ? (
+            <meshStandardMaterial map={faceTexture} roughness={0.6} />
+          ) : (
+            <meshStandardMaterial color={skinColor} roughness={0.6} />
+          )}
         </mesh>
 
-        {/* Eyes */}
-        <group position={[0, 1.38, 0.2]}>
-          <mesh position={[-0.08, 0, 0]}>
-            <sphereGeometry args={[0.04, 8, 8]} />
-            <meshBasicMaterial color="#ffffff" />
-          </mesh>
-          <mesh position={[0.08, 0, 0]}>
-            <sphereGeometry args={[0.04, 8, 8]} />
-            <meshBasicMaterial color="#ffffff" />
-          </mesh>
-          {/* Pupils */}
-          <mesh position={[-0.08, 0, 0.03]}>
-            <sphereGeometry args={[0.02, 8, 8]} />
-            <meshBasicMaterial color="#1a1a1a" />
-          </mesh>
-          <mesh position={[0.08, 0, 0.03]}>
-            <sphereGeometry args={[0.02, 8, 8]} />
-            <meshBasicMaterial color="#1a1a1a" />
-          </mesh>
-        </group>
+        {/* Eyes (only when no face texture - face texture includes eyes) */}
+        {!faceTexture && (
+          <group position={[0, headY + 0.03, 0.2]}>
+            <mesh position={[-0.08, 0, 0]}>
+              <sphereGeometry args={[0.04, 8, 8]} />
+              <meshBasicMaterial color="#ffffff" />
+            </mesh>
+            <mesh position={[0.08, 0, 0]}>
+              <sphereGeometry args={[0.04, 8, 8]} />
+              <meshBasicMaterial color="#ffffff" />
+            </mesh>
+            {/* Pupils */}
+            <mesh position={[-0.08, 0, 0.03]}>
+              <sphereGeometry args={[0.02, 8, 8]} />
+              <meshBasicMaterial color="#1a1a1a" />
+            </mesh>
+            <mesh position={[0.08, 0, 0.03]}>
+              <sphereGeometry args={[0.02, 8, 8]} />
+              <meshBasicMaterial color="#1a1a1a" />
+            </mesh>
+          </group>
+        )}
 
-        {/* Hair */}
-        <mesh position={[0, 1.5, -0.02]} castShadow>
-          <sphereGeometry
-            args={[0.25, 12, 12, 0, Math.PI * 2, 0, Math.PI / 2]}
-          />
-          <meshStandardMaterial color={hairColor} roughness={0.9} />
-        </mesh>
+        {/* Hair (only when no face texture - face texture includes hair) */}
+        {!faceTexture && (
+          <mesh position={[0, headY + 0.15, -0.02]} castShadow>
+            <sphereGeometry
+              args={[0.25, 12, 12, 0, Math.PI * 2, 0, Math.PI / 2]}
+            />
+            <meshStandardMaterial color={hairColor} roughness={0.9} />
+          </mesh>
+        )}
 
         {/* Arms */}
-        <group position={[-0.32, 0.95, 0]}>
+        <group position={[-0.32, armY, 0]}>
           <mesh ref={leftArmRef} rotation={[0, 0, 0.3]} castShadow>
-            <cylinderGeometry args={[0.06, 0.05, 0.45, 8]} />
+            <cylinderGeometry args={[0.06, 0.05, armLength, 8]} />
             <meshStandardMaterial color={clothColor} roughness={0.8} />
           </mesh>
           {/* Hand */}
@@ -213,9 +274,9 @@ export function NPC({ interactable }: NPCProps) {
             <meshStandardMaterial color={skinColor} roughness={0.6} />
           </mesh>
         </group>
-        <group position={[0.32, 0.95, 0]}>
+        <group position={[0.32, armY, 0]}>
           <mesh ref={rightArmRef} rotation={[0, 0, -0.3]} castShadow>
-            <cylinderGeometry args={[0.06, 0.05, 0.45, 8]} />
+            <cylinderGeometry args={[0.06, 0.05, armLength, 8]} />
             <meshStandardMaterial color={clothColor} roughness={0.8} />
           </mesh>
           {/* Hand */}
@@ -226,12 +287,12 @@ export function NPC({ interactable }: NPCProps) {
         </group>
 
         {/* Legs */}
-        <mesh position={[-0.1, 0.35, 0]} castShadow>
-          <cylinderGeometry args={[0.08, 0.07, 0.55, 8]} />
+        <mesh position={[-0.1, legHeight / 2, 0]} castShadow>
+          <cylinderGeometry args={[0.08, 0.07, legHeight, 8]} />
           <meshStandardMaterial color="#2a2015" roughness={0.9} />
         </mesh>
-        <mesh position={[0.1, 0.35, 0]} castShadow>
-          <cylinderGeometry args={[0.08, 0.07, 0.55, 8]} />
+        <mesh position={[0.1, legHeight / 2, 0]} castShadow>
+          <cylinderGeometry args={[0.08, 0.07, legHeight, 8]} />
           <meshStandardMaterial color="#2a2015" roughness={0.9} />
         </mesh>
 
@@ -245,8 +306,90 @@ export function NPC({ interactable }: NPCProps) {
           <meshStandardMaterial color="#1a1510" roughness={0.9} />
         </mesh>
 
-        {/* Type-specific accessories */}
-        {npcType === 'blacksmith' && (
+        {/* Blueprint-driven accessories */}
+        {useBlueprint && (
+          <>
+            {accessories.includes('leather_apron') && (
+              <mesh position={[0, torsoY - 0.05, 0.15]} castShadow>
+                <boxGeometry args={[0.35, 0.4, 0.05]} />
+                <meshStandardMaterial color="#4a3520" roughness={0.9} />
+              </mesh>
+            )}
+            {accessories.includes('hammer') && (
+              <group position={[0.45, legHeight + 0.15, 0]} rotation={[0.3, 0, -0.8]}>
+                <mesh castShadow>
+                  <boxGeometry args={[0.08, 0.45, 0.08]} />
+                  <meshStandardMaterial color="#4a3020" roughness={0.9} />
+                </mesh>
+                <mesh position={[0, 0.28, 0]} castShadow>
+                  <boxGeometry args={[0.15, 0.12, 0.1]} />
+                  <meshStandardMaterial color="#555" metalness={0.8} roughness={0.3} />
+                </mesh>
+              </group>
+            )}
+            {accessories.includes('mug') && (
+              <mesh position={[-0.4, armY - 0.3, 0.1]} castShadow>
+                <cylinderGeometry args={[0.08, 0.1, 0.2, 8]} />
+                <meshStandardMaterial color="#654321" roughness={0.8} />
+              </mesh>
+            )}
+            {accessories.includes('robes') && (
+              <mesh position={[0, torsoY, 0]} castShadow>
+                <cylinderGeometry args={[torsoRadiusTop + 0.05, torsoRadiusBottom + 0.08, torsoHeight + 0.3, 12]} />
+                <meshStandardMaterial color={renderData.clothSecondary} roughness={0.9} transparent opacity={0.7} />
+              </mesh>
+            )}
+            {accessories.includes('scroll') && (
+              <group position={[-0.35, armY - 0.2, 0.1]} rotation={[0, 0, 0.5]}>
+                <mesh castShadow>
+                  <cylinderGeometry args={[0.04, 0.04, 0.3, 8]} />
+                  <meshStandardMaterial color="#f5e6c8" roughness={0.7} />
+                </mesh>
+              </group>
+            )}
+            {accessories.includes('herb_basket') && (
+              <group position={[-0.4, armY - 0.25, 0.05]}>
+                <mesh castShadow>
+                  <cylinderGeometry args={[0.15, 0.12, 0.15, 8]} />
+                  <meshStandardMaterial color="#8B7355" roughness={0.9} />
+                </mesh>
+                {/* Herbs poking out */}
+                <mesh position={[0, 0.1, 0]} castShadow>
+                  <sphereGeometry args={[0.1, 6, 6]} />
+                  <meshStandardMaterial color="#3a6630" roughness={0.8} />
+                </mesh>
+              </group>
+            )}
+            {accessories.includes('shawl') && (
+              <mesh position={[0, neckY + 0.05, 0.05]} castShadow>
+                <boxGeometry args={[0.5, 0.15, 0.2]} />
+                <meshStandardMaterial color={renderData.clothSecondary} roughness={0.8} />
+              </mesh>
+            )}
+            {accessories.includes('holy_book') && (
+              <group position={[0.35, armY - 0.2, 0.1]} rotation={[0.2, 0, -0.3]}>
+                <mesh castShadow>
+                  <boxGeometry args={[0.15, 0.2, 0.05]} />
+                  <meshStandardMaterial color="#3a1a0a" roughness={0.8} />
+                </mesh>
+                {/* Gold clasp */}
+                <mesh position={[0, 0, 0.03]} castShadow>
+                  <boxGeometry args={[0.04, 0.12, 0.01]} />
+                  <meshStandardMaterial color="#c4a747" metalness={0.7} roughness={0.3} />
+                </mesh>
+              </group>
+            )}
+            {accessories.includes('walking_stick') && (
+              <mesh position={[0.5, legHeight * 0.65, 0]} rotation={[0.1, 0, -0.1]} castShadow>
+                <cylinderGeometry args={[0.03, 0.04, legHeight * 2.5, 6]} />
+                <meshStandardMaterial color="#3a2a15" roughness={0.9} />
+              </mesh>
+            )}
+          </>
+        )}
+
+        {/* Legacy type-specific accessories (when no blueprint) */}
+        {!useBlueprint && npcType === 'blacksmith' && (
           <>
             {/* Hammer */}
             <group position={[0.45, 0.5, 0]} rotation={[0.3, 0, -0.8]}>
@@ -271,7 +414,7 @@ export function NPC({ interactable }: NPCProps) {
           </>
         )}
 
-        {npcType === 'innkeeper' && (
+        {!useBlueprint && npcType === 'innkeeper' && (
           <>
             {/* Mug */}
             <mesh position={[-0.4, 0.65, 0.1]} castShadow>
@@ -286,7 +429,7 @@ export function NPC({ interactable }: NPCProps) {
           </>
         )}
 
-        {npcType === 'merchant' && (
+        {!useBlueprint && npcType === 'merchant' && (
           <>
             {/* Backpack */}
             <mesh position={[0, 0.6, -0.25]} castShadow>
@@ -301,7 +444,7 @@ export function NPC({ interactable }: NPCProps) {
           </>
         )}
 
-        {npcType === 'wanderer' && (
+        {!useBlueprint && npcType === 'wanderer' && (
           <>
             {/* Walking stick */}
             <mesh position={[0.5, 0.7, 0]} rotation={[0.1, 0, -0.1]} castShadow>
