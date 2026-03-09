@@ -1,0 +1,31 @@
+{
+  "id": "aldric",
+  "name": "Aldric",
+  "archetype": "blacksmith",
+  "fixed": true,
+  "bodyBuild": { "height": 0.85, "width": 1.25 },
+  "face": {
+    "skinTone": 3,
+    "eyeColor": "brown",
+    "hairStyle": "bald",
+    "hairColor": "#1a1a1a",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["leather_apron", "hammer"],
+  "clothPalette": { "primary": "#4a3320", "secondary": "#2b1d12" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Well met, friend. Need something forged?",
+      "The fire burns hot today. What can I make for you?",
+      "Ah, you're heading out? Let me give you a good blade."
+    ],
+    "quest": [
+      "There's iron in the old mine past the meadow, if you've the courage."
+    ]
+  }
+}

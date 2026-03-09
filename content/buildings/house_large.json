@@ -1,0 +1,15 @@
+{
+  "id": "house_large",
+  "stories": 2,
+  "footprint": { "width": 3, "depth": 3 },
+  "wallMaterial": "timber_frame",
+  "roofStyle": "thatch",
+  "openFront": false,
+  "features": ["door", "windows", "chimney"],
+  "interiorSlots": [
+    { "type": "table", "position": [1, 1] },
+    { "type": "bookshelf", "position": [0.5, 0.5] },
+    { "type": "chair", "position": [1.5, 1] },
+    { "type": "chest", "position": [2, 0.5] }
+  ]
+}

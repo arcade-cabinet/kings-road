@@ -10,6 +10,7 @@ import { BlendFunction } from 'postprocessing';
 import { Component, type ReactNode, Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
 import { useGameStore } from '../stores/gameStore';
+import { AudioSystem } from '../systems/AudioSystem';
 import { ChunkManager } from '../systems/ChunkManager';
 import { DayNightCycle, Fog, SkyDome } from '../systems/Environment';
 import { InteractionSystem } from '../systems/InteractionSystem';
@@ -243,6 +244,7 @@ function SceneContent() {
           {/* Systems */}
           <PlayerController />
           <InteractionSystem />
+          <AudioSystem />
 
           {/* Post Processing */}
           <PostProcessing />
@@ -272,7 +274,7 @@ export function GameScene() {
           fov: 75,
           near: 0.1,
           far: 250,
-          position: [60, 1.6, 60],
+          position: [2, 1.6, 24],
         }}
         gl={{
           antialias: false,

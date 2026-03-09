@@ -11,10 +11,13 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { RoadSpineSchema } from '../src/schemas/world.schema';
-import { QuestDefinitionSchema } from '../src/schemas/quest.schema';
-import { NPCDefinitionSchema } from '../src/schemas/npc.schema';
+import { BuildingArchetypeSchema } from '../src/schemas/building.schema';
 import { FeatureDefinitionSchema } from '../src/schemas/feature.schema';
+import { NPCBlueprintSchema } from '../src/schemas/npc-blueprint.schema';
+import { NPCDefinitionSchema } from '../src/schemas/npc.schema';
+import { QuestDefinitionSchema } from '../src/schemas/quest.schema';
+import { TownConfigSchema } from '../src/schemas/town.schema';
+import { RoadSpineSchema } from '../src/schemas/world.schema';
 import type { z } from 'zod';
 
 // ---------------------------------------------------------------------------
@@ -78,14 +81,17 @@ interface SchemaMapping {
   contentType: string;
 }
 
-function getSchemaForFile(relPath: string): SchemaMapping | null {
+function getSchemaForFile(
+  relPath: string,
+  data?: unknown,
+): SchemaMapping | null {
   // Normalize path separators
   const normalized = relPath.replace(/\\/g, '/');
 
   if (normalized.startsWith('world/')) {
     return { schema: RoadSpineSchema, contentType: 'road-spine' };
   }
-  if (normalized.startsWith('main-quest/')) {
+  if (normalized.startsWith('main-quest/') || normalized.startsWith('quests/')) {
     return { schema: QuestDefinitionSchema, contentType: 'quest' };
   }
   if (normalized.startsWith('side-quests/macro/')) {
@@ -97,8 +103,21 @@ function getSchemaForFile(relPath: string): SchemaMapping | null {
   if (normalized.startsWith('side-quests/micro/')) {
     return { schema: QuestDefinitionSchema, contentType: 'quest' };
   }
-  if (normalized.startsWith('npcs/')) {
+  if (normalized.startsWith('npcs/pools/')) {
     return { schema: NPCDefinitionSchema, contentType: 'npc' };
+  }
+  if (normalized.startsWith('npcs/')) {
+    // Distinguish blueprint files from pool files by checking for bodyBuild field
+    if (data && typeof data === 'object' && 'bodyBuild' in (data as Record<string, unknown>)) {
+      return { schema: NPCBlueprintSchema, contentType: 'npc-blueprint' };
+    }
+    return { schema: NPCDefinitionSchema, contentType: 'npc' };
+  }
+  if (normalized.startsWith('buildings/')) {
+    return { schema: BuildingArchetypeSchema, contentType: 'building' };
+  }
+  if (normalized.startsWith('towns/')) {
+    return { schema: TownConfigSchema, contentType: 'town' };
   }
   if (normalized.startsWith('features/')) {
     return { schema: FeatureDefinitionSchema, contentType: 'feature' };
@@ -368,7 +387,22 @@ export function validateFile(
 ): ValidationResult {
   const relPath = path.relative(contentDir, filePath).replace(/\\/g, '/');
 
-  const mapping = getSchemaForFile(relPath);
+  // Read and parse JSON first so we can use data for schema detection
+  let data: unknown;
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    data = JSON.parse(raw);
+  } catch (err) {
+    return {
+      file: relPath,
+      contentType: 'unknown',
+      status: 'fail',
+      errors: [`Failed to parse JSON: ${err instanceof Error ? err.message : String(err)}`],
+      warnings: [],
+    };
+  }
+
+  const mapping = getSchemaForFile(relPath, data);
   if (!mapping) {
     return {
       file: relPath,
@@ -386,17 +420,6 @@ export function validateFile(
     errors: [],
     warnings: [],
   };
-
-  // Read and parse JSON
-  let data: unknown;
-  try {
-    const raw = fs.readFileSync(filePath, 'utf-8');
-    data = JSON.parse(raw);
-  } catch (err) {
-    result.status = 'fail';
-    result.errors.push(`Failed to parse JSON: ${err instanceof Error ? err.message : String(err)}`);
-    return result;
-  }
 
   // Validate against schema
   try {

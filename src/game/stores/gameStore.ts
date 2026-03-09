@@ -150,7 +150,8 @@ export const useGameStore = create<GameState>((set, _get) => ({
   inDialogue: false,
   seedPhrase: '',
 
-  playerPosition: new THREE.Vector3(60, 1.6, 60),
+  // Default spawn near Ashford cottage (chunk 0,0)
+  playerPosition: new THREE.Vector3(2, 1.6, 24),
   playerVelocityY: 0,
   velocity: 0,
   angularVelocity: 0,
