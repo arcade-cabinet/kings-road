@@ -1,0 +1,112 @@
+{
+  "id": "main-chapter-01",
+  "tier": "macro",
+  "title": "The First Sign",
+  "estimatedMinutes": 35,
+  "anchorAffinity": "anchor-01",
+  "trigger": { "type": "anchor", "anchorId": "anchor-01" },
+  "prerequisites": ["main-chapter-00"],
+  "branches": {
+    "A": {
+      "label": "Gain Captain Hale's trust by helping clear the bandits",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "Hold there, stranger. Millbrook has had enough trouble without outsiders adding to it. Strange lights have been seen at the old mill every night this week, and now bandits are raiding the eastern farms. Prove you mean no harm and help me deal with these raiders, then we can talk about the mill.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "dialogue",
+          "npcArchetype": "innkeeper",
+          "dialogue": "Captain Hale means well, but he is stretched thin. The bandits struck Wynn's farm two nights past and took half his grain store. They camp somewhere along the river east of town. If you help the captain, he will open every door in Millbrook for you.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-03",
+          "type": "encounter",
+          "encounterId": "millbrook-river-bandits",
+          "description": "Track the bandits to their riverside camp and defeat them to recover the stolen grain."
+        },
+        {
+          "id": "a-04",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "You have done Millbrook a great service. I misjudged you, and I am not too proud to say so. Now about those lights at the old mill. My men are afraid to go near the place after dark. If you have the courage, go and investigate. I will lend you a lantern and the key to the mill gate.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-05",
+          "type": "investigate",
+          "description": "Enter the old mill with Captain Hale's key and search for the source of the strange lights."
+        },
+        {
+          "id": "a-06",
+          "type": "puzzle",
+          "description": "Discover that the lights emanate from an ancient map fragment hidden beneath the millstone, its Grail-script glowing faintly in the dark."
+        },
+        {
+          "id": "a-07",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "This map fragment bears the same Grail-script as the texts in our chapel records. The markings point north toward the Thornfield Ruins, a place long shunned by travellers. Whatever the builders of the King's Road hid there, this fragment is the key to finding it.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "hales-ally" }
+    },
+    "B": {
+      "label": "Sneak into the old mill at night without Hale's permission",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "knight",
+          "dialogue": "Hold there, stranger. Millbrook has had enough trouble without outsiders adding to it. Strange lights have been seen at the old mill every night this week, and I have sealed the place until my men can investigate. Move along and do not cause any problems.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "Hale has locked the mill and posted a guard, but there is a way in through the old sluice channel on the river side. The grate has been rusted through for years. If you go at night when the guard changes shift, you could slip in unseen. Just do not tell the captain I told you.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-03",
+          "type": "encounter",
+          "encounterId": "millbrook-mill-stealth",
+          "description": "Sneak past the guard patrol and enter the old mill through the rusted sluice grate under cover of darkness."
+        },
+        {
+          "id": "b-04",
+          "type": "investigate",
+          "description": "Navigate the dark interior of the mill, following the faint glow emanating from beneath the ancient millstone."
+        },
+        {
+          "id": "b-05",
+          "type": "puzzle",
+          "description": "Pry the millstone loose and retrieve the glowing map fragment hidden beneath, its Grail-script casting pale light across the walls."
+        },
+        {
+          "id": "b-06",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "You found this in the mill? I have read of such things in the chapel records. This is genuine Grail-script, and it points toward the Thornfield Ruins north of here. Brother Thomas must not speak of this to Captain Hale, or he will think you a thief. Go quickly before dawn.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "shadow-seeker" }
+    }
+  },
+  "reward": { "type": "item", "itemId": "map-fragment-01b" }
+}

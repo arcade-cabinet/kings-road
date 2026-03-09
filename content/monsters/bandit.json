@@ -1,0 +1,13 @@
+{
+  "id": "bandit",
+  "name": "Roadside Bandit",
+  "bodyType": "biped",
+  "size": 1.0,
+  "colorScheme": {
+    "primary": "#5c3a1e",
+    "secondary": "#8b6f47"
+  },
+  "dangerTier": 1,
+  "health": 22,
+  "damage": 6
+}

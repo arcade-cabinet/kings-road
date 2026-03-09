@@ -1,0 +1,13 @@
+{
+  "id": "ruins-guardian-trial-of-worth",
+  "name": "Trial of Worth",
+  "type": "puzzle",
+  "difficulty": 5,
+  "description": "Beyond the golem's reach, a chamber of polished stone presents three pedestals, each bearing a different offering — a crown, a sword, and a loaf of bread. An inscription on the wall reads: Only the worthy may pass. Choose what matters most, and the way shall open.",
+  "rewards": [
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "stamina_draught", "chance": 0.5 },
+    { "itemId": "pilgrim_medallion", "chance": 0.3 }
+  ],
+  "failureConsequence": "You choose poorly, and the pedestals sink into the floor with a grinding finality. The chamber seals itself, and you must find another route through the ruins."
+}

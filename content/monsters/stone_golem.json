@@ -1,0 +1,15 @@
+{
+  "id": "stone_golem",
+  "name": "Stone Golem",
+  "bodyType": "biped",
+  "size": 2.3,
+  "colorScheme": {
+    "primary": "#708090",
+    "secondary": "#4a5568",
+    "accent": "#6b8e23"
+  },
+  "dangerTier": 3,
+  "health": 110,
+  "damage": 14,
+  "lootTable": "loot-tier-3"
+}

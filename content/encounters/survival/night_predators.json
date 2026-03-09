@@ -1,0 +1,13 @@
+{
+  "id": "night_predators",
+  "name": "Night Predators",
+  "type": "survival",
+  "difficulty": 7,
+  "description": "Darkness falls fast in the highlands and with it comes the howling. Something circles your camp just beyond the firelight, patient and hungry. The flames are your only shield. Gather fuel, keep the blaze high, and do not let it die. Every time the fire gutters, the circling draws closer and the eyes in the dark multiply.",
+  "rewards": [
+    { "itemId": "health_potion", "chance": 0.7 },
+    { "itemId": "torch", "chance": 0.6 },
+    { "itemId": "ration", "chance": 0.4 }
+  ],
+  "failureConsequence": "The fire sputters and dies. In the pitch blackness the predators strike, and you barely escape with shallow wounds and a racing heart. You stumble through the dark until dawn, bloodied and sleepless."
+}

@@ -1,0 +1,35 @@
+{
+  "id": "lord-ashwick",
+  "name": "Lord Ashwick",
+  "archetype": "noble",
+  "fixed": true,
+  "bodyBuild": { "height": 1.2, "width": 1.1 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "gray",
+    "hairStyle": "short",
+    "hairColor": "#2a2a2a",
+    "facialHair": "mustache"
+  },
+  "accessories": ["signet_ring", "fur_cloak", "jeweled_dagger"],
+  "clothPalette": { "primary": "#1a0a2e", "secondary": "#8b0000" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "ADDRESS",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "You dare approach me unbidden? Speak quickly, before I lose patience.",
+      "Another vagrant from the road. Ravensgate has no charity for drifters.",
+      "I am Lord Ashwick. You will address me with the respect my station demands."
+    ],
+    "quest": [
+      "There are... dissidents in my town. People who forget their place. Find them for me, and I shall be generous."
+    ],
+    "idle": [
+      "This land is mine by right and by blood.",
+      "The common folk grow restless. They need a firmer hand."
+    ]
+  }
+}

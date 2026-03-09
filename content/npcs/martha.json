@@ -1,0 +1,36 @@
+{
+  "id": "martha",
+  "name": "Martha",
+  "archetype": "innkeeper",
+  "fixed": true,
+  "bodyBuild": { "height": 1.05, "width": 1.1 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "green",
+    "hairStyle": "long",
+    "hairColor": "#6b4226",
+    "facialHair": "none"
+  },
+  "accessories": ["apron", "ladle"],
+  "clothPalette": { "primary": "#8b4513", "secondary": "#f5deb3" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Come in, come in! You must be half-frozen from the road.",
+      "There's always room at the hearth for a weary soul.",
+      "Sit yourself down, love. I'll fetch you something warm.",
+      "Welcome to The Millbrook Rest. Best pottage this side of the river."
+    ],
+    "quest": [
+      "A peddler left a parcel here weeks ago and never returned. Would you see it delivered to the mill?"
+    ],
+    "idle": [
+      "The fire needs another log...",
+      "I wonder if the barley shipment will arrive before market day."
+    ]
+  }
+}

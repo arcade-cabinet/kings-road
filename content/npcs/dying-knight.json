@@ -1,0 +1,35 @@
+{
+  "id": "dying-knight",
+  "name": "Sir Aldwin",
+  "archetype": "knight",
+  "fixed": true,
+  "bodyBuild": { "height": 1.25, "width": 1.2 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "blue",
+    "hairStyle": "short",
+    "hairColor": "#4a3020",
+    "facialHair": "stubble"
+  },
+  "accessories": ["dented_plate", "torn_tabard", "broken_lance"],
+  "clothPalette": { "primary": "#5a5a6a", "secondary": "#c0a050" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Do not waste your prayers on me. I have made my peace with the road.",
+      "You stopped. Most do not stop. Thank you for that much at least.",
+      "I can hear the wolves in the pines. They have been waiting since midnight."
+    ],
+    "quest": [
+      "My daughter camps with the pilgrims beyond the ridge. Carry my letter to her, or stay and help me stand again. Either way, you will have my gratitude."
+    ],
+    "idle": [
+      "The stars are bright tonight. I had forgotten how bright they are.",
+      "I swore an oath to see this road through to Grailsend. I mean to keep it."
+    ]
+  }
+}

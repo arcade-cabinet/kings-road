@@ -1,0 +1,18 @@
+{
+  "id": "prison",
+  "stories": 2,
+  "footprint": { "width": 2, "depth": 3 },
+  "wallMaterial": "stone",
+  "roofStyle": "flat",
+  "openFront": false,
+  "features": ["door", "barred_windows", "iron_gate"],
+  "interiorSlots": [
+    { "type": "cell", "position": [0.5, 0.5] },
+    { "type": "cell", "position": [1.5, 0.5] },
+    { "type": "cell", "position": [0.5, 1.5] },
+    { "type": "cell", "position": [1.5, 1.5] },
+    { "type": "table", "position": [1, 2.5] },
+    { "type": "weapon_rack", "position": [0.5, 2.5] }
+  ],
+  "npcSlot": { "archetype": "jailer", "position": [1.5, 2.5] }
+}

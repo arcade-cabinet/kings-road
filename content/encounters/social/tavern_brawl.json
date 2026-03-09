@@ -1,0 +1,13 @@
+{
+  "id": "tavern_brawl",
+  "name": "Tavern Brawl",
+  "type": "social",
+  "difficulty": 4,
+  "description": "Raised voices and shattered crockery erupt from a roadside alehouse. Two farmers grapple over a spilled drink while the innkeeper wrings her hands. A well-placed word might calm the storm — or a poor one could drag you into the fray.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.8 },
+    { "itemId": "stamina_draught", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.3 }
+  ],
+  "failureConsequence": "Your intervention backfires spectacularly. A wild punch catches your jaw, the innkeeper bars you from her establishment, and you nurse a bruised ego along with a swollen lip."
+}

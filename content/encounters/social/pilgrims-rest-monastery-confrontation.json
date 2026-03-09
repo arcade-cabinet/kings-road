@@ -1,0 +1,13 @@
+{
+  "id": "pilgrims-rest-monastery-confrontation",
+  "name": "Confrontation at the Monastery",
+  "type": "social",
+  "difficulty": 5,
+  "description": "The abbot of Pilgrim's Rest bars the cloister door, flanked by stern-faced brothers. He accuses you of bringing trouble to their peaceful house and demands you answer for the commotion your arrival has caused. His voice is calm, but his eyes are unyielding.",
+  "rewards": [
+    { "itemId": "health_potion", "chance": 0.5 },
+    { "itemId": "ration", "chance": 0.8 },
+    { "itemId": "rare_herb", "chance": 0.3 }
+  ],
+  "failureConsequence": "The abbot orders the gates closed against you. The monastery's shelter and supplies are denied, and you must press on without rest into the gathering dusk."
+}

@@ -1,0 +1,35 @@
+{
+  "id": "brother-thomas",
+  "name": "Brother Thomas",
+  "archetype": "priest",
+  "fixed": true,
+  "bodyBuild": { "height": 1.15, "width": 0.85 },
+  "face": {
+    "skinTone": 0,
+    "eyeColor": "blue",
+    "hairStyle": "hooded",
+    "hairColor": "#b8a080",
+    "facialHair": "none"
+  },
+  "accessories": ["prayer_beads", "holy_book"],
+  "clothPalette": { "primary": "#f0e6d2", "secondary": "#7a6840" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Peace be with you, traveller. The chapel is open to all.",
+      "You carry a heavy burden, I can see it. Rest here a while.",
+      "The Light watches over those who walk the road with honest hearts."
+    ],
+    "quest": [
+      "An old shrine in the woods has fallen into disrepair. Would you help me gather stones to mend it?"
+    ],
+    "idle": [
+      "The hymns sound different in an empty chapel...",
+      "I should tend the garden before vespers."
+    ]
+  }
+}

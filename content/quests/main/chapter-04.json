@@ -1,0 +1,106 @@
+{
+  "id": "main-chapter-04",
+  "tier": "macro",
+  "title": "The Pilgrim's Wisdom",
+  "estimatedMinutes": 30,
+  "anchorAffinity": "anchor-04",
+  "trigger": { "type": "anchor", "anchorId": "anchor-04" },
+  "prerequisites": ["main-chapter-03"],
+  "branches": {
+    "A": {
+      "label": "Accept the spiritual path and prove your worth through faith and understanding",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "healer",
+          "dialogue": "You look as though you have walked through fire and shadow both. Come, rest a while. The Abbot has been expecting a traveller bearing map fragments, though he will not say how he knew. Let me tend your wounds first. Sister Maeve's poultice has mended many a pilgrim before the real journey begins.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "investigate",
+          "description": "Search the monastery library with Brother Anselm, laying out the three map fragments on his reading table and piecing together the full route to Grailsend."
+        },
+        {
+          "id": "a-03",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "Remarkable. When the three fragments are placed together, they form not merely a map but a cipher. The route to Grailsend is clear enough, yet these marginal inscriptions speak of trials, not treasure. The knight who bore the Grail wrote warnings, not directions. You should hear what the Abbot has to say about this.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-04",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "I have waited many years for someone to bring all three fragments to this table. Now hear the truth that the old order guarded. The Grail is no golden cup, child. It is a test of character, a covenant between the land and those who walk it with honest purpose. The temple at Grailsend will judge you by the choices you have made along the Road. Go now with faith as your compass, and let your deeds speak for you.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-05",
+          "type": "puzzle",
+          "description": "Meditate in the monastery chapel and solve the Abbot's three spiritual reflections: what you sacrificed, what you showed mercy to, and what truth you upheld on your journey along the Road."
+        },
+        {
+          "id": "a-06",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "You have answered well, and the chapel light shines brighter for it. The road to Grailsend leads through the highlands beyond our walls. Take the Abbot's blessing and this pilgrim's seal as proof that you have understood the Grail's true nature. The Guardian at the temple will know you by your spirit, not your sword.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "pilgrim-blessed" }
+    },
+    "B": {
+      "label": "Demand the Grail's location by force, threatening the monastery",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "scholar",
+          "dialogue": "You carry the fragments? Let me examine them at once. The Abbot has long guarded secrets about the Grail's resting place, and with these three pieces assembled I can read the full cipher. But I must warn you, the Abbot will not part with his knowledge willingly. He believes the Grail must be earned through devotion, not claimed by force.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "investigate",
+          "description": "Piece together the three map fragments in the library, reading the cipher that reveals Grailsend's exact location in the highlands beyond the monastery."
+        },
+        {
+          "id": "b-03",
+          "type": "dialogue",
+          "npcArchetype": "priest",
+          "dialogue": "You would threaten this place of peace? These walls have sheltered pilgrims for three centuries. The Grail is no golden cup to be seized and hoarded. It is a test of character, and you are failing it now. But I see the iron in your eyes and I know words alone will not turn you. Very well, the road to Grailsend lies through the highlands, but the temple's Guardian will not be so easily cowed.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-04",
+          "type": "encounter",
+          "encounterId": "pilgrims-rest-monastery-confrontation",
+          "description": "Overcome the monastery's lay brothers who block your path when you threaten the Abbot and ransack the library for the Grail's secrets."
+        },
+        {
+          "id": "b-05",
+          "type": "investigate",
+          "description": "Ransack the Abbot's private study, finding ancient manuscripts that confirm the route through the highlands and the nature of the temple trials at Grailsend."
+        },
+        {
+          "id": "b-06",
+          "type": "dialogue",
+          "npcArchetype": "healer",
+          "dialogue": "You have broken the peace of this abbey and scattered brothers who wished you no harm. The Abbot spoke true, the Grail tests the seeker. Take your maps and your pride and go north through the highlands to Grailsend. But know that the Guardian at the temple will see what you have done here, and the stones remember every act of cruelty.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "abbey-breaker" }
+    }
+  },
+  "reward": { "type": "item", "itemId": "assembled-map" }
+}

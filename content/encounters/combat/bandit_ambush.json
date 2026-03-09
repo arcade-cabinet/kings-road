@@ -1,0 +1,13 @@
+{
+  "id": "bandit_ambush",
+  "name": "Bandit Ambush",
+  "type": "combat",
+  "difficulty": 3,
+  "description": "A ragged band of highwaymen springs from the undergrowth, blades drawn and eyes wild with desperation. Their leader barks a demand for coin, but the set of his jaw says he means to take more than gold.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.8 },
+    { "itemId": "torch", "chance": 0.6 },
+    { "itemId": "health_potion", "chance": 0.3 }
+  ],
+  "failureConsequence": "The bandits strip you of supplies and leave you bruised on the roadside. You lose a day recovering and must press on with lighter pockets."
+}

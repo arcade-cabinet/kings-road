@@ -1,0 +1,79 @@
+{
+  "id": "side-the-bridge-troll",
+  "tier": "meso",
+  "title": "The Bridge Troll",
+  "estimatedMinutes": 18,
+  "anchorAffinity": "anchor-03",
+  "trigger": { "type": "roadside", "distanceRange": [15000, 18000] },
+  "branches": {
+    "A": {
+      "label": "Fight the troll for passage",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "wanderer",
+          "dialogue": "None shall cross my bridge without paying the toll, and the toll is whatever I say it is today. You look strong enough to carry a sword but not clever enough to use your tongue. So what will it be, little traveller? Your coin, your blood, or will you turn back the way you came?",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "encounter",
+          "encounterId": "bridge-troll-fight",
+          "description": "Battle the massive bridge troll on the narrow stone crossing, using the tight quarters to avoid its sweeping blows."
+        },
+        {
+          "id": "a-03",
+          "type": "investigate",
+          "description": "Search the troll's nest beneath the bridge and recover stolen goods from previous travellers."
+        },
+        {
+          "id": "a-04",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "You killed that brute? Bless you, traveller. I have been camped on this side for three days, too frightened to cross. My wares are spoiling in the damp. Please, take something for your trouble. The road to Ravensgate is open again thanks to you.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "troll-slayer" }
+    },
+    "B": {
+      "label": "Solve the troll's riddle to pass",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "wanderer",
+          "dialogue": "None shall cross my bridge without paying the toll, and the toll is whatever I say it is today. But I am feeling generous. Answer my riddle and you may pass free. Get it wrong and I eat your horse. Do not have a horse? Then I eat your boots. Do we have an accord?",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "puzzle",
+          "description": "Solve the troll's riddle: 'I have cities but no houses, forests but no trees, and water but no fish. What am I?'"
+        },
+        {
+          "id": "b-03",
+          "type": "dialogue",
+          "npcArchetype": "wanderer",
+          "dialogue": "A map! Curse it, you are the first to answer correctly in a fortnight. Very well, a bargain is a bargain. Cross and be gone before I change my mind. But I will think of a harder one next time, mark my words. Nobody outwits old Grukk twice.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-04",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "You talked your way past that creature? I tried offering it half my stock and it only laughed. Perhaps there is hope yet for those of us who trade in words rather than swords. Here, take this for the road ahead. You have earned it with wit alone.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "modifier", "modifierId": "riddle-master" }
+    }
+  },
+  "reward": { "type": "currency", "amount": 40 }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "highland-wolves",
+  "name": "Highland Tower Wolves",
+  "type": "combat",
+  "difficulty": 5,
+  "description": "A pack of highland wolves has made their den in the ruins of the first watchtower. The alpha snarls from the broken doorway, flanked by two lean grey hunters. They will not yield their shelter willingly. The brazier stands unlit behind them, crusted with old soot.",
+  "rewards": [
+    { "itemId": "leather_armor", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.5 }
+  ],
+  "failureConsequence": "The wolves drive you back down the ridge with snapping jaws and raking claws. You tumble over loose stones and land hard, bruised and bleeding. The tower remains in their possession."
+}

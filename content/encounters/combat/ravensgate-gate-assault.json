@@ -1,0 +1,13 @@
+{
+  "id": "ravensgate-gate-assault",
+  "name": "Storming the Gate of Ravensgate",
+  "type": "combat",
+  "difficulty": 6,
+  "description": "Ravensgate's iron-banded gate looms overhead, manned by men-at-arms loyal to Lord Ashwick's steward. Arrows whistle from the murder-holes and the portcullis rattles on its chains. To pass, you must fight through the gatehouse or fall trying.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.5 },
+    { "itemId": "leather_armor", "chance": 0.3 },
+    { "itemId": "health_potion", "chance": 0.7 }
+  ],
+  "failureConsequence": "The garrison repels your assault and bars the gate. You retreat under a hail of stones, nursing bruises and a wounded pride."
+}

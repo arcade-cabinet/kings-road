@@ -1,0 +1,13 @@
+{
+  "id": "songbird",
+  "name": "Meadow Songbird",
+  "bodyType": "biped",
+  "size": 0.3,
+  "colorScheme": {
+    "primary": "#d4a843",
+    "secondary": "#6b8e5e"
+  },
+  "dangerTier": 0,
+  "health": 2,
+  "damage": 0
+}

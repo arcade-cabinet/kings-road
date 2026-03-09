@@ -1,0 +1,18 @@
+{
+  "id": "library",
+  "stories": 2,
+  "footprint": { "width": 3, "depth": 3 },
+  "wallMaterial": "stone",
+  "roofStyle": "slate",
+  "openFront": false,
+  "features": ["door", "windows", "bookshelf", "reading_desk", "candles"],
+  "interiorSlots": [
+    { "type": "bookshelf", "position": [0.5, 0.5] },
+    { "type": "bookshelf", "position": [2.5, 0.5] },
+    { "type": "bookshelf", "position": [0.5, 2.5] },
+    { "type": "bookshelf", "position": [2.5, 2.5] },
+    { "type": "reading_desk", "position": [1.5, 1.5] },
+    { "type": "candle", "position": [1.5, 0.5] }
+  ],
+  "npcSlot": { "archetype": "scholar", "position": [1.5, 1.5] }
+}

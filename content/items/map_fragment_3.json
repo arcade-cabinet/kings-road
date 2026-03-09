@@ -1,0 +1,7 @@
+{
+  "id": "map_fragment_3",
+  "name": "Map Fragment — Grailsend",
+  "description": "The final piece of the ancient map, its edges gilded with faded gold leaf. It reveals the hidden path beyond Pilgrim's Rest to the temple at Grailsend.",
+  "type": "key_item",
+  "stackable": false
+}

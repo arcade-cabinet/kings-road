@@ -1,0 +1,13 @@
+{
+  "id": "guard_post",
+  "stories": 2,
+  "footprint": { "width": 1, "depth": 1 },
+  "wallMaterial": "stone",
+  "roofStyle": "flat",
+  "openFront": false,
+  "features": ["door", "arrow_slit", "brazier"],
+  "interiorSlots": [
+    { "type": "weapon_rack", "position": [0.5, 0.5] }
+  ],
+  "npcSlot": { "archetype": "guard", "position": [0.5, 0.5] }
+}

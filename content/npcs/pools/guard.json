@@ -1,0 +1,42 @@
+{
+  "id": "guard-pool",
+  "archetype": "guard",
+  "personality": "Dutiful, bored, slightly suspicious. Speaks in short, routine phrases worn smooth by repetition.",
+  "displayTitle": "Town Guard",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.9, 1.1], "widthRange": [1.0, 1.2] },
+    "clothPalette": {
+      "primary": "#6e7075",
+      "secondary": "#4a4c50",
+      "variations": ["#5e6065", "#808285"]
+    },
+    "signatureAccessories": ["spear", "iron_helm"],
+    "optionalAccessories": ["shield", "lantern", "belt_pouch"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["brown", "gray", "blue"],
+    "hairStyles": ["short", "bald"],
+    "hairColors": ["#1a1a1a", "#3b3b3b", "#6b5030"],
+    "facialHairOptions": ["stubble", "none", "mustache"]
+  },
+  "behavior": { "idleStyle": "patrolling", "interactionVerb": "TALK", "walkNodes": true },
+  "namePool": [
+    "Gareth",
+    "Edric",
+    "Wilhem",
+    "Osbert",
+    "Bran",
+    "Cynric",
+    "Aldred"
+  ],
+  "greetingPool": [
+    { "text": "Keep moving, traveller. No loitering near the gate." },
+    { "text": "Quiet night, thank the saints. Let's hope it stays that way." },
+    { "text": "You look road-worn. The tavern's that way if you need rest." }
+  ],
+  "idlePool": [
+    { "text": "Four more hours on the watch and then a warm bed. I can almost feel the pillow." },
+    { "text": "They said guard duty would be exciting. They lied. Nothing but cold wind and sore feet." }
+  ]
+}

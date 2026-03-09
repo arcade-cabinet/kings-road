@@ -1,0 +1,42 @@
+{
+  "id": "knight-pool",
+  "archetype": "knight",
+  "personality": "Honorable, stoic, burdened by oath. Speaks with formal courtesy and quiet resolve.",
+  "displayTitle": "Sworn Knight",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [1.0, 1.2], "widthRange": [1.1, 1.3] },
+    "clothPalette": {
+      "primary": "#8a8e94",
+      "secondary": "#c0a060",
+      "variations": ["#7a7e84", "#9a9ea4"]
+    },
+    "signatureAccessories": ["sword_belt", "tabard"],
+    "optionalAccessories": ["chainmail", "heraldic_shield", "riding_spurs", "gauntlets"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["blue", "gray", "brown"],
+    "hairStyles": ["short", "bald"],
+    "hairColors": ["#1a1a1a", "#4a3a2a", "#888888"],
+    "facialHairOptions": ["none", "stubble", "mustache"]
+  },
+  "behavior": { "idleStyle": "patrolling", "interactionVerb": "TALK", "walkNodes": true },
+  "namePool": [
+    "Sir Aldric",
+    "Dame Rowena",
+    "Sir Percival",
+    "Dame Yvaine",
+    "Sir Gareth",
+    "Sir Bramwell",
+    "Dame Elora"
+  ],
+  "greetingPool": [
+    { "text": "State your business, traveller. The road is not safe for the unwary." },
+    { "text": "By my oath, I keep the peace on this stretch. You may pass freely." },
+    { "text": "Hold there. I must know your purpose before you go further along the King's Road." }
+  ],
+  "idlePool": [
+    { "text": "My oath binds me to this road until the realm is safe. That day feels distant still." },
+    { "text": "The weight of armor is nothing compared to the weight of the vows I have sworn." }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "ravensgate-caravan-infiltration",
+  "name": "Caravan Infiltration",
+  "type": "stealth",
+  "difficulty": 5,
+  "description": "A merchant caravan bound for Ravensgate camps beside the road, its wagons circled and guards patrolling with lanterns. Hidden among the crates is something you need. You must slip between the wagons unseen, past drowsy guards and restless horses.",
+  "rewards": [
+    { "itemId": "travel_cloak", "chance": 0.3 },
+    { "itemId": "ration", "chance": 0.8 },
+    { "itemId": "health_potion", "chance": 0.4 }
+  ],
+  "failureConsequence": "A horse whinnies at your scent and a guard swings his lantern your way. You are seized and marched to the caravan master, who confiscates your weapons before releasing you at dawn."
+}

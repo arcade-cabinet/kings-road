@@ -1,0 +1,18 @@
+{
+  "id": "arena",
+  "stories": 1,
+  "footprint": { "width": 5, "depth": 5 },
+  "wallMaterial": "stone",
+  "roofStyle": "flat",
+  "openFront": true,
+  "features": ["archway", "spectator_stands", "sand_pit", "weapon_rack"],
+  "interiorSlots": [
+    { "type": "weapon_rack", "position": [0.5, 0.5] },
+    { "type": "weapon_rack", "position": [4.5, 0.5] },
+    { "type": "training_dummy", "position": [1.5, 2.5] },
+    { "type": "training_dummy", "position": [3.5, 2.5] },
+    { "type": "banner", "position": [0.5, 4.5] },
+    { "type": "banner", "position": [4.5, 4.5] },
+    { "type": "bench", "position": [2.5, 4.5] }
+  ]
+}

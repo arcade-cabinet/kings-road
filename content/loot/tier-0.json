@@ -1,0 +1,9 @@
+{
+  "id": "loot-tier-0",
+  "entries": [
+    { "itemId": "wild_comfrey", "weight": 0.4, "quantity": [1, 2] },
+    { "itemId": "wild_thyme", "weight": 0.3, "quantity": [1, 2] },
+    { "itemId": "wild_yarrow", "weight": 0.2, "quantity": [1, 1] },
+    { "itemId": "ration", "weight": 0.1, "quantity": [1, 1] }
+  ]
+}

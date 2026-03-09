@@ -1,0 +1,16 @@
+{
+  "id": "mill",
+  "stories": 2,
+  "footprint": { "width": 2, "depth": 2 },
+  "wallMaterial": "stone",
+  "roofStyle": "thatch",
+  "openFront": false,
+  "features": ["door", "millstone", "grain_chute", "sacks"],
+  "interiorSlots": [
+    { "type": "millstone", "position": [1, 1] },
+    { "type": "grain_sack", "position": [0.5, 0.5] },
+    { "type": "grain_sack", "position": [1.5, 0.5] },
+    { "type": "flour_barrel", "position": [0.5, 1.5] }
+  ],
+  "npcSlot": { "archetype": "miller", "position": [1.5, 1.5] }
+}

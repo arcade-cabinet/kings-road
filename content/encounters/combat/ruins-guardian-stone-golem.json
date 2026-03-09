@@ -1,0 +1,13 @@
+{
+  "id": "ruins-guardian-stone-golem",
+  "name": "Stone Golem of Thornfield",
+  "type": "combat",
+  "difficulty": 5,
+  "description": "The rubble shifts and groans as a figure of mortared stone rises from the ruins, moss-bearded and ancient. Its hollow eyes flare with pale light, and it hefts a fist the size of an anvil. The builders of Thornfield set this guardian well.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "stamina_draught", "chance": 0.4 }
+  ],
+  "failureConsequence": "The golem's stone fist catches you square and sends you tumbling through the archway. You wake among the brambles outside the ruins, barred from entry."
+}

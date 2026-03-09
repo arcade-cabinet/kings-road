@@ -1,0 +1,15 @@
+{
+  "id": "grail_wraith",
+  "name": "Grail Wraith",
+  "bodyType": "biped",
+  "size": 1.6,
+  "colorScheme": {
+    "primary": "#d4af37",
+    "secondary": "#f0ead6",
+    "accent": "#e8e0d0"
+  },
+  "dangerTier": 4,
+  "health": 140,
+  "damage": 28,
+  "lootTable": "loot-tier-4"
+}

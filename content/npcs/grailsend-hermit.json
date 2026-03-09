@@ -1,0 +1,37 @@
+{
+  "id": "grailsend-hermit",
+  "name": "Old Aethelric",
+  "archetype": "hermit",
+  "fixed": true,
+  "bodyBuild": { "height": 0.85, "width": 0.8 },
+  "face": {
+    "skinTone": 3,
+    "eyeColor": "gray",
+    "hairStyle": "long",
+    "hairColor": "#c0c0c0",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["gnarled_staff", "tattered_cloak", "bone_talisman"],
+  "clothPalette": { "primary": "#4a5a3a", "secondary": "#3a2a1a" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "So the road has brought you this far. Not many make it to the grove with their wits still whole.",
+      "I have watched pilgrims come and go for longer than I care to remember. You have a look about you that the others lacked.",
+      "The temple does not welcome the unprepared. Sit with me a while and I will tell you what I know."
+    ],
+    "quest": [
+      "Three trials guard the inner sanctum, and each is shaped by the pilgrim who faces it. The first tests your memory of mercy — every kindness you showed on the road, and every cruelty. The Grail forgets nothing.",
+      "There is a spring beneath the temple roots that has not flowed in a hundred years. The old texts say it will run again when a true seeker arrives. Perhaps you should find it and see what happens."
+    ],
+    "idle": [
+      "The trees here are older than the temple. They remember when the Grail company first came to this place.",
+      "I hear the spring sometimes, deep underground. A faint trickle, like a heartbeat waiting to quicken.",
+      "The Guardian will test you. Do not mistake his silence for approval or his questions for mere ceremony."
+    ]
+  }
+}

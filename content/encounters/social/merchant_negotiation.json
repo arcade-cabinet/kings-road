@@ -1,0 +1,13 @@
+{
+  "id": "merchant_negotiation",
+  "name": "Merchant Negotiation",
+  "type": "social",
+  "difficulty": 3,
+  "description": "A shrewd peddler blocks the road with his overloaded cart, offering passage only to those who can strike a fair bargain. His eyes gleam as he sizes up your purse, but a silver tongue may win more than coin ever could.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.9 },
+    { "itemId": "health_potion", "chance": 0.5 },
+    { "itemId": "torch", "chance": 0.7 }
+  ],
+  "failureConsequence": "The merchant sneers at your poor haggling and doubles his prices. You overpay dearly for meagre supplies, losing coin and dignity in equal measure."
+}

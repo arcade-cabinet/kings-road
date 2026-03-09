@@ -1,0 +1,42 @@
+{
+  "id": "hermit-pool",
+  "archetype": "hermit",
+  "personality": "Eccentric, cryptic, distrustful of company. Speaks in riddles and half-truths from long solitude.",
+  "displayTitle": "Recluse",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.8, 1.0], "widthRange": [0.7, 0.85] },
+    "clothPalette": {
+      "primary": "#5a5040",
+      "secondary": "#3a3530",
+      "variations": ["#6a6050", "#4a4538"]
+    },
+    "signatureAccessories": ["gnarled_staff"],
+    "optionalAccessories": ["tattered_cloak", "bone_necklace", "lantern", "herb_pouch"]
+  },
+  "faceSlots": {
+    "skinToneRange": [1, 4],
+    "eyeColors": ["gray", "green"],
+    "hairStyles": ["long", "bald"],
+    "hairColors": ["#888888", "#aaaaaa", "#4a4a4a"],
+    "facialHairOptions": ["full_beard", "stubble"]
+  },
+  "behavior": { "idleStyle": "idle", "interactionVerb": "TALK", "walkNodes": false },
+  "namePool": [
+    "Old Rowan",
+    "The Thorn",
+    "Moss",
+    "Silent Edda",
+    "Ashburn",
+    "Gale Whisper",
+    "Hollow Jack"
+  ],
+  "greetingPool": [
+    { "text": "You have wandered far from the road to find me. State your purpose quickly." },
+    { "text": "The trees have eyes and the stones have ears. I know why you have come." },
+    { "text": "I left the company of men long ago. What could you possibly want of me?" }
+  ],
+  "idlePool": [
+    { "text": "The owls have been restless these past nights. Something stirs in the deep wood." },
+    { "text": "I talk to the trees because they never talk back. That is the point, you see." }
+  ]
+}

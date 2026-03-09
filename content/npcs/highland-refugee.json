@@ -1,0 +1,37 @@
+{
+  "id": "highland-refugee",
+  "name": "Maelis the Displaced",
+  "archetype": "wanderer",
+  "fixed": true,
+  "bodyBuild": { "height": 0.9, "width": 0.9 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "brown",
+    "hairStyle": "hooded",
+    "hairColor": "#3a2a1a",
+    "facialHair": "none"
+  },
+  "accessories": ["travel_cloak", "bundled_belongings", "worn_boots"],
+  "clothPalette": { "primary": "#7a6a5a", "secondary": "#5a4a3a" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Please, keep your distance until I know your intentions. The road behind me was not kind.",
+      "You are heading north? Then you are braver than I am, or you do not know what waits up there.",
+      "I fled the highlands three days ago and I have not stopped looking over my shoulder since."
+    ],
+    "quest": [
+      "Something stirs in the highland passes — shadows that move against the wind, and a cold that seeps into your bones even at midday. Our village was taken in a single night. I barely escaped with my life and a map showing the old escape routes through the mountains.",
+      "I carry a sealed letter from our village elder meant for the scholars at Thornfield. He said it contained warnings about what is awakening in the north. Take it to them — I cannot go back that way."
+    ],
+    "idle": [
+      "Every sound makes me flinch. I keep expecting to see those shadows on the road behind me.",
+      "The highland folk are hardy, but whatever came for us was beyond any strength of arms.",
+      "If you have water to spare, I would be grateful. I left in such haste I forgot my flask."
+    ]
+  }
+}

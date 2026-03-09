@@ -1,0 +1,35 @@
+{
+  "id": "ravensgate",
+  "name": "Ravensgate",
+  "anchorId": "anchor-03",
+  "layout": "grid",
+  "boundary": "stone_wall",
+  "approach": "open",
+  "center": [0, 0],
+  "buildings": [
+    { "archetype": "gate", "label": "The Iron Gate", "position": [0, -6], "rotation": 0 },
+    { "archetype": "manor", "label": "Ashwick Manor", "position": [0, 5], "rotation": 0, "overrides": { "stories": 2, "wallMaterial": "stone" } },
+    { "archetype": "barracks", "label": "Ravensgate Barracks", "position": [-5, 3], "rotation": 0 },
+    { "archetype": "prison", "label": "The Oubliette", "position": [5, 3], "rotation": 0 },
+    { "archetype": "tavern", "label": "The Black Raven", "position": [-3, -2], "rotation": 0, "overrides": { "stories": 2 } },
+    { "archetype": "market_stall", "label": "Thornton's Wares", "position": [2, -2], "rotation": 0 },
+    { "archetype": "market_stall", "label": "Taxed Goods", "position": [4, -2], "rotation": 0 },
+    { "archetype": "guard_post", "label": "South Watch", "position": [-2, -5], "rotation": 0 },
+    { "archetype": "guard_post", "label": "North Watch", "position": [3, 4], "rotation": 0 },
+    { "archetype": "house_large", "label": "Magistrate's House", "position": [-5, 0], "rotation": 0, "overrides": { "stories": 2 } },
+    { "archetype": "house_large", "label": "Captain's Quarters", "position": [-3, 3], "rotation": 0, "overrides": { "stories": 2 } },
+    { "archetype": "house_large", "label": "Elara's Dwelling", "position": [5, 0], "rotation": 0 },
+    { "archetype": "stable", "label": "Garrison Stables", "position": [-5, -4], "rotation": 0 },
+    { "archetype": "smithy", "label": "The Armoury", "position": [5, -4], "rotation": 0 }
+  ],
+  "npcs": [
+    { "id": "lord-ashwick", "archetype": "noble", "fixed": true, "building": "Ashwick Manor", "name": "Lord Ashwick" },
+    { "id": "captain-roderick", "archetype": "knight", "fixed": true, "building": "Ravensgate Barracks", "name": "Captain Roderick" },
+    { "id": "greta", "archetype": "innkeeper", "fixed": true, "building": "The Black Raven", "name": "Greta" },
+    { "id": "thornton", "archetype": "merchant", "fixed": true, "building": "Thornton's Wares", "name": "Thornton" },
+    { "id": "guard-marcus", "archetype": "knight", "fixed": true, "building": "South Watch", "name": "Guard Marcus" },
+    { "id": "elara", "archetype": "healer", "fixed": true, "building": "Elara's Dwelling", "name": "Elara" },
+    { "id": "prisoner-silas", "archetype": "scholar", "fixed": true, "building": "The Oubliette", "name": "Prisoner Silas" },
+    { "id": "bard-finch", "archetype": "wanderer", "fixed": false, "name": "Bard Finch" }
+  ]
+}

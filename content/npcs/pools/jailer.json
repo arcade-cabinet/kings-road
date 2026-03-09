@@ -1,0 +1,42 @@
+{
+  "id": "jailer-pool",
+  "archetype": "jailer",
+  "personality": "Blunt, weary, darkly humorous. Speaks with resigned authority from years among prisoners.",
+  "displayTitle": "Jailer",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.9, 1.1], "widthRange": [1.0, 1.2] },
+    "clothPalette": {
+      "primary": "#3d3025",
+      "secondary": "#2a201a",
+      "variations": ["#4d4035", "#332a20"]
+    },
+    "signatureAccessories": ["key_ring"],
+    "optionalAccessories": ["truncheon", "belt_lantern", "manacles", "leather_gloves"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["brown", "gray"],
+    "hairStyles": ["bald", "short"],
+    "hairColors": ["#1a1a1a", "#3b3b3b", "#666666"],
+    "facialHairOptions": ["stubble", "mustache", "none"]
+  },
+  "behavior": { "idleStyle": "idle", "interactionVerb": "TALK", "walkNodes": false },
+  "namePool": [
+    "Grimshaw",
+    "Barton",
+    "Caddock",
+    "Mord",
+    "Hadley",
+    "Brunhild",
+    "Thurl"
+  ],
+  "greetingPool": [
+    { "text": "No visitors without the captain's leave. Move along." },
+    { "text": "These cells hold those who've earned their stay. Don't give me cause to add you." },
+    { "text": "Keys and patience — that's all this job requires. Mostly patience." }
+  ],
+  "idlePool": [
+    { "text": "The prisoner in cell three has been muttering about buried treasure again. They all do." },
+    { "text": "Damp walls, cold iron, and the sound of chains. You get used to it after a decade or so." }
+  ]
+}

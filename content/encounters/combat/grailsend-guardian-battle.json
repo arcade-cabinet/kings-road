@@ -1,0 +1,14 @@
+{
+  "id": "grailsend-guardian-battle",
+  "name": "The Temple Guardian",
+  "type": "combat",
+  "difficulty": 8,
+  "description": "A towering figure of burnished bronze steps from the altar niche, its eyes blazing with golden fire. The Guardian of the Grail Temple raises a sword wreathed in holy light and speaks a single word: Prove. The flagstones tremble beneath your feet.",
+  "rewards": [
+    { "itemId": "healing_staff", "chance": 0.3 },
+    { "itemId": "health_potion", "chance": 0.8 },
+    { "itemId": "stamina_draught", "chance": 0.6 },
+    { "itemId": "pilgrim_medallion", "chance": 0.4 }
+  ],
+  "failureConsequence": "The Guardian's blazing sword sweeps you from the nave. You land in the courtyard, humbled and aching, the temple doors sealed until you find the strength to try again."
+}

@@ -1,0 +1,7 @@
+{
+  "id": "boglantern",
+  "name": "Boglantern",
+  "description": "A luminous bog plant whose pale golden glow flickers softly above the marshwater. Travellers sometimes mistake its light for a distant lantern on the moor.",
+  "type": "quest_item",
+  "stackable": false
+}

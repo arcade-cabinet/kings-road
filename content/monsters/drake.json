@@ -1,0 +1,15 @@
+{
+  "id": "drake",
+  "name": "Thornscale Drake",
+  "bodyType": "quadruped",
+  "size": 2.5,
+  "colorScheme": {
+    "primary": "#4a6741",
+    "secondary": "#2d4a2a",
+    "accent": "#c4a000"
+  },
+  "dangerTier": 3,
+  "health": 80,
+  "damage": 20,
+  "lootTable": "loot-tier-3"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "deer",
+  "name": "Fallow Deer",
+  "bodyType": "quadruped",
+  "size": 1.2,
+  "colorScheme": {
+    "primary": "#a0724a",
+    "secondary": "#e8d5b7"
+  },
+  "dangerTier": 0,
+  "health": 8,
+  "damage": 0
+}

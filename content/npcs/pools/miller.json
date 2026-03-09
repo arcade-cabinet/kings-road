@@ -1,0 +1,42 @@
+{
+  "id": "miller-pool",
+  "archetype": "miller",
+  "personality": "Steady, flour-dusted, proud of his trade. Speaks loudly over the rumble of grinding stones.",
+  "displayTitle": "Miller",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.9, 1.05], "widthRange": [1.05, 1.25] },
+    "clothPalette": {
+      "primary": "#e8e0d0",
+      "secondary": "#a09080",
+      "variations": ["#d8d0c0", "#f0e8d8"]
+    },
+    "signatureAccessories": ["dusty_apron"],
+    "optionalAccessories": ["grain_sack", "measuring_scoop", "flour_dusted_cap", "leather_belt"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["brown", "blue"],
+    "hairStyles": ["short", "bald"],
+    "hairColors": ["#6b5030", "#8b7050", "#c8c0b0"],
+    "facialHairOptions": ["stubble", "full_beard", "none"]
+  },
+  "behavior": { "idleStyle": "working", "interactionVerb": "TRADE", "walkNodes": false },
+  "namePool": [
+    "Godwin",
+    "Thatcher",
+    "Cob",
+    "Margery",
+    "Piers",
+    "Aelwen",
+    "Hamnet"
+  ],
+  "greetingPool": [
+    { "text": "The wheel turns and the flour flows. What brings you to the mill?" },
+    { "text": "Careful of the grinding stones, friend. They stop for no one." },
+    { "text": "Grain in, flour out. Simple work, honest living. Need something ground?" }
+  ],
+  "idlePool": [
+    { "text": "The mill wheel needs a new bearing. Oak, not ash — ash splits under the strain." },
+    { "text": "Flour gets into everything. My wife says I sneeze white for a week after grinding day." }
+  ]
+}

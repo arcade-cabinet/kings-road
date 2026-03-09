@@ -1,0 +1,7 @@
+{
+  "id": "peasant-disguise",
+  "name": "Peasant Disguise",
+  "description": "A bundle of rough-spun clothing: a patched tunic, muddy breeches, and a battered straw hat. Enough to pass unnoticed among common folk at market or on the road.",
+  "type": "equipment",
+  "stackable": false
+}

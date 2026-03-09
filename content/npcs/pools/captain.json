@@ -1,0 +1,42 @@
+{
+  "id": "captain-pool",
+  "archetype": "captain",
+  "personality": "Commanding, vigilant, burdened by duty. Speaks with military precision and wary authority.",
+  "displayTitle": "Guard Captain",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [1.0, 1.15], "widthRange": [1.05, 1.25] },
+    "clothPalette": {
+      "primary": "#6b7580",
+      "secondary": "#8b1a1a",
+      "variations": ["#555f6a", "#7a848f"]
+    },
+    "signatureAccessories": ["sword_belt", "captain_cape"],
+    "optionalAccessories": ["rank_insignia", "gauntlets", "polished_helm"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 3],
+    "eyeColors": ["brown", "blue", "gray"],
+    "hairStyles": ["short", "bald"],
+    "hairColors": ["#1a1a1a", "#3b3b3b", "#888888"],
+    "facialHairOptions": ["stubble", "mustache", "none"]
+  },
+  "behavior": { "idleStyle": "patrolling", "interactionVerb": "REPORT", "walkNodes": true },
+  "namePool": [
+    "Roland",
+    "Aldwin",
+    "Tormund",
+    "Leofric",
+    "Baldwin",
+    "Helga",
+    "Sigurd"
+  ],
+  "greetingPool": [
+    { "text": "Hold, traveller. State your business in these parts." },
+    { "text": "The roads grow more dangerous by the day. Watch yourself out there." },
+    { "text": "We keep the peace here. If you've nothing to hide, you've nothing to fear." }
+  ],
+  "idlePool": [
+    { "text": "Two patrols overdue and supplies running thin. I need more men, not more problems." },
+    { "text": "The night watch reports movement in the eastern wood. I do not like it one bit." }
+  ]
+}

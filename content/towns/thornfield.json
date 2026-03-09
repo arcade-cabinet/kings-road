@@ -1,0 +1,19 @@
+{
+  "id": "thornfield",
+  "name": "Thornfield Ruins",
+  "anchorId": "anchor-02",
+  "layout": "organic",
+  "boundary": "none",
+  "approach": "open",
+  "center": [0, 0],
+  "buildings": [
+    { "archetype": "cottage", "label": "Ruin-Keeper's Camp", "position": [-3, -2], "rotation": 12 },
+    { "archetype": "guard_post", "label": "Warden's Watch", "position": [3, -3], "rotation": -8 },
+    { "archetype": "watchtower", "label": "Crumbling Lookout", "position": [5, 2], "rotation": 0 }
+  ],
+  "npcs": [
+    { "id": "ruin-keeper", "archetype": "scholar", "fixed": true, "building": "Ruin-Keeper's Camp", "name": "Ruin-Keeper Aldhelm" },
+    { "id": "camp-warden", "archetype": "knight", "fixed": true, "building": "Warden's Watch", "name": "Warden Bryce" },
+    { "id": "thornfield-scholar", "archetype": "scholar", "fixed": true, "building": "Ruin-Keeper's Camp", "name": "Scholar Eadmund" }
+  ]
+}

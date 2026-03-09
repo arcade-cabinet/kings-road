@@ -1,0 +1,7 @@
+{
+  "id": "windcrown",
+  "name": "Windcrown",
+  "description": "A hardy herb crowned with tiny white blossoms that grows only on windswept hilltops. Its leaves rustle with a faint, musical whisper even when the air is still.",
+  "type": "quest_item",
+  "stackable": false
+}

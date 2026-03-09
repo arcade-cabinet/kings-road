@@ -1,0 +1,13 @@
+{
+  "id": "river_crossing",
+  "name": "River Crossing",
+  "type": "survival",
+  "difficulty": 3,
+  "description": "Spring meltwater has swollen the river to a churning torrent. The old ford is submerged and the nearest bridge lies a day's walk upstream. Fallen timber and slippery stones offer a treacherous path across, but one misstep could sweep you downstream.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.8 },
+    { "itemId": "health_potion", "chance": 0.4 },
+    { "itemId": "torch", "chance": 0.6 }
+  ],
+  "failureConsequence": "The current catches your legs and drags you under. You claw your way to the far bank, gasping and half-drowned, but your pack is lighter — the river claimed a portion of your supplies."
+}

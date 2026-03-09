@@ -1,0 +1,35 @@
+{
+  "id": "bard-finch",
+  "name": "Bard Finch",
+  "archetype": "wanderer",
+  "fixed": false,
+  "bodyBuild": { "height": 1.0, "width": 0.85 },
+  "face": {
+    "skinTone": 4,
+    "eyeColor": "brown",
+    "hairStyle": "long",
+    "hairColor": "#1a1a1a",
+    "facialHair": "none"
+  },
+  "accessories": ["lute", "feathered_cap", "travel_pack"],
+  "clothPalette": { "primary": "#5c3a1e", "secondary": "#c9a84c" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Ah, a fellow traveller! Care for a song? Or perhaps... information? I deal in both.",
+      "They call me Finch. I go where the stories are, and Ravensgate has plenty.",
+      "Careful with that honest face of yours. It'll get you killed in this town."
+    ],
+    "quest": [
+      "I know a secret way into the lord's manor — through the old wine cellar. But I'll need a distraction at the front gate. Interested?"
+    ],
+    "idle": [
+      "Every town has its secrets. Ravensgate has more than most.",
+      "I've been composing a ballad about Lord Ashwick. I doubt he'd appreciate the lyrics."
+    ]
+  }
+}

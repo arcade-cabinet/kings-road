@@ -1,0 +1,15 @@
+{
+  "id": "troll",
+  "name": "Bridge Troll",
+  "bodyType": "biped",
+  "size": 2.2,
+  "colorScheme": {
+    "primary": "#3d5c3a",
+    "secondary": "#5a7a4a",
+    "accent": "#8b7355"
+  },
+  "dangerTier": 2,
+  "health": 60,
+  "damage": 8,
+  "lootTable": "loot-tier-2"
+}

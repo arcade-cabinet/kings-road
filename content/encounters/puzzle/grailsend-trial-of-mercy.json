@@ -1,0 +1,13 @@
+{
+  "id": "grailsend-trial-of-mercy",
+  "name": "Trial of Mercy",
+  "type": "puzzle",
+  "difficulty": 7,
+  "description": "The temple's inner court presents a harrowing illusion: a wounded knight kneels before you, begging for the mercy of a swift end, while a weeping child clutches at your sleeve, pleading for you to save him. The Grail's light watches from above, judging not your strength but the quality of your compassion.",
+  "rewards": [
+    { "itemId": "healing_staff", "chance": 0.3 },
+    { "itemId": "health_potion", "chance": 0.7 },
+    { "itemId": "pilgrim_medallion", "chance": 0.4 }
+  ],
+  "failureConsequence": "The illusion fades and the Grail's light dims to a cold ember. You are left standing in an empty courtyard, the way forward barred until you understand what mercy truly asks."
+}

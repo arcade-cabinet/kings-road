@@ -1,0 +1,35 @@
+{
+  "id": "captain-roderick",
+  "name": "Captain Roderick",
+  "archetype": "knight",
+  "fixed": true,
+  "bodyBuild": { "height": 1.35, "width": 1.4 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "brown",
+    "hairStyle": "short",
+    "hairColor": "#1a1a1a",
+    "facialHair": "stubble"
+  },
+  "accessories": ["longsword", "tower_shield", "plate_gorget"],
+  "clothPalette": { "primary": "#2a2a2a", "secondary": "#1a0a2e" },
+  "behavior": {
+    "idleStyle": "patrolling",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Halt. No one passes without my leave. State your purpose in Ravensgate.",
+      "You've wandered into the wrong town, stranger. Lord Ashwick's law is absolute here.",
+      "I am Captain Roderick. My blade serves Lord Ashwick and no other."
+    ],
+    "quest": [
+      "A band of outlaws camps in the Thornwood. Bring me proof of their end, or don't bother returning."
+    ],
+    "idle": [
+      "Lord Ashwick's word is law. Anyone who questions that answers to me.",
+      "The prisoners in the tower are none of your concern."
+    ]
+  }
+}

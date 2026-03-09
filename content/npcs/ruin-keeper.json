@@ -1,0 +1,37 @@
+{
+  "id": "ruin-keeper",
+  "name": "Ruin-Keeper Aldhelm",
+  "archetype": "scholar",
+  "fixed": true,
+  "bodyBuild": { "height": 0.9, "width": 0.85 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "green",
+    "hairStyle": "bald",
+    "hairColor": "#888888",
+    "facialHair": "stubble"
+  },
+  "accessories": ["tattered_robe", "lantern", "old_map"],
+  "clothPalette": { "primary": "#5a4e3c", "secondary": "#8b7d6b" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "You've found the ruins, then. Most turn back when the thorns close in. Sit a moment — I can tell you what these stones remember.",
+      "Careful where you step. The flagstones here are older than any living king, and what lies beneath them is older still.",
+      "Another seeker on the King's Road. I keep the camp fire burning for folk like you."
+    ],
+    "quest": [
+      "These ruins were a scriptorium once, before the thorns took them. The monks who worked here copied texts about the Grail — maps, hymns, prophecies. Most were lost, but fragments remain in the lower chambers. I can show you the way in, if you've nerve enough.",
+      "I've spent twenty years cataloguing what the ruins surrender. Each season the earth shifts and reveals something new. Last autumn I found a map fragment that matches none of the known roads. It points beyond Ravensgate, toward the highlands."
+    ],
+    "idle": [
+      "The thorns grow thicker each year. Sometimes I think the ruins want to be forgotten.",
+      "I found a carved lintel yesterday with script I cannot read. Something about a covenant.",
+      "The camp is modest, but the fire is warm and the tea is strong. Help yourself."
+    ]
+  }
+}

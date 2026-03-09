@@ -1,0 +1,12 @@
+{
+  "id": "health_potion",
+  "name": "Health Potion",
+  "description": "A ruby-red draught brewed from meadowsweet and blessed water. It mends flesh and eases pain within moments.",
+  "type": "consumable",
+  "effect": {
+    "stat": "health",
+    "value": 25,
+    "duration": 0
+  },
+  "stackable": true
+}

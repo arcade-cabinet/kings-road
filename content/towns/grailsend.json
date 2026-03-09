@@ -1,0 +1,20 @@
+{
+  "id": "grailsend",
+  "name": "Grailsend",
+  "anchorId": "anchor-05",
+  "layout": "organic",
+  "boundary": "none",
+  "approach": "grove",
+  "center": [0, 0],
+  "buildings": [
+    { "archetype": "temple", "label": "Temple Entrance", "position": [0, 4], "rotation": 0, "overrides": { "stories": 2 } },
+    { "archetype": "cottage", "label": "Pilgrim's Camp", "position": [-4, -2], "rotation": 15 },
+    { "archetype": "chapel", "label": "Wayside Shrine", "position": [3, -1], "rotation": -10 }
+  ],
+  "npcs": [
+    { "id": "the-guardian", "archetype": "knight", "fixed": true, "building": "Temple Entrance", "name": "The Guardian" },
+    { "id": "the-oracle", "archetype": "scholar", "fixed": true, "building": "Temple Entrance", "name": "The Oracle" },
+    { "id": "temple-pilgrim", "archetype": "pilgrim", "fixed": true, "building": "Pilgrim's Camp", "name": "Pilgrim Margery" },
+    { "id": "grailsend-hermit", "archetype": "hermit", "fixed": true, "building": "Wayside Shrine", "name": "Old Aethelric" }
+  ]
+}

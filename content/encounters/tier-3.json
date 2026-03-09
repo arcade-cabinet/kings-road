@@ -1,0 +1,10 @@
+{
+  "id": "encounter-tier-3",
+  "dangerTier": 3,
+  "entries": [
+    { "monsterId": "drake", "weight": 0.35, "count": [1, 1] },
+    { "monsterId": "necromancer", "weight": 0.35, "count": [1, 1] },
+    { "monsterId": "basilisk", "weight": 0.3, "count": [1, 1] }
+  ],
+  "lootTable": "loot-tier-3"
+}

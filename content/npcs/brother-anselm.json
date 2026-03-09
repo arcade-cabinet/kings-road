@@ -1,0 +1,36 @@
+{
+  "id": "brother-anselm",
+  "name": "Brother Anselm",
+  "archetype": "scholar",
+  "fixed": true,
+  "bodyBuild": { "height": 1.0, "width": 0.75 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "brown",
+    "hairStyle": "short",
+    "hairColor": "#3a2a1a",
+    "facialHair": "none"
+  },
+  "accessories": ["robes", "quill", "spectacles"],
+  "clothPalette": { "primary": "#d4c9b0", "secondary": "#2e1f0f" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Ah, a visitor! Forgive the mess — I was cross-referencing two accounts of the Grail's arrival in these lands.",
+      "Welcome, friend. Do you read Latin? No matter — I can translate the important bits.",
+      "Mind the manuscripts, if you please. Some are older than this abbey itself."
+    ],
+    "quest": [
+      "The chronicles speak of five Grail markers along the Road, each inscribed by the knight who bore the chalice. I have mapped four, but the fifth eludes me — somewhere past Ravensgate, hidden beneath a fallen chapel. If you find the inscription, copy it exactly. Every letter matters.",
+      "The Abbot speaks of faith, and rightly so. But the Grail's history is also a matter of record. The order that guarded it left ciphered texts in every town along the Road. Gather what you can — together they form a map that no single fragment can reveal."
+    ],
+    "idle": [
+      "This passage here — it contradicts the Ashford account entirely. Fascinating.",
+      "I have worn through three quills this week alone. The truth does not transcribe itself."
+    ]
+  }
+}

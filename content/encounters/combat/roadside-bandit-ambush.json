@@ -1,0 +1,13 @@
+{
+  "id": "roadside-bandit-ambush",
+  "name": "Roadside Bandit Ambush",
+  "type": "combat",
+  "difficulty": 3,
+  "description": "A fallen oak blocks the King's Road, and the silence that follows is too perfect. Figures rise from the ditches on either side — masked men with cudgels and short bows, arranged with the practised ease of those who have robbed this stretch before.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.7 },
+    { "itemId": "torch", "chance": 0.6 },
+    { "itemId": "health_potion", "chance": 0.3 }
+  ],
+  "failureConsequence": "The bandits bind your hands and take everything of value before vanishing into the bracken. A passing carter frees you an hour later, but your supplies are gone."
+}

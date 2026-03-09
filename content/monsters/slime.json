@@ -1,0 +1,13 @@
+{
+  "id": "slime",
+  "name": "Green Slime",
+  "bodyType": "amorphous",
+  "size": 0.6,
+  "colorScheme": {
+    "primary": "#4a7a3b",
+    "secondary": "#6fbf56"
+  },
+  "dangerTier": 1,
+  "health": 12,
+  "damage": 3
+}

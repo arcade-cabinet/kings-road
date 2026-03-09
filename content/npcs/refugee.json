@@ -1,0 +1,35 @@
+{
+  "id": "refugee",
+  "name": "Refugee",
+  "archetype": "wanderer",
+  "fixed": false,
+  "bodyBuild": { "height": 0.9, "width": 0.8 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "gray",
+    "hairStyle": "short",
+    "hairColor": "#7a6a5a",
+    "facialHair": "stubble"
+  },
+  "accessories": ["bundled_belongings", "torn_blanket"],
+  "clothPalette": { "primary": "#5a5a50", "secondary": "#3a3a35" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Please, I mean no harm. I'm only passing through. My village... it's gone.",
+      "Have you food to spare? I've eaten nothing but roots for three days.",
+      "Don't look at me like that. I was a carpenter once. I had a home."
+    ],
+    "quest": [
+      "My daughter was separated from me when we fled. She has a red ribbon in her hair. If you find her on the road, tell her I'm heading to Millbrook."
+    ],
+    "idle": [
+      "I keep walking, but I don't know where I'm going anymore.",
+      "The smoke was visible for a whole day after we left..."
+    ]
+  }
+}

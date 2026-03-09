@@ -1,0 +1,22 @@
+{
+  "id": "manor",
+  "stories": 2,
+  "footprint": { "width": 4, "depth": 5 },
+  "wallMaterial": "stone",
+  "roofStyle": "slate",
+  "openFront": false,
+  "features": ["door", "windows", "chimney", "balcony", "garden"],
+  "interiorSlots": [
+    { "type": "throne", "position": [2, 1] },
+    { "type": "table", "position": [2, 2.5] },
+    { "type": "chair", "position": [1.5, 2.5] },
+    { "type": "chair", "position": [2.5, 2.5] },
+    { "type": "hearth", "position": [2, 0.5] },
+    { "type": "bookshelf", "position": [0.5, 0.5] },
+    { "type": "bookshelf", "position": [3.5, 0.5] },
+    { "type": "chest", "position": [0.5, 4.5] },
+    { "type": "bed", "position": [3, 4] },
+    { "type": "tapestry", "position": [0.5, 2] }
+  ],
+  "npcSlot": { "archetype": "lord", "position": [2, 1.5] }
+}

@@ -1,0 +1,83 @@
+{
+  "id": "side-the-missing-merchant",
+  "tier": "meso",
+  "title": "The Missing Merchant",
+  "estimatedMinutes": 22,
+  "anchorAffinity": "anchor-01",
+  "trigger": { "type": "anchor", "anchorId": "anchor-01" },
+  "branches": {
+    "A": {
+      "label": "Track the bandits who took him",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "My partner Osbert left for Ravensgate three days past and has not returned. His cart was found overturned on the forest road with the goods scattered and boot prints everywhere. The reeve says it is bandits, the same ones who have been plaguing the Millbrook road since midsummer. Please, find Osbert before they do him worse harm.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "investigate",
+          "description": "Examine the overturned cart on the forest road for tracks and clues about which direction the bandits dragged Osbert."
+        },
+        {
+          "id": "a-03",
+          "type": "encounter",
+          "encounterId": "bandit_ambush",
+          "description": "Follow the trail to a hidden bandit camp in the forest. Fight through the lookouts to reach the clearing where Osbert is bound to a tree."
+        },
+        {
+          "id": "a-04",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "You came for me. I had given up hope after the second night. Those ruffians wanted the location of our warehouse in Ravensgate but I told them nothing. My partner will be overjoyed. Here, I hid this in my boot before they searched me — take it as thanks. It is the finest thing I ever traded for.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "item", "itemId": "travel_cloak" }
+    },
+    "B": {
+      "label": "Discover the merchant fled his debts",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "My partner Osbert left for Ravensgate three days past and has not returned. His cart was found overturned on the forest road with the goods scattered and boot prints everywhere. I fear the worst but something nags at me — he has been anxious of late, whispering with strangers at the tavern. Please, find out what happened to him.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "investigate",
+          "description": "Search the overturned cart and notice the damage looks staged — the axle was removed, not broken, and the scattered goods are the cheapest stock."
+        },
+        {
+          "id": "b-03",
+          "type": "encounter",
+          "encounterId": "merchant_negotiation",
+          "description": "Visit the tavern and press the innkeeper for information about Osbert's secretive meetings with a moneylender from Ravensgate."
+        },
+        {
+          "id": "b-04",
+          "type": "travel",
+          "destination": "river-crossing",
+          "description": "Follow Osbert's true trail to the river crossing south of Millbrook, where he arranged passage on a barge heading downstream."
+        },
+        {
+          "id": "b-05",
+          "type": "dialogue",
+          "npcArchetype": "merchant",
+          "dialogue": "He staged his own disappearance? I cannot believe it. The debts, the whispering — it all makes sense now. Part of me is relieved he is alive but the betrayal stings. At least I know the truth and can settle his accounts before they come after me instead. You have saved me from ruin, traveller. Take this for your trouble.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "currency", "amount": 40 }
+    }
+  },
+  "reward": { "type": "modifier", "modifierId": "truth-seeker" }
+}

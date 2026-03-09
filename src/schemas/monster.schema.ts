@@ -10,9 +10,9 @@ export const MonsterArchetypeSchema = z.object({
     secondary: z.string().optional(),
     accent: z.string().optional(),
   }),
-  dangerTier: z.number().int().min(1).max(4),
+  dangerTier: z.number().int().min(0).max(4),
   health: z.number().int().min(1),
-  damage: z.number().int().min(1),
+  damage: z.number().int().min(0),
   lootTable: z.string().optional(),
 });
 export type MonsterArchetype = z.infer<typeof MonsterArchetypeSchema>;

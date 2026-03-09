@@ -1,0 +1,42 @@
+{
+  "id": "scholar-pool",
+  "archetype": "scholar",
+  "personality": "Absent-minded, endlessly curious, ink-stained. Speaks in tangential bursts of enthusiasm about obscure topics.",
+  "displayTitle": "Scholar",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.9, 1.1], "widthRange": [0.75, 0.9] },
+    "clothPalette": {
+      "primary": "#2a3050",
+      "secondary": "#4a3070",
+      "variations": ["#1a2040", "#3a4060"]
+    },
+    "signatureAccessories": ["reading_spectacles", "scroll_case"],
+    "optionalAccessories": ["ink_pot", "quill", "magnifying_lens", "book_satchel"]
+  },
+  "faceSlots": {
+    "skinToneRange": [0, 2],
+    "eyeColors": ["blue", "gray", "brown"],
+    "hairStyles": ["bald", "long"],
+    "hairColors": ["#3b3b3b", "#888888", "#aaaaaa"],
+    "facialHairOptions": ["none", "stubble", "mustache"]
+  },
+  "behavior": { "idleStyle": "sitting", "interactionVerb": "TALK", "walkNodes": false },
+  "namePool": [
+    "Aldhelm",
+    "Beatrix",
+    "Cuthbert",
+    "Elowen",
+    "Phineas",
+    "Thessaly",
+    "Anselm"
+  ],
+  "greetingPool": [
+    { "text": "Ah, a visitor! Do forgive the mess — these manuscripts will not catalogue themselves." },
+    { "text": "Knowledge is the greatest treasure on the King's Road. What would you learn?" },
+    { "text": "I have read of places you have surely walked. Come, share your observations with me." }
+  ],
+  "idlePool": [
+    { "text": "This passage contradicts the Ashford Codex entirely. Either the monks lied or history did." },
+    { "text": "I have been cross-referencing these maps for a fortnight. The old borders make no sense at all." }
+  ]
+}

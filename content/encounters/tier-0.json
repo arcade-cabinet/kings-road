@@ -1,0 +1,12 @@
+{
+  "id": "encounter-tier-0",
+  "dangerTier": 0,
+  "entries": [
+    { "monsterId": "rabbit", "weight": 0.3, "count": [1, 3] },
+    { "monsterId": "deer", "weight": 0.25, "count": [1, 2] },
+    { "monsterId": "songbird", "weight": 0.25, "count": [2, 5] },
+    { "monsterId": "butterfly_swarm", "weight": 0.1, "count": [1, 1] },
+    { "monsterId": "hedgehog", "weight": 0.1, "count": [1, 2] }
+  ],
+  "lootTable": "loot-tier-0"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "cursed-ring-shade",
+  "name": "Shade of the Cursed Ring",
+  "type": "combat",
+  "difficulty": 5,
+  "description": "The tarnished ring pulses with cold light, and a shadow peels itself from the ground — the shade of whoever last wore the cursed band. It wears a face twisted between sorrow and rage, and its dark blade cuts without sound.",
+  "rewards": [
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "antidote", "chance": 0.4 },
+    { "itemId": "stamina_draught", "chance": 0.4 }
+  ],
+  "failureConsequence": "The shade's icy touch drains your strength and leaves you trembling on the roadside. The cursed ring rolls away into the grass, waiting for its next victim."
+}

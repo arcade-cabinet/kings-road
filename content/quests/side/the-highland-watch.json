@@ -1,0 +1,107 @@
+{
+  "id": "side-the-highland-watch",
+  "tier": "meso",
+  "title": "The Highland Watch",
+  "estimatedMinutes": 25,
+  "anchorAffinity": "anchor-04",
+  "trigger": { "type": "roadside", "distanceRange": [19000, 22000] },
+  "branches": {
+    "A": {
+      "label": "Light the signal fires by force",
+      "steps": [
+        {
+          "id": "a-01",
+          "type": "dialogue",
+          "npcArchetype": "watchman",
+          "dialogue": "I kept these towers for thirty years. Thirty years of cold nights and wolf howls and nobody caring whether the fires burned or not. Now the darkness is creeping down from the highlands and the beacons are cold. I am too old to climb the ridges alone. Will you help me light them before nightfall? There are three towers along the ridge and each one needs a torch set to its brazier.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "a-02",
+          "type": "travel",
+          "description": "Climb the highland ridge to reach the first watchtower ruin. The path is steep and loose stones tumble underfoot."
+        },
+        {
+          "id": "a-03",
+          "type": "encounter",
+          "encounterId": "highland-wolves",
+          "description": "A pack of highland wolves has denned in the first tower. Drive them out before you can reach the brazier."
+        },
+        {
+          "id": "a-04",
+          "type": "travel",
+          "description": "Press along the exposed ridge path to the second watchtower. Wind batters you from every side."
+        },
+        {
+          "id": "a-05",
+          "type": "encounter",
+          "encounterId": "highland-bandits",
+          "description": "Bandits have occupied the second tower, using it as a lookout for caravans on the road below. Clear them out."
+        },
+        {
+          "id": "a-06",
+          "type": "investigate",
+          "description": "Light the final brazier atop the third tower and watch the chain of signal fires blaze to life across the highland ridge."
+        },
+        {
+          "id": "a-07",
+          "type": "dialogue",
+          "npcArchetype": "watchman",
+          "dialogue": "Look at that. Three fires burning against the dusk, just as they did in my father's time. You have done what a dozen soldiers could not. The highlands will be safer tonight. Take this old blade of mine. It has seen more winters than you have summers, but the edge is still true.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "item", "itemId": "iron_sword" }
+    },
+    "B": {
+      "label": "Use the hidden passage system",
+      "steps": [
+        {
+          "id": "b-01",
+          "type": "dialogue",
+          "npcArchetype": "watchman",
+          "dialogue": "I kept these towers for thirty years. Thirty years of cold nights and wolf howls and nobody caring whether the fires burned or not. Now the darkness is creeping down from the highlands and the beacons are cold. I am too old to climb the ridges alone. Will you help me light them before nightfall? There are three towers along the ridge and each one needs a torch set to its brazier.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        },
+        {
+          "id": "b-02",
+          "type": "investigate",
+          "description": "Examine the base of the nearest watchtower and discover a concealed entrance beneath a fallen capstone. The old watchmen built tunnels connecting all three towers."
+        },
+        {
+          "id": "b-03",
+          "type": "puzzle",
+          "description": "Navigate the crumbling underground passages. Collapsed sections require you to find alternate routes by reading carved direction markers left by the original builders."
+        },
+        {
+          "id": "b-04",
+          "type": "investigate",
+          "description": "Emerge inside the second tower through a hidden trapdoor, bypassing the bandits camped outside. Light the brazier from within."
+        },
+        {
+          "id": "b-05",
+          "type": "puzzle",
+          "description": "The final passage is flooded. Find a way to divert the water using the old drainage lever system before the tunnel collapses entirely."
+        },
+        {
+          "id": "b-06",
+          "type": "investigate",
+          "description": "Climb up through the third tower and light the last brazier. The chain of fires blazes across the ridge without a single blow struck."
+        },
+        {
+          "id": "b-07",
+          "type": "dialogue",
+          "npcArchetype": "watchman",
+          "dialogue": "You found the old passages. I had nearly forgotten they existed. My grandfather built those tunnels so the watchmen could move between towers in winter storms. You are cleverer than most who walk this road. Take this map I drew in my younger days. It marks every hidden path in these highlands.",
+          "dialogueMinWords": 15,
+          "dialogueMaxWords": 80
+        }
+      ],
+      "reward": { "type": "item", "itemId": "map_fragment_3" }
+    }
+  },
+  "reward": { "type": "currency", "amount": 50 }
+}

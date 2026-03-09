@@ -1,0 +1,29 @@
+{
+  "id": "side-strange-shrine",
+  "tier": "micro",
+  "title": "The Strange Shrine",
+  "estimatedMinutes": 7,
+  "anchorAffinity": "anchor-04",
+  "trigger": { "type": "roadside", "distanceRange": [23000, 26000] },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "investigate",
+      "description": "A faint golden light pulses from a moss-covered shrine half-hidden among the highland pines. Approach carefully and examine the source of the eerie glow."
+    },
+    {
+      "id": "s-02",
+      "type": "puzzle",
+      "description": "The shrine bears three carved symbols that correspond to phases of the moon. Rotate the stone rings until the symbols align with the current sky to unlock the shrine's inner chamber."
+    },
+    {
+      "id": "s-03",
+      "type": "dialogue",
+      "npcArchetype": "scholar",
+      "dialogue": "You have opened the shrine. Few possess the patience to read the old signs. This place was built by pilgrims who walked the King's Road long before the towns were raised. They left blessings sealed in stone for those who would come after. The warmth you feel is their gift to you.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "modifier", "modifierId": "pilgrims-blessing" }
+}

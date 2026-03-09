@@ -1,0 +1,37 @@
+{
+  "id": "side-the-last-waystone",
+  "tier": "micro",
+  "title": "The Last Waystone",
+  "estimatedMinutes": 10,
+  "anchorAffinity": "anchor-05",
+  "trigger": { "type": "roadside", "distanceRange": [25000, 27500] },
+  "steps": [
+    {
+      "id": "s-01",
+      "type": "dialogue",
+      "npcArchetype": "pilgrim",
+      "dialogue": "The waystone is broken. Something shattered it in the night, something with terrible strength. These stones have guided pilgrims to Grailsend for a thousand years. If we do not mend it, those who come after us will lose the path. Will you help me gather the fragments? They cannot have scattered far.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    },
+    {
+      "id": "s-02",
+      "type": "investigate",
+      "description": "Search the surrounding scrubland and rocky outcrops for the shattered fragments of the ancient waystone. Three large pieces and several smaller shards lie scattered across the hillside."
+    },
+    {
+      "id": "s-03",
+      "type": "puzzle",
+      "description": "Reassemble the waystone fragments on its original foundation. The carved runes must align correctly for the consecration to hold. Rotate each piece until the inscription reads as a complete blessing."
+    },
+    {
+      "id": "s-04",
+      "type": "dialogue",
+      "npcArchetype": "pilgrim",
+      "dialogue": "It is whole again. Can you feel it? The warmth in the stone, like a heartbeat returning. The old pilgrims carved their faith into these markers and the faith endures. Grailsend is close now. Whatever awaits us there, we walk the last stretch with the blessing of everyone who walked before us. You have my thanks, traveller.",
+      "dialogueMinWords": 15,
+      "dialogueMaxWords": 80
+    }
+  ],
+  "reward": { "type": "modifier", "modifierId": "pilgrims-blessing" }
+}

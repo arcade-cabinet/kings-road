@@ -1,0 +1,12 @@
+{
+  "id": "ashford-wolves-at-the-gate",
+  "name": "Wolves at the Gate",
+  "type": "combat",
+  "difficulty": 2,
+  "description": "A pair of lean wolves prowl before Ashford's timber gate, their silver pelts bristling in the morning chill. The village watch calls for aid — the beasts have grown bold with hunger, and the lambing pens lie just beyond the threshold.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.7 },
+    { "itemId": "health_potion", "chance": 0.3 }
+  ],
+  "failureConsequence": "The wolves scatter into the fields, dragging a bleating lamb with them. The villagers eye you with quiet disappointment as you nurse a bitten arm."
+}

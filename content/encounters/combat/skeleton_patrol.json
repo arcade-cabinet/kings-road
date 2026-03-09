@@ -1,0 +1,13 @@
+{
+  "id": "skeleton_patrol",
+  "name": "Skeleton Patrol",
+  "type": "combat",
+  "difficulty": 5,
+  "description": "The clatter of bone on stone echoes across the old battleground. A patrol of skeletal warriors marches in grim formation, rusted blades still clutched in fleshless hands, bound to an oath they swore in life and cannot break in death.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.5 },
+    { "itemId": "stamina_draught", "chance": 0.4 },
+    { "itemId": "wooden_shield", "chance": 0.3 }
+  ],
+  "failureConsequence": "The undead patrol overwhelms you with tireless, mechanical strikes. You flee into the night, your shield arm numb and your courage badly shaken."
+}

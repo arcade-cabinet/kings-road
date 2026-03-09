@@ -1,0 +1,13 @@
+{
+  "id": "highland-bandits",
+  "name": "Highland Tower Bandits",
+  "type": "combat",
+  "difficulty": 6,
+  "description": "Three ragged bandits have claimed the second watchtower as their lookout. From its height they spot merchant caravans on the road below and descend to ambush them. Their leader wears a stolen captain's cloak and wields a notched blade. They will not give up their vantage without a fight.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.3 },
+    { "itemId": "health_potion", "chance": 0.5 },
+    { "itemId": "ration", "chance": 0.6 }
+  ],
+  "failureConsequence": "The bandits overpower you and hurl you from the tower steps. You crash into the scree below, losing your footing and half your supplies. They jeer from above as you retreat down the ridge."
+}

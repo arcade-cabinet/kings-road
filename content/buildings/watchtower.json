@@ -1,0 +1,13 @@
+{
+  "id": "watchtower",
+  "stories": 3,
+  "footprint": { "width": 1, "depth": 1 },
+  "wallMaterial": "stone",
+  "roofStyle": "flat",
+  "openFront": false,
+  "features": ["door", "arrow_slit", "beacon", "ladder"],
+  "interiorSlots": [
+    { "type": "weapon_rack", "position": [0.5, 0.5] }
+  ],
+  "npcSlot": { "archetype": "watchman", "position": [0.5, 0.5] }
+}

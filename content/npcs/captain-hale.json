@@ -1,0 +1,35 @@
+{
+  "id": "captain-hale",
+  "name": "Captain Hale",
+  "archetype": "knight",
+  "fixed": true,
+  "bodyBuild": { "height": 1.3, "width": 1.35 },
+  "face": {
+    "skinTone": 3,
+    "eyeColor": "brown",
+    "hairStyle": "short",
+    "hairColor": "#1a1a1a",
+    "facialHair": "stubble"
+  },
+  "accessories": ["sword", "shield", "tabard"],
+  "clothPalette": { "primary": "#4a4a4a", "secondary": "#8b0000" },
+  "behavior": {
+    "idleStyle": "patrolling",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "State your business. Millbrook is under my watch.",
+      "You don't look like trouble. See that it stays that way.",
+      "The roads aren't safe. If you've seen anything, speak up."
+    ],
+    "quest": [
+      "Wolves have been prowling near the eastern pastures. Thin their numbers and report back to me."
+    ],
+    "idle": [
+      "The garrison is stretched thin as it is.",
+      "I need to inspect the watchtower before nightfall."
+    ]
+  }
+}

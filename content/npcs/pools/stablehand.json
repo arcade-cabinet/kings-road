@@ -1,0 +1,42 @@
+{
+  "id": "stablehand-pool",
+  "archetype": "stablehand",
+  "personality": "Earnest, horse-obsessed, perpetually hay-covered. Speaks with youthful energy about every mount in the stable.",
+  "displayTitle": "Stablehand",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.8, 1.0], "widthRange": [0.85, 1.0] },
+    "clothPalette": {
+      "primary": "#c8a850",
+      "secondary": "#8b7030",
+      "variations": ["#b89840", "#d8b860"]
+    },
+    "signatureAccessories": ["riding_crop"],
+    "optionalAccessories": ["hay_in_hair", "horse_brush", "bucket", "leather_vest"]
+  },
+  "faceSlots": {
+    "skinToneRange": [1, 4],
+    "eyeColors": ["brown", "green", "blue"],
+    "hairStyles": ["short", "long"],
+    "hairColors": ["#6b5030", "#c8a870", "#8b6840"],
+    "facialHairOptions": ["none", "stubble"]
+  },
+  "behavior": { "idleStyle": "working", "interactionVerb": "TRADE", "walkNodes": false },
+  "namePool": [
+    "Robin",
+    "Ned",
+    "Tilly",
+    "Hodge",
+    "Elspeth",
+    "Pip",
+    "Marigold"
+  ],
+  "greetingPool": [
+    { "text": "Easy there, the horses spook at sudden movements. Can I help you?" },
+    { "text": "If you need a mount rested or fed, you've come to the right place." },
+    { "text": "The mare in the third stall is the finest beast on the road. Just looking costs nothing." }
+  ],
+  "idlePool": [
+    { "text": "Come now, girl, eat your oats. You will need your strength for the road tomorrow." },
+    { "text": "I have mucked out twelve stalls already today. My back aches but the horses are happy." }
+  ]
+}

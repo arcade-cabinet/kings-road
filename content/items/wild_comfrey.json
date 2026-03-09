@@ -1,0 +1,7 @@
+{
+  "id": "wild_comfrey",
+  "name": "Wild Comfrey",
+  "description": "Broad, hairy leaves and drooping bell-shaped flowers of wild comfrey. Crushed into a poultice, it knits bruised flesh and mends aching bones.",
+  "type": "quest_item",
+  "stackable": true
+}

@@ -1,0 +1,13 @@
+{
+  "id": "bridge-troll-fight",
+  "name": "The Bridge Troll",
+  "type": "combat",
+  "difficulty": 4,
+  "description": "A massive shape hauls itself from beneath the old stone bridge, water streaming from mossy shoulders. The troll blinks in the sunlight and bares a mouthful of blunt teeth, its voice a wet rumble demanding tribute — or a fight.",
+  "rewards": [
+    { "itemId": "wooden_shield", "chance": 0.3 },
+    { "itemId": "health_potion", "chance": 0.5 },
+    { "itemId": "ration", "chance": 0.7 }
+  ],
+  "failureConsequence": "The troll hurls you into the river with a contemptuous swat. You wash up downstream, bruised and soggy, and must find another crossing."
+}

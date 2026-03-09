@@ -1,0 +1,7 @@
+{
+  "id": "map-fragment-ashford",
+  "name": "Cartographer's Map: Ashford",
+  "description": "A finely drafted map piece from the Ashford cartographer's workshop. Warm sepia lines trace the familiar lanes, orchards, and meadow paths surrounding the village.",
+  "type": "key_item",
+  "stackable": false
+}

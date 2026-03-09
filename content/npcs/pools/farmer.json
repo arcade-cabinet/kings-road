@@ -1,0 +1,42 @@
+{
+  "id": "farmer-pool",
+  "archetype": "farmer",
+  "personality": "Patient, weather-worn, superstitious. Speaks slowly with earthy wisdom and seasonal worry.",
+  "displayTitle": "Yeoman Farmer",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.85, 1.0], "widthRange": [1.0, 1.2] },
+    "clothPalette": {
+      "primary": "#c8a96e",
+      "secondary": "#7a6030",
+      "variations": ["#b89858", "#d4b97e"]
+    },
+    "signatureAccessories": ["straw_hat"],
+    "optionalAccessories": ["pitchfork", "seed_pouch", "muddy_boots", "leather_gloves"]
+  },
+  "faceSlots": {
+    "skinToneRange": [1, 4],
+    "eyeColors": ["brown", "green"],
+    "hairStyles": ["short", "bald"],
+    "hairColors": ["#6b5030", "#a08050", "#c8a870"],
+    "facialHairOptions": ["stubble", "full_beard", "none"]
+  },
+  "behavior": { "idleStyle": "working", "interactionVerb": "TALK", "walkNodes": false },
+  "namePool": [
+    "Eanric",
+    "Bethan",
+    "Cob",
+    "Mildred",
+    "Dunstan",
+    "Alditha",
+    "Walder"
+  ],
+  "greetingPool": [
+    { "text": "Morning, traveller. The harvest has been kind this year, thank the Lord." },
+    { "text": "Mind the furrows, if you please. These fields are all we have to feed the village." },
+    { "text": "Aye, it is hard work, but honest. Can I help you with something?" }
+  ],
+  "idlePool": [
+    { "text": "The barley wants another week of sun. If the rains hold off, we shall eat well this winter." },
+    { "text": "Old Bess wandered into the north field again. That cow has more spirit than sense." }
+  ]
+}

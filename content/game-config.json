@@ -1,0 +1,4351 @@
+{
+  "version": "1.0.0",
+  "name": "kings-road",
+  "world": {
+    "totalDistance": 30000,
+    "anchors": [
+      {
+        "id": "home",
+        "name": "Ashford",
+        "type": "VILLAGE_FRIENDLY",
+        "distanceFromStart": 0,
+        "mainQuestChapter": "chapter-00",
+        "description": "Your home town, a quiet farming village at the foot of gentle hills.",
+        "features": [
+          "home",
+          "tavern",
+          "blacksmith"
+        ]
+      },
+      {
+        "id": "anchor-01",
+        "name": "Millbrook",
+        "type": "VILLAGE_FRIENDLY",
+        "distanceFromStart": 6000,
+        "mainQuestChapter": "chapter-01",
+        "description": "A market town where the King's Road crosses the River Mill.",
+        "features": [
+          "tavern",
+          "market",
+          "chapel"
+        ]
+      },
+      {
+        "id": "anchor-02",
+        "name": "Thornfield Ruins",
+        "type": "DUNGEON",
+        "distanceFromStart": 12000,
+        "mainQuestChapter": "chapter-02",
+        "description": "Ancient ruins said to hold clues to the Grail's location.",
+        "features": [
+          "dungeon_entrance",
+          "camp"
+        ]
+      },
+      {
+        "id": "anchor-03",
+        "name": "Ravensgate",
+        "type": "VILLAGE_HOSTILE",
+        "distanceFromStart": 17000,
+        "mainQuestChapter": "chapter-03",
+        "description": "A walled town under the thumb of a tyrannical lord.",
+        "features": [
+          "gate",
+          "prison",
+          "tavern"
+        ]
+      },
+      {
+        "id": "anchor-04",
+        "name": "The Pilgrim's Rest",
+        "type": "WAYPOINT",
+        "distanceFromStart": 21000,
+        "mainQuestChapter": "chapter-04",
+        "description": "A roadside monastery offering shelter to weary travelers.",
+        "features": [
+          "chapel",
+          "garden",
+          "library"
+        ]
+      },
+      {
+        "id": "anchor-05",
+        "name": "Grailsend",
+        "type": "DUNGEON",
+        "distanceFromStart": 28000,
+        "mainQuestChapter": "chapter-05",
+        "description": "The final temple where the Holy Grail awaits the worthy.",
+        "features": [
+          "temple_entrance",
+          "guardian"
+        ]
+      }
+    ],
+    "regions": [
+      {
+        "id": "ashford-meadows",
+        "name": "Ashford Meadows",
+        "biome": "MEADOW",
+        "anchorRange": [
+          "home",
+          "anchor-01"
+        ],
+        "terrainFeatures": [
+          "rolling_hills",
+          "wildflower_fields",
+          "stone_walls",
+          "grazing_pastures"
+        ]
+      },
+      {
+        "id": "millbrook-forests",
+        "name": "Millbrook Forests",
+        "biome": "FOREST",
+        "anchorRange": [
+          "anchor-01",
+          "anchor-02"
+        ],
+        "terrainFeatures": [
+          "dense_canopy",
+          "moss_covered_roots",
+          "forest_clearings",
+          "fallen_logs"
+        ]
+      },
+      {
+        "id": "thornfield-hills",
+        "name": "Thornfield Hills",
+        "biome": "HILLS",
+        "anchorRange": [
+          "anchor-02",
+          "anchor-03"
+        ],
+        "terrainFeatures": [
+          "rocky_outcrops",
+          "windswept_ridges",
+          "heather_slopes",
+          "ancient_cairns"
+        ]
+      },
+      {
+        "id": "ravensgate-moors",
+        "name": "Ravensgate Moors",
+        "biome": "MOOR",
+        "anchorRange": [
+          "anchor-03",
+          "anchor-04"
+        ],
+        "terrainFeatures": [
+          "boggy_hollows",
+          "standing_stones",
+          "mist_banks",
+          "peat_pools"
+        ]
+      },
+      {
+        "id": "grailsend-highlands",
+        "name": "Grailsend Highlands",
+        "biome": "HILLS",
+        "anchorRange": [
+          "anchor-04",
+          "anchor-05"
+        ],
+        "terrainFeatures": [
+          "steep_cliffs",
+          "mountain_streams",
+          "pine_groves",
+          "sacred_stones"
+        ]
+      }
+    ]
+  },
+  "pacing": {
+    "walkSpeed": 4,
+    "sprintSpeed": 7,
+    "ambientInterval": [
+      30,
+      90
+    ],
+    "minorInterval": [
+      120,
+      300
+    ],
+    "majorInterval": [
+      600,
+      1200
+    ],
+    "questMicroInterval": [
+      300,
+      600
+    ],
+    "questMesoInterval": [
+      900,
+      1800
+    ],
+    "questMacroInterval": [
+      3600,
+      7200
+    ],
+    "anchorInterval": [
+      4000,
+      8000
+    ]
+  },
+  "mainQuest": [
+    {
+      "id": "main-chapter-00",
+      "tier": "macro",
+      "title": "The Call",
+      "estimatedMinutes": 25,
+      "anchorAffinity": "home",
+      "trigger": {
+        "type": "anchor",
+        "anchorId": "home"
+      },
+      "branches": {
+        "A": {
+          "label": "Accept the quest eagerly, inspired by the legend",
+          "steps": [
+            {
+              "id": "a-01",
+              "type": "dialogue",
+              "npcArchetype": "pilgrim",
+              "dialogue": "Please, traveller, come closer. I was bound for Grailsend, walking the old King's Road as my father did before me. But my strength has failed. The Grail still waits at the road's end, and someone must carry word to the scholar in your village. Promise me you will seek him out.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-02",
+              "type": "investigate",
+              "description": "Search the dying pilgrim's belongings and find a weathered map fragment bearing ancient waypoint markings."
+            },
+            {
+              "id": "a-03",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "This map fragment is genuine. I have spent decades studying the old texts, and I recognise these waypoint glyphs. The Holy Grail lies beyond Grailsend at the road's end. Many have sought it and failed, but the pilgrim's map changes everything. You must follow the King's Road north.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-04",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "Old Tomas speaks the truth. I have read the parish records, and they tell of knights who walked this very road in search of the Grail. Go with my blessing, child. The saints will watch over you, and I shall pray for your safe return to Ashford.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-05",
+              "type": "travel",
+              "destination": "anchor-01",
+              "description": "Set out from Ashford along the King's Road, heading north toward Millbrook with the pilgrim's map fragment in hand."
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "eager-pilgrim"
+          }
+        },
+        "B": {
+          "label": "Reluctantly agree after the village comes under threat",
+          "steps": [
+            {
+              "id": "b-01",
+              "type": "dialogue",
+              "npcArchetype": "pilgrim",
+              "dialogue": "Please, traveller, come closer. I was bound for Grailsend, walking the old King's Road as my father did before me. But my strength has failed. The Grail still waits at the road's end, and someone must carry word to the scholar in your village. Promise me you will seek him out.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-02",
+              "type": "investigate",
+              "description": "Search the dying pilgrim's belongings and find a weathered map fragment bearing ancient waypoint markings."
+            },
+            {
+              "id": "b-03",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "I feared this day would come. Dark riders were seen on the moors beyond Millbrook, and the harvest has been failing for three seasons now. These are the signs the old texts warned of. The land itself is dying because the Grail covenant has been broken. Unless someone restores it, Ashford will fall.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-04",
+              "type": "encounter",
+              "encounterId": "ashford-wolves-at-the-gate",
+              "description": "Wolves driven mad by the failing land attack the village outskirts. Defend the farmsteads with the other villagers."
+            },
+            {
+              "id": "b-05",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "You saw what happened. The wolves have never come this close to the village before. Old Tomas is right, the land grows sick and only the Grail can heal it. I know you did not ask for this burden, but Ashford needs you. Will you walk the King's Road for our sake?",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-06",
+              "type": "travel",
+              "destination": "anchor-01",
+              "description": "Leave Ashford reluctantly, driven by duty to save the village, heading north along the King's Road toward Millbrook."
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "reluctant-hero"
+          }
+        }
+      },
+      "reward": {
+        "type": "item",
+        "itemId": "map-fragment-01"
+      }
+    },
+    {
+      "id": "main-chapter-01",
+      "tier": "macro",
+      "title": "The First Sign",
+      "estimatedMinutes": 35,
+      "anchorAffinity": "anchor-01",
+      "trigger": {
+        "type": "anchor",
+        "anchorId": "anchor-01"
+      },
+      "prerequisites": [
+        "main-chapter-00"
+      ],
+      "branches": {
+        "A": {
+          "label": "Gain Captain Hale's trust by helping clear the bandits",
+          "steps": [
+            {
+              "id": "a-01",
+              "type": "dialogue",
+              "npcArchetype": "knight",
+              "dialogue": "Hold there, stranger. Millbrook has had enough trouble without outsiders adding to it. Strange lights have been seen at the old mill every night this week, and now bandits are raiding the eastern farms. Prove you mean no harm and help me deal with these raiders, then we can talk about the mill.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-02",
+              "type": "dialogue",
+              "npcArchetype": "innkeeper",
+              "dialogue": "Captain Hale means well, but he is stretched thin. The bandits struck Wynn's farm two nights past and took half his grain store. They camp somewhere along the river east of town. If you help the captain, he will open every door in Millbrook for you.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-03",
+              "type": "encounter",
+              "encounterId": "millbrook-river-bandits",
+              "description": "Track the bandits to their riverside camp and defeat them to recover the stolen grain."
+            },
+            {
+              "id": "a-04",
+              "type": "dialogue",
+              "npcArchetype": "knight",
+              "dialogue": "You have done Millbrook a great service. I misjudged you, and I am not too proud to say so. Now about those lights at the old mill. My men are afraid to go near the place after dark. If you have the courage, go and investigate. I will lend you a lantern and the key to the mill gate.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-05",
+              "type": "investigate",
+              "description": "Enter the old mill with Captain Hale's key and search for the source of the strange lights."
+            },
+            {
+              "id": "a-06",
+              "type": "puzzle",
+              "description": "Discover that the lights emanate from an ancient map fragment hidden beneath the millstone, its Grail-script glowing faintly in the dark."
+            },
+            {
+              "id": "a-07",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "This map fragment bears the same Grail-script as the texts in our chapel records. The markings point north toward the Thornfield Ruins, a place long shunned by travellers. Whatever the builders of the King's Road hid there, this fragment is the key to finding it.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "hales-ally"
+          }
+        },
+        "B": {
+          "label": "Sneak into the old mill at night without Hale's permission",
+          "steps": [
+            {
+              "id": "b-01",
+              "type": "dialogue",
+              "npcArchetype": "knight",
+              "dialogue": "Hold there, stranger. Millbrook has had enough trouble without outsiders adding to it. Strange lights have been seen at the old mill every night this week, and I have sealed the place until my men can investigate. Move along and do not cause any problems.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-02",
+              "type": "dialogue",
+              "npcArchetype": "merchant",
+              "dialogue": "Hale has locked the mill and posted a guard, but there is a way in through the old sluice channel on the river side. The grate has been rusted through for years. If you go at night when the guard changes shift, you could slip in unseen. Just do not tell the captain I told you.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-03",
+              "type": "encounter",
+              "encounterId": "millbrook-mill-stealth",
+              "description": "Sneak past the guard patrol and enter the old mill through the rusted sluice grate under cover of darkness."
+            },
+            {
+              "id": "b-04",
+              "type": "investigate",
+              "description": "Navigate the dark interior of the mill, following the faint glow emanating from beneath the ancient millstone."
+            },
+            {
+              "id": "b-05",
+              "type": "puzzle",
+              "description": "Pry the millstone loose and retrieve the glowing map fragment hidden beneath, its Grail-script casting pale light across the walls."
+            },
+            {
+              "id": "b-06",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "You found this in the mill? I have read of such things in the chapel records. This is genuine Grail-script, and it points toward the Thornfield Ruins north of here. Brother Thomas must not speak of this to Captain Hale, or he will think you a thief. Go quickly before dawn.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "shadow-seeker"
+          }
+        }
+      },
+      "reward": {
+        "type": "item",
+        "itemId": "map-fragment-01b"
+      }
+    },
+    {
+      "id": "main-chapter-02",
+      "tier": "macro",
+      "title": "The Ruins Speak",
+      "estimatedMinutes": 45,
+      "anchorAffinity": "anchor-02",
+      "trigger": {
+        "type": "anchor",
+        "anchorId": "anchor-02"
+      },
+      "prerequisites": [
+        "main-chapter-01"
+      ],
+      "branches": {
+        "A": {
+          "label": "Break through by force",
+          "steps": [
+            {
+              "id": "a-01",
+              "type": "dialogue",
+              "npcArchetype": "knight",
+              "dialogue": "These ruins are sealed by ancient stonework, but no wall stands forever. I can see the mortar has weakened along the eastern face. With enough force we could bring the passage open, though whatever sleeps within may not welcome the disturbance.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-02",
+              "type": "encounter",
+              "encounterId": "ruins-guardian-stone-golem",
+              "description": "Battle the awakened stone golem guarding the collapsed eastern passage."
+            },
+            {
+              "id": "a-03",
+              "type": "investigate",
+              "description": "Search the shattered antechamber for the mechanism that opens the inner sanctum."
+            },
+            {
+              "id": "a-04",
+              "type": "encounter",
+              "encounterId": "ruins-guardian-spectral-warden",
+              "description": "Defeat the spectral warden roused by the forced entry into the sanctum."
+            },
+            {
+              "id": "a-05",
+              "type": "puzzle",
+              "description": "Align the broken seal fragments to unlock the reliquary containing the second map fragment."
+            },
+            {
+              "id": "a-06",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "The map fragment speaks of Ravensgate, a walled town to the north. Its lord once served as custodian of the Grail road, but the inscriptions suggest he has turned from that sacred duty. We must go there next and learn what he knows, willing or not.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "ruins-breaker"
+          }
+        },
+        "B": {
+          "label": "Solve the riddles with Brother Thomas's knowledge",
+          "steps": [
+            {
+              "id": "b-01",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "I have studied texts that speak of Thornfield's builders. They were scholars who valued wisdom above brute strength. The entrance responds to an old liturgical cipher, one I learned from a manuscript in our chapel library. Let me try the inscription here.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-02",
+              "type": "puzzle",
+              "description": "Decipher the liturgical inscription on the ruins entrance using Brother Thomas's knowledge of the old texts."
+            },
+            {
+              "id": "b-03",
+              "type": "investigate",
+              "description": "Explore the peacefully opened corridors, reading wall carvings that reveal the history of the Grail road's custodians."
+            },
+            {
+              "id": "b-04",
+              "type": "puzzle",
+              "description": "Solve the three-part riddle of the inner sanctum: the riddle of the pilgrim, the riddle of the road, and the riddle of the cup."
+            },
+            {
+              "id": "b-05",
+              "type": "encounter",
+              "encounterId": "ruins-guardian-trial-of-worth",
+              "description": "Face the trial of worth — a guardian spirit tests your resolve through a ritual combat that rewards wisdom over aggression."
+            },
+            {
+              "id": "b-06",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "The second map fragment is ours, and with it comes a troubling revelation. These carvings name Lord Ashwick of Ravensgate as the last appointed custodian of this very shrine. Yet the wards were sealed against him. Something dark has taken root in that town, and we must go there to learn the truth.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "ruins-scholar"
+          }
+        }
+      },
+      "reward": {
+        "type": "item",
+        "itemId": "map-fragment-02"
+      }
+    },
+    {
+      "id": "main-chapter-03",
+      "tier": "macro",
+      "title": "The Iron Gate",
+      "estimatedMinutes": 40,
+      "anchorAffinity": "anchor-03",
+      "trigger": {
+        "type": "anchor",
+        "anchorId": "anchor-03"
+      },
+      "prerequisites": [
+        "main-chapter-02"
+      ],
+      "branches": {
+        "A": {
+          "label": "Work with Elara to infiltrate Ravensgate through diplomacy and deception",
+          "steps": [
+            {
+              "id": "a-01",
+              "type": "dialogue",
+              "npcArchetype": "healer",
+              "dialogue": "The gate guards answer only to Lord Ashwick, and he turns away all strangers. But there is a merchant caravan expected at dusk, and I have arranged passage for you among their number. Once inside, seek the prison tower on the northern wall. Silas is held in the upper cell. Take this healer's token to explain your presence if questioned.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-02",
+              "type": "encounter",
+              "encounterId": "ravensgate-caravan-infiltration",
+              "description": "Blend in with the merchant caravan and pass through the gate without raising suspicion from Ashwick's guards."
+            },
+            {
+              "id": "a-03",
+              "type": "investigate",
+              "description": "Navigate the narrow streets of Ravensgate after dark, following Elara's directions to the prison tower on the northern wall."
+            },
+            {
+              "id": "a-04",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "You came from the healer? Then listen well, for we have little time. The third map fragment is hidden beneath the hearthstone in the manor library. Ashwick does not know its true significance. He imprisoned me for speaking against his rule, not for the fragment. Take it and flee before the dawn watch. The eastern postern gate is rarely guarded.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-05",
+              "type": "encounter",
+              "encounterId": "ravensgate-library-stealth",
+              "description": "Steal into Ashwick's manor library under cover of night and retrieve the map fragment from beneath the hearthstone without alerting the household guard."
+            },
+            {
+              "id": "a-06",
+              "type": "dialogue",
+              "npcArchetype": "healer",
+              "dialogue": "You have the fragment? Good. The eastern postern is unlatched as I promised. Go now, while the mist still clings to the moors. Silas will remain my burden to bear, but knowing the Grail road continues gives us both hope. The next sign points north to a monastery the pilgrims call the Pilgrim's Rest.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "shadow-diplomat"
+          }
+        },
+        "B": {
+          "label": "Confront Lord Ashwick directly and take the fragment by force",
+          "steps": [
+            {
+              "id": "b-01",
+              "type": "dialogue",
+              "npcArchetype": "knight",
+              "dialogue": "Ravensgate is closed to outsiders by order of Lord Ashwick. Turn back the way you came, pilgrim, or face the consequences. These walls have stood for three hundred years, and no wanderer from the road will breach them while I draw breath.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-02",
+              "type": "encounter",
+              "encounterId": "ravensgate-gate-assault",
+              "description": "Storm the gatehouse and fight through Ashwick's guards to force entry into the walled town."
+            },
+            {
+              "id": "b-03",
+              "type": "dialogue",
+              "npcArchetype": "noble",
+              "dialogue": "You dare storm my gates and march through my town like some conquering hero? I am the lord of Ravensgate, and you are nothing but a trespasser. Guards, seize this fool and throw them in the tower with the other wretch. Let the stones teach them respect.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-04",
+              "type": "encounter",
+              "encounterId": "ravensgate-manor-battle",
+              "description": "Battle Lord Ashwick's personal guard in the manor courtyard and defeat his captain to reach the prison tower."
+            },
+            {
+              "id": "b-05",
+              "type": "investigate",
+              "description": "Break open Silas's cell in the prison tower and search the manor library for the map fragment hidden beneath the hearthstone."
+            },
+            {
+              "id": "b-06",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "So Ashwick has fallen at last. I knew his tyranny would draw a reckoning. The third map fragment lies beneath the hearthstone in the manor library. I hid it there before my arrest. Take it quickly. With Ashwick defeated, the townsfolk will help us reach the eastern road. The next sign points north to the Pilgrim's Rest.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "gate-breaker"
+          }
+        }
+      },
+      "reward": {
+        "type": "item",
+        "itemId": "map-fragment-03"
+      }
+    },
+    {
+      "id": "main-chapter-04",
+      "tier": "macro",
+      "title": "The Pilgrim's Wisdom",
+      "estimatedMinutes": 30,
+      "anchorAffinity": "anchor-04",
+      "trigger": {
+        "type": "anchor",
+        "anchorId": "anchor-04"
+      },
+      "prerequisites": [
+        "main-chapter-03"
+      ],
+      "branches": {
+        "A": {
+          "label": "Accept the spiritual path and prove your worth through faith and understanding",
+          "steps": [
+            {
+              "id": "a-01",
+              "type": "dialogue",
+              "npcArchetype": "healer",
+              "dialogue": "You look as though you have walked through fire and shadow both. Come, rest a while. The Abbot has been expecting a traveller bearing map fragments, though he will not say how he knew. Let me tend your wounds first. Sister Maeve's poultice has mended many a pilgrim before the real journey begins.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-02",
+              "type": "investigate",
+              "description": "Search the monastery library with Brother Anselm, laying out the three map fragments on his reading table and piecing together the full route to Grailsend."
+            },
+            {
+              "id": "a-03",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "Remarkable. When the three fragments are placed together, they form not merely a map but a cipher. The route to Grailsend is clear enough, yet these marginal inscriptions speak of trials, not treasure. The knight who bore the Grail wrote warnings, not directions. You should hear what the Abbot has to say about this.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-04",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "I have waited many years for someone to bring all three fragments to this table. Now hear the truth that the old order guarded. The Grail is no golden cup, child. It is a test of character, a covenant between the land and those who walk it with honest purpose. The temple at Grailsend will judge you by the choices you have made along the Road. Go now with faith as your compass, and let your deeds speak for you.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-05",
+              "type": "puzzle",
+              "description": "Meditate in the monastery chapel and solve the Abbot's three spiritual reflections: what you sacrificed, what you showed mercy to, and what truth you upheld on your journey along the Road."
+            },
+            {
+              "id": "a-06",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "You have answered well, and the chapel light shines brighter for it. The road to Grailsend leads through the highlands beyond our walls. Take the Abbot's blessing and this pilgrim's seal as proof that you have understood the Grail's true nature. The Guardian at the temple will know you by your spirit, not your sword.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "pilgrim-blessed"
+          }
+        },
+        "B": {
+          "label": "Demand the Grail's location by force, threatening the monastery",
+          "steps": [
+            {
+              "id": "b-01",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "You carry the fragments? Let me examine them at once. The Abbot has long guarded secrets about the Grail's resting place, and with these three pieces assembled I can read the full cipher. But I must warn you, the Abbot will not part with his knowledge willingly. He believes the Grail must be earned through devotion, not claimed by force.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-02",
+              "type": "investigate",
+              "description": "Piece together the three map fragments in the library, reading the cipher that reveals Grailsend's exact location in the highlands beyond the monastery."
+            },
+            {
+              "id": "b-03",
+              "type": "dialogue",
+              "npcArchetype": "priest",
+              "dialogue": "You would threaten this place of peace? These walls have sheltered pilgrims for three centuries. The Grail is no golden cup to be seized and hoarded. It is a test of character, and you are failing it now. But I see the iron in your eyes and I know words alone will not turn you. Very well, the road to Grailsend lies through the highlands, but the temple's Guardian will not be so easily cowed.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-04",
+              "type": "encounter",
+              "encounterId": "pilgrims-rest-monastery-confrontation",
+              "description": "Overcome the monastery's lay brothers who block your path when you threaten the Abbot and ransack the library for the Grail's secrets."
+            },
+            {
+              "id": "b-05",
+              "type": "investigate",
+              "description": "Ransack the Abbot's private study, finding ancient manuscripts that confirm the route through the highlands and the nature of the temple trials at Grailsend."
+            },
+            {
+              "id": "b-06",
+              "type": "dialogue",
+              "npcArchetype": "healer",
+              "dialogue": "You have broken the peace of this abbey and scattered brothers who wished you no harm. The Abbot spoke true, the Grail tests the seeker. Take your maps and your pride and go north through the highlands to Grailsend. But know that the Guardian at the temple will see what you have done here, and the stones remember every act of cruelty.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "abbey-breaker"
+          }
+        }
+      },
+      "reward": {
+        "type": "item",
+        "itemId": "assembled-map"
+      }
+    },
+    {
+      "id": "main-chapter-05",
+      "tier": "macro",
+      "title": "The Grail",
+      "estimatedMinutes": 40,
+      "anchorAffinity": "anchor-05",
+      "trigger": {
+        "type": "anchor",
+        "anchorId": "anchor-05"
+      },
+      "prerequisites": [
+        "main-chapter-04"
+      ],
+      "branches": {
+        "A": {
+          "label": "Pass the Guardian's trials of wisdom, mercy, and sacrifice",
+          "steps": [
+            {
+              "id": "a-01",
+              "type": "dialogue",
+              "npcArchetype": "knight",
+              "dialogue": "You stand before the threshold of Grailsend, the last temple on the King's Road. I am its Guardian, bound here since before your grandfather's grandfather drew breath. Three trials await you within, and none may be overcome by the sword alone. Tell me, pilgrim, are you prepared to be judged?",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-02",
+              "type": "puzzle",
+              "description": "The Trial of Wisdom: answer the Guardian's three riddles drawn from the history of the King's Road. Each riddle references events from Ashford, Thornfield, and Ravensgate that you witnessed on your journey."
+            },
+            {
+              "id": "a-03",
+              "type": "encounter",
+              "encounterId": "grailsend-trial-of-mercy",
+              "description": "The Trial of Mercy: a wounded enemy begs for help. Choose to heal them rather than strike, proving compassion over vengeance."
+            },
+            {
+              "id": "a-04",
+              "type": "puzzle",
+              "description": "The Trial of Sacrifice: the temple demands you surrender your most valued possession — the map fragments that guided you here — to unseal the inner sanctum."
+            },
+            {
+              "id": "a-05",
+              "type": "dialogue",
+              "npcArchetype": "knight",
+              "dialogue": "You have passed all three trials. Few have walked this far, and fewer still have proven worthy. The sanctum is open to you now. Seek the Oracle within, for she holds the final truth of the Grail. Go with my blessing, and know that the road remembers your choices.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "a-06",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "You came seeking a golden cup, did you not? The Grail is no vessel of gold. It is the ancient covenant between the land and those who tend it. Your journey along the King's Road has already restored it. Every act of wisdom, mercy, and sacrifice renewed the bond. The land will heal now, pilgrim. Ashford will bloom again.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "grail-worthy"
+          }
+        },
+        "B": {
+          "label": "Fight through the temple guardians by force",
+          "steps": [
+            {
+              "id": "b-01",
+              "type": "dialogue",
+              "npcArchetype": "knight",
+              "dialogue": "You stand before the threshold of Grailsend. I am its Guardian, and I will not step aside for bluster or steel. If you refuse the trials, you must prove your worth the old way. Raise your weapon, pilgrim, and let the stones judge whether your cause is just.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            },
+            {
+              "id": "b-02",
+              "type": "encounter",
+              "encounterId": "grailsend-guardian-battle",
+              "description": "Battle the ancient Guardian, a towering knight wreathed in spectral light who has guarded the temple for centuries."
+            },
+            {
+              "id": "b-03",
+              "type": "encounter",
+              "encounterId": "grailsend-temple-sentinels",
+              "description": "Fight through the temple sentinels — stone warriors that animate from the corridor walls as you force your way deeper into the sanctum."
+            },
+            {
+              "id": "b-04",
+              "type": "investigate",
+              "description": "Navigate the shattered inner corridors, using brute strength to clear collapsed archways and force open sealed doors that the trials would have opened peacefully."
+            },
+            {
+              "id": "b-05",
+              "type": "encounter",
+              "encounterId": "grailsend-final-ward",
+              "description": "Defeat the final ward — a spectral echo of every Guardian who served before, rising as one last defence of the Grail's secret."
+            },
+            {
+              "id": "b-06",
+              "type": "dialogue",
+              "npcArchetype": "scholar",
+              "dialogue": "So you have come by force. The Guardian lies broken and the wards are shattered. Very well, hear the truth you have fought so hard to reach. The Grail is no golden cup. It is the covenant between land and people, and you have damaged it further by your violence here. The land may yet heal, but the road ahead will be harder for what you have done.",
+              "dialogueMinWords": 15,
+              "dialogueMaxWords": 80
+            }
+          ],
+          "reward": {
+            "type": "modifier",
+            "modifierId": "grail-breaker"
+          }
+        }
+      },
+      "reward": {
+        "type": "item",
+        "itemId": "grail-covenant"
+      }
+    }
+  ],
+  "sideQuests": {
+    "macro": [
+      {
+        "id": "side-the-cartographers-map",
+        "tier": "macro",
+        "title": "The Cartographer's Map",
+        "estimatedMinutes": 75,
+        "anchorAffinity": "home",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "home"
+        },
+        "prerequisites": [
+          "main-chapter-01"
+        ],
+        "branches": {
+          "A": {
+            "label": "Chart the road through direct exploration",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "scholar",
+                "dialogue": "I am Gerold, once the royal cartographer. The old maps of the King's Road were burned during the wars, and now pilgrims walk blind into danger. I am too old to make the journey myself, but if you carry my instruments and sketch what you see at each landmark, I can piece together a true map. Visit every anchor along the road and record what you find there.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "investigate",
+                "description": "Survey Ashford and its surroundings using Gerold's cartography instruments. Record the position of the tavern, blacksmith, and the hill paths leading to the King's Road."
+              },
+              {
+                "id": "a-03",
+                "type": "travel",
+                "destination": "anchor-01",
+                "description": "Follow the King's Road north through the Ashford Meadows to Millbrook, noting terrain features, river crossings, and landmarks along the way."
+              },
+              {
+                "id": "a-04",
+                "type": "investigate",
+                "description": "Chart Millbrook's layout from the high ground above the River Mill crossing. Mark the market square, chapel, and the road's fork toward the forests."
+              },
+              {
+                "id": "a-05",
+                "type": "travel",
+                "destination": "anchor-02",
+                "description": "Push deeper along the road through the Millbrook Forests to the Thornfield Ruins, recording the forest trails and ancient waymarkers."
+              },
+              {
+                "id": "a-06",
+                "type": "investigate",
+                "description": "Map the Thornfield Ruins and their surroundings. Sketch the dungeon entrance, the camp perimeter, and the crumbling walls that mark the old settlement boundary."
+              },
+              {
+                "id": "a-07",
+                "type": "travel",
+                "destination": "anchor-03",
+                "description": "Traverse the Thornfield Hills toward Ravensgate, charting the winding road through heather slopes and rocky passes."
+              },
+              {
+                "id": "a-08",
+                "type": "investigate",
+                "description": "Sketch Ravensgate's walls, gate, and tower from a vantage point on the eastern ridge. Note the prison tower and the road that passes through the town centre."
+              },
+              {
+                "id": "a-09",
+                "type": "travel",
+                "destination": "anchor-04",
+                "description": "Cross the Ravensgate Moors to reach the Pilgrim's Rest monastery, marking the standing stones and mist-prone hollows on the map."
+              },
+              {
+                "id": "a-10",
+                "type": "investigate",
+                "description": "Document the Pilgrim's Rest monastery grounds — the chapel, garden, library, and the road's continuation toward the highlands."
+              },
+              {
+                "id": "a-11",
+                "type": "travel",
+                "destination": "anchor-05",
+                "description": "Make the final ascent through the Grailsend Highlands to the temple at Grailsend, charting the steep mountain paths and pine groves."
+              },
+              {
+                "id": "a-12",
+                "type": "investigate",
+                "description": "Complete the map with a survey of Grailsend — the temple entrance, the guardian's chamber, and the sacred stones that mark the end of the King's Road."
+              },
+              {
+                "id": "a-13",
+                "type": "dialogue",
+                "npcArchetype": "scholar",
+                "dialogue": "Every anchor, every crossing, every ruin — you have given me more than enough to restore the true map of the King's Road. And look here, your sketches reveal paths the old maps never showed. Hidden trails through the forests, a cave system beneath the moors, a forgotten shrine in the highlands. This map will guide pilgrims safely for generations. You have my deepest gratitude.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "unlock",
+              "unlockId": "world-map-explorer"
+            }
+          },
+          "B": {
+            "label": "Recover the lost map fragments from each region",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "scholar",
+                "dialogue": "There is another way, perhaps faster. The old royal map was not destroyed entirely — it was torn into six pieces and hidden by the last custodians before the wars reached them. One fragment was left at each anchor along the King's Road. Find them all and I can restore the original, which showed not just the road but every secret path and hidden place between Ashford and Grailsend.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "fetch",
+                "itemId": "map-fragment-ashford",
+                "description": "Search beneath the hearthstone in the old cartographer's study in Ashford. Gerold recalls the first fragment was hidden there before the fires came."
+              },
+              {
+                "id": "b-03",
+                "type": "travel",
+                "destination": "anchor-01",
+                "description": "Travel to Millbrook and seek the second fragment hidden somewhere in the town."
+              },
+              {
+                "id": "b-04",
+                "type": "puzzle",
+                "description": "Solve the inscription on the chapel's foundation stone in Millbrook to reveal a hollow compartment containing the second map fragment."
+              },
+              {
+                "id": "b-05",
+                "type": "travel",
+                "destination": "anchor-02",
+                "description": "Journey to the Thornfield Ruins to find the third fragment somewhere among the ancient stonework."
+              },
+              {
+                "id": "b-06",
+                "type": "fetch",
+                "itemId": "map-fragment-thornfield",
+                "description": "Retrieve the third fragment from inside a sealed reliquary in the Thornfield Ruins, hidden behind a wall carving of the pilgrim's road."
+              },
+              {
+                "id": "b-07",
+                "type": "travel",
+                "destination": "anchor-03",
+                "description": "Make your way to Ravensgate to recover the fourth fragment from within the walled town."
+              },
+              {
+                "id": "b-08",
+                "type": "investigate",
+                "description": "Search the old records room beneath Ravensgate's gatehouse for the fourth map fragment, hidden among tax scrolls that no one has read in decades."
+              },
+              {
+                "id": "b-09",
+                "type": "travel",
+                "destination": "anchor-04",
+                "description": "Continue to the Pilgrim's Rest monastery to find the fifth fragment."
+              },
+              {
+                "id": "b-10",
+                "type": "fetch",
+                "itemId": "map-fragment-monastery",
+                "description": "Ask the monastery librarian about old documents. The fifth fragment is pressed between the pages of an illuminated manuscript in the restricted archive."
+              },
+              {
+                "id": "b-11",
+                "type": "travel",
+                "destination": "anchor-05",
+                "description": "Ascend to Grailsend for the final fragment, said to be sealed within the temple's outer wall."
+              },
+              {
+                "id": "b-12",
+                "type": "fetch",
+                "itemId": "map-fragment-grailsend",
+                "description": "Pry the sixth and final fragment from a niche in the temple wall at Grailsend, sealed with wax bearing the old royal cartographer's sigil."
+              },
+              {
+                "id": "b-13",
+                "type": "dialogue",
+                "npcArchetype": "scholar",
+                "dialogue": "All six fragments, and the seals still intact. When I piece them together the old map reveals everything — every hidden cave, forgotten shrine, and smuggler's trail along the entire King's Road. This is worth more than gold. The secrets it holds will serve you well in the journey ahead. Take this copy I have made for you, and may it light your path.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "unlock",
+              "unlockId": "world-map-antiquarian"
+            }
+          }
+        },
+        "reward": {
+          "type": "modifier",
+          "modifierId": "master-cartographer"
+        }
+      },
+      {
+        "id": "side-the-herbalists-journey",
+        "tier": "macro",
+        "title": "The Herbalist's Journey",
+        "estimatedMinutes": 60,
+        "anchorAffinity": "anchor-01",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "anchor-01"
+        },
+        "prerequisites": [
+          "main-chapter-01"
+        ],
+        "branches": {
+          "A": {
+            "label": "Follow the old herbalist's teachings",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "healer",
+                "dialogue": "You have a keen eye, traveller. Not many notice the meadowsweet growing by the River Mill. I was an herbalist once, before my hands grew too stiff to gather. There are five rare herbs along the King's Road, each blooming only in its own soil. Bring them to me and I will teach you the healer's art that saved more lives on this road than any sword ever did.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "fetch",
+                "itemId": "silverleaf",
+                "description": "Gather silverleaf from the damp meadows near the River Mill at Millbrook. It grows in clusters along the bank where the current slows beneath the old stone bridge."
+              },
+              {
+                "id": "a-03",
+                "type": "travel",
+                "destination": "millbrook-forests",
+                "description": "Journey into the dense Millbrook Forests between Millbrook and Thornfield Ruins to search for the second herb."
+              },
+              {
+                "id": "a-04",
+                "type": "fetch",
+                "itemId": "shadowmoss",
+                "description": "Collect shadowmoss from the moss-covered roots in the deepest part of the Millbrook Forests, where the canopy blocks all sunlight."
+              },
+              {
+                "id": "a-05",
+                "type": "travel",
+                "destination": "thornfield-hills",
+                "description": "Continue along the King's Road through the Thornfield Hills toward Ravensgate, searching the rocky outcrops for highland herbs."
+              },
+              {
+                "id": "a-06",
+                "type": "fetch",
+                "itemId": "windcrown",
+                "description": "Harvest windcrown from the exposed ridgeline above Thornfield Ruins, where the constant gales have shaped it into a hardy spiral."
+              },
+              {
+                "id": "a-07",
+                "type": "travel",
+                "destination": "ravensgate-moors",
+                "description": "Press onward past Ravensgate into the misty moors, where the rarest herbs survive in the boggy hollows."
+              },
+              {
+                "id": "a-08",
+                "type": "fetch",
+                "itemId": "boglantern",
+                "description": "Gather boglantern from the peat pools of the Ravensgate Moors. Its pale glow is visible only at dusk, flickering among the standing stones."
+              },
+              {
+                "id": "a-09",
+                "type": "travel",
+                "destination": "grailsend-highlands",
+                "description": "Make the final journey to the Grailsend Highlands to find the last and rarest herb near the sacred stones."
+              },
+              {
+                "id": "a-10",
+                "type": "fetch",
+                "itemId": "grailbloom",
+                "description": "Pluck the grailbloom from a crevice beside the sacred stones in the Grailsend Highlands. Legend says it grows only where holy ground meets mountain air."
+              },
+              {
+                "id": "a-11",
+                "type": "dialogue",
+                "npcArchetype": "healer",
+                "dialogue": "All five. You truly walked the length of the King's Road for these. With the silverleaf and grailbloom I can brew a tincture that closes wounds in moments. The shadowmoss draws poison, the windcrown steadies a faltering heart, and the boglantern soothes a troubled mind. You have earned the healer's gift, child. Use it wisely on the road ahead.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "unlock",
+              "unlockId": "healer-craft-traditional"
+            }
+          },
+          "B": {
+            "label": "Study under the monastery's apothecary",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "priest",
+                "dialogue": "The brothers at the Pilgrim's Rest monastery keep an apothecary garden, but their stores run low. They seek the same five rare herbs that grow wild along the road. If you bring the herbs to Brother Anselm instead, he will teach you the monastic tradition of healing — slower perhaps, but with deeper knowledge of which ailments each remedy truly cures.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "fetch",
+                "itemId": "silverleaf",
+                "description": "Gather silverleaf from the damp meadows near the River Mill at Millbrook. Mark the location carefully so the monastery can cultivate it in future seasons."
+              },
+              {
+                "id": "b-03",
+                "type": "travel",
+                "destination": "millbrook-forests",
+                "description": "Travel deep into the Millbrook Forests to find the second herb for the monastery's apothecary."
+              },
+              {
+                "id": "b-04",
+                "type": "fetch",
+                "itemId": "shadowmoss",
+                "description": "Carefully scrape shadowmoss from the ancient roots in the darkest glades of the Millbrook Forests, preserving the root stock for regrowth."
+              },
+              {
+                "id": "b-05",
+                "type": "fetch",
+                "itemId": "windcrown",
+                "description": "Climb the windswept ridges of the Thornfield Hills and harvest windcrown where it clings to the rocky outcrops above the ruins."
+              },
+              {
+                "id": "b-06",
+                "type": "fetch",
+                "itemId": "boglantern",
+                "description": "Wade into the peat pools of the Ravensgate Moors at twilight and gather the glowing boglantern that rises from the dark water."
+              },
+              {
+                "id": "b-07",
+                "type": "fetch",
+                "itemId": "grailbloom",
+                "description": "Ascend to the sacred stones in the Grailsend Highlands and harvest the grailbloom, taking care to replant seeds in the crevice for future pilgrims."
+              },
+              {
+                "id": "b-08",
+                "type": "travel",
+                "destination": "anchor-04",
+                "description": "Carry all five herbs to the Pilgrim's Rest monastery and deliver them to Brother Anselm in the apothecary garden."
+              },
+              {
+                "id": "b-09",
+                "type": "dialogue",
+                "npcArchetype": "priest",
+                "dialogue": "Five specimens, each one pristine. You have a gatherer's patience, which is half of what makes a true healer. The other half is knowing when a remedy will help and when it will only prolong suffering. Stay a while and study our texts. I will teach you the apothecary's discipline — the art of diagnosis before cure. This knowledge will serve you well beyond the King's Road.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "unlock",
+              "unlockId": "healer-craft-apothecary"
+            }
+          }
+        },
+        "reward": {
+          "type": "modifier",
+          "modifierId": "herbalist-trained"
+        }
+      }
+    ],
+    "meso": [
+      {
+        "id": "side-lord-ashwicks-secret",
+        "tier": "meso",
+        "title": "Lord Ashwick's Secret",
+        "estimatedMinutes": 28,
+        "anchorAffinity": "anchor-03",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "anchor-03"
+        },
+        "branches": {
+          "A": {
+            "label": "Bribe the tower guards",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "healer",
+                "dialogue": "I tend to the sick and wounded of Ravensgate, but there are prisoners in that tower whom even I am forbidden to visit. Whatever Lord Ashwick hides up there, it frightens his own guards. I have seen them cross themselves when they change the watch. If you could find a way inside, you might discover the truth that keeps this town in chains.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "investigate",
+                "description": "Observe the tower guard rotation from the tavern window and identify which guards seem unhappy with their post. Look for signs of discontent or gambling debts."
+              },
+              {
+                "id": "a-03",
+                "type": "encounter",
+                "encounterId": "merchant_negotiation",
+                "description": "Approach the disgruntled tower guard during his break at the tavern and negotiate a price for looking the other way during the next watch change."
+              },
+              {
+                "id": "a-04",
+                "type": "fetch",
+                "itemId": "ashwick_ledger",
+                "description": "Slip into the tower while the bribed guard holds the door. Climb to the upper chamber and find Lord Ashwick's secret ledger hidden behind a loose stone in the wall."
+              },
+              {
+                "id": "a-05",
+                "type": "dialogue",
+                "npcArchetype": "healer",
+                "dialogue": "A ledger of payments to bandits on the King's Road — Ashwick has been funding the very outlaws who terrorise the pilgrims, then charging travellers for safe passage through his lands. This is the proof the people need. I will see that copies reach the right hands. You have struck a blow against tyranny today, stranger. Take this salve — you may need it before your journey ends.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "item",
+              "itemId": "healing_salve"
+            }
+          },
+          "B": {
+            "label": "Find the secret passage into the tower",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "scholar",
+                "dialogue": "You wish to know what Ashwick hides in the tower? I can tell you, for I was imprisoned there until they moved me to this pit. There is a passage — older than the town itself — that runs beneath the manor walls. The old lord showed it to me when I served as his chronicler. Its entrance lies behind the standing stone in the eastern cemetery, marked with a mason's compass.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "investigate",
+                "description": "Search the eastern cemetery outside Ravensgate's walls for the standing stone marked with a mason's compass. Clear the ivy to reveal the passage entrance."
+              },
+              {
+                "id": "b-03",
+                "type": "puzzle",
+                "description": "Navigate the ancient passage beneath the manor walls. Solve the lock mechanism — three rotating stone discs that must align to show the old lord's sigil — to open the sealed door."
+              },
+              {
+                "id": "b-04",
+                "type": "fetch",
+                "itemId": "ashwick_ledger",
+                "description": "Emerge inside the tower's upper chamber through a trapdoor concealed beneath a moth-eaten rug. Find the secret ledger and a cache of letters proving Ashwick's treachery."
+              },
+              {
+                "id": "b-05",
+                "type": "dialogue",
+                "npcArchetype": "scholar",
+                "dialogue": "You found it. The ledger and the letters both — more than I dared hope. When I was his chronicler, I suspected Ashwick was funding the road bandits, but I never had proof until now. Take this to Elara, and she will see it spread through the town. And take my thanks as well. Forty-seven days in this cell, and you are the first glimmer of justice I have seen.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "item",
+              "itemId": "old_lords_signet"
+            }
+          }
+        },
+        "reward": {
+          "type": "modifier",
+          "modifierId": "ashwick-exposed"
+        }
+      },
+      {
+        "id": "side-the-bridge-troll",
+        "tier": "meso",
+        "title": "The Bridge Troll",
+        "estimatedMinutes": 18,
+        "anchorAffinity": "anchor-03",
+        "trigger": {
+          "type": "roadside",
+          "distanceRange": [
+            15000,
+            18000
+          ]
+        },
+        "branches": {
+          "A": {
+            "label": "Fight the troll for passage",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "wanderer",
+                "dialogue": "None shall cross my bridge without paying the toll, and the toll is whatever I say it is today. You look strong enough to carry a sword but not clever enough to use your tongue. So what will it be, little traveller? Your coin, your blood, or will you turn back the way you came?",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "encounter",
+                "encounterId": "bridge-troll-fight",
+                "description": "Battle the massive bridge troll on the narrow stone crossing, using the tight quarters to avoid its sweeping blows."
+              },
+              {
+                "id": "a-03",
+                "type": "investigate",
+                "description": "Search the troll's nest beneath the bridge and recover stolen goods from previous travellers."
+              },
+              {
+                "id": "a-04",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "You killed that brute? Bless you, traveller. I have been camped on this side for three days, too frightened to cross. My wares are spoiling in the damp. Please, take something for your trouble. The road to Ravensgate is open again thanks to you.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "modifier",
+              "modifierId": "troll-slayer"
+            }
+          },
+          "B": {
+            "label": "Solve the troll's riddle to pass",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "wanderer",
+                "dialogue": "None shall cross my bridge without paying the toll, and the toll is whatever I say it is today. But I am feeling generous. Answer my riddle and you may pass free. Get it wrong and I eat your horse. Do not have a horse? Then I eat your boots. Do we have an accord?",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "puzzle",
+                "description": "Solve the troll's riddle: 'I have cities but no houses, forests but no trees, and water but no fish. What am I?'"
+              },
+              {
+                "id": "b-03",
+                "type": "dialogue",
+                "npcArchetype": "wanderer",
+                "dialogue": "A map! Curse it, you are the first to answer correctly in a fortnight. Very well, a bargain is a bargain. Cross and be gone before I change my mind. But I will think of a harder one next time, mark my words. Nobody outwits old Grukk twice.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-04",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "You talked your way past that creature? I tried offering it half my stock and it only laughed. Perhaps there is hope yet for those of us who trade in words rather than swords. Here, take this for the road ahead. You have earned it with wit alone.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "modifier",
+              "modifierId": "riddle-master"
+            }
+          }
+        },
+        "reward": {
+          "type": "currency",
+          "amount": 40
+        }
+      },
+      {
+        "id": "side-the-cursed-ring",
+        "tier": "meso",
+        "title": "The Cursed Ring",
+        "estimatedMinutes": 22,
+        "anchorAffinity": "anchor-02",
+        "trigger": {
+          "type": "roadside",
+          "distanceRange": [
+            10000,
+            13000
+          ]
+        },
+        "branches": {
+          "A": {
+            "label": "Find the witch who cursed the ring",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "That ring I sold you, I am sorry. I did not know it was cursed when I bought it from the old woman in the hills. Strange things have followed me since I handled it — crows circling, milk souring, a shadow at my door. Please, find the witch and make her undo this wretched hex.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "investigate",
+                "description": "Follow the trail of withered flowers and dead songbirds into the thornwood to locate the witch's dwelling."
+              },
+              {
+                "id": "a-03",
+                "type": "puzzle",
+                "description": "Solve the witch's three-part ward puzzle to gain entry to her cottage without triggering the protective hexes."
+              },
+              {
+                "id": "a-04",
+                "type": "dialogue",
+                "npcArchetype": "hermit",
+                "dialogue": "So you found me. That ring was never meant for clumsy merchants. It binds itself to the worthy and tests their resolve. You passed through my wards without violence, which tells me enough. Give it here and I shall lift the curse. Consider it a lesson about buying trinkets from strangers.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "modifier",
+              "modifierId": "hex-breaker"
+            }
+          },
+          "B": {
+            "label": "Destroy the ring at the standing stones",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "That ring I sold you, I am sorry. I did not know it was cursed when I bought it from the old woman in the hills. Strange things have followed me since I handled it — crows circling, milk souring, a shadow at my door. There must be some way to destroy the wretched thing.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "investigate",
+                "description": "Seek out the ancient standing stones on the hilltop, said to be a place where cursed objects can be unmade."
+              },
+              {
+                "id": "b-03",
+                "type": "encounter",
+                "encounterId": "cursed-ring-shade",
+                "description": "The ring's curse manifests as a shade that rises from the stone circle, fighting to preserve its vessel."
+              },
+              {
+                "id": "b-04",
+                "type": "puzzle",
+                "description": "Place the ring upon the altar stone and align the moonlight through the standing stones to channel enough sacred energy to shatter the curse."
+              },
+              {
+                "id": "b-05",
+                "type": "dialogue",
+                "npcArchetype": "wanderer",
+                "dialogue": "I saw the light from the stones half a league away. Whatever you did up there, the air feels cleaner for it. The old folk say those stones were placed to burn away wickedness. Seems they still have some power left in them after all these ages.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "modifier",
+              "modifierId": "curse-shatterer"
+            }
+          }
+        },
+        "reward": {
+          "type": "item",
+          "itemId": "purified-ring"
+        }
+      },
+      {
+        "id": "side-the-deserter",
+        "tier": "meso",
+        "title": "The Deserter",
+        "estimatedMinutes": 20,
+        "anchorAffinity": "anchor-01",
+        "trigger": {
+          "type": "roadside",
+          "distanceRange": [
+            5000,
+            8000
+          ]
+        },
+        "branches": {
+          "A": {
+            "label": "Help the soldier escape",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "knight",
+                "dialogue": "Please, I beg you, do not raise the alarm. I am no criminal, just a man who cannot bear another day under Lord Ashwick's banner. His orders grow crueller by the week. I only wish to reach the coast and start anew. Will you help me slip past the patrol on the north road?",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "fetch",
+                "itemId": "peasant-disguise",
+                "description": "Find a set of peasant clothes from a nearby farmstead to disguise the soldier."
+              },
+              {
+                "id": "a-03",
+                "type": "escort",
+                "description": "Guide the disguised soldier along a hidden forest path that bypasses the patrol checkpoint on the north road."
+              },
+              {
+                "id": "a-04",
+                "type": "dialogue",
+                "npcArchetype": "knight",
+                "dialogue": "I will not forget this kindness, stranger. If ever you find yourself on the western coast, ask for Edric at the dockyards. I owe you a debt that coin alone cannot repay. May the road treat you gently.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "modifier",
+              "modifierId": "merciful-heart"
+            }
+          },
+          "B": {
+            "label": "Turn the soldier in to his captain",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "knight",
+                "dialogue": "Please, I beg you, do not raise the alarm. I am no criminal, just a man who cannot bear another day under Lord Ashwick's banner. His orders grow crueller by the week. I only wish to reach the coast and start anew. Will you help me slip past the patrol on the north road?",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "travel",
+                "destination": "patrol-camp",
+                "description": "Lead the soldier toward the patrol camp under the pretense of helping him, then alert the guards."
+              },
+              {
+                "id": "b-03",
+                "type": "encounter",
+                "encounterId": "deserter-struggle",
+                "description": "The soldier realises your betrayal and fights desperately to escape before the guards arrive."
+              },
+              {
+                "id": "b-04",
+                "type": "dialogue",
+                "npcArchetype": "knight",
+                "dialogue": "Well done, traveller. Desertion is a rot that spreads if left unchecked. Lord Ashwick will hear of your service. Take this purse and know that the law stands because good folk uphold it, even when the choice is hard.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "currency",
+              "amount": 50
+            }
+          }
+        },
+        "reward": {
+          "type": "modifier",
+          "modifierId": "road-judge"
+        }
+      },
+      {
+        "id": "side-the-missing-merchant",
+        "tier": "meso",
+        "title": "The Missing Merchant",
+        "estimatedMinutes": 22,
+        "anchorAffinity": "anchor-01",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "anchor-01"
+        },
+        "branches": {
+          "A": {
+            "label": "Track the bandits who took him",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "My partner Osbert left for Ravensgate three days past and has not returned. His cart was found overturned on the forest road with the goods scattered and boot prints everywhere. The reeve says it is bandits, the same ones who have been plaguing the Millbrook road since midsummer. Please, find Osbert before they do him worse harm.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "investigate",
+                "description": "Examine the overturned cart on the forest road for tracks and clues about which direction the bandits dragged Osbert."
+              },
+              {
+                "id": "a-03",
+                "type": "encounter",
+                "encounterId": "bandit_ambush",
+                "description": "Follow the trail to a hidden bandit camp in the forest. Fight through the lookouts to reach the clearing where Osbert is bound to a tree."
+              },
+              {
+                "id": "a-04",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "You came for me. I had given up hope after the second night. Those ruffians wanted the location of our warehouse in Ravensgate but I told them nothing. My partner will be overjoyed. Here, I hid this in my boot before they searched me — take it as thanks. It is the finest thing I ever traded for.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "item",
+              "itemId": "travel_cloak"
+            }
+          },
+          "B": {
+            "label": "Discover the merchant fled his debts",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "My partner Osbert left for Ravensgate three days past and has not returned. His cart was found overturned on the forest road with the goods scattered and boot prints everywhere. I fear the worst but something nags at me — he has been anxious of late, whispering with strangers at the tavern. Please, find out what happened to him.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "investigate",
+                "description": "Search the overturned cart and notice the damage looks staged — the axle was removed, not broken, and the scattered goods are the cheapest stock."
+              },
+              {
+                "id": "b-03",
+                "type": "encounter",
+                "encounterId": "merchant_negotiation",
+                "description": "Visit the tavern and press the innkeeper for information about Osbert's secretive meetings with a moneylender from Ravensgate."
+              },
+              {
+                "id": "b-04",
+                "type": "travel",
+                "destination": "river-crossing",
+                "description": "Follow Osbert's true trail to the river crossing south of Millbrook, where he arranged passage on a barge heading downstream."
+              },
+              {
+                "id": "b-05",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "He staged his own disappearance? I cannot believe it. The debts, the whispering — it all makes sense now. Part of me is relieved he is alive but the betrayal stings. At least I know the truth and can settle his accounts before they come after me instead. You have saved me from ruin, traveller. Take this for your trouble.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "currency",
+              "amount": 40
+            }
+          }
+        },
+        "reward": {
+          "type": "modifier",
+          "modifierId": "truth-seeker"
+        }
+      },
+      {
+        "id": "side-the-poisoned-well",
+        "tier": "meso",
+        "title": "The Poisoned Well",
+        "estimatedMinutes": 25,
+        "anchorAffinity": "anchor-01",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "anchor-01"
+        },
+        "branches": {
+          "A": {
+            "label": "Confront the herbalist",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "farmer",
+                "dialogue": "Something is wrong with our water, stranger. Half the folk along Mill Lane have taken ill this past week — fevers, shaking, a terrible wasting. Old Agnes says it started the same day that new herbalist set up shop near the well. Nobody wants to accuse her outright, but the timing is too neat to ignore. Would you look into it before more of us fall sick?",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "investigate",
+                "description": "Examine the town well for signs of contamination and speak with the sick villagers to learn when their symptoms began."
+              },
+              {
+                "id": "a-03",
+                "type": "fetch",
+                "itemId": "rare_herb",
+                "description": "Search the herbalist's garden for the distinctive purple nightveil plant whose roots produce the toxin found in the well water."
+              },
+              {
+                "id": "a-04",
+                "type": "encounter",
+                "encounterId": "merchant_negotiation",
+                "description": "Confront the herbalist with the evidence. She insists it was an accident — her compost heap leached into the groundwater — but her defensive manner suggests otherwise."
+              },
+              {
+                "id": "a-05",
+                "type": "dialogue",
+                "npcArchetype": "farmer",
+                "dialogue": "So it was her doing after all. Whether by carelessness or design, she has much to answer for. The reeve will deal with her now. You have done Millbrook a great service, traveller. The market folk have gathered a purse for you, and I have added my best laying hen's weight in silver besides.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "item",
+              "itemId": "antidote"
+            }
+          },
+          "B": {
+            "label": "Trace the poison source upstream",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "farmer",
+                "dialogue": "Something is wrong with our water, stranger. Half the folk along Mill Lane have taken ill this past week — fevers, shaking, a terrible wasting. The well draws from the River Mill, and I reckon whatever foulness plagues us flows down from upstream. Would you follow the water and find the source before the whole town sickens?",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "investigate",
+                "description": "Follow the River Mill upstream from the town well, testing the water at intervals and searching for signs of contamination."
+              },
+              {
+                "id": "b-03",
+                "type": "travel",
+                "destination": "upstream-cave",
+                "description": "Trek through the forested riverbank to reach a cave where a foul runoff seeps into the current from an old mineral deposit disturbed by recent rains."
+              },
+              {
+                "id": "b-04",
+                "type": "puzzle",
+                "description": "Redirect the cave's drainage channel using loose stones and fallen timber to divert the contaminated runoff away from the river."
+              },
+              {
+                "id": "b-05",
+                "type": "dialogue",
+                "npcArchetype": "farmer",
+                "dialogue": "The water already runs clearer, I can see it from the bridge. You found the true source and mended it with your own hands. The herbalist sends her thanks as well — she was afraid the town would turn on her next. Take this tonic she brewed. She says it will ward off any lingering poison in your blood.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "item",
+              "itemId": "health_potion"
+            }
+          }
+        },
+        "reward": {
+          "type": "modifier",
+          "modifierId": "millbrook-healer"
+        }
+      },
+      {
+        "id": "side-the-underground",
+        "tier": "meso",
+        "title": "The Underground",
+        "estimatedMinutes": 25,
+        "anchorAffinity": "anchor-03",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "anchor-03"
+        },
+        "branches": {
+          "A": {
+            "label": "Join the resistance openly",
+            "steps": [
+              {
+                "id": "a-01",
+                "type": "dialogue",
+                "npcArchetype": "innkeeper",
+                "dialogue": "Keep your voice down, stranger. You have been asking questions that draw the wrong kind of attention in Ravensgate. If you truly wish to help, come to the cellar of the Black Raven after the midnight bell. Knock three times and ask for the old vintage. But know this — once you walk through that door, there is no walking back out.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-02",
+                "type": "investigate",
+                "description": "Wait for nightfall and descend into the cellar beneath the Black Raven tavern. Find the hidden passage behind the wine casks that leads to the resistance meeting hall."
+              },
+              {
+                "id": "a-03",
+                "type": "dialogue",
+                "npcArchetype": "knight",
+                "dialogue": "So Greta vouches for you. That is no small thing. We are soldiers, merchants, healers — ordinary folk who have suffered enough under Ashwick's boot. We need someone from outside these walls, someone the captain's spies do not yet know. Will you carry a message to our allies in the moors? The guards search everyone at the gate, but a pilgrim on the King's Road might pass unnoticed.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "a-04",
+                "type": "travel",
+                "destination": "ravensgate-moors",
+                "description": "Smuggle the coded message past the gate guards and deliver it to the resistance contact camped in the moors beyond Ravensgate's walls."
+              },
+              {
+                "id": "a-05",
+                "type": "dialogue",
+                "npcArchetype": "innkeeper",
+                "dialogue": "The message reached them safely. You have done more for Ravensgate in one night than we have managed in months of whispering. The resistance is stronger now, and when the time comes to act, you will have a place among us. Take this — it belonged to the old lord, before Ashwick seized the manor. Wear it and our people will know you as a friend.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "item",
+              "itemId": "resistance_token"
+            }
+          },
+          "B": {
+            "label": "Infiltrate the resistance as a spy",
+            "steps": [
+              {
+                "id": "b-01",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "You have sharp eyes, traveller. I have noticed the same things you have — the whispers in the tavern, the strangers who arrive after dark and leave before dawn. Lord Ashwick's captain pays well for information about dissidents. If you could get inside their little conspiracy and bring me names, I will see that you are richly rewarded. Thornton always pays his debts.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              },
+              {
+                "id": "b-02",
+                "type": "investigate",
+                "description": "Pose as a sympathiser and gain the trust of the tavern regulars at the Black Raven. Listen for talk of secret meetings and coded phrases."
+              },
+              {
+                "id": "b-03",
+                "type": "encounter",
+                "encounterId": "merchant_negotiation",
+                "description": "Attend a resistance gathering in the cellar beneath the tavern and memorise the faces and plans discussed without arousing suspicion."
+              },
+              {
+                "id": "b-04",
+                "type": "dialogue",
+                "npcArchetype": "merchant",
+                "dialogue": "Six names and a meeting place — you have earned every coin of this. The captain will be most pleased. But between you and me, do not linger in Ravensgate once the arrests begin. Ashwick's gratitude has a short memory, and those who know too much often end up in the Oubliette alongside the people they betrayed.",
+                "dialogueMinWords": 15,
+                "dialogueMaxWords": 80
+              }
+            ],
+            "reward": {
+              "type": "currency",
+              "amount": 60
+            }
+          }
+        },
+        "reward": {
+          "type": "modifier",
+          "modifierId": "ravensgate-insider"
+        }
+      }
+    ],
+    "micro": [
+      {
+        "id": "side-aldrics-missing-hammer",
+        "tier": "micro",
+        "title": "Aldric's Missing Hammer",
+        "estimatedMinutes": 5,
+        "anchorAffinity": "home",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "home"
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "dialogue",
+            "npcArchetype": "blacksmith",
+            "dialogue": "I cannot forge a single nail without my good hammer and the blasted thing has gone missing. I had it leaning by the anvil yesterday evening but when I came in at dawn it was nowhere to be found. Old Tomas says he saw a fox dragging something shiny toward the forest edge. Would you search the tree line for me? I would go myself but orders are piling up.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          },
+          {
+            "id": "s-02",
+            "type": "fetch",
+            "itemId": "aldrics_hammer",
+            "description": "Search the forest edge near Ashford for Aldric's hammer, likely dragged there by a fox."
+          },
+          {
+            "id": "s-03",
+            "type": "dialogue",
+            "npcArchetype": "blacksmith",
+            "dialogue": "Ha, there she is! Good as new, not a scratch on the head. You have saved me a week of work and the village a week without horseshoes. Take this blade I finished this morning. It is honest steel and will serve you well on the road ahead. Come back any time you need something mended.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "item",
+          "itemId": "iron_sword"
+        }
+      },
+      {
+        "id": "side-bandit-ambush",
+        "tier": "micro",
+        "title": "Bandit Ambush",
+        "estimatedMinutes": 8,
+        "anchorAffinity": "anchor-01",
+        "trigger": {
+          "type": "roadside",
+          "distanceRange": [
+            7000,
+            10000
+          ]
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "encounter",
+            "encounterId": "roadside-bandit-ambush",
+            "description": "A band of highwaymen springs from the treeline, blocking the road with drawn blades and demanding your coin."
+          },
+          {
+            "id": "s-02",
+            "type": "investigate",
+            "description": "Search the bandits' makeshift camp hidden among the forest undergrowth for stolen goods and a crude map of ambush points along the King's Road."
+          },
+          {
+            "id": "s-03",
+            "type": "dialogue",
+            "npcArchetype": "wanderer",
+            "dialogue": "You cleared those wretches out, did you? I saw their fire smoke from the ridge and feared the worst. They have been preying on travellers for weeks now. The map you found should be taken to the next town guard. Here, take what little coin I can spare for your trouble.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "currency",
+          "amount": 25
+        }
+      },
+      {
+        "id": "side-besss-secret-recipe",
+        "tier": "micro",
+        "title": "Bess's Secret Recipe",
+        "estimatedMinutes": 5,
+        "anchorAffinity": "home",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "home"
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "dialogue",
+            "npcArchetype": "innkeeper",
+            "dialogue": "Oh, you look like someone who knows their way around the countryside. My grandmother's stew recipe calls for fresh moonpetal herbs but the patch I used to pick from has gone dry. The wise woman who camps beyond the eastern meadow told me they still grow along the brook past the old stone wall. Could you gather a handful for me before the evening crowd arrives?",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          },
+          {
+            "id": "s-02",
+            "type": "fetch",
+            "itemId": "rare_herb",
+            "description": "Gather fresh moonpetal herbs from the brook beyond the old stone wall east of Ashford."
+          },
+          {
+            "id": "s-03",
+            "type": "dialogue",
+            "npcArchetype": "innkeeper",
+            "dialogue": "Perfect, these are just what I needed. The leaves are still dewy and fragrant. Tonight the whole tavern will smell of grandmother's stew and every soul in Ashford will be lining up for a bowl. Here, take this recipe scroll as thanks. It has a few other remedies written in the margins that might prove useful on the road.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "item",
+          "itemId": "secret_recipe"
+        }
+      },
+      {
+        "id": "side-father-cedrics-lost-hymnal",
+        "tier": "micro",
+        "title": "Father Cedric's Lost Hymnal",
+        "estimatedMinutes": 8,
+        "anchorAffinity": "home",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "home"
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "dialogue",
+            "npcArchetype": "priest",
+            "dialogue": "Bless you, child. I wonder if you might help an old man with a small mystery. My illuminated hymnal has vanished from the lectern. I have searched the nave and the vestry twice over but it is nowhere to be found. The chapel attic has not been swept in years and I fear my knees will not survive the ladder. Would you have a look up there for me?",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          },
+          {
+            "id": "s-02",
+            "type": "investigate",
+            "description": "Climb into the dusty chapel attic and search among old crates, moth-eaten vestments, and cobwebs for Father Cedric's missing hymnal."
+          },
+          {
+            "id": "s-03",
+            "type": "fetch",
+            "itemId": "lost_hymnal",
+            "description": "Retrieve the illuminated hymnal from behind the stack of old sermon scrolls in the attic."
+          },
+          {
+            "id": "s-04",
+            "type": "dialogue",
+            "npcArchetype": "priest",
+            "dialogue": "Oh, wonderful, you found it tucked behind the scrolls. A crow must have carried it up through the belfry window. The pages are a little dusty but the gold leaf still shines. The saints smile upon you, traveller. Take this blessing for the road. It will keep the dark at bay when the night grows long.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "item",
+          "itemId": "pilgrim_medallion"
+        }
+      },
+      {
+        "id": "side-lost-pilgrim",
+        "tier": "micro",
+        "title": "The Lost Pilgrim",
+        "estimatedMinutes": 7,
+        "anchorAffinity": "home",
+        "trigger": {
+          "type": "roadside",
+          "distanceRange": [
+            2000,
+            5000
+          ]
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "dialogue",
+            "npcArchetype": "pilgrim",
+            "dialogue": "Thank the saints, a kind face at last. I set out from Ashford at dawn but the path split three ways and I have been walking in circles ever since. The meadow tracks all look the same once the morning mist rolls in. Could you lead me back to the nearest town? I fear I shall never find the road again on my own.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          },
+          {
+            "id": "s-02",
+            "type": "escort",
+            "description": "Guide the lost pilgrim safely back to the nearest settlement along the King's Road."
+          },
+          {
+            "id": "s-03",
+            "type": "dialogue",
+            "npcArchetype": "pilgrim",
+            "dialogue": "Bless you, traveller. I can see the town gates from here and my old legs will carry me the rest of the way. Take this small token of thanks. The road ahead grows wilder, so keep your wits about you and may the saints light your path.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "currency",
+          "amount": 15
+        }
+      },
+      {
+        "id": "side-merchants-broken-cart",
+        "tier": "micro",
+        "title": "The Merchant's Broken Cart",
+        "estimatedMinutes": 8,
+        "anchorAffinity": "anchor-03",
+        "trigger": {
+          "type": "roadside",
+          "distanceRange": [
+            18000,
+            20000
+          ]
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "dialogue",
+            "npcArchetype": "merchant",
+            "dialogue": "Oh, what rotten luck. The axle snapped clean through on that last rut and now my wares are scattered across the moorland. I cannot lift the cart alone and every moment my goods sit in the damp they lose their worth. Would you lend your strength, friend?",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          },
+          {
+            "id": "s-02",
+            "type": "fetch",
+            "description": "Search the nearby copse for a sturdy branch that can serve as a replacement axle for the merchant's damaged cart.",
+            "itemId": "sturdy-branch"
+          },
+          {
+            "id": "s-03",
+            "type": "investigate",
+            "description": "Fit the branch beneath the cart and secure the wheel, working alongside the merchant to lever the cart upright and reload the scattered goods."
+          },
+          {
+            "id": "s-04",
+            "type": "dialogue",
+            "npcArchetype": "merchant",
+            "dialogue": "Marvellous work, truly marvellous. The wheel turns true again and my silks are no worse for their tumble. Take your pick from my wares as payment. A merchant never forgets a kindness on the road, and I travel this way often.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "item",
+          "itemId": "travel_cloak"
+        }
+      },
+      {
+        "id": "side-sister-maeves-garden",
+        "tier": "micro",
+        "title": "Sister Maeve's Garden",
+        "estimatedMinutes": 12,
+        "anchorAffinity": "anchor-04",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "anchor-04"
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "dialogue",
+            "npcArchetype": "healer",
+            "dialogue": "Bless you for stopping, traveller. The abbey's herb garden keeps us supplied through most seasons, but the frost came early this year and three of my most vital plants have wilted. I need fresh cuttings of yarrow, comfrey, and wild thyme from the hills beyond the monastery walls. They grow among the rocky slopes where the moorland meets the highland grass. Could you gather them before nightfall?",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          },
+          {
+            "id": "s-02",
+            "type": "fetch",
+            "itemId": "wild_yarrow",
+            "description": "Gather a bundle of wild yarrow from the sunny ledges on the hillside east of the monastery, where it grows in pale clusters among the loose stones."
+          },
+          {
+            "id": "s-03",
+            "type": "fetch",
+            "itemId": "wild_comfrey",
+            "description": "Collect fresh comfrey leaves from the damp hollow beside the stream that runs down from the highlands, just north of the abbey walls."
+          },
+          {
+            "id": "s-04",
+            "type": "fetch",
+            "itemId": "wild_thyme",
+            "description": "Pick sprigs of wild thyme from the windswept ridge above the monastery, where the moorland heather gives way to highland grass."
+          },
+          {
+            "id": "s-05",
+            "type": "dialogue",
+            "npcArchetype": "healer",
+            "dialogue": "All three, and in fine condition too. The yarrow will staunch wounds, the comfrey will mend broken bones, and the thyme will keep fever at bay through the winter months. You have done the abbey a kindness that will outlast your visit, friend. Take this salve for the road ahead — I brewed it fresh this morning and it will close a wound faster than any prayer alone.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "item",
+          "itemId": "healing_salve"
+        }
+      },
+      {
+        "id": "side-strange-shrine",
+        "tier": "micro",
+        "title": "The Strange Shrine",
+        "estimatedMinutes": 7,
+        "anchorAffinity": "anchor-04",
+        "trigger": {
+          "type": "roadside",
+          "distanceRange": [
+            23000,
+            26000
+          ]
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "investigate",
+            "description": "A faint golden light pulses from a moss-covered shrine half-hidden among the highland pines. Approach carefully and examine the source of the eerie glow."
+          },
+          {
+            "id": "s-02",
+            "type": "puzzle",
+            "description": "The shrine bears three carved symbols that correspond to phases of the moon. Rotate the stone rings until the symbols align with the current sky to unlock the shrine's inner chamber."
+          },
+          {
+            "id": "s-03",
+            "type": "dialogue",
+            "npcArchetype": "scholar",
+            "dialogue": "You have opened the shrine. Few possess the patience to read the old signs. This place was built by pilgrims who walked the King's Road long before the towns were raised. They left blessings sealed in stone for those who would come after. The warmth you feel is their gift to you.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "modifier",
+          "modifierId": "pilgrims-blessing"
+        }
+      },
+      {
+        "id": "side-the-missing-manuscript",
+        "tier": "micro",
+        "title": "The Missing Manuscript",
+        "estimatedMinutes": 10,
+        "anchorAffinity": "anchor-04",
+        "trigger": {
+          "type": "anchor",
+          "anchorId": "anchor-04"
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "dialogue",
+            "npcArchetype": "scholar",
+            "dialogue": "Traveller, I am in a terrible state. A manuscript I was studying has gone missing from my reading desk — an illuminated treatise on the Grail knights, centuries old and irreplaceable. I locked the library last night as always, yet this morning the desk was bare. I suspect it has been misplaced rather than stolen, but my eyes are too weary to search every shelf. Would you help me look?",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          },
+          {
+            "id": "s-02",
+            "type": "investigate",
+            "description": "Search the monastery library methodically — check the upper shelves, the reading alcoves, and the stack of unsorted volumes near the south window."
+          },
+          {
+            "id": "s-03",
+            "type": "fetch",
+            "itemId": "grail_treatise",
+            "description": "Retrieve the illuminated treatise from behind a row of prayer books on the topmost shelf, where it was shelved by mistake."
+          },
+          {
+            "id": "s-04",
+            "type": "dialogue",
+            "npcArchetype": "scholar",
+            "dialogue": "Behind the prayer books — of course! Brother Thomas must have reshelved it after vespers without reading the spine. Thank the saints it is undamaged. You have saved weeks of work, friend. Take this ink-stamp as thanks. The monks use it to mark safe passages along the Road and it may open a door or two before journey's end.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "item",
+          "itemId": "monastery_ink_stamp"
+        }
+      },
+      {
+        "id": "side-wounded-soldier",
+        "tier": "micro",
+        "title": "The Wounded Soldier",
+        "estimatedMinutes": 6,
+        "anchorAffinity": "anchor-02",
+        "trigger": {
+          "type": "roadside",
+          "distanceRange": [
+            13000,
+            16000
+          ]
+        },
+        "steps": [
+          {
+            "id": "s-01",
+            "type": "dialogue",
+            "npcArchetype": "knight",
+            "dialogue": "Stay your hand, I mean no harm. I was set upon by brigands on the hillside pass and my leg is badly cut. If you have any salve or clean cloth I would be in your debt. Otherwise I fear this wound will fester before I reach shelter.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          },
+          {
+            "id": "s-02",
+            "type": "investigate",
+            "description": "Tend to the soldier's wound using herbs from the nearby hillside, binding the gash with a strip of clean linen torn from his own cloak."
+          },
+          {
+            "id": "s-03",
+            "type": "dialogue",
+            "npcArchetype": "knight",
+            "dialogue": "You have a steady hand and a good heart. I serve the garrison at Ravensgate, though I wonder what that service is worth these days. Take my old blade, it has seen better years but the steel is still true. You will need it on the road ahead.",
+            "dialogueMinWords": 15,
+            "dialogueMaxWords": 80
+          }
+        ],
+        "reward": {
+          "type": "item",
+          "itemId": "iron_sword"
+        }
+      }
+    ]
+  },
+  "npcs": [
+    {
+      "id": "bandit-pool",
+      "archetype": "bandit",
+      "namePool": [
+        "Scarrow",
+        "Black Meg",
+        "Dagger Tom",
+        "Rattlesnake",
+        "The Cur"
+      ],
+      "greetingPool": [
+        {
+          "text": "Your coin or your life, traveller. I will not ask a second time."
+        },
+        {
+          "text": "Well, well. Another fat purse wandering the road without an escort."
+        },
+        {
+          "text": "Drop your weapons and empty your pockets. Nobody has to get hurt today."
+        },
+        {
+          "text": "The King's Road belongs to us now. You will pay the toll or pay in blood."
+        }
+      ],
+      "appearance": {
+        "clothColor": "dark-leather",
+        "accessory": "face_mask"
+      }
+    },
+    {
+      "id": "blacksmith-pool",
+      "archetype": "blacksmith",
+      "namePool": [
+        "Cedric",
+        "Haldric",
+        "Brynn",
+        "Osric",
+        "Wulfgar"
+      ],
+      "greetingPool": [
+        {
+          "text": "The forge runs hot today. What brings you to my anvil, traveller?"
+        },
+        {
+          "text": "Steel speaks truer than words. Tell me what you need shaped."
+        },
+        {
+          "text": "Mind the sparks, friend. I can mend what ails your gear, if the coin is right."
+        }
+      ],
+      "appearance": {
+        "clothColor": "soot-brown",
+        "accessory": "leather_apron"
+      }
+    },
+    {
+      "id": "captain-pool",
+      "archetype": "captain",
+      "namePool": [
+        "Roland",
+        "Aldwin",
+        "Tormund",
+        "Leofric",
+        "Baldwin"
+      ],
+      "greetingPool": [
+        {
+          "text": "Hold, traveller. State your business in these parts."
+        },
+        {
+          "text": "The roads grow more dangerous by the day. Watch yourself out there."
+        },
+        {
+          "text": "We keep the peace here. If you've nothing to hide, you've nothing to fear."
+        }
+      ],
+      "appearance": {
+        "clothColor": "steel-grey",
+        "accessory": "sword_belt"
+      }
+    },
+    {
+      "id": "farmer-pool",
+      "archetype": "farmer",
+      "namePool": [
+        "Eanric",
+        "Bethan",
+        "Cob",
+        "Mildred",
+        "Dunstan"
+      ],
+      "greetingPool": [
+        {
+          "text": "Morning, traveller. The harvest has been kind this year, thank the Lord."
+        },
+        {
+          "text": "Mind the furrows, if you please. These fields are all we have to feed the village."
+        },
+        {
+          "text": "Aye, it is hard work, but honest. Can I help you with something?"
+        }
+      ],
+      "appearance": {
+        "clothColor": "wheat-tan",
+        "accessory": "straw_hat"
+      }
+    },
+    {
+      "id": "guard-pool",
+      "archetype": "guard",
+      "namePool": [
+        "Gareth",
+        "Edric",
+        "Wilhem",
+        "Osbert",
+        "Bran"
+      ],
+      "greetingPool": [
+        {
+          "text": "Keep moving, traveller. No loitering near the gate."
+        },
+        {
+          "text": "Quiet night, thank the saints. Let's hope it stays that way."
+        },
+        {
+          "text": "You look road-worn. The tavern's that way if you need rest."
+        }
+      ],
+      "appearance": {
+        "clothColor": "iron-grey",
+        "accessory": "spear"
+      }
+    },
+    {
+      "id": "healer-pool",
+      "archetype": "healer",
+      "namePool": [
+        "Miriel",
+        "Leofric",
+        "Ysabel",
+        "Theron",
+        "Anneth"
+      ],
+      "greetingPool": [
+        {
+          "text": "Let me see your wounds, traveller. The herbs will do their work if you hold still."
+        },
+        {
+          "text": "The land provides all the healing one needs. Come, tell me what ails you."
+        },
+        {
+          "text": "You carry weariness in your bones. Rest here a moment and let me tend to you."
+        }
+      ],
+      "appearance": {
+        "clothColor": "sage-green",
+        "accessory": "herb_pouch"
+      }
+    },
+    {
+      "id": "herbalist-pool",
+      "archetype": "herbalist",
+      "namePool": [
+        "Hazel",
+        "Rowan",
+        "Sage",
+        "Primrose",
+        "Bryony"
+      ],
+      "greetingPool": [
+        {
+          "text": "The garden speaks to those who listen. Can I prepare something for you?"
+        },
+        {
+          "text": "Comfrey for wounds, lavender for rest, thyme for courage. What ails you?"
+        },
+        {
+          "text": "Mind where you step — that yarrow took all summer to coax into bloom."
+        }
+      ],
+      "appearance": {
+        "clothColor": "moss-green",
+        "accessory": "herb_basket"
+      }
+    },
+    {
+      "id": "hermit-pool",
+      "archetype": "hermit",
+      "namePool": [
+        "Old Rowan",
+        "The Thorn",
+        "Moss",
+        "Silent Edda",
+        "Ashburn"
+      ],
+      "greetingPool": [
+        {
+          "text": "You have wandered far from the road to find me. State your purpose quickly."
+        },
+        {
+          "text": "The trees have eyes and the stones have ears. I know why you have come."
+        },
+        {
+          "text": "I left the company of men long ago. What could you possibly want of me?"
+        }
+      ],
+      "appearance": {
+        "clothColor": "forest-green",
+        "accessory": "gnarled_staff"
+      }
+    },
+    {
+      "id": "innkeeper-pool",
+      "archetype": "innkeeper",
+      "namePool": [
+        "Mabel",
+        "Godwin",
+        "Hilda",
+        "Barret",
+        "Nan"
+      ],
+      "greetingPool": [
+        {
+          "text": "Welcome, welcome! Rest your feet and warm your belly. Ale or cider?"
+        },
+        {
+          "text": "You look road-weary, friend. I have a bowl of stew and a clean bed waiting."
+        },
+        {
+          "text": "Come in from the cold! Every traveller deserves a warm hearth and honest company."
+        }
+      ],
+      "appearance": {
+        "clothColor": "russet",
+        "accessory": "dish_towel"
+      }
+    },
+    {
+      "id": "jailer-pool",
+      "archetype": "jailer",
+      "namePool": [
+        "Grimshaw",
+        "Barton",
+        "Caddock",
+        "Mord",
+        "Hadley"
+      ],
+      "greetingPool": [
+        {
+          "text": "No visitors without the captain's leave. Move along."
+        },
+        {
+          "text": "These cells hold those who've earned their stay. Don't give me cause to add you."
+        },
+        {
+          "text": "Keys and patience — that's all this job requires. Mostly patience."
+        }
+      ],
+      "appearance": {
+        "clothColor": "dark-brown",
+        "accessory": "key_ring"
+      }
+    },
+    {
+      "id": "knight-pool",
+      "archetype": "knight",
+      "namePool": [
+        "Sir Aldric",
+        "Dame Rowena",
+        "Sir Percival",
+        "Dame Yvaine",
+        "Sir Gareth"
+      ],
+      "greetingPool": [
+        {
+          "text": "State your business, traveller. The road is not safe for the unwary."
+        },
+        {
+          "text": "By my oath, I keep the peace on this stretch. You may pass freely."
+        },
+        {
+          "text": "Hold there. I must know your purpose before you go further along the King's Road."
+        }
+      ],
+      "appearance": {
+        "clothColor": "steel-gray",
+        "accessory": "tabard"
+      }
+    },
+    {
+      "id": "lord-pool",
+      "archetype": "lord",
+      "namePool": [
+        "Aldric",
+        "Pemberton",
+        "Hereward",
+        "Godfrey",
+        "Thurstan"
+      ],
+      "greetingPool": [
+        {
+          "text": "You stand in the presence of the lord of this domain. Speak your piece."
+        },
+        {
+          "text": "These lands are under my protection. I trust you bring no trouble."
+        },
+        {
+          "text": "A traveller on the King's Road. You may rest here, but mind our laws."
+        }
+      ],
+      "appearance": {
+        "clothColor": "royal-burgundy",
+        "accessory": "signet_ring"
+      }
+    },
+    {
+      "id": "merchant-pool",
+      "archetype": "merchant",
+      "namePool": [
+        "Aldous",
+        "Margery",
+        "Tybalt",
+        "Constance",
+        "Reynard"
+      ],
+      "greetingPool": [
+        {
+          "text": "Fine goods from every corner of the realm! Have a look, friend."
+        },
+        {
+          "text": "I deal in quality, not quantity. Tell me what you seek and I shall name a fair price."
+        },
+        {
+          "text": "Business has been slow on the road of late. Perhaps you have coin to spare?"
+        }
+      ],
+      "appearance": {
+        "clothColor": "deep-green",
+        "accessory": "coin_purse"
+      }
+    },
+    {
+      "id": "miller-pool",
+      "archetype": "miller",
+      "namePool": [
+        "Godwin",
+        "Thatcher",
+        "Cob",
+        "Margery",
+        "Piers"
+      ],
+      "greetingPool": [
+        {
+          "text": "The wheel turns and the flour flows. What brings you to the mill?"
+        },
+        {
+          "text": "Careful of the grinding stones, friend. They stop for no one."
+        },
+        {
+          "text": "Grain in, flour out. Simple work, honest living. Need something ground?"
+        }
+      ],
+      "appearance": {
+        "clothColor": "flour-white",
+        "accessory": "dusty_apron"
+      }
+    },
+    {
+      "id": "noble-pool",
+      "archetype": "noble",
+      "namePool": [
+        "Lord Edric",
+        "Lady Isolde",
+        "Lord Mortimer",
+        "Lady Gwendolyn",
+        "Lord Hastings"
+      ],
+      "greetingPool": [
+        {
+          "text": "You stand before a lord of this realm. Speak plainly and waste not my time."
+        },
+        {
+          "text": "Ah, a commoner from the road. I trust you bring news of some importance?"
+        },
+        {
+          "text": "I govern these lands by right and duty. What matter brings you to my hall?"
+        }
+      ],
+      "appearance": {
+        "clothColor": "royal-purple",
+        "accessory": "signet_ring"
+      }
+    },
+    {
+      "id": "pilgrim-pool",
+      "archetype": "pilgrim",
+      "namePool": [
+        "Brother Simeon",
+        "Sister Agnes",
+        "Pilgrim Hector",
+        "Sister Colette",
+        "Brother Aldwyn"
+      ],
+      "greetingPool": [
+        {
+          "text": "Blessings upon you, fellow traveller. I walk this road in search of the holy spring — they say its waters carry the grace of saints long departed."
+        },
+        {
+          "text": "The road to the shrine is long, but each step is a prayer. Will you walk a while with me?"
+        },
+        {
+          "text": "I have left hearth and home to seek what cannot be found within four walls. The sacred places call to those who listen."
+        },
+        {
+          "text": "A kind face on a pilgrim road is worth more than silver. God keep you, friend."
+        }
+      ],
+      "appearance": {
+        "clothColor": "undyed_linen",
+        "accessory": "pilgrim_badge"
+      }
+    },
+    {
+      "id": "priest-pool",
+      "archetype": "priest",
+      "namePool": [
+        "Father Dunstan",
+        "Brother Ailred",
+        "Sister Winifred",
+        "Father Ambrose",
+        "Brother Simeon"
+      ],
+      "greetingPool": [
+        {
+          "text": "Peace be upon you, child. The chapel doors are always open to the weary."
+        },
+        {
+          "text": "The Lord watches over all who walk the road in faith. How may I counsel you?"
+        },
+        {
+          "text": "Come, rest your spirit here. The world beyond these walls is full of trials."
+        }
+      ],
+      "appearance": {
+        "clothColor": "brown",
+        "accessory": "prayer_beads"
+      }
+    },
+    {
+      "id": "scholar-pool",
+      "archetype": "scholar",
+      "namePool": [
+        "Aldhelm",
+        "Beatrix",
+        "Cuthbert",
+        "Elowen",
+        "Phineas"
+      ],
+      "greetingPool": [
+        {
+          "text": "Ah, a visitor! Do forgive the mess — these manuscripts will not catalogue themselves."
+        },
+        {
+          "text": "Knowledge is the greatest treasure on the King's Road. What would you learn?"
+        },
+        {
+          "text": "I have read of places you have surely walked. Come, share your observations with me."
+        }
+      ],
+      "appearance": {
+        "clothColor": "ink-blue",
+        "accessory": "reading_spectacles"
+      }
+    },
+    {
+      "id": "stablehand-pool",
+      "archetype": "stablehand",
+      "namePool": [
+        "Robin",
+        "Ned",
+        "Tilly",
+        "Hodge",
+        "Elspeth"
+      ],
+      "greetingPool": [
+        {
+          "text": "Easy there, the horses spook at sudden movements. Can I help you?"
+        },
+        {
+          "text": "If you need a mount rested or fed, you've come to the right place."
+        },
+        {
+          "text": "The mare in the third stall is the finest beast on the road. Just looking costs nothing."
+        }
+      ],
+      "appearance": {
+        "clothColor": "hay-gold",
+        "accessory": "riding_crop"
+      }
+    },
+    {
+      "id": "wanderer-pool",
+      "archetype": "wanderer",
+      "namePool": [
+        "Tam",
+        "Lirael",
+        "Dusty Jack",
+        "Orla",
+        "Fenn"
+      ],
+      "greetingPool": [
+        {
+          "text": "The road has been long but the company is welcome. Where are you headed, friend?"
+        },
+        {
+          "text": "I have walked this road three times over and still it surprises me. Stay a while?"
+        },
+        {
+          "text": "No home but the sky above and the dirt below. That suits me well enough."
+        }
+      ],
+      "appearance": {
+        "clothColor": "dusty-brown",
+        "accessory": "walking_stick"
+      }
+    },
+    {
+      "id": "watchman-pool",
+      "archetype": "watchman",
+      "namePool": [
+        "Aldhelm",
+        "Dunstan",
+        "Sigric",
+        "Wulfnoth",
+        "Leofstan"
+      ],
+      "greetingPool": [
+        {
+          "text": "Nothing moves on the road without my knowing. State your purpose."
+        },
+        {
+          "text": "I've watched from this tower since dawn. The road is clear, for now."
+        },
+        {
+          "text": "Sharp eyes keep folk safe. If you've seen anything amiss, tell me now."
+        }
+      ],
+      "appearance": {
+        "clothColor": "forest-green",
+        "accessory": "longbow"
+      }
+    }
+  ],
+  "features": [
+    {
+      "id": "abandoned_camp",
+      "tier": "minor",
+      "name": "Abandoned Camp",
+      "description": "A circle of blackened stones marks a cold campfire, surrounded by trampled grass and a torn canvas lean-to.",
+      "visualType": "abandoned_camp",
+      "interactable": true,
+      "dialogueOnInteract": "The ashes are days old but still faintly warm. A scratched message on a flat stone reads: 'Beware the road past nightfall. They walk without lanterns.'"
+    },
+    {
+      "id": "ancient_oak",
+      "tier": "ambient",
+      "name": "Ancient Oak",
+      "description": "A gnarled oak stands sentinel beside the road, its canopy so vast it casts the path in cool, dappled shadow.",
+      "visualType": "ancient_oak",
+      "interactable": false
+    },
+    {
+      "id": "ancient_ruins",
+      "tier": "major",
+      "name": "Ancient Ruins",
+      "description": "Crumbling stone archways rise from the earth, half-swallowed by ivy and time. A dark staircase descends into the hillside beneath the largest arch.",
+      "visualType": "ruined_archway_dungeon_entrance",
+      "interactable": true,
+      "dialogueOnInteract": "You descend the worn steps into cool darkness. The air smells of damp stone and forgotten centuries. Carvings on the walls depict a procession of knights bearing a radiant vessel — the Grail, perhaps. The passage continues deeper than your torchlight can reach."
+    },
+    {
+      "id": "berry_bush",
+      "tier": "ambient",
+      "name": "Berry Bush",
+      "description": "A sprawling hedgerow heavy with dark berries lines the roadside, the fruit staining the ground purple beneath it.",
+      "visualType": "berry_bush",
+      "interactable": false
+    },
+    {
+      "id": "bird_nest",
+      "tier": "ambient",
+      "name": "Bird Nest",
+      "description": "A woven nest of twigs and moss sits tucked in a low branch, its occupants flitting away with sharp chirps at the sound of footsteps.",
+      "visualType": "bird_nest",
+      "interactable": false
+    },
+    {
+      "id": "crossroads_sign",
+      "tier": "minor",
+      "name": "Crossroads Sign",
+      "description": "A leaning wooden post bears three pointing arms, each painted with a town name in fading letters.",
+      "visualType": "crossroads_sign",
+      "interactable": true,
+      "dialogueOnInteract": "One arm points east to a town you have never heard of. Another has been snapped off and lies in the weeds. The remaining sign reads 'King's Road — onward' in a steady hand."
+    },
+    {
+      "id": "dragon_bones",
+      "tier": "major",
+      "name": "Dragon Bones",
+      "description": "The bleached skeleton of a great wyrm sprawls across a clearing, its ribcage arching high enough to walk beneath. Wildflowers grow through the eye sockets.",
+      "visualType": "dragon_skeleton_monument",
+      "interactable": true,
+      "dialogueOnInteract": "You press your hand against the massive skull and feel a vibration deep in the bone. Visions flicker — fire across the sky, a knight with a shining lance, the beast's final roar echoing through these hills. An inscription on a fang reads: 'Here fell Cyndrath, last of the old fire.'"
+    },
+    {
+      "id": "enchanted_grove",
+      "tier": "major",
+      "name": "Enchanted Grove",
+      "description": "A circle of silver-barked trees glows with pale inner light. The grass within is impossibly green, and the air hums with a sound just below hearing.",
+      "visualType": "glowing_tree_circle_healing",
+      "interactable": true,
+      "dialogueOnInteract": "You step into the grove and feel every ache and weariness lift from your body like morning mist. The trees seem to lean inward, sheltering you. A voice, neither male nor female, whispers through the leaves: 'Rest, pilgrim. The road is long, but you are not forgotten.'"
+    },
+    {
+      "id": "fairy_circle",
+      "tier": "minor",
+      "name": "Fairy Circle",
+      "description": "A perfect ring of pale mushrooms grows in the shade of an elm, the grass within unnaturally green and soft.",
+      "visualType": "fairy_circle",
+      "interactable": true,
+      "dialogueOnInteract": "You step inside the ring and the air hums with a faint melody just below hearing. The light seems to bend. When you step out again, the sun has moved — though it felt like only a moment."
+    },
+    {
+      "id": "fallen_log",
+      "tier": "ambient",
+      "name": "Fallen Log",
+      "description": "A great trunk lies half-sunk in ferns and ivy, its bark soft with age, offering an inviting seat for weary travellers.",
+      "visualType": "fallen_log",
+      "interactable": false
+    },
+    {
+      "id": "fox_den",
+      "tier": "ambient",
+      "name": "Fox Den",
+      "description": "A small burrow beneath a mossy bank marks the entrance to a fox's earth, tufts of russet fur caught on the brambles nearby.",
+      "visualType": "fox_den",
+      "interactable": false
+    },
+    {
+      "id": "hermit_cave",
+      "tier": "major",
+      "name": "Hermit's Cave",
+      "description": "A shallow cave mouth gapes in the hillside, screened by hanging roots. A thin trail of smoke curls from within, and crude wind-charms dangle from the entrance.",
+      "visualType": "cave_dwelling_with_smoke",
+      "interactable": true,
+      "dialogueOnInteract": "A ragged figure emerges from the shadows, eyes bright with unsettling clarity. 'Another seeker on the road,' the hermit rasps. 'I once walked your path. The Grail does not reward the bold — it rewards the true. Remember that when the road asks you to choose.'"
+    },
+    {
+      "id": "hunter_blind",
+      "tier": "minor",
+      "name": "Hunter's Blind",
+      "description": "Branches woven between two trees form a rough shelter, the ground beneath scattered with feathers and snare cord.",
+      "visualType": "hunter_blind",
+      "interactable": true,
+      "dialogueOnInteract": "Inside the blind you find dried venison wrapped in cloth and a handful of iron arrowheads. The hunter will return — but the offering feels deliberate, left for a fellow traveller."
+    },
+    {
+      "id": "milestone_marker",
+      "tier": "minor",
+      "name": "Milestone Marker",
+      "description": "A weathered stone post stands at the roadside, its chiselled numerals marking the leagues to distant towns.",
+      "visualType": "milestone_marker",
+      "interactable": true,
+      "dialogueOnInteract": "You trace the carved letters with your finger. The distances are given in old leagues, a measure no longer used. Someone has added a crude arrow and the word 'HOPE' in charcoal."
+    },
+    {
+      "id": "mushroom_ring",
+      "tier": "ambient",
+      "name": "Mushroom Ring",
+      "description": "A perfect circle of pale toadstools marks the grass, the kind old wives whisper was trampled flat by dancing fae.",
+      "visualType": "mushroom_ring",
+      "interactable": false
+    },
+    {
+      "id": "old_well",
+      "tier": "minor",
+      "name": "Old Well",
+      "description": "A stone well ringed with moss sits beside the path, its rope frayed and its wooden bucket grey with age.",
+      "visualType": "old_well",
+      "interactable": true,
+      "dialogueOnInteract": "You lower the bucket and hear it splash far below. The water you draw is icy cold and sweet. Coins glint at the bottom — wishes cast by travellers long gone."
+    },
+    {
+      "id": "ruined_farmstead",
+      "tier": "minor",
+      "name": "Ruined Farmstead",
+      "description": "Crumbling stone walls outline what was once a cottage, its hearth open to the sky and brambles climbing the doorframe.",
+      "visualType": "ruined_farmstead",
+      "interactable": true,
+      "dialogueOnInteract": "Among the rubble you find a child's wooden toy, bleached by rain and sun. The land here was good once. Whatever drove the family away left no other trace."
+    },
+    {
+      "id": "standing_stone",
+      "tier": "ambient",
+      "name": "Standing Stone",
+      "description": "A weathered monolith rises from the grass, its surface traced with spirals so old they seem carved by the wind itself.",
+      "visualType": "standing_stone",
+      "interactable": false
+    },
+    {
+      "id": "stone_bridge",
+      "tier": "minor",
+      "name": "Stone Bridge",
+      "description": "A mossy stone bridge arches over a chattering brook, its keystone carved with a faded mason's mark.",
+      "visualType": "stone_bridge",
+      "interactable": true,
+      "dialogueOnInteract": "You lean over the parapet and peer into the clear water below. A trout darts beneath the shadow of the arch. Someone has scratched initials into the worn stone railing."
+    },
+    {
+      "id": "stream_crossing",
+      "tier": "ambient",
+      "name": "Stream Crossing",
+      "description": "A shallow brook cuts across the road over a bed of smooth stones, its water clear enough to count the pebbles on the bottom.",
+      "visualType": "stream_crossing",
+      "interactable": false
+    },
+    {
+      "id": "watchtower_ruin",
+      "tier": "major",
+      "name": "Ruined Watchtower",
+      "description": "A crumbling stone tower stands on the hilltop, its upper floors collapsed but its spiral staircase still climbable. Signal-fire scars blacken the parapet.",
+      "visualType": "stone_tower_ruin_climbable",
+      "interactable": true,
+      "dialogueOnInteract": "You climb the cracked steps to the parapet and the world opens before you. Miles of rolling countryside stretch in every direction — the road a pale ribbon winding through green and gold. From here you can see the next town's smoke and, far distant, the spire of Grailsend catching the sun."
+    },
+    {
+      "id": "wayside_shrine",
+      "tier": "minor",
+      "name": "Wayside Shrine",
+      "description": "A small stone alcove shelters a carved figure of a saint, fresh wildflowers laid at its feet by some faithful hand.",
+      "visualType": "wayside_shrine",
+      "interactable": true,
+      "dialogueOnInteract": "You kneel before the shrine and feel a gentle warmth spread through your limbs. The carved saint seems to smile, and for a moment the road ahead feels less lonesome."
+    },
+    {
+      "id": "weather_vane",
+      "tier": "minor",
+      "name": "Weather Vane",
+      "description": "An iron rooster atop a tall wooden pole creaks in the breeze, its arrow spinning lazily above the treetops.",
+      "visualType": "weather_vane",
+      "interactable": true,
+      "dialogueOnInteract": "The vane points steadily westward despite the shifting wind. Old wives say a fixed vane means a storm is gathering beyond the hills. The sky does look darker that way."
+    },
+    {
+      "id": "wildflower_patch",
+      "tier": "ambient",
+      "name": "Wildflower Patch",
+      "description": "A sun-dappled carpet of cornflowers and poppies spills across the roadside, humming with the drowsy murmur of bees.",
+      "visualType": "wildflower_patch",
+      "interactable": false
+    },
+    {
+      "id": "wind_chimes",
+      "tier": "ambient",
+      "name": "Wind Chimes",
+      "description": "Lengths of hollow reed and bone dangle from a crooked post, tinkling a wandering melody whenever the breeze stirs.",
+      "visualType": "wind_chimes",
+      "interactable": false
+    }
+  ],
+  "items": [
+    {
+      "id": "aldrics_hammer",
+      "name": "Aldric's Hammer",
+      "description": "The prized hammer of Aldric the blacksmith, lost during a bandit raid on Ashford. Return it to him to complete the quest 'The Smith's Loss' (quest: side-smiths-loss).",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "antidote",
+      "name": "Antidote",
+      "description": "A pungent green elixir compounded from charcoal and wild garlic. It purges venom and halts the spread of poison.",
+      "type": "consumable",
+      "effect": {
+        "stat": "poisonResist",
+        "value": 100,
+        "duration": 30
+      },
+      "stackable": true
+    },
+    {
+      "id": "ashwick_ledger",
+      "name": "Ashwick Ledger",
+      "description": "A leather-bound ledger filled with Lord Ashwick's private accounts. Columns of figures and cryptic annotations hint at dealings best kept from public scrutiny.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "assembled-map",
+      "name": "Assembled Pilgrim's Map",
+      "description": "The complete map, painstakingly assembled from scattered fragments. Every bend of the King's Road is laid bare, from Ashford's gentle hills to the hallowed gates of Grailsend.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "boglantern",
+      "name": "Boglantern",
+      "description": "A luminous bog plant whose pale golden glow flickers softly above the marshwater. Travellers sometimes mistake its light for a distant lantern on the moor.",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "grail-covenant",
+      "name": "Holy Grail Covenant",
+      "description": "A radiant scroll inscribed with the sacred covenant of the Grail temple. Golden lettering gleams upon ivory vellum, its words a promise sealed in faith and light.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "grail_key",
+      "name": "Key of the Grail",
+      "description": "A slender iron key wrought in the shape of a chalice. Forged in ages past, it alone can unseal the inner sanctum of the Grailsend temple.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "grail_treatise",
+      "name": "Treatise on the Grail",
+      "description": "An ancient scholarly treatise penned on heavy vellum, its margins crowded with annotations. It recounts the history and mysteries of the Grail in measured, reverent prose.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "grailbloom",
+      "name": "Grailbloom",
+      "description": "A rare and wondrous flower found only in the hallowed meadows near the Grail temple. Its petals glow with a warm, honeyed light at dusk.",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "healing_salve",
+      "name": "Healing Salve",
+      "description": "A fragrant herbal salve blended from comfrey, yarrow, and wild honey. When spread upon a wound, it soothes the sting and hastens mending.",
+      "type": "consumable",
+      "effect": {
+        "stat": "health",
+        "value": 15
+      },
+      "stackable": true
+    },
+    {
+      "id": "healing_staff",
+      "name": "Healing Staff",
+      "description": "A willow staff blessed at Pilgrim's Rest. Its warm glow mends wounds slowly, restoring vitality over time.",
+      "type": "equipment",
+      "effect": {
+        "stat": "healPower",
+        "value": 6
+      },
+      "stackable": false
+    },
+    {
+      "id": "health_potion",
+      "name": "Health Potion",
+      "description": "A ruby-red draught brewed from meadowsweet and blessed water. It mends flesh and eases pain within moments.",
+      "type": "consumable",
+      "effect": {
+        "stat": "health",
+        "value": 25,
+        "duration": 0
+      },
+      "stackable": true
+    },
+    {
+      "id": "iron_sword",
+      "name": "Iron Sword",
+      "description": "A sturdy blade forged by the smiths of Ashford. Its edge holds true against common foes along the King's Road.",
+      "type": "equipment",
+      "effect": {
+        "stat": "attack",
+        "value": 5
+      },
+      "stackable": false
+    },
+    {
+      "id": "leather_armor",
+      "name": "Leather Armor",
+      "description": "Tanned hide shaped into a breastplate and pauldrons. It offers modest protection without hindering movement.",
+      "type": "equipment",
+      "effect": {
+        "stat": "defense",
+        "value": 4
+      },
+      "stackable": false
+    },
+    {
+      "id": "lost_hymnal",
+      "name": "Lost Hymnal",
+      "description": "An illuminated book of sacred hymns that went missing from the chapel at Pilgrim's Rest. Brother Anselm seeks its return for the quest 'Songs of the Faithful' (quest: side-songs-faithful).",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "map-fragment-01",
+      "name": "Ashford Map Fragment",
+      "description": "A tattered piece of vellum bearing faded ink lines that trace the first leg of the pilgrim road from Ashford. The edges are softened by age and travel.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map-fragment-01b",
+      "name": "Millbrook Map Fragment",
+      "description": "A secondary fragment of parchment discovered in Millbrook, its careful annotations revealing an alternate route through the rolling meadows beyond the village.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map-fragment-02",
+      "name": "Thornfield Map Fragment",
+      "description": "A worn map fragment recovered from the Thornfield Ruins. Delicate charcoal markings chart the winding path through ancient stonework and overgrown lanes.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map-fragment-03",
+      "name": "Ravensgate Map Fragment",
+      "description": "A creased parchment bearing the Ravensgate cartographer's careful hand. It depicts the final stretches of the road where the land grows wild and sacred.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map-fragment-ashford",
+      "name": "Cartographer's Map: Ashford",
+      "description": "A finely drafted map piece from the Ashford cartographer's workshop. Warm sepia lines trace the familiar lanes, orchards, and meadow paths surrounding the village.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map-fragment-grailsend",
+      "name": "Cartographer's Map: Grailsend",
+      "description": "The final piece of the cartographer's grand survey. It depicts the sacred vale of Grailsend, where the road ends beneath the shadow of the Grail temple's spire.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map-fragment-monastery",
+      "name": "Cartographer's Map: Monastery",
+      "description": "A reverent map piece drawn within the monastery scriptorium. Cloistered gardens, pilgrim trails, and the abbey's silhouette are rendered in a careful monastic hand.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map-fragment-thornfield",
+      "name": "Cartographer's Map: Thornfield",
+      "description": "A cartographer's rendering of the Thornfield region, its ink still crisp. Hedgerows, standing stones, and the outlines of ruined walls are marked with scholarly precision.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map_fragment_1",
+      "name": "Map Fragment — Ashford",
+      "description": "A weathered parchment bearing the first section of an ancient map. It depicts the lands around Ashford and the road leading east toward the ruins.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map_fragment_2",
+      "name": "Map Fragment — Thornfield",
+      "description": "A crumbling vellum sheet showing the middle stretch of the King's Road. Faded ink traces the path from Thornfield Ruins through Millbrook toward Ravensgate.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "map_fragment_3",
+      "name": "Map Fragment — Grailsend",
+      "description": "The final piece of the ancient map, its edges gilded with faded gold leaf. It reveals the hidden path beyond Pilgrim's Rest to the temple at Grailsend.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "monastery_ink_stamp",
+      "name": "Monastery Ink Stamp",
+      "description": "A carved wooden stamp bearing the monastery's seal: a cross entwined with ivy. Pressed into warm wax or damp ink, it marks documents with unquestionable authority.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "old_lords_signet",
+      "name": "Lord Ashwick's Signet Ring",
+      "description": "A heavy gold ring bearing the Ashwick coat of arms: a stag beneath an oak. Its worn edges speak of years upon a lord's hand and the weight of noble obligation.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "peasant-disguise",
+      "name": "Peasant Disguise",
+      "description": "A bundle of rough-spun clothing: a patched tunic, muddy breeches, and a battered straw hat. Enough to pass unnoticed among common folk at market or on the road.",
+      "type": "equipment",
+      "stackable": false
+    },
+    {
+      "id": "pilgrim_medallion",
+      "name": "Pilgrim's Medallion",
+      "description": "A bronze medallion stamped with the crossed-keys emblem of the old pilgrimage route. It grants passage through sacred gates along the King's Road.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "purified-ring",
+      "name": "Purified Ring",
+      "description": "A silver ring once bound by a dark enchantment, now cleansed through prayer and blessed water. It gleams with a quiet, steadfast light that wards the wearer from harm.",
+      "type": "equipment",
+      "effect": {
+        "stat": "defense",
+        "value": 3
+      },
+      "stackable": false
+    },
+    {
+      "id": "rare_herb",
+      "name": "Moonpetal Herb",
+      "description": "A luminous silver-leafed herb that blooms only under a full moon. Sister Maeve requires it to brew a healing salve for the quest 'The Healer's Need' (quest: side-healers-need).",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "ration",
+      "name": "Ration",
+      "description": "Salted meat, hard cheese, and twice-baked bread wrapped in cloth. Enough to sustain a pilgrim for a day's march.",
+      "type": "consumable",
+      "effect": {
+        "stat": "hunger",
+        "value": 30,
+        "duration": 120
+      },
+      "stackable": true
+    },
+    {
+      "id": "resistance_token",
+      "name": "Resistance Token",
+      "description": "A small bronze coin stamped with a clenched fist and a hidden motto. Those who carry it are recognized as friends of the underground resistance.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "secret_recipe",
+      "name": "Secret Recipe",
+      "description": "A scroll of vellum bearing Martha's grandmother's recipe for honeyed mead, stolen by a rival innkeeper. Needed for the quest 'A Taste of Home' (quest: side-taste-of-home).",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "shadowmoss",
+      "name": "Shadowmoss",
+      "description": "A dark, velvety moss that thrives in the deepest shade of ancient groves. Its cool touch carries a faint earthy fragrance cherished by apothecaries.",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "silverleaf",
+      "name": "Silverleaf",
+      "description": "A rare herb whose slender leaves shimmer like polished silver in the sunlight. It is prized by healers for its gentle restorative properties.",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "stamina_draught",
+      "name": "Stamina Draught",
+      "description": "A bitter amber tonic that quickens the blood. Grants a surge of endurance for a short while after drinking.",
+      "type": "consumable",
+      "effect": {
+        "stat": "stamina",
+        "value": 15,
+        "duration": 60
+      },
+      "stackable": true
+    },
+    {
+      "id": "stolen_manuscript",
+      "name": "Stolen Manuscript",
+      "description": "A rare scholarly treatise on the history of the Grail, taken from the Ravensgate library by Lord Ashwick's men. Prisoner Silas needs it for the quest 'Forbidden Knowledge' (quest: side-forbidden-knowledge).",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "sturdy-branch",
+      "name": "Sturdy Oak Branch",
+      "description": "A thick, gnarled branch of English oak, smoothed by weather and strong enough to serve as a walking staff or, in need, a makeshift weapon.",
+      "type": "equipment",
+      "effect": {
+        "stat": "attack",
+        "value": 2
+      },
+      "stackable": false
+    },
+    {
+      "id": "three-trials-seal",
+      "name": "Seal of the Three Trials",
+      "description": "A heavy bronze seal bearing three interlocking symbols — an eye for Wisdom, hands for Mercy, and a flame for Sacrifice. It radiates warmth and unlocks the doors to the Guardian's Arena.",
+      "type": "key_item",
+      "stackable": false
+    },
+    {
+      "id": "torch",
+      "name": "Torch",
+      "description": "A pitch-soaked brand that casts a warm circle of light. It keeps the dark at bay and frightens lesser creatures.",
+      "type": "consumable",
+      "effect": {
+        "stat": "visibility",
+        "value": 10,
+        "duration": 180
+      },
+      "stackable": true
+    },
+    {
+      "id": "travel_cloak",
+      "name": "Travel Cloak",
+      "description": "A thick wool cloak dyed forest green. It wards off chill and bramble, letting the wearer move swiftly through the wilds.",
+      "type": "equipment",
+      "effect": {
+        "stat": "speed",
+        "value": 2
+      },
+      "stackable": false
+    },
+    {
+      "id": "wild_comfrey",
+      "name": "Wild Comfrey",
+      "description": "Broad, hairy leaves and drooping bell-shaped flowers of wild comfrey. Crushed into a poultice, it knits bruised flesh and mends aching bones.",
+      "type": "quest_item",
+      "stackable": true
+    },
+    {
+      "id": "wild_thyme",
+      "name": "Wild Thyme",
+      "description": "Sprigs of fragrant wild thyme plucked from sun-warmed limestone. Its sweet, earthy scent recalls summer meadows and the hum of bees among the clover.",
+      "type": "quest_item",
+      "stackable": true
+    },
+    {
+      "id": "wild_yarrow",
+      "name": "Wild Yarrow",
+      "description": "A cluster of feathery white yarrow blossoms gathered from the roadside. Herbalists value it for staunching wounds and easing fevers.",
+      "type": "quest_item",
+      "stackable": true
+    },
+    {
+      "id": "windcrown",
+      "name": "Windcrown",
+      "description": "A hardy herb crowned with tiny white blossoms that grows only on windswept hilltops. Its leaves rustle with a faint, musical whisper even when the air is still.",
+      "type": "quest_item",
+      "stackable": false
+    },
+    {
+      "id": "wooden_shield",
+      "name": "Wooden Shield",
+      "description": "An oak shield banded with iron. Rough-hewn but reliable, it bears the dents of many a traveller before you.",
+      "type": "equipment",
+      "effect": {
+        "stat": "defense",
+        "value": 3
+      },
+      "stackable": false
+    }
+  ],
+  "encounters": [
+    {
+      "id": "ashford-wolves-at-the-gate",
+      "name": "Wolves at the Gate",
+      "type": "combat",
+      "difficulty": 2,
+      "description": "A pair of lean wolves prowl before Ashford's timber gate, their silver pelts bristling in the morning chill. The village watch calls for aid — the beasts have grown bold with hunger, and the lambing pens lie just beyond the threshold.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.7
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "The wolves scatter into the fields, dragging a bleating lamb with them. The villagers eye you with quiet disappointment as you nurse a bitten arm."
+    },
+    {
+      "id": "bandit_ambush",
+      "name": "Bandit Ambush",
+      "type": "combat",
+      "difficulty": 3,
+      "description": "A ragged band of highwaymen springs from the undergrowth, blades drawn and eyes wild with desperation. Their leader barks a demand for coin, but the set of his jaw says he means to take more than gold.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.8
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.6
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "The bandits strip you of supplies and leave you bruised on the roadside. You lose a day recovering and must press on with lighter pockets."
+    },
+    {
+      "id": "bridge-troll-fight",
+      "name": "The Bridge Troll",
+      "type": "combat",
+      "difficulty": 4,
+      "description": "A massive shape hauls itself from beneath the old stone bridge, water streaming from mossy shoulders. The troll blinks in the sunlight and bares a mouthful of blunt teeth, its voice a wet rumble demanding tribute — or a fight.",
+      "rewards": [
+        {
+          "itemId": "wooden_shield",
+          "chance": 0.3
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.5
+        },
+        {
+          "itemId": "ration",
+          "chance": 0.7
+        }
+      ],
+      "failureConsequence": "The troll hurls you into the river with a contemptuous swat. You wash up downstream, bruised and soggy, and must find another crossing."
+    },
+    {
+      "id": "cursed-ring-shade",
+      "name": "Shade of the Cursed Ring",
+      "type": "combat",
+      "difficulty": 5,
+      "description": "The tarnished ring pulses with cold light, and a shadow peels itself from the ground — the shade of whoever last wore the cursed band. It wears a face twisted between sorrow and rage, and its dark blade cuts without sound.",
+      "rewards": [
+        {
+          "itemId": "health_potion",
+          "chance": 0.6
+        },
+        {
+          "itemId": "antidote",
+          "chance": 0.4
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.4
+        }
+      ],
+      "failureConsequence": "The shade's icy touch drains your strength and leaves you trembling on the roadside. The cursed ring rolls away into the grass, waiting for its next victim."
+    },
+    {
+      "id": "deserter-struggle",
+      "name": "The Desperate Deserter",
+      "type": "combat",
+      "difficulty": 3,
+      "description": "A wild-eyed soldier in torn livery stumbles from the hedgerow, sword shaking in his fist. He has fled his lord's levy and fears pursuit more than death. He demands your cloak and provisions, too frightened to parley, too desperate to back down.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.4
+        },
+        {
+          "itemId": "ration",
+          "chance": 0.8
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.5
+        }
+      ],
+      "failureConsequence": "The deserter lands a lucky blow and snatches your pack before bolting into the woods. You are left with a bruised jaw and a lighter load."
+    },
+    {
+      "id": "dragon_lair",
+      "name": "Dragon Lair",
+      "type": "combat",
+      "difficulty": 10,
+      "description": "The mountain opens into a vast cavern where gold and bone lie in equal measure. Ancient beyond reckoning, the dragon uncurls from its hoard with terrible grace, scales like hammered bronze catching the glow of its own inner fire. The air itself bows before its presence.",
+      "rewards": [
+        {
+          "itemId": "healing_staff",
+          "chance": 0.6
+        },
+        {
+          "itemId": "travel_cloak",
+          "chance": 0.5
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 1
+        },
+        {
+          "itemId": "iron_sword",
+          "chance": 0.4
+        },
+        {
+          "itemId": "pilgrim_medallion",
+          "chance": 0.2
+        }
+      ],
+      "failureConsequence": "Dragon fire sears the cavern walls as you scramble for the exit. You escape with your life but little else, bearing burns that mark you as one who dared challenge a wyrm and failed."
+    },
+    {
+      "id": "grailsend-final-ward",
+      "name": "The Final Ward",
+      "type": "combat",
+      "difficulty": 9,
+      "description": "The air itself resists you as you approach the Grail's resting place. A lattice of golden light coalesces into a seraph of living flame, its wings filling the vaulted chamber. It does not speak — it simply raises a hand, and the world narrows to a single, searing test of will and steel.",
+      "rewards": [
+        {
+          "itemId": "grail_key",
+          "chance": 0.5
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.9
+        },
+        {
+          "itemId": "healing_staff",
+          "chance": 0.3
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.7
+        }
+      ],
+      "failureConsequence": "The seraph's radiance overwhelms you, and you are borne gently but irresistibly back through the temple halls. You awake outside, unharmed but deeply shaken, the Grail still beyond your grasp."
+    },
+    {
+      "id": "grailsend-guardian-battle",
+      "name": "The Temple Guardian",
+      "type": "combat",
+      "difficulty": 8,
+      "description": "A towering figure of burnished bronze steps from the altar niche, its eyes blazing with golden fire. The Guardian of the Grail Temple raises a sword wreathed in holy light and speaks a single word: Prove. The flagstones tremble beneath your feet.",
+      "rewards": [
+        {
+          "itemId": "healing_staff",
+          "chance": 0.3
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.8
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.6
+        },
+        {
+          "itemId": "pilgrim_medallion",
+          "chance": 0.4
+        }
+      ],
+      "failureConsequence": "The Guardian's blazing sword sweeps you from the nave. You land in the courtyard, humbled and aching, the temple doors sealed until you find the strength to try again."
+    },
+    {
+      "id": "grailsend-temple-sentinels",
+      "name": "Sentinels of the Inner Sanctum",
+      "type": "combat",
+      "difficulty": 7,
+      "description": "Twin suits of armour flank the passage to the inner sanctum, their visors dark and empty. As you step between them, they stir to life with a groan of ancient iron, drawing swords that have not tasted air in centuries. They move in perfect, silent unison.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.5
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.7
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.5
+        }
+      ],
+      "failureConsequence": "The sentinels drive you back with relentless precision, sealing the passage with crossed blades. The inner sanctum remains beyond your reach."
+    },
+    {
+      "id": "millbrook-river-bandits",
+      "name": "River Bandits at the Mill Crossing",
+      "type": "combat",
+      "difficulty": 3,
+      "description": "Three rough men lounge on the mossy stones of Millbrook's river crossing, toll-collectors of their own devising. The mill wheel turns lazily behind them as their leader flicks a knife between his fingers and grins.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.3
+        },
+        {
+          "itemId": "ration",
+          "chance": 0.8
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.5
+        }
+      ],
+      "failureConsequence": "The bandits relieve you of your supplies and shove you into the shallows. You drag yourself onto the far bank, soaked and lighter of purse."
+    },
+    {
+      "id": "ravensgate-gate-assault",
+      "name": "Storming the Gate of Ravensgate",
+      "type": "combat",
+      "difficulty": 6,
+      "description": "Ravensgate's iron-banded gate looms overhead, manned by men-at-arms loyal to Lord Ashwick's steward. Arrows whistle from the murder-holes and the portcullis rattles on its chains. To pass, you must fight through the gatehouse or fall trying.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.5
+        },
+        {
+          "itemId": "leather_armor",
+          "chance": 0.3
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.7
+        }
+      ],
+      "failureConsequence": "The garrison repels your assault and bars the gate. You retreat under a hail of stones, nursing bruises and a wounded pride."
+    },
+    {
+      "id": "ravensgate-manor-battle",
+      "name": "Battle in Ashwick Manor",
+      "type": "combat",
+      "difficulty": 7,
+      "description": "The great hall of Ashwick Manor rings with steel as the steward's household guard closes ranks around the dais. Tapestries billow in the draught from shattered windows, and candlelight throws wild shadows across the flagstones. This is the heart of Ravensgate's power.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.6
+        },
+        {
+          "itemId": "leather_armor",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.7
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.5
+        }
+      ],
+      "failureConsequence": "The guards overwhelm you and drag you before the steward. You are cast from the manor with a warning that the next trespass will end less gently."
+    },
+    {
+      "id": "roadside-bandit-ambush",
+      "name": "Roadside Bandit Ambush",
+      "type": "combat",
+      "difficulty": 3,
+      "description": "A fallen oak blocks the King's Road, and the silence that follows is too perfect. Figures rise from the ditches on either side — masked men with cudgels and short bows, arranged with the practised ease of those who have robbed this stretch before.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.7
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.6
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "The bandits bind your hands and take everything of value before vanishing into the bracken. A passing carter frees you an hour later, but your supplies are gone."
+    },
+    {
+      "id": "ruins-guardian-spectral-warden",
+      "name": "Spectral Warden of the Ruins",
+      "type": "combat",
+      "difficulty": 6,
+      "description": "A translucent figure in tarnished armour drifts through the broken hall, its sword trailing wisps of blue flame. The warden's voice echoes like wind through a bell tower — it speaks of oaths unbroken and trespassers unwelcome.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.5
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.6
+        },
+        {
+          "itemId": "pilgrim_medallion",
+          "chance": 0.2
+        }
+      ],
+      "failureConsequence": "The warden's spectral blade passes through your guard and chills you to the marrow. You flee the ruins shivering, unable to return until the cold leaves your bones."
+    },
+    {
+      "id": "ruins-guardian-stone-golem",
+      "name": "Stone Golem of Thornfield",
+      "type": "combat",
+      "difficulty": 5,
+      "description": "The rubble shifts and groans as a figure of mortared stone rises from the ruins, moss-bearded and ancient. Its hollow eyes flare with pale light, and it hefts a fist the size of an anvil. The builders of Thornfield set this guardian well.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.6
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.4
+        }
+      ],
+      "failureConsequence": "The golem's stone fist catches you square and sends you tumbling through the archway. You wake among the brambles outside the ruins, barred from entry."
+    },
+    {
+      "id": "skeleton_patrol",
+      "name": "Skeleton Patrol",
+      "type": "combat",
+      "difficulty": 5,
+      "description": "The clatter of bone on stone echoes across the old battleground. A patrol of skeletal warriors marches in grim formation, rusted blades still clutched in fleshless hands, bound to an oath they swore in life and cannot break in death.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.5
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.4
+        },
+        {
+          "itemId": "wooden_shield",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "The undead patrol overwhelms you with tireless, mechanical strikes. You flee into the night, your shield arm numb and your courage badly shaken."
+    },
+    {
+      "id": "spider_nest",
+      "name": "Spider Nest",
+      "type": "combat",
+      "difficulty": 7,
+      "description": "Thick webs choke the hollow between the trees, glistening with venom in the pale light. Giant spiders scuttle across their silken domain, each the size of a hunting hound. At the centre of the nest, something ancient and bloated shifts in the shadows.",
+      "rewards": [
+        {
+          "itemId": "antidote",
+          "chance": 0.8
+        },
+        {
+          "itemId": "rare_herb",
+          "chance": 0.5
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.6
+        },
+        {
+          "itemId": "leather_armor",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "Venom courses through your veins as the spiders bind you in silk. You barely cut free before the paralysis takes hold, but the poison lingers for days."
+    },
+    {
+      "id": "troll_bridge",
+      "name": "Troll Bridge",
+      "type": "combat",
+      "difficulty": 6,
+      "description": "A massive troll squats beneath the old stone bridge, its mossy hide blending with the riverbank. It rises to its full height as you approach, cracking knuckles the size of flagstones. The stench alone could fell a lesser traveller.",
+      "rewards": [
+        {
+          "itemId": "wooden_shield",
+          "chance": 0.6
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.7
+        },
+        {
+          "itemId": "iron_sword",
+          "chance": 0.4
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.5
+        }
+      ],
+      "failureConsequence": "The troll hurls you into the river with a contemptuous swat. You wash up downstream, battered and half-drowned, forced to find another crossing."
+    },
+    {
+      "id": "wolf_pack",
+      "name": "Wolf Pack",
+      "type": "combat",
+      "difficulty": 4,
+      "description": "Grey shapes circle through the mist, low growls rumbling like distant thunder. A pack of gaunt wolves has caught your scent, and hunger has driven them past their fear of men. Their alpha watches from a ridge, waiting for the right moment to strike.",
+      "rewards": [
+        {
+          "itemId": "leather_armor",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.5
+        },
+        {
+          "itemId": "ration",
+          "chance": 0.7
+        }
+      ],
+      "failureConsequence": "The wolves drag you down and maul your legs before the pack leader calls them off. You limp away with deep gashes that slow your journey for days."
+    },
+    {
+      "id": "ancient_lock",
+      "name": "Ancient Lock",
+      "type": "puzzle",
+      "difficulty": 6,
+      "description": "An iron-banded chest sits half-buried in the roots of a dead oak, its lock a cunning mechanism of interlocking rings and sliding pins. No key exists for this device — only patience and sharp wits will coax it open.",
+      "rewards": [
+        {
+          "itemId": "leather_armor",
+          "chance": 0.5
+        },
+        {
+          "itemId": "iron_sword",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.6
+        },
+        {
+          "itemId": "rare_herb",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "A hidden spring snaps shut, driving a thin needle into your thumb. The lock resets with a mocking click, and the venom leaves your hand numb and throbbing for hours."
+    },
+    {
+      "id": "grailsend-trial-of-mercy",
+      "name": "Trial of Mercy",
+      "type": "puzzle",
+      "difficulty": 7,
+      "description": "The temple's inner court presents a harrowing illusion: a wounded knight kneels before you, begging for the mercy of a swift end, while a weeping child clutches at your sleeve, pleading for you to save him. The Grail's light watches from above, judging not your strength but the quality of your compassion.",
+      "rewards": [
+        {
+          "itemId": "healing_staff",
+          "chance": 0.3
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.7
+        },
+        {
+          "itemId": "pilgrim_medallion",
+          "chance": 0.4
+        }
+      ],
+      "failureConsequence": "The illusion fades and the Grail's light dims to a cold ember. You are left standing in an empty courtyard, the way forward barred until you understand what mercy truly asks."
+    },
+    {
+      "id": "oracle_trial",
+      "name": "Oracle Trial",
+      "type": "puzzle",
+      "difficulty": 8,
+      "description": "Three stone basins stand before a crumbling shrine, each filled with a different liquid — clear water, dark wine, and shimmering quicksilver. The Oracle's voice echoes from nowhere, demanding you pour the truth into the vessel of worth. The wrong offering will shatter more than stone.",
+      "rewards": [
+        {
+          "itemId": "healing_staff",
+          "chance": 0.3
+        },
+        {
+          "itemId": "travel_cloak",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.7
+        },
+        {
+          "itemId": "antidote",
+          "chance": 0.5
+        },
+        {
+          "itemId": "pilgrim_medallion",
+          "chance": 0.15
+        }
+      ],
+      "failureConsequence": "The quicksilver hisses and the basins crack. The Oracle's voice turns cold, declaring you unworthy. A creeping doubt settles in your mind that lingers long after you leave the ruined shrine."
+    },
+    {
+      "id": "riddle_door",
+      "name": "Riddle Door",
+      "type": "puzzle",
+      "difficulty": 5,
+      "description": "A weathered stone door bars the path, carved with a riddling verse in old script. Three symbols gleam faintly in the rock — sun, moon, and star — and the inscription demands the traveller choose wisely or not at all.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.5
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.7
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.4
+        }
+      ],
+      "failureConsequence": "The wrong symbol flares hot beneath your palm. The door remains sealed and the path ahead is blocked, forcing a long and weary detour through the bramble."
+    },
+    {
+      "id": "ruins-guardian-trial-of-worth",
+      "name": "Trial of Worth",
+      "type": "puzzle",
+      "difficulty": 5,
+      "description": "Beyond the golem's reach, a chamber of polished stone presents three pedestals, each bearing a different offering — a crown, a sword, and a loaf of bread. An inscription on the wall reads: Only the worthy may pass. Choose what matters most, and the way shall open.",
+      "rewards": [
+        {
+          "itemId": "health_potion",
+          "chance": 0.6
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.5
+        },
+        {
+          "itemId": "pilgrim_medallion",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "You choose poorly, and the pedestals sink into the floor with a grinding finality. The chamber seals itself, and you must find another route through the ruins."
+    },
+    {
+      "id": "merchant_negotiation",
+      "name": "Merchant Negotiation",
+      "type": "social",
+      "difficulty": 3,
+      "description": "A shrewd peddler blocks the road with his overloaded cart, offering passage only to those who can strike a fair bargain. His eyes gleam as he sizes up your purse, but a silver tongue may win more than coin ever could.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.9
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.5
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.7
+        }
+      ],
+      "failureConsequence": "The merchant sneers at your poor haggling and doubles his prices. You overpay dearly for meagre supplies, losing coin and dignity in equal measure."
+    },
+    {
+      "id": "noble_court",
+      "name": "Noble Court",
+      "type": "social",
+      "difficulty": 7,
+      "description": "A minor lord holds court beneath a faded pavilion, dispensing judgment to those who seek his favour. Courtiers whisper behind painted fans, and every word carries the weight of alliance or exile. Only the most eloquent will leave with honour intact.",
+      "rewards": [
+        {
+          "itemId": "travel_cloak",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.6
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.5
+        },
+        {
+          "itemId": "pilgrim_medallion",
+          "chance": 0.1
+        }
+      ],
+      "failureConsequence": "Your words falter before the assembled court. The lord dismisses you with a wave, and his guards escort you roughly from the pavilion. Whispers of your disgrace will precede you down the road."
+    },
+    {
+      "id": "pilgrims-rest-monastery-confrontation",
+      "name": "Confrontation at the Monastery",
+      "type": "social",
+      "difficulty": 5,
+      "description": "The abbot of Pilgrim's Rest bars the cloister door, flanked by stern-faced brothers. He accuses you of bringing trouble to their peaceful house and demands you answer for the commotion your arrival has caused. His voice is calm, but his eyes are unyielding.",
+      "rewards": [
+        {
+          "itemId": "health_potion",
+          "chance": 0.5
+        },
+        {
+          "itemId": "ration",
+          "chance": 0.8
+        },
+        {
+          "itemId": "rare_herb",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "The abbot orders the gates closed against you. The monastery's shelter and supplies are denied, and you must press on without rest into the gathering dusk."
+    },
+    {
+      "id": "tavern_brawl",
+      "name": "Tavern Brawl",
+      "type": "social",
+      "difficulty": 4,
+      "description": "Raised voices and shattered crockery erupt from a roadside alehouse. Two farmers grapple over a spilled drink while the innkeeper wrings her hands. A well-placed word might calm the storm — or a poor one could drag you into the fray.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.8
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "Your intervention backfires spectacularly. A wild punch catches your jaw, the innkeeper bars you from her establishment, and you nurse a bruised ego along with a swollen lip."
+    },
+    {
+      "id": "guard_evasion",
+      "name": "Guard Evasion",
+      "type": "stealth",
+      "difficulty": 5,
+      "description": "Torchlight sweeps the gatehouse passage in steady arcs. Two sentries pace the wall-walk above while a third guards the postern door. Timing, patience, and the cover of a moonless night are your only allies.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.8
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.6
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.4
+        }
+      ],
+      "failureConsequence": "A loose cobblestone betrays your step. The sentries close in and march you back to the town gate, barring re-entry until the next watch change."
+    },
+    {
+      "id": "millbrook-mill-stealth",
+      "name": "Sneaking Through the Old Mill",
+      "type": "stealth",
+      "difficulty": 3,
+      "description": "The old watermill stands dark against the evening sky, its wheel still turning with a rhythmic creak. Smugglers have made it their storehouse, and a pair of lookouts warm their hands by a brazier near the door. You must slip past them to reach the passage beyond.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.7
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.5
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "A loose board groans underfoot and the lookouts spring to their feet. You are chased into the night and must circle back by a longer path, losing precious hours."
+    },
+    {
+      "id": "prison_break",
+      "name": "Prison Break",
+      "type": "stealth",
+      "difficulty": 6,
+      "description": "The stone corridors of the oubliette echo with the clank of iron boots. A prisoner whispers through the bars, begging for freedom. To reach the cell keys, you must slip past three patrols and a watchful turnkey who never seems to blink.",
+      "rewards": [
+        {
+          "itemId": "iron_sword",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.6
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.5
+        },
+        {
+          "itemId": "travel_cloak",
+          "chance": 0.2
+        }
+      ],
+      "failureConsequence": "A guard spots your shadow and raises the alarm. You are seized and thrown into a cell yourself, losing a full day before a sympathetic jailer lets you slip away at dawn."
+    },
+    {
+      "id": "ravensgate-caravan-infiltration",
+      "name": "Caravan Infiltration",
+      "type": "stealth",
+      "difficulty": 5,
+      "description": "A merchant caravan bound for Ravensgate camps beside the road, its wagons circled and guards patrolling with lanterns. Hidden among the crates is something you need. You must slip between the wagons unseen, past drowsy guards and restless horses.",
+      "rewards": [
+        {
+          "itemId": "travel_cloak",
+          "chance": 0.3
+        },
+        {
+          "itemId": "ration",
+          "chance": 0.8
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.4
+        }
+      ],
+      "failureConsequence": "A horse whinnies at your scent and a guard swings his lantern your way. You are seized and marched to the caravan master, who confiscates your weapons before releasing you at dawn."
+    },
+    {
+      "id": "ravensgate-library-stealth",
+      "name": "The Library Heist",
+      "type": "stealth",
+      "difficulty": 5,
+      "description": "Ravensgate's library is a tall, narrow tower of honeyed stone, its shelves guarded by a sharp-eared archivist and a pair of sleepless clerks. The documents you seek lie in a locked cabinet on the upper gallery, and every footstep on the old oak floor carries like a drumbeat.",
+      "rewards": [
+        {
+          "itemId": "stolen_manuscript",
+          "chance": 0.5
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.4
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "The archivist catches you rifling through the cabinet and raises the alarm. You are escorted from the tower under guard and barred from the library until you can explain yourself."
+    },
+    {
+      "id": "river_crossing",
+      "name": "River Crossing",
+      "type": "survival",
+      "difficulty": 3,
+      "description": "Spring meltwater has swollen the river to a churning torrent. The old ford is submerged and the nearest bridge lies a day's walk upstream. Fallen timber and slippery stones offer a treacherous path across, but one misstep could sweep you downstream.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.8
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.4
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.6
+        }
+      ],
+      "failureConsequence": "The current catches your legs and drags you under. You claw your way to the far bank, gasping and half-drowned, but your pack is lighter — the river claimed a portion of your supplies."
+    },
+    {
+      "id": "wilderness_storm",
+      "name": "Wilderness Storm",
+      "type": "survival",
+      "difficulty": 4,
+      "description": "Black clouds boil over the moors and the wind turns savage. Rain lashes the road to mud, lightning splits an oak on the hillside, and the temperature plummets. Finding shelter and keeping a fire alive may be the difference between life and a frozen end.",
+      "rewards": [
+        {
+          "itemId": "ration",
+          "chance": 0.7
+        },
+        {
+          "itemId": "torch",
+          "chance": 0.5
+        },
+        {
+          "itemId": "health_potion",
+          "chance": 0.3
+        }
+      ],
+      "failureConsequence": "The cold sinks into your bones and the rain extinguishes your last torch. You stumble on through the dark, arriving at shelter soaked and shivering, losing precious supplies to the downpour."
+    }
+  ]
+}

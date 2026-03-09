@@ -1,0 +1,16 @@
+{
+  "id": "herb_garden",
+  "stories": 1,
+  "footprint": { "width": 2, "depth": 2 },
+  "wallMaterial": "timber_frame",
+  "roofStyle": "flat",
+  "openFront": true,
+  "features": ["herb_beds", "drying_rack", "mortar_pestle"],
+  "interiorSlots": [
+    { "type": "herb_bed", "position": [0.5, 0.5] },
+    { "type": "herb_bed", "position": [1.5, 0.5] },
+    { "type": "herb_bed", "position": [0.5, 1.5] },
+    { "type": "drying_rack", "position": [1.5, 1.5] }
+  ],
+  "npcSlot": { "archetype": "herbalist", "position": [1, 1] }
+}

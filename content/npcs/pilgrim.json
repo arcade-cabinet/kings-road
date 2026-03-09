@@ -1,0 +1,35 @@
+{
+  "id": "pilgrim",
+  "name": "Pilgrim",
+  "archetype": "wanderer",
+  "fixed": false,
+  "bodyBuild": { "height": 1.0, "width": 0.9 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "brown",
+    "hairStyle": "hooded",
+    "hairColor": "#5a3a20",
+    "facialHair": "none"
+  },
+  "accessories": ["prayer_beads", "walking_stick", "worn_satchel"],
+  "clothPalette": { "primary": "#6b5b4f", "secondary": "#c2a97e" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Blessings upon you, traveller. I walk this road in devotion, as my fathers did before me.",
+      "The road is long but the spirit is willing. Have you seen the chapel at Pilgrim's Rest?",
+      "I carry nothing but faith and a water-skin. It is enough."
+    ],
+    "quest": [
+      "I dropped my prayer book at the last river crossing. It was my grandmother's — the only thing of hers I still possess. Would you retrieve it for me?"
+    ],
+    "idle": [
+      "Each step brings me closer to grace...",
+      "The birds sing psalms, if you listen closely."
+    ]
+  }
+}

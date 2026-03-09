@@ -1,0 +1,43 @@
+{
+  "id": "bandit-pool",
+  "archetype": "bandit",
+  "personality": "Cunning, desperate, and territorial. Speaks with threatening bravado to mask fear.",
+  "displayTitle": "Highwayman",
+  "visualIdentity": {
+    "bodyBuild": { "heightRange": [0.85, 1.05], "widthRange": [0.85, 1.05] },
+    "clothPalette": {
+      "primary": "#3b2f20",
+      "secondary": "#1a1510",
+      "variations": ["#4a3a28", "#2d2318"]
+    },
+    "signatureAccessories": ["face_mask"],
+    "optionalAccessories": ["dagger", "rope_belt", "hooded_cloak", "arm_wraps"]
+  },
+  "faceSlots": {
+    "skinToneRange": [1, 4],
+    "eyeColors": ["brown", "gray"],
+    "hairStyles": ["short", "hooded"],
+    "hairColors": ["#1a1a1a", "#3b2f20", "#5c4a35"],
+    "facialHairOptions": ["stubble", "none"]
+  },
+  "behavior": { "idleStyle": "patrolling", "interactionVerb": "CONFRONT", "walkNodes": true },
+  "namePool": [
+    "Scarrow",
+    "Black Meg",
+    "Dagger Tom",
+    "Rattlesnake",
+    "The Cur",
+    "Crooked Nell",
+    "Ashen Will"
+  ],
+  "greetingPool": [
+    { "text": "Your coin or your life, traveller. I will not ask a second time." },
+    { "text": "Well, well. Another fat purse wandering the road without an escort." },
+    { "text": "Drop your weapons and empty your pockets. Nobody has to get hurt today." },
+    { "text": "The King's Road belongs to us now. You will pay the toll or pay in blood." }
+  ],
+  "idlePool": [
+    { "text": "The next merchant caravan should be along before nightfall. Easy pickings." },
+    { "text": "I did not choose this life. But it chose me well enough, and the pay beats farming." }
+  ]
+}

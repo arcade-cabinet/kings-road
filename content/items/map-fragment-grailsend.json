@@ -1,0 +1,7 @@
+{
+  "id": "map-fragment-grailsend",
+  "name": "Cartographer's Map: Grailsend",
+  "description": "The final piece of the cartographer's grand survey. It depicts the sacred vale of Grailsend, where the road ends beneath the shadow of the Grail temple's spire.",
+  "type": "key_item",
+  "stackable": false
+}

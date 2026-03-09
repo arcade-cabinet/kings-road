@@ -1,0 +1,10 @@
+{
+  "id": "encounter-tier-4",
+  "dangerTier": 4,
+  "entries": [
+    { "monsterId": "dragon", "weight": 0.4, "count": [1, 1] },
+    { "monsterId": "lich_lord", "weight": 0.35, "count": [1, 1] },
+    { "monsterId": "ancient_horror", "weight": 0.25, "count": [1, 1] }
+  ],
+  "lootTable": "loot-tier-4"
+}

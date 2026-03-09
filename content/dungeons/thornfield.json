@@ -1,0 +1,137 @@
+{
+  "id": "thornfield-ruins",
+  "name": "Thornfield Ruins",
+  "anchorId": "anchor-02",
+  "description": "Ancient ruins sprawling beneath the Thornfield hilltop, once a great library-fortress of a forgotten order. Crumbling stone corridors wind past collapsed galleries and ritual chambers, all guarding the clue to the Grail's resting place.",
+  "recommendedLevel": 5,
+  "entranceRoomId": "entrance-hall",
+  "bossRoomId": "guardian-sanctum",
+  "rooms": [
+    {
+      "id": "entrance-hall",
+      "name": "Entrance Hall",
+      "type": "entrance",
+      "description": "Daylight filters through cracks in the vaulted ceiling, illuminating faded frescoes of knights bearing a radiant cup. The flagstones are cracked and mossy, and the air smells of damp earth and old stone.",
+      "connections": [
+        { "to": "western-corridor", "direction": "west" },
+        { "to": "eastern-corridor", "direction": "east" },
+        { "to": "collapsed-gallery", "direction": "north", "secret": true, "secretHint": "A draught of cold air seeps from behind a cracked fresco depicting a hidden door." }
+      ]
+    },
+    {
+      "id": "western-corridor",
+      "name": "Western Corridor",
+      "type": "corridor",
+      "description": "A long passage lined with empty torch sconces. The flagstones are worn smooth by centuries of footsteps, and the walls bear scratches from something sharp and restless.",
+      "encounterId": "skeleton_patrol",
+      "traps": [
+        {
+          "type": "dart_wall",
+          "difficulty": 4,
+          "damage": 8,
+          "description": "Hidden darts fire from narrow slits in the stonework when a loose flagstone is pressed."
+        }
+      ],
+      "connections": [
+        { "to": "entrance-hall", "direction": "east" },
+        { "to": "riddle-chamber", "direction": "west" }
+      ]
+    },
+    {
+      "id": "eastern-corridor",
+      "name": "Eastern Corridor",
+      "type": "corridor",
+      "description": "Rubble from a partial cave-in narrows this passage to single file. Cobwebs thick as curtains drape the arched ceiling, and something skitters in the dark beyond.",
+      "encounterId": "spider_nest",
+      "traps": [
+        {
+          "type": "pit_fall",
+          "difficulty": 3,
+          "damage": 12,
+          "description": "A section of floor gives way over a shallow pit lined with broken masonry and jagged stones."
+        }
+      ],
+      "connections": [
+        { "to": "entrance-hall", "direction": "west" },
+        { "to": "crypt-antechamber", "direction": "north" }
+      ]
+    },
+    {
+      "id": "riddle-chamber",
+      "name": "Chamber of Riddles",
+      "type": "puzzle",
+      "description": "A hexagonal room whose six walls each bear a carved symbol: sun, moon, star, tree, river, and crown. A stone pedestal in the centre holds a tarnished bronze dial. The correct alignment opens the way forward.",
+      "encounterId": "riddle_door",
+      "lootTableId": "loot-tier-2",
+      "connections": [
+        { "to": "western-corridor", "direction": "east" },
+        { "to": "reliquary", "direction": "north" }
+      ]
+    },
+    {
+      "id": "crypt-antechamber",
+      "name": "Crypt Antechamber",
+      "type": "chamber",
+      "description": "Stone sarcophagi line the walls, their lids slightly ajar. The air is thick with dust and the faint scent of ancient herbs once used for embalming. Faded names are carved above each niche.",
+      "encounterId": "skeleton_patrol",
+      "lootTableId": "loot-tier-2",
+      "connections": [
+        { "to": "eastern-corridor", "direction": "south" },
+        { "to": "lock-passage", "direction": "north" }
+      ]
+    },
+    {
+      "id": "lock-passage",
+      "name": "The Sealed Passage",
+      "type": "puzzle",
+      "description": "A heavy iron door blocks the northern passage, its surface etched with interlocking gears and counterweights. Three keyholes of different shapes demand a mechanical solution rather than brute force.",
+      "encounterId": "ancient_lock",
+      "connections": [
+        { "to": "crypt-antechamber", "direction": "south" },
+        { "to": "guardian-sanctum", "direction": "north" }
+      ]
+    },
+    {
+      "id": "collapsed-gallery",
+      "name": "Collapsed Gallery",
+      "type": "corridor",
+      "description": "A once-grand gallery whose upper floor has caved in, creating a treacherous slope of broken timbers and shattered tile. Only those who know the hidden entrance from the hall can reach it.",
+      "traps": [
+        {
+          "type": "collapsing_ceiling",
+          "difficulty": 5,
+          "damage": 15,
+          "description": "Loose stones and rotting beams groan overhead, threatening to bring the remaining ceiling down on the unwary."
+        }
+      ],
+      "connections": [
+        { "to": "entrance-hall", "direction": "south", "secret": true, "secretHint": "The fresco in the entrance hall conceals a narrow gap behind the painted door." },
+        { "to": "reliquary", "direction": "west" }
+      ]
+    },
+    {
+      "id": "reliquary",
+      "name": "The Reliquary",
+      "type": "treasure",
+      "description": "A small vaulted chamber whose walls shimmer with remnants of gold leaf. Stone niches once held sacred relics, and a few tarnished offerings still glint in the dust. This room connects both dungeon paths.",
+      "lootTableId": "loot-tier-3",
+      "connections": [
+        { "to": "riddle-chamber", "direction": "south" },
+        { "to": "collapsed-gallery", "direction": "east" },
+        { "to": "guardian-sanctum", "direction": "north" }
+      ]
+    },
+    {
+      "id": "guardian-sanctum",
+      "name": "The Guardian's Sanctum",
+      "type": "boss",
+      "description": "A vast circular chamber beneath a cracked dome painted with stars. At its centre stands an armoured figure of living stone, the Guardian of the Thornfield seal. The Grail clue is carved into the floor behind the Guardian's throne.",
+      "encounterId": "troll_bridge",
+      "lootTableId": "loot-tier-3",
+      "connections": [
+        { "to": "lock-passage", "direction": "south" },
+        { "to": "reliquary", "direction": "south" }
+      ]
+    }
+  ]
+}

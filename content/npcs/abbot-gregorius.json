@@ -1,0 +1,36 @@
+{
+  "id": "abbot-gregorius",
+  "name": "Abbot Gregorius",
+  "archetype": "priest",
+  "fixed": true,
+  "bodyBuild": { "height": 1.15, "width": 0.9 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "gray",
+    "hairStyle": "bald",
+    "hairColor": "#c0c0c0",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["robes", "holy_book", "rosary"],
+  "clothPalette": { "primary": "#f5f0e8", "secondary": "#8b6914" },
+  "behavior": {
+    "idleStyle": "sitting",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Peace be upon you, pilgrim. You have come far along the Road, and farther still you must go.",
+      "Welcome to our humble rest. The stones here have heard a thousand prayers, and they shall hear yours too.",
+      "Sit with me a moment. The journey to the Grail is not only of the feet, but of the spirit."
+    ],
+    "quest": [
+      "The Grail does not reveal itself to the strong or the clever, but to the pure of heart. Long ago, a knight of this very order carried it from the Holy Land and hid it where only faith could find it. Seek the chapel at road's end — but know that the Grail tests the seeker, not the sword.",
+      "Sister Maeve tends to wounds of the body, but there are wounds of the soul that only the Grail can heal. If you would seek it, go with compassion as your shield."
+    ],
+    "idle": [
+      "The light through these windows has not changed in three hundred years. There is comfort in that.",
+      "I have read every manuscript in our library twice over. The truth of the Grail is woven through them all, if one knows where to look."
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "sister-maeve",
+  "name": "Sister Maeve",
+  "archetype": "healer",
+  "fixed": true,
+  "bodyBuild": { "height": 0.85, "width": 0.8 },
+  "face": {
+    "skinTone": 0,
+    "eyeColor": "green",
+    "hairStyle": "hooded",
+    "hairColor": "#a0522d",
+    "facialHair": "none"
+  },
+  "accessories": ["herb_satchel", "mortar_pestle", "bandages"],
+  "clothPalette": { "primary": "#e8e0d0", "secondary": "#5a7a4a" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Oh, you poor dear. Let me see those blisters — the Road spares no one's feet.",
+      "Come in, come in. I have a poultice brewing that will set you right.",
+      "Blessings, traveller. Rest here and I shall tend to what ails you."
+    ],
+    "quest": [
+      "A fever has taken root in the village beyond the next hill. I have prepared a bundle of healing herbs — meadowsweet and yarrow — but I cannot leave the abbey. Would you carry them to the sick? The Grail's grace flows through acts of mercy, not grand quests alone.",
+      "Brother Anselm found mention of a sacred spring in the old texts, said to cure any ailment. It lies somewhere off the Road near the standing stones. If you could bring back even a vial of that water, I could save lives that no herb can reach."
+    ],
+    "idle": [
+      "Comfrey for bruises, chamomile for rest, yarrow to stop the bleeding. The garden provides.",
+      "The Abbot says prayer heals the soul. I say a good poultice helps the prayer along."
+    ]
+  }
+}

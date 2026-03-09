@@ -1,0 +1,13 @@
+{
+  "id": "guard_evasion",
+  "name": "Guard Evasion",
+  "type": "stealth",
+  "difficulty": 5,
+  "description": "Torchlight sweeps the gatehouse passage in steady arcs. Two sentries pace the wall-walk above while a third guards the postern door. Timing, patience, and the cover of a moonless night are your only allies.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.8 },
+    { "itemId": "torch", "chance": 0.6 },
+    { "itemId": "stamina_draught", "chance": 0.4 }
+  ],
+  "failureConsequence": "A loose cobblestone betrays your step. The sentries close in and march you back to the town gate, barring re-entry until the next watch change."
+}

@@ -1,0 +1,37 @@
+{
+  "id": "camp-warden",
+  "name": "Warden Bryce",
+  "archetype": "knight",
+  "fixed": true,
+  "bodyBuild": { "height": 1.1, "width": 1.2 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "brown",
+    "hairStyle": "short",
+    "hairColor": "#4a3728",
+    "facialHair": "stubble"
+  },
+  "accessories": ["chainmail", "shortsword", "bedroll"],
+  "clothPalette": { "primary": "#6b6b6b", "secondary": "#3d5a3d" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Halt. The ruins draw bandits as well as scholars. Which are you?",
+      "Welcome to what passes for civilisation out here. Mind the perimeter — I've set snares for wolves.",
+      "Another pilgrim headed deeper? The lower chambers aren't safe after dark."
+    ],
+    "quest": [
+      "Lord Ashwick's men came through a fortnight past, asking about the old scriptorium. They took what scrolls they could carry and left. I didn't like the look of them, but I'm just one sword against many.",
+      "If you're heading into the ruins proper, take a torch and keep your back to the wall. Something moves down there that isn't rats."
+    ],
+    "idle": [
+      "I took this post because I was told it would be quiet. Nobody mentioned the wolves.",
+      "The scholar keeps odd hours. I hear him muttering over his maps at all hours.",
+      "There's a standing stone just north of camp that hums when the wind is right. Unsettling."
+    ]
+  }
+}

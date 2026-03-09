@@ -1,0 +1,13 @@
+{
+  "id": "millbrook-mill-stealth",
+  "name": "Sneaking Through the Old Mill",
+  "type": "stealth",
+  "difficulty": 3,
+  "description": "The old watermill stands dark against the evening sky, its wheel still turning with a rhythmic creak. Smugglers have made it their storehouse, and a pair of lookouts warm their hands by a brazier near the door. You must slip past them to reach the passage beyond.",
+  "rewards": [
+    { "itemId": "ration", "chance": 0.7 },
+    { "itemId": "torch", "chance": 0.5 },
+    { "itemId": "health_potion", "chance": 0.3 }
+  ],
+  "failureConsequence": "A loose board groans underfoot and the lookouts spring to their feet. You are chased into the night and must circle back by a longer path, losing precious hours."
+}

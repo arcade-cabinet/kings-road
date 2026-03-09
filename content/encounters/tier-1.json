@@ -1,0 +1,12 @@
+{
+  "id": "encounter-tier-1",
+  "dangerTier": 1,
+  "entries": [
+    { "monsterId": "wolf", "weight": 0.3, "count": [1, 3] },
+    { "monsterId": "bandit", "weight": 0.25, "count": [1, 2] },
+    { "monsterId": "giant_rat", "weight": 0.2, "count": [2, 4] },
+    { "monsterId": "skeleton", "weight": 0.15, "count": [1, 2] },
+    { "monsterId": "slime", "weight": 0.1, "count": [1, 3] }
+  ],
+  "lootTable": "loot-tier-1"
+}

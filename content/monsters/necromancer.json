@@ -1,0 +1,15 @@
+{
+  "id": "necromancer",
+  "name": "Necromancer",
+  "bodyType": "biped",
+  "size": 1.1,
+  "colorScheme": {
+    "primary": "#1a1a2e",
+    "secondary": "#2d2d44",
+    "accent": "#6b2fa0"
+  },
+  "dangerTier": 3,
+  "health": 65,
+  "damage": 22,
+  "lootTable": "loot-tier-3"
+}

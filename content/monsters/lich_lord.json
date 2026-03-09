@@ -1,0 +1,15 @@
+{
+  "id": "lich_lord",
+  "name": "Lich Lord",
+  "bodyType": "biped",
+  "size": 1.3,
+  "colorScheme": {
+    "primary": "#0d0d1a",
+    "secondary": "#1a1a33",
+    "accent": "#00ffcc"
+  },
+  "dangerTier": 4,
+  "health": 150,
+  "damage": 35,
+  "lootTable": "loot-tier-4"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "giant_rat",
+  "name": "Giant Rat",
+  "bodyType": "quadruped",
+  "size": 0.5,
+  "colorScheme": {
+    "primary": "#4a3728",
+    "secondary": "#7a6252"
+  },
+  "dangerTier": 1,
+  "health": 10,
+  "damage": 3
+}

@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('King\'s Road', () => {
+test.describe("King's Road", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
 
   test('displays main menu on load', async ({ page }) => {
     // Check for title
-    await expect(page.getByText('King\'s Road')).toBeVisible();
-    
+    await expect(page.getByText("King's Road")).toBeVisible();
+
     // Check for subtitle
     await expect(page.getByText('Seek the Holy Grail')).toBeVisible();
   });
@@ -16,7 +16,7 @@ test.describe('King\'s Road', () => {
   test('shows realm seed input', async ({ page }) => {
     // Check for realm seed label
     await expect(page.getByText('Realm Seed')).toBeVisible();
-    
+
     // Seed phrase should be generated
     const seedText = page.locator('.font-lora.text-2xl, .font-lora.text-3xl');
     await expect(seedText).toBeVisible();
@@ -34,12 +34,14 @@ test.describe('King\'s Road', () => {
 
   test('reseed button changes seed', async ({ page }) => {
     // Get initial seed
-    const seedLocator = page.locator('.font-lora.text-2xl, .font-lora.text-3xl');
+    const seedLocator = page.locator(
+      '.font-lora.text-2xl, .font-lora.text-3xl',
+    );
     const initialSeed = await seedLocator.textContent();
 
     // Click reseed - may take a few tries to get different seed
     const reseedButton = page.getByRole('button', { name: 'Reseed' });
-    
+
     let changed = false;
     for (let i = 0; i < 10 && !changed; i++) {
       await reseedButton.click();
@@ -48,7 +50,7 @@ test.describe('King\'s Road', () => {
         changed = true;
       }
     }
-    
+
     // Reseed should eventually produce different seed (or the action works)
     expect(changed || true).toBe(true); // Pass if button is clickable
   });
@@ -103,10 +105,10 @@ test.describe('King\'s Road', () => {
     await page.keyboard.press('a');
     await page.keyboard.press('s');
     await page.keyboard.press('d');
-    
+
     // Wait a bit and ensure game still running
     await page.waitForTimeout(500);
-    
+
     // Canvas should still be visible
     const canvas = page.locator('canvas');
     await expect(canvas).toBeVisible();
@@ -141,7 +143,7 @@ test.describe('Game UI Components', () => {
 
     const enterButton = page.getByRole('button', { name: 'Enter Realm' });
     await enterButton.hover();
-    
+
     // Button should still be visible after hover
     await expect(enterButton).toBeVisible();
   });
@@ -154,10 +156,12 @@ test.describe('Mobile Support', () => {
     await page.goto('/');
 
     // Title should still be visible
-    await expect(page.getByText('King\'s Road')).toBeVisible();
+    await expect(page.getByText("King's Road")).toBeVisible();
 
     // Buttons should be accessible
-    await expect(page.getByRole('button', { name: 'Enter Realm' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Enter Realm' }),
+    ).toBeVisible();
   });
 
   test('game starts on mobile', async ({ page }) => {

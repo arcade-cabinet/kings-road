@@ -1,0 +1,14 @@
+{
+  "id": "prison_break",
+  "name": "Prison Break",
+  "type": "stealth",
+  "difficulty": 6,
+  "description": "The stone corridors of the oubliette echo with the clank of iron boots. A prisoner whispers through the bars, begging for freedom. To reach the cell keys, you must slip past three patrols and a watchful turnkey who never seems to blink.",
+  "rewards": [
+    { "itemId": "iron_sword", "chance": 0.4 },
+    { "itemId": "health_potion", "chance": 0.6 },
+    { "itemId": "stamina_draught", "chance": 0.5 },
+    { "itemId": "travel_cloak", "chance": 0.2 }
+  ],
+  "failureConsequence": "A guard spots your shadow and raises the alarm. You are seized and thrown into a cell yourself, losing a full day before a sympathetic jailer lets you slip away at dawn."
+}

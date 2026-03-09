@@ -1,0 +1,35 @@
+{
+  "id": "lucy",
+  "name": "Lucy",
+  "archetype": "wanderer",
+  "fixed": false,
+  "bodyBuild": { "height": 0.8, "width": 0.75 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "blue",
+    "hairStyle": "hooded",
+    "hairColor": "#d4a56a",
+    "facialHair": "none"
+  },
+  "accessories": ["travel_pack", "walking_stick"],
+  "clothPalette": { "primary": "#5a4e3c", "secondary": "#3b6e4f" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Oh, hello! I'm just passing through. Lovely little village, this.",
+      "You're heading north? I've come from that way — be careful.",
+      "I've walked every road between here and the sea. Care to hear a tale?"
+    ],
+    "quest": [
+      "I lost a locket at the old bridge upstream. It's all I have left of my mother. Would you look for it?"
+    ],
+    "idle": [
+      "I wonder what's past the next hill...",
+      "The stars were strange last night. Moving, almost."
+    ]
+  }
+}

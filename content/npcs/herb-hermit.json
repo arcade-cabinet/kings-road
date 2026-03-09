@@ -1,0 +1,35 @@
+{
+  "id": "herb-hermit",
+  "name": "Herb Hermit",
+  "archetype": "hermit",
+  "fixed": true,
+  "bodyBuild": { "height": 0.85, "width": 0.8 },
+  "face": {
+    "skinTone": 0,
+    "eyeColor": "green",
+    "hairStyle": "long",
+    "hairColor": "#a09080",
+    "facialHair": "full_beard"
+  },
+  "accessories": ["herb_pouch", "mortar_pestle", "gnarled_staff"],
+  "clothPalette": { "primary": "#3b5e2f", "secondary": "#8b7355" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Shh — you'll disturb the yarrow. Step carefully, if you must step at all.",
+      "Ah, another one trampling through my garden. What do you want?",
+      "The meadowsweet is in bloom today. That means rain by evening, mark my words."
+    ],
+    "quest": [
+      "There's a patch of ghost-nettle growing near the old ruins upstream. Bring me a handful and I'll brew you something that will make your bones sing."
+    ],
+    "idle": [
+      "Comfrey for the joints, feverfew for the head... now where did I put the valerian?",
+      "The forest provides everything a body needs. People just forgot how to listen."
+    ]
+  }
+}
