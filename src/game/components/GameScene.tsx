@@ -6,6 +6,7 @@ import {
   SMAA,
   Vignette,
 } from '@react-three/postprocessing';
+import { Physics } from '@react-three/rapier';
 import { BlendFunction } from 'postprocessing';
 import { Component, type ReactNode, Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
@@ -235,7 +236,7 @@ function SceneContent() {
 
       {/* Game content - only when active AND we have a seed */}
       {gameActive && seedPhrase && (
-        <>
+        <Physics gravity={[0, -25, 0]} timeStep="vary">
           {/* Environment */}
           <Fog />
           <DayNightCycle />
@@ -254,7 +255,7 @@ function SceneContent() {
 
           {/* Post Processing */}
           <PostProcessing />
-        </>
+        </Physics>
       )}
     </>
   );

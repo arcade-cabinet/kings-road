@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "King's Road",
+    "slug": "kings-road",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "icon": "./assets/icon.png",
+    "scheme": "kingsroad",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kingsroad.game"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#f5f0e8"
+      },
+      "package": "com.kingsroad.game"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f5f0e8"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

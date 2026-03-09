@@ -67,6 +67,39 @@ export const FaceSlotsSchema = z.object({
     .min(1),
 });
 
+/** NPC expression states — from Grok Phase 2's 6 expressions */
+export const ExpressionType = z.enum([
+  'neutral',
+  'happy',
+  'angry',
+  'sad',
+  'surprised',
+  'sleeping',
+  'speaking',
+]);
+export type ExpressionType = z.infer<typeof ExpressionType>;
+
+/**
+ * Chibi face configuration — controls procedural face generation.
+ * From Grok Phase 1-2's canvas-based face system.
+ */
+export const ChibiFaceConfigSchema = z.object({
+  /** Eye shape: round=large chibi eyes, narrow=squinting, almond=default */
+  eyeShape: z.enum(['round', 'narrow', 'almond', 'wide']).default('almond'),
+  /** Pupil size relative to eye (0.3-0.8) */
+  pupilSize: z.number().min(0.3).max(0.8).default(0.5),
+  /** Brow angle in degrees (-30 = angry, 0 = neutral, 30 = worried) */
+  browAngle: z.number().min(-30).max(30).default(0),
+  /** Mouth style */
+  mouthStyle: z
+    .enum(['smile', 'frown', 'neutral', 'open', 'smirk'])
+    .default('neutral'),
+  /** Face shape */
+  faceShape: z.enum(['round', 'oval', 'square', 'heart']).default('round'),
+  /** Blush intensity (0 = none, 1 = full) */
+  blushIntensity: z.number().min(0).max(1).default(0),
+});
+
 /** Behavior defaults for this archetype */
 export const ArchetypeBehaviorSchema = z.object({
   idleStyle: z.enum(['idle', 'working', 'patrolling', 'sitting']),
@@ -117,5 +150,20 @@ export const NPCDefinitionSchema = z.object({
       accessory: z.string().optional(),
     })
     .optional(),
+
+  // --- Grok-inspired expansions (all optional for backward compat) ---
+
+  /** Supported expression states for this archetype */
+  expressions: z.array(ExpressionType).optional(),
+  /** Chibi face generation config (overrides faceSlots for fine control) */
+  chibiFaceConfig: ChibiFaceConfigSchema.optional(),
+  /** Animation set key (maps to a set of procedural animations) */
+  animationSet: z
+    .enum(['standard', 'smith', 'merchant', 'guard', 'noble', 'elder'])
+    .optional(),
+  /** Reference to a dialogue tree definition */
+  dialogueTreeRef: z.string().optional(),
+  /** Race for character proportions and face generation */
+  race: z.enum(['human', 'elf', 'dwarf', 'orc', 'halfling']).optional(),
 });
 export type NPCDefinition = z.infer<typeof NPCDefinitionSchema>;

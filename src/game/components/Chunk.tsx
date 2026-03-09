@@ -1,3 +1,4 @@
+import { CuboidCollider, RigidBody } from '@react-three/rapier';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { ChunkData } from '../types';
@@ -514,6 +515,30 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
           />
         ) : null,
       )}
+
+      {/* Rapier static colliders — ground plane + all obstacles */}
+      <RigidBody type="fixed" colliders={false}>
+        {/* Ground plane collider */}
+        <CuboidCollider
+          args={[CHUNK_SIZE / 2, 0.1, CHUNK_SIZE / 2]}
+          position={[oX + CHUNK_SIZE / 2, -0.1, oZ + CHUNK_SIZE / 2]}
+        />
+        {/* Obstacle colliders matching the AABB data */}
+        {chunkData.collidables.map((aabb) => {
+          const w = (aabb.maxX - aabb.minX) / 2;
+          const d = (aabb.maxZ - aabb.minZ) / 2;
+          const h = BLOCK_SIZE;
+          const cx = (aabb.minX + aabb.maxX) / 2;
+          const cz = (aabb.minZ + aabb.maxZ) / 2;
+          return (
+            <CuboidCollider
+              key={`${cx.toFixed(1)},${cz.toFixed(1)}`}
+              args={[w, h, d]}
+              position={[cx, h, cz]}
+            />
+          );
+        })}
+      </RigidBody>
     </group>
   );
 }

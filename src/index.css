@@ -1,8 +1,12 @@
 /* Game CSS */
 @import "tailwindcss";
 
-/* Google Fonts - warm, pastoral medieval aesthetic */
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Crimson+Text:ital@0;1&display=swap');
+/* Google Fonts via @fontsource — bundled locally, no CDN fetch */
+@import '@fontsource/lora/400.css';
+@import '@fontsource/lora/600.css';
+@import '@fontsource/lora/700.css';
+@import '@fontsource/crimson-text/400.css';
+@import '@fontsource/crimson-text/400-italic.css';
 
 /* Base styles - warm pastoral medieval theme */
 @layer base {

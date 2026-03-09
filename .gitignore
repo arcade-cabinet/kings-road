@@ -9,3 +9,10 @@ vite.config.d.ts
 .DS_Store
 .ralph-tui/
 content/validation-report.json
+
+# Expo / React Native
+.expo/
+ios/
+android/
+expo-env.d.ts
+kings-road/

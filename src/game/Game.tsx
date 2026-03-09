@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { GameScene } from './components/GameScene';
 import { DialogueBox } from './components/ui/DialogueBox';
 import { GameHUD } from './components/ui/GameHUD';
+import { LoadingOverlay } from './components/ui/LoadingOverlay';
 import { MainMenu } from './components/ui/MainMenu';
 import { MobileControls } from './components/ui/MobileControls';
 import { QuestLog } from './components/ui/QuestLog';
@@ -45,6 +46,7 @@ export function Game() {
 
       {/* UI Layers */}
       <MainMenu />
+      <LoadingOverlay />
       <GameHUD />
       <DialogueBox />
       <QuestLog />
