@@ -264,7 +264,7 @@ export function generateFloorPlates(
     floors.push({
       x: w / 2 - holeW / 2,
       y: floorY,
-      z: (d - stripD) / 2 - (d - stripD) / 2 + stripD / 2 - d / 2 + stripD / 2,
+      z: d / 2 - stripD / 2,
       sx: holeW,
       sy: floorThickness,
       sz: stripD,

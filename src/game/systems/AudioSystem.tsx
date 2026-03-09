@@ -45,7 +45,9 @@ export function AudioSystem() {
       document.removeEventListener('keydown', handler);
       for (const layer of layersRef.current) {
         layer.stop();
+        layer.gain.dispose();
       }
+      layersRef.current = [];
     };
   }, [initialized]);
 

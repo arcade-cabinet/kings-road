@@ -14,7 +14,12 @@ export function generateFaceTexture(face: Face): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error(
+      'Failed to get 2D canvas context for face texture generation',
+    );
+  }
 
   const skinHex = SKIN_COLORS[face.skinTone] ?? SKIN_COLORS[2];
   const eyeHex = EYE_COLORS[face.eyeColor] ?? EYE_COLORS.brown;
