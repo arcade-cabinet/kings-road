@@ -1,0 +1,11 @@
+{
+  "totalDistance": 30000,
+  "anchors": [
+    { "id": "home", "name": "Ashford", "type": "VILLAGE_FRIENDLY", "distanceFromStart": 0, "mainQuestChapter": "chapter-00", "description": "Your home town, a quiet farming village.", "features": ["home", "tavern", "blacksmith"] },
+    { "id": "anchor-01", "name": "Millbrook", "type": "VILLAGE_FRIENDLY", "distanceFromStart": 6000, "mainQuestChapter": "chapter-01", "description": "A market town along the King's Road.", "features": ["tavern", "market", "chapel"] },
+    { "id": "anchor-02", "name": "Thornfield Ruins", "type": "DUNGEON", "distanceFromStart": 12000, "mainQuestChapter": "chapter-02", "description": "Ancient ruins hiding secrets of the Grail.", "features": ["dungeon_entrance", "camp"] },
+    { "id": "anchor-03", "name": "Ravensgate", "type": "VILLAGE_HOSTILE", "distanceFromStart": 17000, "mainQuestChapter": "chapter-03", "description": "A walled town under tyrannical rule.", "features": ["gate", "prison", "tavern"] },
+    { "id": "anchor-04", "name": "The Pilgrim's Rest", "type": "WAYPOINT", "distanceFromStart": 21000, "mainQuestChapter": "chapter-04", "description": "A roadside monastery offering shelter to travelers.", "features": ["chapel", "garden", "library"] },
+    { "id": "anchor-05", "name": "Grailsend", "type": "DUNGEON", "distanceFromStart": 28000, "mainQuestChapter": "chapter-05", "description": "The final temple where the Holy Grail awaits.", "features": ["temple_entrance", "guardian"] }
+  ]
+}
