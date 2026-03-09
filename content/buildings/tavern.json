@@ -1,0 +1,19 @@
+{
+  "id": "tavern",
+  "stories": 2,
+  "footprint": { "width": 3, "depth": 4 },
+  "wallMaterial": "timber_frame",
+  "roofStyle": "thatch",
+  "openFront": false,
+  "features": ["door", "windows", "chimney", "sign", "hearth"],
+  "interiorSlots": [
+    { "type": "hearth", "position": [1.5, 0.5] },
+    { "type": "table", "position": [1, 2] },
+    { "type": "table", "position": [2, 2] },
+    { "type": "chair", "position": [0.5, 2] },
+    { "type": "chair", "position": [2.5, 2] },
+    { "type": "barrel", "position": [0.5, 3] },
+    { "type": "barrel", "position": [1, 3] }
+  ],
+  "npcSlot": { "archetype": "innkeeper", "position": [1.5, 3] }
+}
