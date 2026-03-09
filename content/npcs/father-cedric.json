@@ -1,0 +1,31 @@
+{
+  "id": "father-cedric",
+  "name": "Father Cedric",
+  "archetype": "priest",
+  "fixed": true,
+  "bodyBuild": { "height": 1.1, "width": 0.8 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "blue",
+    "hairStyle": "bald",
+    "hairColor": "#dddddd",
+    "facialHair": "none"
+  },
+  "accessories": ["robes", "holy_book"],
+  "clothPalette": { "primary": "#f5f1e8", "secondary": "#c4a747" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Blessings upon you, child. The light watches over all who walk the Road.",
+      "Come, rest in the chapel. These walls have stood for centuries.",
+      "The old prayers still hold power, I believe."
+    ],
+    "quest": [
+      "May the saints guide your steps. The road ahead is long."
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "bess",
+  "name": "Bess",
+  "archetype": "innkeeper",
+  "fixed": true,
+  "bodyBuild": { "height": 1.0, "width": 1.0 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "green",
+    "hairStyle": "long",
+    "hairColor": "#aa3322",
+    "facialHair": "none"
+  },
+  "accessories": ["apron", "mug"],
+  "clothPalette": { "primary": "#2d4c1e", "secondary": "#f5f5dc" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Welcome to The Golden Meadow! Warm bed and cold ale await.",
+      "You look road-weary. Sit down, have a drink.",
+      "The stew's fresh today. Best in three villages, if I say so myself."
+    ],
+    "quest": [
+      "Strange folk on the road lately. Be careful out there.",
+      "A bard passed through last week singing of ruins to the north."
+    ]
+  }
+}

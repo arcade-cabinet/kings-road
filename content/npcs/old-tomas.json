@@ -1,0 +1,32 @@
+{
+  "id": "old-tomas",
+  "name": "Old Tomas",
+  "archetype": "scholar",
+  "fixed": true,
+  "bodyBuild": { "height": 1.1, "width": 0.85 },
+  "face": {
+    "skinTone": 1,
+    "eyeColor": "gray",
+    "hairStyle": "short",
+    "hairColor": "#cccccc",
+    "facialHair": "stubble"
+  },
+  "accessories": ["robes", "scroll"],
+  "clothPalette": { "primary": "#3a3a5a", "secondary": "#2a2a3a" },
+  "behavior": {
+    "idleStyle": "idle",
+    "interactionVerb": "TALK",
+    "walkNodes": false
+  },
+  "dialogue": {
+    "greeting": [
+      "Ah, young one. Come in, come in. I've been expecting someone like you.",
+      "These maps tell tales older than Ashford itself.",
+      "Have you heard of the Holy Grail? No? Then sit. Listen."
+    ],
+    "quest": [
+      "The Grail was last seen beyond Grailsend, far to the north along the King's Road. Many have sought it. None have returned.",
+      "Take this map. It marks the ancient waypoints. Follow the Road, and you may find what kings could not."
+    ]
+  }
+}

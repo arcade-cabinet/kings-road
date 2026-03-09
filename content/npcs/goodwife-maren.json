@@ -1,0 +1,31 @@
+{
+  "id": "goodwife-maren",
+  "name": "Goodwife Maren",
+  "archetype": "healer",
+  "fixed": true,
+  "bodyBuild": { "height": 0.95, "width": 1.0 },
+  "face": {
+    "skinTone": 2,
+    "eyeColor": "brown",
+    "hairStyle": "long",
+    "hairColor": "#888888",
+    "facialHair": "none"
+  },
+  "accessories": ["herb_basket", "shawl"],
+  "clothPalette": { "primary": "#5a7a4a", "secondary": "#8b7355" },
+  "behavior": {
+    "idleStyle": "working",
+    "interactionVerb": "TALK",
+    "walkNodes": true
+  },
+  "dialogue": {
+    "greeting": [
+      "Hello, dear. Let me look at you... you're healthy enough, for now.",
+      "The herbs are coming in well this season. Take some for the road.",
+      "My garden keeps Ashford well. Feverfew for fevers, yarrow for wounds."
+    ],
+    "quest": [
+      "Take these healing salves. The road is no place to fall ill."
+    ]
+  }
+}
