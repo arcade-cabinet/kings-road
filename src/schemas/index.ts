@@ -7,3 +7,4 @@ export * from './pacing.schema';
 export * from './quest.schema';
 export * from './world.schema';
 export { BuildingArchetypeSchema, type BuildingArchetype, WallMaterial, RoofStyle } from './building.schema';
+export { TownConfigSchema, type TownConfig, LayoutStrategy, BoundaryType, ApproachType } from './town.schema';
