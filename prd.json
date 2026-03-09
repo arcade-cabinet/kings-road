@@ -1,13 +1,13 @@
 {
-  "title": "King's Road — Full Game Content Pipeline",
-  "version": "1.0.0",
+  "name": "King's Road — Full Game Content Pipeline",
+  "branchName": "ralph/game-content-pipeline",
   "description": "Comprehensive content authoring for King's Road: 6 anchor towns, 6 main quest chapters, 30+ side quests, 50+ NPCs, 20+ monsters, 40+ items, 30+ roadside features, encounter tables, and pacing config. All content validated by Zod schemas and consumed by the Engine v2 blueprint factory system.",
-  "stories": [
+  "userStories": [
     {
-      "id": "S001",
+      "id": "US-001",
       "title": "Pacing Configuration",
       "description": "Create content/pacing/config.json defining walk/sprint speeds and all interval ranges (ambient, minor, major, quest micro/meso/macro, anchor). These pacing values govern how frequently encounters, features, and quests appear along the road. Use PacingConfigSchema.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "File content/pacing/config.json exists and passes PacingConfigSchema validation",
         "walkSpeed=4, sprintSpeed=7",
         "ambientInterval=[30,90] (seconds between ambient sounds/visuals)",
@@ -15,653 +15,871 @@
         "majorInterval=[600,1200] (dungeons, boss encounters)",
         "questMicroInterval=[300,600], questMesoInterval=[900,1800], questMacroInterval=[3600,7200]",
         "anchorInterval=[4000,8000] (distance between major anchors)",
-        "Integration test validates config loads and all values in range"
+        "Integration test validates config loads and all values in range",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S002",
+      "id": "US-002",
       "title": "Ashford Town Config — Verify & Complete",
       "description": "Verify existing content/towns/ashford.json is fully wired. Add any missing building archetypes, NPC blueprints, or interior slots. Ensure all 5 NPCs have complete dialogue pools (3+ greetings, 1+ quest lines). Validate with TownConfigSchema.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/towns/ashford.json passes TownConfigSchema validation",
         "All 5 building archetypes (cottage, tavern, smithy, chapel, house_large) have complete interiorSlots",
         "All 5 NPC blueprints have 3+ greeting lines and 1+ quest dialogue",
-        "Integration test: load Ashford → layoutTown → generateBuildingGeometry for all 6 buildings"
+        "Integration test: load Ashford → layoutTown → generateBuildingGeometry for all 6 buildings",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S003",
+      "id": "US-003",
       "title": "Millbrook Town Config",
       "description": "Create content/towns/millbrook.json — a market town at anchor-01 (distance 6000). Layout strategy: 'road' (buildings line a main street). 8-10 buildings including tavern, market_stall x3, chapel, guard_post, house_large x2, stable. Boundary: hedge. Approach: bridge.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/towns/millbrook.json exists and passes TownConfigSchema",
         "Layout strategy is 'road'",
         "8-10 buildings with distinct archetypes",
         "Boundary type 'hedge', approach 'bridge'",
-        "All building archetypes exist in content/buildings/"
+        "All building archetypes exist in content/buildings/",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S006", "S007"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-006", "US-007"]
     },
     {
-      "id": "S004",
+      "id": "US-004",
       "title": "Ravensgate Town Config",
       "description": "Create content/towns/ravensgate.json — a walled hostile town at anchor-03 (distance 17000). Layout strategy: 'grid' (street grid inside stone walls). 12-15 buildings including gate, prison, tavern, barracks, lord's manor, merchant x2, house_large x3, guard_post x2. Boundary: stone_wall. Approach: open.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/towns/ravensgate.json exists and passes TownConfigSchema",
         "Layout strategy is 'grid'",
         "12-15 buildings reflecting a hostile walled city",
         "Boundary 'stone_wall', approach 'open'",
         "All building archetypes exist in content/buildings/",
-        "NPCs include hostile/suspicious dialogue variants"
+        "NPCs include hostile/suspicious dialogue variants",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S006", "S007", "S008"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-006", "US-007", "US-008"]
     },
     {
-      "id": "S005",
+      "id": "US-005",
       "title": "Pilgrim's Rest Waypoint Config",
       "description": "Create content/towns/pilgrims-rest.json — a roadside monastery at anchor-04 (distance 21000). Layout strategy: 'organic'. 4-5 buildings: chapel (large), garden structure, library, dormitory, herb_garden. Boundary: hedge. Approach: grove. Peaceful refuge with healer and scholar NPCs.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/towns/pilgrims-rest.json exists and passes TownConfigSchema",
         "Layout strategy 'organic', boundary 'hedge', approach 'grove'",
         "4-5 buildings appropriate for a monastery",
-        "NPCs include healer and scholar archetypes"
+        "NPCs include healer and scholar archetypes",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S006", "S007"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-006", "US-007"]
     },
     {
-      "id": "S006",
+      "id": "US-006",
       "title": "Building Archetypes — Market & Civic",
       "description": "Create building archetype JSONs: market_stall (1 story, 2x1, timber_frame, openFront), guard_post (2 stories, 1x1, stone, flat roof), stable (1 story, 3x2, timber_frame, thatch), barracks (2 stories, 3x3, stone, slate), manor (2 stories, 4x5, stone, slate), prison (2 stories, 2x3, stone, flat).",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "6 new JSON files in content/buildings/",
         "All pass BuildingArchetypeSchema validation",
         "Each has appropriate interiorSlots for its function",
-        "market_stall has openFront=true"
+        "market_stall has openFront=true",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S007",
+      "id": "US-007",
       "title": "Building Archetypes — Religious & Utility",
       "description": "Create building archetype JSONs: library (2 stories, 3x3, stone, slate), dormitory (2 stories, 2x4, plaster, thatch), herb_garden (1 story, 2x2, timber_frame, flat, openFront), mill (2 stories, 2x2, stone, thatch), watchtower (3 stories, 1x1, stone, flat).",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "5 new JSON files in content/buildings/",
         "All pass BuildingArchetypeSchema validation",
         "watchtower is the only 3-story building",
-        "herb_garden has openFront=true"
+        "herb_garden has openFront=true",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S008",
+      "id": "US-008",
       "title": "Building Archetypes — Large Structures",
       "description": "Create building archetype JSONs: gate (special 1-story 4x1 stone flat archetype with no roof, representing a town gate), temple (2 stories, 4x6, stone, slate — for Grailsend), arena (1 story, 5x5, stone, flat, openFront).",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "3 new JSON files in content/buildings/",
         "All pass BuildingArchetypeSchema validation",
         "temple is the largest building (4x6)",
-        "gate and arena have appropriate openFront settings"
+        "gate and arena have appropriate openFront settings",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S009",
+      "id": "US-009",
       "title": "Millbrook NPCs — Blueprints",
       "description": "Create 6 NPC blueprints for Millbrook: Martha (innkeeper, warm), Gerold (merchant, shrewd), Brother Thomas (priest, gentle), Captain Hale (knight, stern), Farmer Wynn (farmer, worried about crops), Lucy (wanderer, passing through with news). Each with face, bodyBuild, clothPalette, behavior, dialogue.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "6 new JSON files in content/npcs/",
         "All pass NPCBlueprintSchema validation",
         "Each has 3+ greeting lines and 1+ quest dialogue",
         "Face configs use diverse skinTones, hairStyles, eyeColors",
-        "Behaviors match archetypes (innkeeper=working, merchant=idle, knight=patrolling)"
+        "Behaviors match archetypes (innkeeper=working, merchant=idle, knight=patrolling)",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S010",
+      "id": "US-010",
       "title": "Ravensgate NPCs — Blueprints",
       "description": "Create 8 NPC blueprints for Ravensgate: Lord Ashwick (noble, antagonist), Captain Roderick (knight, loyal to lord), Elara (healer, secret ally), Thornton (merchant, fearful), Bard Finch (wanderer, information broker), Greta (innkeeper, sympathetic), Guard Marcus (knight, conflicted), Prisoner Silas (scholar, imprisoned quest-giver).",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "8 new JSON files in content/npcs/",
         "All pass NPCBlueprintSchema validation",
         "Dialogue reflects Ravensgate's hostile atmosphere",
         "Lord Ashwick and Captain Roderick have antagonistic dialogue",
-        "Elara and Greta have secretly sympathetic dialogue"
+        "Elara and Greta have secretly sympathetic dialogue",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S011",
+      "id": "US-011",
       "title": "Pilgrim's Rest NPCs — Blueprints",
       "description": "Create 3 NPC blueprints for Pilgrim's Rest: Abbot Gregorius (priest, wise), Sister Maeve (healer, kind), Brother Anselm (scholar, bookish). Peaceful, contemplative dialogue. Provide lore about the Grail.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "3 new JSON files in content/npcs/",
         "All pass NPCBlueprintSchema validation",
         "Dialogue provides Grail lore and spiritual guidance",
-        "Healer NPC has healing-related quest dialogue"
+        "Healer NPC has healing-related quest dialogue",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S012",
+      "id": "US-012",
       "title": "Grailsend NPCs — Blueprints",
       "description": "Create 2 NPC blueprints for the final temple: The Guardian (knight, ancient), The Oracle (scholar, cryptic). These are the final NPCs before the endgame.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "2 new JSON files in content/npcs/",
         "All pass NPCBlueprintSchema validation",
         "Guardian dialogue tests player's worthiness",
-        "Oracle dialogue reveals final Grail truth"
+        "Oracle dialogue reveals final Grail truth",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S013",
+      "id": "US-013",
       "title": "Roadside NPCs — Wanderers & Hermits",
       "description": "Create 8 NPC blueprints for random roadside encounters: 4 wanderer variants (pilgrim, peddler, bard, refugee) and 4 hermit variants (herb_hermit, mad_hermit, retired_knight, wise_woman). These spawn procedurally in WILD chunks.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "8 new JSON files in content/npcs/",
         "All pass NPCBlueprintSchema validation",
         "Wanderers have travel-themed dialogue",
         "Hermits have cryptic/specialized dialogue",
-        "Each has distinct face, bodyBuild, clothPalette"
+        "Each has distinct face, bodyBuild, clothPalette",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S014",
+      "id": "US-014",
       "title": "NPC Definition Pools",
       "description": "Create content/npcs/pools/ directory with NPC definition pool JSONs (NPCDefinitionSchema) for each archetype: blacksmith.json, innkeeper.json, merchant.json, healer.json, knight.json, farmer.json, priest.json, noble.json, scholar.json, wanderer.json, hermit.json, bandit.json. Each pool has 3+ names and 2+ greetings for procedural NPC generation.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "12 pool JSON files in content/npcs/pools/",
         "All pass NPCDefinitionSchema validation",
         "Each has namePool with 3+ names",
         "Each has greetingPool with 2+ dialogue lines",
-        "Bandit pool has hostile greetings"
+        "Bandit pool has hostile greetings",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S015",
+      "id": "US-015",
       "title": "Main Quest — Chapter 0: The Call (Ashford)",
       "description": "Create content/quests/main/chapter-00.json. Macro quest: player discovers a dying pilgrim on the road who speaks of the Holy Grail. Must talk to Old Tomas (scholar) who reveals the legend. Branch A: accept quest eagerly. Branch B: reluctantly agree after village comes under threat. Steps include dialogue, investigation, and a travel step leaving Ashford.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/quests/main/chapter-00.json exists and passes QuestDefinitionSchema",
         "tier: 'macro', trigger type 'anchor' with anchorId 'home'",
         "Has both A and B branches",
         "Dialogue steps meet 15-80 word limits",
         "References valid NPCs (old-tomas, father-cedric)",
-        "estimatedMinutes between 15-30"
+        "estimatedMinutes between 15-30",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S002"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-002"]
     },
     {
-      "id": "S016",
+      "id": "US-016",
       "title": "Main Quest — Chapter 1: The First Sign (Millbrook)",
       "description": "Create content/quests/main/chapter-01.json. Macro quest at Millbrook: investigate rumors of strange lights at the old mill. Meet Captain Hale who's suspicious of outsiders. Branch A: gain trust through helping with bandits. Branch B: sneak into the mill at night. Discover ancient map fragment pointing toward Thornfield.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/quests/main/chapter-01.json passes QuestDefinitionSchema",
         "tier: 'macro', trigger type 'anchor' with anchorId 'anchor-01'",
         "A and B branches with different approaches",
         "References Millbrook NPCs",
         "Includes combat or stealth encounter references",
-        "estimatedMinutes between 20-40"
+        "estimatedMinutes between 20-40",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S003", "S009"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-003", "US-009"]
     },
     {
-      "id": "S017",
+      "id": "US-017",
       "title": "Main Quest — Chapter 2: The Ruins Speak (Thornfield)",
       "description": "Create content/quests/main/chapter-02.json. Macro quest at Thornfield Ruins dungeon: navigate the ruins, solve ancient puzzles, fight guardian creatures. Branch A: use force to break through. Branch B: solve riddles using knowledge from Brother Thomas. Find second map fragment and learn of Ravensgate's role.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/quests/main/chapter-02.json passes QuestDefinitionSchema",
         "tier: 'macro', trigger type 'anchor' with anchorId 'anchor-02'",
         "Includes puzzle and combat encounter references",
         "A and B branches (force vs knowledge)",
-        "estimatedMinutes between 30-50"
+        "estimatedMinutes between 30-50",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S018",
+      "id": "US-018",
       "title": "Main Quest — Chapter 3: The Iron Gate (Ravensgate)",
       "description": "Create content/quests/main/chapter-03.json. Macro quest: gain entry to Ravensgate, find imprisoned scholar Silas who holds the third map fragment. Branch A: diplomacy and deception (work with Elara). Branch B: direct confrontation with Lord Ashwick. Escape the city with the fragment.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/quests/main/chapter-03.json passes QuestDefinitionSchema",
         "tier: 'macro', trigger type 'anchor' with anchorId 'anchor-03'",
         "References Ravensgate NPCs (Ashwick, Elara, Silas)",
         "A and B branches with stealth/social vs combat",
-        "estimatedMinutes between 30-50"
+        "estimatedMinutes between 30-50",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S004", "S010"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-004", "US-010"]
     },
     {
-      "id": "S019",
+      "id": "US-019",
       "title": "Main Quest — Chapter 4: The Pilgrim's Wisdom (Pilgrim's Rest)",
       "description": "Create content/quests/main/chapter-04.json. Macro quest: at the monastery, assemble the three map fragments. Abbot Gregorius reveals the true nature of the Grail — it's not a cup but a test of character. Branch A: accept the spiritual path. Branch B: demand the Grail's location by force. Prepare for final journey.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/quests/main/chapter-04.json passes QuestDefinitionSchema",
         "tier: 'macro', trigger type 'anchor' with anchorId 'anchor-04'",
         "References Pilgrim's Rest NPCs",
         "A and B branches reflecting moral choice",
-        "estimatedMinutes between 20-35"
+        "estimatedMinutes between 20-35",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S005", "S011"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-005", "US-011"]
     },
     {
-      "id": "S020",
+      "id": "US-020",
       "title": "Main Quest — Chapter 5: The Grail (Grailsend)",
       "description": "Create content/quests/main/chapter-05.json. Macro quest: the final temple. Face the Guardian's trials. Branch A: pass tests of wisdom, mercy, and sacrifice. Branch B: fight through guardians. Meet the Oracle who reveals the Grail's final secret. Game ending depends on accumulated choices.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/quests/main/chapter-05.json passes QuestDefinitionSchema",
         "tier: 'macro', trigger type 'anchor' with anchorId 'anchor-05'",
         "References Grailsend NPCs (Guardian, Oracle)",
         "A and B branches with different endings",
         "Final encounter references",
-        "estimatedMinutes between 30-45"
+        "estimatedMinutes between 30-45",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S012"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-012"]
     },
     {
-      "id": "S021",
+      "id": "US-021",
       "title": "Side Quests — Ashford Micro (3 quests)",
       "description": "Create 3 micro side quests for Ashford: (1) Aldric's Missing Hammer — fetch quest, find hammer in nearby forest. (2) Bess's Secret Recipe — dialogue chain, gather herbs. (3) Father Cedric's Lost Hymnal — investigate the chapel attic. Each is linear (steps, no branches).",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "3 JSON files in content/quests/side/",
         "All pass QuestDefinitionSchema with tier='micro'",
         "Each has steps array (no branches required for micro)",
         "Each trigger type 'anchor' with anchorId 'home'",
         "estimatedMinutes 5-15 each",
-        "Reference valid Ashford NPCs and items"
+        "Reference valid Ashford NPCs and items",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S002", "S032"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-002", "US-032"]
     },
     {
-      "id": "S022",
+      "id": "US-022",
       "title": "Side Quests — Millbrook Meso (2 quests)",
       "description": "Create 2 meso side quests for Millbrook: (1) The Poisoned Well — investigate illness, A: confront the herbalist, B: trace poison source upstream. (2) The Missing Merchant — a trader vanished on the road, A: track bandits, B: discover the merchant fled debts.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "2 JSON files in content/quests/side/",
         "All pass QuestDefinitionSchema with tier='meso'",
         "Each has A/B branches",
         "Each trigger type 'anchor' with anchorId 'anchor-01'",
         "estimatedMinutes 15-30 each",
-        "Reference valid encounters and items"
+        "Reference valid encounters and items",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S003", "S009", "S032"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-003", "US-009", "US-032"]
     },
     {
-      "id": "S023",
+      "id": "US-023",
       "title": "Side Quests — Roadside Micro (5 quests)",
       "description": "Create 5 roadside micro side quests triggered by distance: (1) Lost Pilgrim — escort to nearest town. (2) Bandit Ambush — combat encounter. (3) Wounded Soldier — heal or loot dilemma. (4) Merchant's Broken Cart — help repair. (5) Strange Shrine — investigate mysterious glow.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "5 JSON files in content/quests/side/",
         "All pass QuestDefinitionSchema with tier='micro'",
         "Each trigger type 'roadside' with appropriate distanceRange",
         "Linear steps, no branches required",
         "estimatedMinutes 5-10 each",
-        "Spread across different distance ranges of the road"
+        "Spread across different distance ranges of the road",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S032"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-032"]
     },
     {
-      "id": "S024",
+      "id": "US-024",
       "title": "Side Quests — Ravensgate Meso (2 quests)",
       "description": "Create 2 meso side quests for Ravensgate: (1) The Underground — find the resistance movement, A: join openly, B: infiltrate as spy. (2) Lord Ashwick's Secret — discover what the lord hides in the tower, A: bribe guards, B: find secret passage.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "2 JSON files in content/quests/side/",
         "All pass QuestDefinitionSchema with tier='meso'",
         "Each has A/B branches",
         "Each trigger type 'anchor' with anchorId 'anchor-03'",
         "estimatedMinutes 15-30 each",
-        "Reference Ravensgate NPCs"
+        "Reference Ravensgate NPCs",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S004", "S010", "S032"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-004", "US-010", "US-032"]
     },
     {
-      "id": "S025",
+      "id": "US-025",
       "title": "Side Quests — Cross-Region Macro (2 quests)",
       "description": "Create 2 macro side quests spanning multiple anchors: (1) The Herbalist's Journey — gather 5 rare herbs from different regions, unlock healer abilities. (2) The Cartographer's Map — complete the world map by visiting all anchors, reveal hidden locations.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "2 JSON files in content/quests/side/",
         "All pass QuestDefinitionSchema with tier='macro'",
         "Each has A/B branches",
         "Prerequisites reference earlier quests",
         "estimatedMinutes 45-90 each",
-        "Steps reference multiple anchor locations"
+        "Steps reference multiple anchor locations",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S015", "S016", "S032"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-015", "US-016", "US-032"]
     },
     {
-      "id": "S026",
+      "id": "US-026",
       "title": "Side Quests — Pilgrim's Rest Micro (2 quests)",
       "description": "Create 2 micro side quests for Pilgrim's Rest: (1) The Missing Manuscript — help Brother Anselm find a stolen book in the library. (2) Sister Maeve's Garden — gather specific herbs from the surrounding hills.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "2 JSON files in content/quests/side/",
         "All pass QuestDefinitionSchema with tier='micro'",
         "Linear steps",
         "Each trigger type 'anchor' with anchorId 'anchor-04'",
-        "estimatedMinutes 5-15 each"
+        "estimatedMinutes 5-15 each",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S005", "S011", "S032"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-005", "US-011", "US-032"]
     },
     {
-      "id": "S027",
+      "id": "US-027",
       "title": "Side Quests — Roadside Encounters Meso (3 quests)",
       "description": "Create 3 meso roadside quests: (1) The Deserter — a soldier wants help escaping his post, A: help him, B: turn him in. (2) The Cursed Ring — a peddler sells you a ring that brings bad luck, A: find the witch, B: destroy it. (3) The Bridge Troll — a troll blocks passage, A: fight, B: solve riddle.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "3 JSON files in content/quests/side/",
         "All pass QuestDefinitionSchema with tier='meso'",
         "Each has A/B branches",
         "Each trigger type 'roadside'",
-        "estimatedMinutes 15-25 each"
+        "estimatedMinutes 15-25 each",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S032"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-032"]
     },
     {
-      "id": "S028",
+      "id": "US-028",
       "title": "Monster Archetypes — Tier 1 (Common)",
       "description": "Create 5 monster archetype JSONs for danger tier 1: wolf (quadruped), bandit (biped), giant_rat (quadruped), skeleton (biped), slime (amorphous). Low health, low damage. Found near the road.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "5 JSON files in content/monsters/",
         "All pass MonsterArchetypeSchema validation",
         "All dangerTier=1",
         "Health 10-30, damage 3-8",
         "Mix of bodyTypes",
-        "Each has a colorScheme with primary + secondary"
+        "Each has a colorScheme with primary + secondary",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S029",
+      "id": "US-029",
       "title": "Monster Archetypes — Tier 2 (Uncommon)",
       "description": "Create 5 monster archetypes for danger tier 2: dire_wolf (quadruped), bandit_leader (biped), giant_spider (quadruped), wraith (amorphous), troll (biped). Medium health and damage. Found 1-2 chunks from road.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "5 JSON files in content/monsters/",
         "All pass MonsterArchetypeSchema with dangerTier=2",
         "Health 30-60, damage 8-15",
-        "Each has lootTable reference"
+        "Each has lootTable reference",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S030",
+      "id": "US-030",
       "title": "Monster Archetypes — Tier 3-4 (Rare & Boss)",
       "description": "Create 6 monster archetypes: Tier 3 — drake (quadruped), necromancer (biped), basilisk (serpent). Tier 4 — dragon (quadruped, size 4.0), lich_lord (biped), ancient_horror (amorphous, size 5.0). High health/damage. Deep wilderness and dungeons only.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "6 JSON files in content/monsters/",
         "3 at dangerTier=3, 3 at dangerTier=4",
         "Tier 3: health 60-100, damage 15-25",
         "Tier 4: health 100-200, damage 25-50",
         "Each has lootTable reference",
-        "dragon and ancient_horror use large sizes (4.0-5.0)"
+        "dragon and ancient_horror use large sizes (4.0-5.0)",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S031",
+      "id": "US-031",
       "title": "Encounter Tables — All Tiers",
       "description": "Create encounter table JSONs for each danger tier (0-4): content/encounters/tier-0.json through tier-4.json. Each table has weighted monster entries with count ranges. Tier 0 (road) has no combat. Tier 1-4 have escalating monster pools.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "5 JSON files in content/encounters/",
         "All pass EncounterTableSchema validation",
         "Tier 0 entries are ambient/non-combat only",
         "Higher tiers reference corresponding monster archetypes",
         "Weight values sum to approximately 1.0 per table",
-        "Each tier references a loot table"
+        "Each tier references a loot table",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S028", "S029", "S030"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-028", "US-029", "US-030"]
     },
     {
-      "id": "S032",
-      "title": "Items — Core Equipment & Quest Items",
-      "description": "Create 20 item definition JSONs in content/items/: 5 equipment (iron_sword, leather_armor, wooden_shield, healing_staff, travel_cloak), 5 consumables (health_potion, stamina_draught, antidote, ration, torch), 5 key_items (map_fragment_1/2/3, pilgrim_medallion, grail_key), 5 quest_items (aldrics_hammer, secret_recipe, lost_hymnal, stolen_manuscript, rare_herb).",
-      "acceptance_criteria": [
-        "20 JSON files in content/items/",
+      "id": "US-032",
+      "title": "Items — Core Equipment & Consumables",
+      "description": "Create 10 item definition JSONs in content/items/: 5 equipment (iron_sword, leather_armor, wooden_shield, healing_staff, travel_cloak) and 5 consumables (health_potion, stamina_draught, antidote, ration, torch). Equipment items have stat effects, consumables have duration-based effects.",
+      "acceptanceCriteria": [
+        "10 JSON files in content/items/",
         "All pass ItemDefinitionSchema validation",
         "Equipment items have stat effects",
         "Consumables have duration-based effects",
-        "Key items are not stackable",
-        "Quest items reference their associated quest IDs in description"
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S033",
+      "id": "US-033",
+      "title": "Items — Key Items & Quest Items",
+      "description": "Create 10 item definition JSONs in content/items/: 5 key_items (map_fragment_1, map_fragment_2, map_fragment_3, pilgrim_medallion, grail_key) and 5 quest_items (aldrics_hammer, secret_recipe, lost_hymnal, stolen_manuscript, rare_herb). Key items are not stackable. Quest items reference their associated quest IDs.",
+      "acceptanceCriteria": [
+        "10 JSON files in content/items/",
+        "All pass ItemDefinitionSchema validation",
+        "Key items are not stackable",
+        "Quest items reference their associated quest IDs in description",
+        "npx tsx scripts/validate-trove.ts passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
+    },
+    {
+      "id": "US-034",
       "title": "Loot Tables — All Tiers",
       "description": "Create loot table JSONs for each danger tier: content/loot/tier-1.json through tier-4.json. Each table has weighted item drops with quantity ranges. Higher tiers drop better equipment.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "4 JSON files in content/loot/",
         "All pass LootTableSchema validation",
         "Tier 1 drops: rations, torches, small coins",
         "Tier 2 drops: health potions, basic equipment",
         "Tier 3 drops: rare equipment, antidotes",
         "Tier 4 drops: unique items, key items",
-        "Item IDs reference valid items from S032"
+        "Item IDs reference valid items from US-032 and US-033",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S032"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-032", "US-033"]
     },
     {
-      "id": "S034",
+      "id": "US-035",
       "title": "Roadside Features — Ambient (10 features)",
       "description": "Create 10 ambient feature definitions: wildflower_patch, ancient_oak, standing_stone, bird_nest, fox_den, mushroom_ring, fallen_log, stream_crossing, berry_bush, wind_chimes. Non-interactable visual flavor along the road.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "10 JSON files in content/features/",
         "All pass FeatureDefinitionSchema with tier='ambient'",
         "interactable=false for all",
         "Each has descriptive visualType",
-        "Descriptions are evocative and 10-300 chars"
+        "Descriptions are evocative and 10-300 chars",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S035",
+      "id": "US-036",
       "title": "Roadside Features — Minor (10 features)",
       "description": "Create 10 minor features: wayside_shrine, stone_bridge, abandoned_camp, milestone_marker, old_well, ruined_farmstead, crossroads_sign, hunter_blind, fairy_circle, weather_vane. Interactable with short dialogue/description.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "10 JSON files in content/features/",
         "All pass FeatureDefinitionSchema with tier='minor'",
         "interactable=true for all",
         "Each has dialogueOnInteract (50-300 chars)",
-        "Visual types map to renderable objects"
+        "Visual types map to renderable objects",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S036",
+      "id": "US-037",
       "title": "Roadside Features — Major (5 features)",
       "description": "Create 5 major features: ancient_ruins (dungeon entrance), dragon_bones (lore marker), hermit_cave (NPC encounter), enchanted_grove (healing spot), watchtower_ruin (vantage point). Significant gameplay impact.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "5 JSON files in content/features/",
         "All pass FeatureDefinitionSchema with tier='major'",
         "interactable=true for all",
         "Each has detailed dialogueOnInteract (100-300 chars)",
-        "Visual types suggest substantial 3D structures"
+        "Visual types suggest substantial 3D structures",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S037",
+      "id": "US-038",
       "title": "Encounter Definitions — Combat (6 encounters)",
       "description": "Create 6 combat encounter definitions: bandit_ambush (difficulty 3), wolf_pack (difficulty 4), skeleton_patrol (difficulty 5), troll_bridge (difficulty 6), spider_nest (difficulty 7), dragon_lair (difficulty 10). Each with description, rewards, and failure consequences.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "6 JSON files in content/encounters/combat/",
         "All pass EncounterDefinitionSchema with type='combat'",
         "Difficulty ranges from 3-10",
         "Each has rewards referencing valid items",
-        "Each has failureConsequence"
+        "Each has failureConsequence",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S032"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-032"]
     },
     {
-      "id": "S038",
+      "id": "US-039",
       "title": "Encounter Definitions — Social & Puzzle (6 encounters)",
       "description": "Create 6 non-combat encounters: merchant_negotiation (social, diff 3), tavern_brawl (social, diff 4), riddle_door (puzzle, diff 5), ancient_lock (puzzle, diff 6), noble_court (social, diff 7), oracle_trial (puzzle, diff 8).",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "6 JSON files in content/encounters/",
         "All pass EncounterDefinitionSchema",
         "3 social type, 3 puzzle type",
         "Difficulty ranges 3-8",
         "Each has rewards and failure consequences",
-        "Descriptions are 10-500 chars"
+        "Descriptions are 10-500 chars",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S032"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-032"]
     },
     {
-      "id": "S039",
+      "id": "US-040",
       "title": "Encounter Definitions — Stealth & Survival (4 encounters)",
       "description": "Create 4 encounters: prison_break (stealth, diff 6), guard_evasion (stealth, diff 5), wilderness_storm (survival, diff 4), river_crossing (survival, diff 3).",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "4 JSON files in content/encounters/",
         "All pass EncounterDefinitionSchema",
         "2 stealth type, 2 survival type",
-        "Each has rewards and failure consequences"
+        "Each has rewards and failure consequences",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S032"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-032"]
     },
     {
-      "id": "S040",
+      "id": "US-041",
       "title": "Thornfield Ruins Dungeon Layout",
       "description": "Create content/dungeons/thornfield.json defining the dungeon at anchor-02. Multiple rooms connected by corridors, puzzle chambers, a boss arena. Reference encounter IDs and loot tables. Include trap placements and secret passages.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/dungeons/thornfield.json exists",
         "Defines room layout with connections",
         "References valid encounter IDs",
         "Includes at least 1 puzzle room, 1 boss room, 2 trap corridors",
         "Has a secret passage mechanic"
       ],
-      "dependencies": ["S037", "S038"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-038", "US-039"]
     },
     {
-      "id": "S041",
+      "id": "US-042",
       "title": "Grailsend Temple Dungeon Layout",
       "description": "Create content/dungeons/grailsend.json defining the final temple at anchor-05. Three trial chambers (wisdom, mercy, sacrifice), a guardian arena, the Grail chamber. The most complex dungeon layout.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/dungeons/grailsend.json exists",
         "Three distinct trial chambers with different encounter types",
         "Guardian arena with boss encounter reference",
         "Grail chamber as final room",
-        "References valid encounters from S037/S038/S039"
+        "References valid encounters from US-038/US-039/US-040"
       ],
-      "dependencies": ["S037", "S038", "S039"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-038", "US-039", "US-040"]
     },
     {
-      "id": "S042",
+      "id": "US-043",
       "title": "Road Spine Regions",
       "description": "Add regions array to content/world/road-spine.json. Define 5 regions: Ashford Meadows (MEADOW, anchors home→anchor-01), Millbrook Forests (FOREST, anchor-01→anchor-02), Thornfield Hills (HILLS, anchor-02→anchor-03), Ravensgate Moors (MOOR, anchor-03→anchor-04), Grailsend Highlands (HILLS, anchor-04→anchor-05). Each with terrainFeatures.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "road-spine.json updated with regions array",
         "Passes RoadSpineSchema validation",
         "5 regions with distinct biomes",
         "Each region has 3+ terrain features",
-        "Regions cover the full road with no gaps"
+        "Regions cover the full road with no gaps",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": []
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
     },
     {
-      "id": "S043",
+      "id": "US-044",
       "title": "Town Config Loader — Expand for All Towns",
       "description": "Update src/game/world/town-configs.ts to import and register all town configs (Millbrook at anchor-01 chunk, Ravensgate at anchor-03 chunk, Pilgrim's Rest at anchor-04 chunk). Map anchor IDs to chunk coordinates based on road distances and CHUNK_SIZE.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "town-configs.ts imports all town JSONs",
         "getTownConfig returns correct config for each town's chunk coordinates",
         "All new building archetypes registered in BUILDING_ARCHETYPES",
         "All new NPC blueprints registered in NPC_BLUEPRINTS",
-        "Integration tests verify all towns load and layout correctly"
+        "Integration tests verify all towns load and layout correctly",
+        "pnpm tsc --noEmit passes",
+        "pnpm exec biome check . passes",
+        "pnpm test passes"
       ],
-      "dependencies": ["S003", "S004", "S005", "S006", "S007", "S008", "S009", "S010", "S011", "S012"]
+      "priority": 4,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-003", "US-004", "US-005", "US-006", "US-007", "US-008", "US-009", "US-010", "US-011", "US-012"]
     },
     {
-      "id": "S044",
+      "id": "US-045",
       "title": "Game Config Assembly",
       "description": "Create content/game-config.json assembling all content: world (road-spine with regions), pacing config, main quest chapters, all side quests (macro/meso/micro), NPC pools, feature definitions, item definitions, encounter definitions. Validate against GameConfigSchema.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "content/game-config.json exists",
         "Passes GameConfigSchema validation",
         "References all 6 main quest chapters",
         "sideQuests.macro has 2+ quests",
         "sideQuests.meso has 7+ quests",
         "sideQuests.micro has 10+ quests",
-        "All NPC/item/encounter references are valid cross-references"
+        "All NPC/item/encounter references are valid cross-references",
+        "npx tsx scripts/validate-trove.ts passes"
       ],
-      "dependencies": ["S001", "S014", "S015", "S016", "S017", "S018", "S019", "S020", "S021", "S022", "S023", "S024", "S025", "S026", "S027", "S031", "S032", "S033", "S034", "S035", "S036", "S037", "S038", "S039", "S042"]
+      "priority": 5,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-001", "US-014", "US-015", "US-016", "US-017", "US-018", "US-019", "US-020", "US-021", "US-022", "US-023", "US-024", "US-025", "US-026", "US-027", "US-031", "US-032", "US-033", "US-034", "US-035", "US-036", "US-037", "US-038", "US-039", "US-040", "US-043"]
     },
     {
-      "id": "S045",
+      "id": "US-046",
       "title": "Content Validation Script",
       "description": "Create scripts/validate-content.ts that loads all content JSON files, validates each against its Zod schema, checks cross-references (item IDs referenced in quests exist, NPC IDs in towns exist, encounter IDs in quests exist), and reports errors.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "scripts/validate-content.ts exists",
         "Validates all content directories: buildings, towns, npcs, quests, monsters, encounters, items, features, loot, dungeons",
         "Cross-reference checking for all ID references",
         "Reports clear error messages with file paths",
         "Exit code 0 when all valid, 1 when errors found",
-        "Can be run via 'npx tsx scripts/validate-content.ts'"
+        "Can be run via 'npx tsx scripts/validate-content.ts'",
+        "pnpm tsc --noEmit passes"
       ],
-      "dependencies": ["S044"]
+      "priority": 6,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-045"]
     },
     {
-      "id": "S046",
+      "id": "US-047",
       "title": "Monster Factory — Runtime Rendering",
       "description": "Create src/game/factories/monster-factory.ts that takes a MonsterArchetype and produces render data (geometry dimensions, color materials, animation parameters). Create src/game/components/Monster.tsx R3F component. Similar pattern to NPC factory but for hostile entities.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "monster-factory.ts exists with buildMonsterRenderData(archetype)",
         "Monster.tsx R3F component renders from archetype",
         "bodyType determines base geometry (biped=box stack, quadruped=elongated, serpent=cylinders, amorphous=sphere)",
         "colorScheme applied as materials",
         "size parameter scales the entire model",
-        "Unit tests for factory function"
+        "Unit tests for factory function",
+        "pnpm tsc --noEmit passes",
+        "pnpm exec biome check . passes",
+        "pnpm test passes"
       ],
-      "dependencies": ["S028"]
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-028"]
     },
     {
-      "id": "S047",
+      "id": "US-048",
       "title": "Encounter System — Runtime",
       "description": "Create src/game/systems/EncounterSystem.tsx that checks player position against danger tier, rolls encounter tables, and spawns monster groups. Integrate with ChunkManager to add encounter zones to chunks based on danger tier.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "EncounterSystem.tsx mounts in GameScene",
         "Uses getDangerTier() to determine encounter probability",
         "Rolls against encounter tables to select monsters",
         "Spawns Monster components at appropriate positions",
         "Cooldown timer prevents encounter spam",
-        "Combat encounters block movement (basic state)"
+        "Combat encounters block movement (basic state)",
+        "pnpm tsc --noEmit passes",
+        "pnpm exec biome check . passes",
+        "pnpm test passes"
       ],
-      "dependencies": ["S031", "S046"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-031", "US-047"]
     },
     {
-      "id": "S048",
+      "id": "US-049",
       "title": "Quest System — Runtime State Machine",
       "description": "Create src/game/systems/QuestSystem.tsx and src/game/stores/questStore.ts. Track active quests, current step, branch choices. Trigger quest steps based on player location (anchor proximity) and NPC dialogue. Display quest log in HUD.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "questStore.ts manages active quests, completed quests, current steps",
         "QuestSystem.tsx checks triggers each frame",
         "Anchor triggers fire when player enters anchor town chunk",
         "Roadside triggers fire based on distance from start",
         "Prerequisite triggers check completed quests",
-        "Quest state persists across chunk loads"
+        "Quest state persists across chunk loads",
+        "pnpm tsc --noEmit passes",
+        "pnpm exec biome check . passes",
+        "pnpm test passes"
       ],
-      "dependencies": ["S015", "S021"]
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-015", "US-021"]
     },
     {
-      "id": "S049",
+      "id": "US-050",
       "title": "Feature Spawner — Roadside Features",
       "description": "Create src/game/systems/FeatureSpawner.tsx that procedurally places roadside features along ROAD and WILD chunks based on pacing intervals. Uses feature definitions to select appropriate tier features.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "FeatureSpawner.tsx mounts in GameScene",
         "Places ambient features every ambientInterval",
         "Places minor features every minorInterval",
         "Places major features every majorInterval",
         "Feature components render with appropriate geometry",
-        "Interactable features create Interactable entries for interaction system"
+        "Interactable features create Interactable entries for interaction system",
+        "pnpm tsc --noEmit passes",
+        "pnpm exec biome check . passes",
+        "pnpm test passes"
       ],
-      "dependencies": ["S001", "S034", "S035", "S036"]
+      "priority": 4,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-001", "US-035", "US-036", "US-037"]
     },
     {
-      "id": "S050",
+      "id": "US-051",
       "title": "Integration Test — Full Game Config Validation",
       "description": "Create comprehensive integration test that loads game-config.json and validates the entire content graph: all cross-references resolve, pacing intervals are sane, quest chains are completable, every anchor has content, no orphaned items/encounters.",
-      "acceptance_criteria": [
+      "acceptanceCriteria": [
         "Test file src/game/world/game-config.test.ts exists",
         "Loads and validates game-config.json against GameConfigSchema",
         "Verifies all item IDs referenced in quests/loot exist",
@@ -669,9 +887,14 @@
         "Verifies all encounter references exist",
         "Verifies quest dependency chains are acyclic",
         "Verifies every anchor has at least one quest",
-        "All tests pass"
+        "All tests pass",
+        "pnpm tsc --noEmit passes",
+        "pnpm test passes"
       ],
-      "dependencies": ["S044"]
+      "priority": 6,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-045"]
     }
   ]
 }
