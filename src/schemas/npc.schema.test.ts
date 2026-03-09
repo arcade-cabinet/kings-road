@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { NPCDefinitionSchema, DialogueLineSchema } from './npc.schema';
+import { describe, expect, it } from 'vitest';
+import { DialogueLineSchema, NPCDefinitionSchema } from './npc.schema';
 
 describe('NPC Schema', () => {
   it('validates a complete NPC definition', () => {
@@ -8,12 +8,17 @@ describe('NPC Schema', () => {
       archetype: 'blacksmith',
       namePool: ['Aldric', 'Brennan', 'Cedric'],
       greetingPool: [
-        { text: 'Welcome to my forge, traveler. What can I craft for you today?' },
+        {
+          text: 'Welcome to my forge, traveler. What can I craft for you today?',
+        },
         { text: 'The anvil sings when good steel meets it. What do you need?' },
       ],
       questDialogue: {
         'quest-broken-sword': [
-          { text: 'Aye, I can reforge that blade. Bring me iron ore from the hills.', condition: 'quest:broken-sword:active' },
+          {
+            text: 'Aye, I can reforge that blade. Bring me iron ore from the hills.',
+            condition: 'quest:broken-sword:active',
+          },
         ],
       },
       appearance: {
@@ -42,9 +47,7 @@ describe('NPC Schema', () => {
       id: 'npc-bad',
       archetype: 'merchant',
       namePool: ['Alice', 'Bob', 'Charlie'],
-      greetingPool: [
-        { text: 'Hello there, welcome to my humble shop today.' },
-      ],
+      greetingPool: [{ text: 'Hello there, welcome to my humble shop today.' }],
     };
     expect(() => NPCDefinitionSchema.parse(npc)).toThrow();
   });

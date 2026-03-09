@@ -1,5 +1,9 @@
-import { describe, it, expect } from 'vitest';
-import { QuestDefinitionSchema, QuestStepSchema, QuestBranchSchema } from './quest.schema';
+import { describe, expect, it } from 'vitest';
+import {
+  QuestBranchSchema,
+  QuestDefinitionSchema,
+  QuestStepSchema,
+} from './quest.schema';
 
 describe('Quest Schema', () => {
   it('validates a micro quest', () => {
@@ -17,7 +21,8 @@ describe('Quest Schema', () => {
           npcArchetype: 'merchant',
           dialogueMinWords: 20,
           dialogueMaxWords: 80,
-          dialogue: 'Good traveler, I have lost my way. The road forked and I took the wrong path. Could you escort me to Millbrook?',
+          dialogue:
+            'Good traveler, I have lost my way. The road forked and I took the wrong path. Could you escort me to Millbrook?',
         },
         {
           id: 'step-02',
@@ -43,7 +48,13 @@ describe('Quest Schema', () => {
         A: {
           label: 'Confront the poisoner',
           steps: [
-            { id: 'a-01', type: 'investigate', description: 'Search the well house for clues.', dialogueMinWords: 15, dialogueMaxWords: 60 },
+            {
+              id: 'a-01',
+              type: 'investigate',
+              description: 'Search the well house for clues.',
+              dialogueMinWords: 15,
+              dialogueMaxWords: 60,
+            },
             { id: 'a-02', type: 'encounter', encounterId: 'poisoner-fight' },
           ],
           reward: { type: 'modifier', modifierId: 'village-hero' },
@@ -51,8 +62,23 @@ describe('Quest Schema', () => {
         B: {
           label: 'Find the cure',
           steps: [
-            { id: 'b-01', type: 'fetch', itemId: 'moonpetal', description: 'Find moonpetal herbs in the forest.', dialogueMinWords: 15, dialogueMaxWords: 60 },
-            { id: 'b-02', type: 'dialogue', npcArchetype: 'healer', dialogue: 'You found the moonpetal! Let me brew the antidote right away for the village folk.', dialogueMinWords: 15, dialogueMaxWords: 60 },
+            {
+              id: 'b-01',
+              type: 'fetch',
+              itemId: 'moonpetal',
+              description: 'Find moonpetal herbs in the forest.',
+              dialogueMinWords: 15,
+              dialogueMaxWords: 60,
+            },
+            {
+              id: 'b-02',
+              type: 'dialogue',
+              npcArchetype: 'healer',
+              dialogue:
+                'You found the moonpetal! Let me brew the antidote right away for the village folk.',
+              dialogueMinWords: 15,
+              dialogueMaxWords: 60,
+            },
           ],
           reward: { type: 'modifier', modifierId: 'village-healer' },
         },
@@ -71,7 +97,14 @@ describe('Quest Schema', () => {
       anchorAffinity: 'anchor-01',
       trigger: { type: 'roadside', distanceRange: [0, 100] },
       steps: [
-        { id: 'step-01', type: 'dialogue', npcArchetype: 'merchant', dialogue: 'Hi.', dialogueMinWords: 20, dialogueMaxWords: 80 },
+        {
+          id: 'step-01',
+          type: 'dialogue',
+          npcArchetype: 'merchant',
+          dialogue: 'Hi.',
+          dialogueMinWords: 20,
+          dialogueMaxWords: 80,
+        },
       ],
       reward: { type: 'item', itemId: 'nothing' },
     };
@@ -87,11 +120,21 @@ describe('Quest Schema', () => {
       anchorAffinity: 'anchor-01',
       trigger: { type: 'anchor', anchorId: 'anchor-01' },
       steps: [
-        { id: 'step-01', type: 'dialogue', npcArchetype: 'merchant', dialogue: 'This is a long enough dialogue to pass the minimum word count requirement for the step.', dialogueMinWords: 15, dialogueMaxWords: 80 },
+        {
+          id: 'step-01',
+          type: 'dialogue',
+          npcArchetype: 'merchant',
+          dialogue:
+            'This is a long enough dialogue to pass the minimum word count requirement for the step.',
+          dialogueMinWords: 15,
+          dialogueMaxWords: 80,
+        },
       ],
       reward: { type: 'item', itemId: 'something' },
     };
-    expect(() => QuestDefinitionSchema.parse(quest)).toThrow('Meso and macro quests must have A/B branches');
+    expect(() => QuestDefinitionSchema.parse(quest)).toThrow(
+      'Meso and macro quests must have A/B branches',
+    );
   });
 
   it('rejects quest with neither steps nor branches', () => {
@@ -104,7 +147,9 @@ describe('Quest Schema', () => {
       trigger: { type: 'roadside', distanceRange: [0, 100] },
       reward: { type: 'item', itemId: 'nothing' },
     };
-    expect(() => QuestDefinitionSchema.parse(quest)).toThrow('Quest must have either steps or branches');
+    expect(() => QuestDefinitionSchema.parse(quest)).toThrow(
+      'Quest must have either steps or branches',
+    );
   });
 
   it('validates quest step with dialogue word count validation', () => {
@@ -123,7 +168,11 @@ describe('Quest Schema', () => {
     const branch = {
       label: 'Take the peaceful path',
       steps: [
-        { id: 'step-01', type: 'travel', description: 'Walk through the meadow.' },
+        {
+          id: 'step-01',
+          type: 'travel',
+          description: 'Walk through the meadow.',
+        },
       ],
       reward: { type: 'item', itemId: 'flower-crown' },
     };
@@ -139,7 +188,15 @@ describe('Quest Schema', () => {
       anchorAffinity: 'anchor-01',
       trigger: { type: 'prerequisite', questId: 'micro-lost-merchant' },
       steps: [
-        { id: 'step-01', type: 'dialogue', npcArchetype: 'merchant', dialogue: 'Thank you for your help before, traveler. I have another task for you this time around.', dialogueMinWords: 15, dialogueMaxWords: 80 },
+        {
+          id: 'step-01',
+          type: 'dialogue',
+          npcArchetype: 'merchant',
+          dialogue:
+            'Thank you for your help before, traveler. I have another task for you this time around.',
+          dialogueMinWords: 15,
+          dialogueMaxWords: 80,
+        },
       ],
       reward: { type: 'currency', amount: 50 },
     };

@@ -1,5 +1,5 @@
-import type { ChunkType } from '../types';
 import type { RoadSpine } from '../../schemas/world.schema';
+import type { ChunkType } from '../types';
 import { cyrb128, mulberry32 } from './random';
 
 export const CHUNK_SIZE = 120;
@@ -124,7 +124,11 @@ export function getChunkType(
   }
 
   // NEAR the road (|cx| === 1) — road shoulder
-  if (Math.abs(cx) === 1 && distance >= 0 && distance <= roadSpine.totalDistance) {
+  if (
+    Math.abs(cx) === 1 &&
+    distance >= 0 &&
+    distance <= roadSpine.totalDistance
+  ) {
     return 'ROAD';
   }
 

@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createWorld } from 'koota';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-  IsPlayer,
+  DistanceTraveled,
   Health,
-  Stamina,
+  IsPlayer,
   Movement,
   PlayerInput,
-  DistanceTraveled,
+  Stamina,
 } from './player';
 
 describe('Player Traits', () => {
@@ -70,7 +70,12 @@ describe('Player Traits', () => {
 
     it('can be set to sprinting', () => {
       const entity = world.spawn(Movement);
-      entity.set(Movement, { speed: 7, angularSpeed: 0, isSprinting: true, isGrounded: true });
+      entity.set(Movement, {
+        speed: 7,
+        angularSpeed: 0,
+        isSprinting: true,
+        isGrounded: true,
+      });
       expect(entity.get(Movement)?.isSprinting).toBe(true);
       expect(entity.get(Movement)?.speed).toBe(7);
     });

@@ -1,5 +1,8 @@
-import { PacingConfigSchema, type PacingConfig } from '../../schemas/pacing.schema';
-import { mulberry32, cyrb128 } from '../utils/random';
+import {
+  type PacingConfig,
+  PacingConfigSchema,
+} from '../../schemas/pacing.schema';
+import { cyrb128, mulberry32 } from '../utils/random';
 
 /** A feature placement along the road spine. */
 export interface FeaturePlacement {
@@ -25,7 +28,10 @@ export const DEFAULT_PACING_CONFIG: PacingConfig = PacingConfigSchema.parse({
  * Sample an interval from a [min, max] range using jitter from the RNG.
  * Adds natural variation to prevent robotic regularity.
  */
-function sampleInterval(range: readonly [number, number], rng: () => number): number {
+function sampleInterval(
+  range: readonly [number, number],
+  rng: () => number,
+): number {
   const [min, max] = range;
   return min + rng() * (max - min);
 }

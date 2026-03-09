@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
+import type { RoadSpine } from '../../schemas/world.schema';
+import { cyrb128, mulberry32 } from './random';
 import {
   BLOCK_SIZE,
   CHUNK_SIZE,
-  PLAYER_HEIGHT,
-  PLAYER_RADIUS,
-  VIEW_DISTANCE,
+  chunkZToRoadDistance,
   getChunkName,
   getChunkType,
   getRandomDialogue,
   getRandomNPCName,
-  chunkZToRoadDistance,
+  PLAYER_HEIGHT,
+  PLAYER_RADIUS,
+  VIEW_DISTANCE,
 } from './worldGen';
-import { mulberry32, cyrb128 } from './random';
-import type { RoadSpine } from '../../schemas/world.schema';
 
 describe('constants', () => {
   it('exports correct CHUNK_SIZE', () => {
@@ -152,7 +152,7 @@ describe('getRandomDialogue', () => {
   it('returns consistent dialogue for same RNG state', () => {
     const rng1 = mulberry32(cyrb128('same-seed'));
     const rng2 = mulberry32(cyrb128('same-seed'));
-    
+
     const dialogue1 = getRandomDialogue('blacksmith', rng1);
     const dialogue2 = getRandomDialogue('blacksmith', rng2);
     expect(dialogue1).toBe(dialogue2);
@@ -182,7 +182,7 @@ describe('getRandomNPCName', () => {
   it('returns consistent name for same RNG state', () => {
     const rng1 = mulberry32(cyrb128('same-seed'));
     const rng2 = mulberry32(cyrb128('same-seed'));
-    
+
     const name1 = getRandomNPCName(rng1);
     const name2 = getRandomNPCName(rng2);
     expect(name1).toBe(name2);
@@ -203,12 +203,66 @@ describe('getRandomNPCName', () => {
 const testSpine: RoadSpine = {
   totalDistance: 30000,
   anchors: [
-    { id: 'home', name: 'Ashford', type: 'VILLAGE_FRIENDLY', distanceFromStart: 0, mainQuestChapter: 'chapter-00', description: 'Your home town, a quiet farming village.', features: ['home', 'tavern'], sideQuestSlots: 0 },
-    { id: 'anchor-01', name: 'Millbrook', type: 'VILLAGE_FRIENDLY', distanceFromStart: 6000, mainQuestChapter: 'chapter-01', description: 'A market town along the road.', features: ['tavern', 'market'], sideQuestSlots: 0 },
-    { id: 'anchor-02', name: 'Thornfield', type: 'DUNGEON', distanceFromStart: 12000, mainQuestChapter: 'chapter-02', description: 'Ancient ruins holding secrets.', features: ['dungeon_entrance'], sideQuestSlots: 0 },
-    { id: 'anchor-03', name: 'Ravensgate', type: 'VILLAGE_HOSTILE', distanceFromStart: 17000, mainQuestChapter: 'chapter-03', description: 'A walled town under tyrannical rule.', features: ['gate', 'tavern'], sideQuestSlots: 0 },
-    { id: 'anchor-04', name: 'Rest', type: 'WAYPOINT', distanceFromStart: 21000, mainQuestChapter: 'chapter-04', description: 'A roadside monastery for travelers.', features: ['chapel'], sideQuestSlots: 0 },
-    { id: 'anchor-05', name: 'Grailsend', type: 'DUNGEON', distanceFromStart: 28000, mainQuestChapter: 'chapter-05', description: 'The final temple where the Grail awaits.', features: ['temple_entrance'], sideQuestSlots: 0 },
+    {
+      id: 'home',
+      name: 'Ashford',
+      type: 'VILLAGE_FRIENDLY',
+      distanceFromStart: 0,
+      mainQuestChapter: 'chapter-00',
+      description: 'Your home town, a quiet farming village.',
+      features: ['home', 'tavern'],
+      sideQuestSlots: 0,
+    },
+    {
+      id: 'anchor-01',
+      name: 'Millbrook',
+      type: 'VILLAGE_FRIENDLY',
+      distanceFromStart: 6000,
+      mainQuestChapter: 'chapter-01',
+      description: 'A market town along the road.',
+      features: ['tavern', 'market'],
+      sideQuestSlots: 0,
+    },
+    {
+      id: 'anchor-02',
+      name: 'Thornfield',
+      type: 'DUNGEON',
+      distanceFromStart: 12000,
+      mainQuestChapter: 'chapter-02',
+      description: 'Ancient ruins holding secrets.',
+      features: ['dungeon_entrance'],
+      sideQuestSlots: 0,
+    },
+    {
+      id: 'anchor-03',
+      name: 'Ravensgate',
+      type: 'VILLAGE_HOSTILE',
+      distanceFromStart: 17000,
+      mainQuestChapter: 'chapter-03',
+      description: 'A walled town under tyrannical rule.',
+      features: ['gate', 'tavern'],
+      sideQuestSlots: 0,
+    },
+    {
+      id: 'anchor-04',
+      name: 'Rest',
+      type: 'WAYPOINT',
+      distanceFromStart: 21000,
+      mainQuestChapter: 'chapter-04',
+      description: 'A roadside monastery for travelers.',
+      features: ['chapel'],
+      sideQuestSlots: 0,
+    },
+    {
+      id: 'anchor-05',
+      name: 'Grailsend',
+      type: 'DUNGEON',
+      distanceFromStart: 28000,
+      mainQuestChapter: 'chapter-05',
+      description: 'The final temple where the Grail awaits.',
+      features: ['temple_entrance'],
+      sideQuestSlots: 0,
+    },
   ],
 };
 

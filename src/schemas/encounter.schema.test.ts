@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { EncounterDefinitionSchema } from './encounter.schema';
 
 describe('Encounter Schema', () => {
@@ -8,7 +8,8 @@ describe('Encounter Schema', () => {
       name: 'Confronting the Poisoner',
       type: 'combat',
       difficulty: 4,
-      description: 'A tense confrontation with the person responsible for poisoning the village well.',
+      description:
+        'A tense confrontation with the person responsible for poisoning the village well.',
       rewards: [
         { itemId: 'poisoner-confession', chance: 1 },
         { itemId: 'rare-herb', chance: 0.3 },

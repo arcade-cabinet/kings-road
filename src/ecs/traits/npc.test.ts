@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createWorld } from 'koota';
-import { IsNPC, NPCArchetype, Dialogue, Interactable } from './npc';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { Dialogue, Interactable, IsNPC, NPCArchetype } from './npc';
 
 describe('NPC Traits', () => {
   let world: ReturnType<typeof createWorld>;
@@ -75,7 +75,9 @@ describe('NPC Traits', () => {
     });
 
     it('accepts custom interaction settings', () => {
-      const entity = world.spawn(Interactable({ radius: 5, actionVerb: 'Trade' }));
+      const entity = world.spawn(
+        Interactable({ radius: 5, actionVerb: 'Trade' }),
+      );
       const int = entity.get(Interactable);
       expect(int?.radius).toBe(5);
       expect(int?.actionVerb).toBe('Trade');

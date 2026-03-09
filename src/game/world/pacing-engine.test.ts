@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  generatePlacements,
-  generateRoadPacing,
   DEFAULT_PACING_CONFIG,
   type FeaturePlacement,
+  generatePlacements,
+  generateRoadPacing,
 } from './pacing-engine';
 
 describe('pacing-engine', () => {
@@ -12,19 +12,33 @@ describe('pacing-engine', () => {
 
   describe('generatePlacements', () => {
     it('produces a non-empty array of placements', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       expect(placements.length).toBeGreaterThan(0);
     });
 
     it('placements are sorted by distance', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       for (let i = 1; i < placements.length; i++) {
-        expect(placements[i].distance).toBeGreaterThanOrEqual(placements[i - 1].distance);
+        expect(placements[i].distance).toBeGreaterThanOrEqual(
+          placements[i - 1].distance,
+        );
       }
     });
 
     it('all placements are within [0, totalDistance)', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       for (const p of placements) {
         expect(p.distance).toBeGreaterThanOrEqual(0);
         expect(p.distance).toBeLessThan(totalDistance);
@@ -32,7 +46,11 @@ describe('pacing-engine', () => {
     });
 
     it('includes all three tiers', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       const tiers = new Set(placements.map((p) => p.tier));
       expect(tiers.has('ambient')).toBe(true);
       expect(tiers.has('minor')).toBe(true);
@@ -40,21 +58,35 @@ describe('pacing-engine', () => {
     });
 
     it('ambient placements are more frequent than minor', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
-      const ambientCount = placements.filter((p) => p.tier === 'ambient').length;
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
+      const ambientCount = placements.filter(
+        (p) => p.tier === 'ambient',
+      ).length;
       const minorCount = placements.filter((p) => p.tier === 'minor').length;
       expect(ambientCount).toBeGreaterThan(minorCount);
     });
 
     it('minor placements are more frequent than major', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       const minorCount = placements.filter((p) => p.tier === 'minor').length;
       const majorCount = placements.filter((p) => p.tier === 'major').length;
       expect(minorCount).toBeGreaterThan(majorCount);
     });
 
     it('each placement has a featureId', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       for (const p of placements) {
         expect(p.featureId).toBeTruthy();
         expect(p.featureId).toContain(p.tier);
@@ -62,7 +94,11 @@ describe('pacing-engine', () => {
     });
 
     it('distances are rounded integers', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       for (const p of placements) {
         expect(Number.isInteger(p.distance)).toBe(true);
       }
@@ -77,8 +113,16 @@ describe('pacing-engine', () => {
     });
 
     it('different seeds produce different placements', () => {
-      const a = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, 'seed-one');
-      const b = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, 'seed-two');
+      const a = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        'seed-one',
+      );
+      const b = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        'seed-two',
+      );
       // Extremely unlikely to be identical
       expect(a).not.toEqual(b);
     });
@@ -86,7 +130,9 @@ describe('pacing-engine', () => {
     it('determinism holds across multiple runs', () => {
       const results: FeaturePlacement[][] = [];
       for (let i = 0; i < 5; i++) {
-        results.push(generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, 'stable'));
+        results.push(
+          generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, 'stable'),
+        );
       }
       for (let i = 1; i < results.length; i++) {
         expect(results[i]).toEqual(results[0]);
@@ -96,7 +142,11 @@ describe('pacing-engine', () => {
 
   describe('interval behavior', () => {
     it('ambient features have roughly expected density', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       const ambientPlacements = placements.filter((p) => p.tier === 'ambient');
       // Average interval is 300 (midpoint of [200, 400])
       // Expected count ~= 30000 / 300 = 100, but with jitter
@@ -105,7 +155,11 @@ describe('pacing-engine', () => {
     });
 
     it('major features have roughly expected density', () => {
-      const placements = generatePlacements(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generatePlacements(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       const majorPlacements = placements.filter((p) => p.tier === 'major');
       // Average interval is 1200 (midpoint of [1000, 1400])
       // Expected count ~= 30000 / 1200 = 25, but with jitter
@@ -121,7 +175,9 @@ describe('pacing-engine', () => {
         majorInterval: [1000, 1000] as [number, number],
       };
       const placements = generatePlacements(10000, tightConfig, seed);
-      const ambientCount = placements.filter((p) => p.tier === 'ambient').length;
+      const ambientCount = placements.filter(
+        (p) => p.tier === 'ambient',
+      ).length;
       const minorCount = placements.filter((p) => p.tier === 'minor').length;
       const majorCount = placements.filter((p) => p.tier === 'major').length;
 
@@ -153,7 +209,11 @@ describe('pacing-engine', () => {
 
   describe('generateRoadPacing', () => {
     it('validates config and produces placements', () => {
-      const placements = generateRoadPacing(totalDistance, DEFAULT_PACING_CONFIG, seed);
+      const placements = generateRoadPacing(
+        totalDistance,
+        DEFAULT_PACING_CONFIG,
+        seed,
+      );
       expect(placements.length).toBeGreaterThan(0);
       expect(placements[0].tier).toBeDefined();
     });

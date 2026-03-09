@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createWorld } from 'koota';
-import { QuestLog, IsQuestGiver } from './quest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { IsQuestGiver, QuestLog } from './quest';
 
 describe('Quest Traits', () => {
   let world: ReturnType<typeof createWorld>;
@@ -40,7 +40,9 @@ describe('Quest Traits', () => {
     it('tracks quest branches', () => {
       const entity = world.spawn(QuestLog);
       entity.set(QuestLog, {
-        activeQuests: [{ questId: 'meso-poisoned-well', currentStep: 1, branch: 'A' }],
+        activeQuests: [
+          { questId: 'meso-poisoned-well', currentStep: 1, branch: 'A' },
+        ],
         completedQuests: ['micro-lost-merchant'],
         mainQuestChapter: 1,
       });
@@ -57,7 +59,9 @@ describe('Quest Traits', () => {
     });
 
     it('stores a quest reference', () => {
-      const entity = world.spawn(IsQuestGiver({ questId: 'meso-poisoned-well' }));
+      const entity = world.spawn(
+        IsQuestGiver({ questId: 'meso-poisoned-well' }),
+      );
       expect(entity.get(IsQuestGiver)?.questId).toBe('meso-poisoned-well');
     });
   });

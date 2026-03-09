@@ -41,10 +41,12 @@ export type Region = z.infer<typeof RegionSchema>;
 
 export const RoadSpineSchema = z.object({
   totalDistance: z.number().int().positive(),
-  anchors: z.array(AnchorPointSchema).min(2).refine(
-    (anchors) => anchors[0].distanceFromStart === 0,
-    { message: 'First anchor must be at distance 0 (home town)' }
-  ),
+  anchors: z
+    .array(AnchorPointSchema)
+    .min(2)
+    .refine((anchors) => anchors[0].distanceFromStart === 0, {
+      message: 'First anchor must be at distance 0 (home town)',
+    }),
   regions: z.array(RegionSchema).optional(),
 });
 export type RoadSpine = z.infer<typeof RoadSpineSchema>;

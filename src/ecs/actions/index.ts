@@ -1,22 +1,20 @@
 import { createActions, type Entity } from 'koota';
 import {
-  IsPlayer,
-  Health,
-  Stamina,
-  Movement,
-  PlayerInput,
-  DistanceTraveled,
-  QuestLog,
-  Position,
-  Velocity,
-  Rotation,
-  IsNPC,
-  NPCArchetype,
   Dialogue,
+  DistanceTraveled,
+  Health,
   Interactable,
-  RoadPosition,
-  IsOnRoad,
+  IsNPC,
+  IsPlayer,
   IsQuestGiver,
+  Movement,
+  NPCArchetype,
+  PlayerInput,
+  Position,
+  QuestLog,
+  Rotation,
+  Stamina,
+  Velocity,
 } from '../traits';
 
 export const playerActions = createActions((world) => ({
@@ -75,7 +73,7 @@ export const npcActions = createActions((world) => ({
     ),
 }));
 
-export const questActions = createActions((world) => ({
+export const questActions = createActions((_world) => ({
   startQuest: (entity: Entity, questId: string) => {
     const log = entity.get(QuestLog);
     if (!log) return;

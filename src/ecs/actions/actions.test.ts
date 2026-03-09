@@ -1,23 +1,23 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createWorld, type World } from 'koota';
-import { playerActions, npcActions, questActions } from './index';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-  IsPlayer,
-  Health,
-  Stamina,
-  Movement,
-  PlayerInput,
-  DistanceTraveled,
-  QuestLog,
-  Position,
-  Velocity,
-  Rotation,
-  IsNPC,
-  NPCArchetype,
   Dialogue,
+  DistanceTraveled,
+  Health,
   Interactable,
+  IsNPC,
+  IsPlayer,
   IsQuestGiver,
+  Movement,
+  NPCArchetype,
+  PlayerInput,
+  Position,
+  QuestLog,
+  Rotation,
+  Stamina,
+  Velocity,
 } from '../traits';
+import { npcActions, playerActions, questActions } from './index';
 
 describe('playerActions', () => {
   let world: World;
@@ -43,7 +43,10 @@ describe('playerActions', () => {
       expect(entity.get(Stamina)).toEqual({ current: 100, max: 100 });
       expect(entity.has(Movement)).toBe(true);
       expect(entity.has(PlayerInput)).toBe(true);
-      expect(entity.get(DistanceTraveled)).toEqual({ total: 0, sinceLastFeature: 0 });
+      expect(entity.get(DistanceTraveled)).toEqual({
+        total: 0,
+        sinceLastFeature: 0,
+      });
       expect(entity.has(QuestLog)).toBe(true);
     });
 
@@ -219,7 +222,9 @@ describe('questActions', () => {
       chooseBranch(player, 'meso-poisoned-well', 'B');
 
       const log = player.get(QuestLog);
-      const merchant = log?.activeQuests.find((q) => q.questId === 'micro-lost-merchant');
+      const merchant = log?.activeQuests.find(
+        (q) => q.questId === 'micro-lost-merchant',
+      );
       expect(merchant?.branch).toBeUndefined();
     });
   });
@@ -309,8 +314,13 @@ describe('questActions', () => {
     it('runs a complete quest from start to finish', () => {
       const { spawnPlayer } = playerActions(world);
       const { spawnNPC } = npcActions(world);
-      const { startQuest, chooseBranch, advanceStep, completeQuest, assignQuestGiver } =
-        questActions(world);
+      const {
+        startQuest,
+        chooseBranch,
+        advanceStep,
+        completeQuest,
+        assignQuestGiver,
+      } = questActions(world);
 
       // Set up
       const player = spawnPlayer(0, 0, 0);
@@ -339,7 +349,9 @@ describe('questActions', () => {
       // Quest complete
       completeQuest(player, 'meso-poisoned-well');
       expect(player.get(QuestLog)?.activeQuests).toHaveLength(0);
-      expect(player.get(QuestLog)?.completedQuests).toContain('meso-poisoned-well');
+      expect(player.get(QuestLog)?.completedQuests).toContain(
+        'meso-poisoned-well',
+      );
     });
   });
 });

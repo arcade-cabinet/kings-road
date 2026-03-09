@@ -1,5 +1,9 @@
-import { describe, it, expect } from 'vitest';
-import { RoadSpineSchema, AnchorPointSchema, RegionSchema } from './world.schema';
+import { describe, expect, it } from 'vitest';
+import {
+  AnchorPointSchema,
+  RegionSchema,
+  RoadSpineSchema,
+} from './world.schema';
 
 describe('World Schema', () => {
   it('validates a valid anchor point', () => {
@@ -9,7 +13,7 @@ describe('World Schema', () => {
       type: 'VILLAGE_FRIENDLY',
       distanceFromStart: 6000,
       mainQuestChapter: 'chapter-01',
-      description: 'A quiet farming village at the start of the King\'s Road.',
+      description: "A quiet farming village at the start of the King's Road.",
       features: ['tavern', 'blacksmith'],
     };
     expect(() => AnchorPointSchema.parse(anchor)).not.toThrow();
@@ -124,7 +128,9 @@ describe('World Schema', () => {
         },
       ],
     };
-    expect(() => RoadSpineSchema.parse(spine)).toThrow('First anchor must be at distance 0');
+    expect(() => RoadSpineSchema.parse(spine)).toThrow(
+      'First anchor must be at distance 0',
+    );
   });
 
   it('rejects road spine with fewer than 2 anchors', () => {

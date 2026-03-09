@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { GameConfigSchema } from './game-config.schema';
 
 describe('Game Config Schema', () => {
@@ -23,7 +23,7 @@ describe('Game Config Schema', () => {
           type: 'VILLAGE_FRIENDLY',
           distanceFromStart: 6000,
           mainQuestChapter: 'chapter-01',
-          description: 'A market town along the King\'s Road.',
+          description: "A market town along the King's Road.",
           features: ['tavern', 'market'],
         },
       ],
@@ -49,13 +49,29 @@ describe('Game Config Schema', () => {
           A: {
             label: 'Accept the quest willingly',
             steps: [
-              { id: 'a-01', type: 'dialogue', npcArchetype: 'priest', dialogue: 'The road awaits you, pilgrim. Seek the Grail and restore light to these lands once more.', dialogueMinWords: 10, dialogueMaxWords: 80 },
+              {
+                id: 'a-01',
+                type: 'dialogue',
+                npcArchetype: 'priest',
+                dialogue:
+                  'The road awaits you, pilgrim. Seek the Grail and restore light to these lands once more.',
+                dialogueMinWords: 10,
+                dialogueMaxWords: 80,
+              },
             ],
           },
           B: {
             label: 'Reluctantly depart',
             steps: [
-              { id: 'b-01', type: 'dialogue', npcArchetype: 'farmer', dialogue: 'You must go, child. The signs are clear and the road will not wait much longer for you.', dialogueMinWords: 10, dialogueMaxWords: 80 },
+              {
+                id: 'b-01',
+                type: 'dialogue',
+                npcArchetype: 'farmer',
+                dialogue:
+                  'You must go, child. The signs are clear and the road will not wait much longer for you.',
+                dialogueMinWords: 10,
+                dialogueMaxWords: 80,
+              },
             ],
           },
         },
@@ -73,8 +89,12 @@ describe('Game Config Schema', () => {
         archetype: 'innkeeper',
         namePool: ['Martha', 'Bessie', 'Elspeth'],
         greetingPool: [
-          { text: 'Welcome, weary traveler! Come sit by the fire and rest your bones a while.' },
-          { text: 'Ale or mead? Either will warm your spirits on this cold evening tonight.' },
+          {
+            text: 'Welcome, weary traveler! Come sit by the fire and rest your bones a while.',
+          },
+          {
+            text: 'Ale or mead? Either will warm your spirits on this cold evening tonight.',
+          },
         ],
       },
     ],
@@ -82,16 +102,18 @@ describe('Game Config Schema', () => {
       {
         id: 'feat-milestone-01',
         tier: 'ambient',
-        name: 'King\'s Milestone',
-        description: 'A carved stone marker showing distance to the next town along the road.',
+        name: "King's Milestone",
+        description:
+          'A carved stone marker showing distance to the next town along the road.',
         visualType: 'milestone',
       },
     ],
     items: [
       {
         id: 'merchant-map',
-        name: 'Merchant\'s Map',
-        description: 'A hand-drawn map showing hidden paths along the King\'s Road.',
+        name: "Merchant's Map",
+        description:
+          "A hand-drawn map showing hidden paths along the King's Road.",
         type: 'key_item',
       },
     ],
@@ -101,7 +123,8 @@ describe('Game Config Schema', () => {
         name: 'Confronting the Poisoner',
         type: 'combat',
         difficulty: 4,
-        description: 'A tense confrontation with the person responsible for poisoning the well.',
+        description:
+          'A tense confrontation with the person responsible for poisoning the well.',
       },
     ],
   };

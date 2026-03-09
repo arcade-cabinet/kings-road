@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createWorld } from 'koota';
-import { RoadPosition, IsOnRoad, IsAnchor, IsFeature } from './pacing';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { IsAnchor, IsFeature, IsOnRoad, RoadPosition } from './pacing';
 
 describe('Pacing Traits', () => {
   let world: ReturnType<typeof createWorld>;
@@ -53,7 +53,9 @@ describe('Pacing Traits', () => {
     });
 
     it('stores feature info', () => {
-      const entity = world.spawn(IsFeature({ featureId: 'stone-bridge-01', tier: 'minor' }));
+      const entity = world.spawn(
+        IsFeature({ featureId: 'stone-bridge-01', tier: 'minor' }),
+      );
       const feat = entity.get(IsFeature);
       expect(feat?.featureId).toBe('stone-bridge-01');
       expect(feat?.tier).toBe('minor');

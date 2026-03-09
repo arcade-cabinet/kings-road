@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { RoadSpineSchema } from './world.schema';
-import { QuestDefinitionSchema } from './quest.schema';
-import { NPCDefinitionSchema } from './npc.schema';
+import { EncounterDefinitionSchema } from './encounter.schema';
 import { FeatureDefinitionSchema } from './feature.schema';
 import { ItemDefinitionSchema } from './item.schema';
-import { EncounterDefinitionSchema } from './encounter.schema';
+import { NPCDefinitionSchema } from './npc.schema';
 import { PacingConfigSchema } from './pacing.schema';
+import { QuestDefinitionSchema } from './quest.schema';
+import { RoadSpineSchema } from './world.schema';
 
 export const GameConfigSchema = z.object({
   version: z.string().regex(/^\d+\.\d+\.\d+$/),

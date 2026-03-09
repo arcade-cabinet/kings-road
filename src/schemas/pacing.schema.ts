@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-const IntervalRange = z.tuple([z.number().positive(), z.number().positive()])
+const IntervalRange = z
+  .tuple([z.number().positive(), z.number().positive()])
   .refine(([min, max]) => min <= max, { message: 'min must be <= max' });
 
 export const PacingConfigSchema = z.object({

@@ -6,15 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 pnpm dev                    # Dev server at localhost:5173
-pnpm build                  # Production build
+pnpm build                  # Production build (outputs dist/)
 pnpm test                   # Run all Vitest unit tests
 pnpm test -- src/schemas/   # Run tests in a specific directory
 pnpm test:watch             # Watch mode
-pnpm test:coverage          # Coverage report
+pnpm test:coverage          # Coverage report (80% thresholds)
 pnpm test:e2e               # Playwright e2e tests (requires build first)
 pnpm tsc --noEmit           # Full TypeScript check
 pnpm tscgo --noEmit         # Fast TypeScript check (native compiler)
 npx tsx scripts/validate-trove.ts  # Validate JSON content against Zod schemas
+pnpm exec biome check .     # Lint and format check
 ```
 
 ## Architecture
@@ -23,7 +24,7 @@ npx tsx scripts/validate-trove.ts  # Validate JSON content against Zod schemas
 Zod Schemas (src/schemas/) --> JSON Content (content/) --> Koota ECS (src/ecs/) --> R3F Rendering (src/game/)
 ```
 
-All game content is JSON validated against Zod schemas. Koota ECS consumes config at runtime. React Three Fiber renders the ECS world. The Zustand store in `gameStore.ts` is legacy -- new state should use Koota traits.
+All game content is JSON validated against Zod schemas. Koota ECS consumes config at runtime. React Three Fiber renders the ECS world. The Zustand store in `gameStore.ts` is legacy — new state should use Koota traits.
 
 ## Key Directories
 
@@ -35,9 +36,10 @@ All game content is JSON validated against Zod schemas. Koota ECS consumes confi
 | `src/game/systems/` | Game logic: PlayerController, ChunkManager, Environment, InteractionSystem |
 | `src/game/stores/gameStore.ts` | Legacy Zustand store (being migrated to Koota) |
 | `src/game/utils/` | Seeded RNG (`random.ts`), world generation (`worldGen.ts`), textures (`textures.ts`) |
-| `content/` | JSON content trove -- quests, NPCs, features, road spine |
-| `content/world/road-spine.json` | 6 anchor points defining the 30km King's Road |
-| `scripts/validate-trove.ts` | Content validation pipeline |
+| `src/game/world/` | Road spine loader and pacing engine |
+| `content/` | JSON content trove — quests, NPCs, features, road spine |
+| `scripts/` | Build and validation scripts |
+| `.claude/` | Claude Code agents, commands, hooks, settings |
 
 ## Content Pipeline
 
@@ -60,11 +62,20 @@ Quest tiers: `macro` (1-2h, must branch), `meso` (15-45min, must branch), `micro
 - **Zod `z.infer<typeof Schema>`** for TypeScript types derived from schemas
 - Core game types live in `src/game/types.ts`
 - Do not store Three.js objects in React state (use refs)
+- Do not create new React context providers (use Koota or Zustand)
+- Do not put content JSON in `src/` (it belongs in `content/`)
 
 ## Mood
 
-Pastoral, romanticized medieval English. Warm cream backgrounds, golden sunlight, honey limestone, lush meadows. Lora serif for display, Crimson Text for body. Holy Grail narrative. No grimdark. See `docs/DESIGN.md` for full palette.
+Pastoral, romanticized medieval English. Warm cream backgrounds (#f5f0e8), golden sunlight, honey limestone, lush meadows. Lora serif for display, Crimson Text for body. Holy Grail narrative. No grimdark. See `docs/DESIGN.md` for full palette.
 
 ## Road Spine
 
-The world is organized along a 1D road from Ashford (distance 0) to Grailsend (distance 28000). Six anchor points define the main quest chapters. See `content/world/road-spine.json`.
+The world is organized along a 1D road from Ashford (distance 0) to Grailsend (distance 28000). Six anchor points define the main quest chapters. The pacing engine in `src/game/world/pacing-engine.ts` generates deterministic feature placements along this spine. See `content/world/road-spine.json`.
+
+## CI/CD
+
+- **CI** (`.github/workflows/ci.yml`): Biome lint, TypeScript check, unit tests, content validation — runs on push to main and PRs
+- **CD** (`.github/workflows/cd.yml`): Builds and deploys to GitHub Pages on push to main
+- All GitHub Actions pinned to exact SHAs
+- Dependabot configured for npm and github-actions ecosystems

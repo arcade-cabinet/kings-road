@@ -1,15 +1,15 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as os from 'node:os';
+import * as path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-  runValidation,
-  validateFile,
-  findJsonFiles,
-  estimateQuestDuration,
   calculateSubstanceScore,
   checkQuestBranches,
   checkReferentialIntegrity,
+  estimateQuestDuration,
+  findJsonFiles,
+  runValidation,
+  validateFile,
 } from '../../scripts/validate-trove';
 
 // ---------------------------------------------------------------------------
@@ -25,7 +25,8 @@ const VALID_ROAD_SPINE = {
       type: 'VILLAGE_FRIENDLY',
       distanceFromStart: 0,
       mainQuestChapter: 'chapter-00',
-      description: 'Your home town, a quiet farming village at the foot of gentle hills.',
+      description:
+        'Your home town, a quiet farming village at the foot of gentle hills.',
       features: ['home', 'tavern', 'blacksmith'],
     },
     {
@@ -34,7 +35,8 @@ const VALID_ROAD_SPINE = {
       type: 'VILLAGE_FRIENDLY',
       distanceFromStart: 6000,
       mainQuestChapter: 'chapter-01',
-      description: "A market town where the King's Road crosses the River Mill.",
+      description:
+        "A market town where the King's Road crosses the River Mill.",
       features: ['tavern', 'market', 'chapel'],
     },
   ],
@@ -121,8 +123,12 @@ const VALID_NPC = {
   archetype: 'merchant',
   namePool: ['Edwin', 'Godric', 'Aldric'],
   greetingPool: [
-    { text: 'Welcome, traveler! Have a look at my fine wares from across the kingdom.' },
-    { text: 'Good day to you! The road has been kind today, and so shall I be.' },
+    {
+      text: 'Welcome, traveler! Have a look at my fine wares from across the kingdom.',
+    },
+    {
+      text: 'Good day to you! The road has been kind today, and so shall I be.',
+    },
   ],
 };
 
@@ -187,8 +193,18 @@ describe('findJsonFiles', () => {
 describe('validateFile — road spine', () => {
   it('passes valid road spine', () => {
     writeContentFile('world/road-spine.json', VALID_ROAD_SPINE);
-    const index = { anchorIds: new Set<string>(), questIds: new Set<string>(), npcArchetypes: new Set<string>(), encounterIds: new Set<string>(), featureIds: new Set<string>() };
-    const result = validateFile(path.join(tmpDir, 'world/road-spine.json'), tmpDir, index);
+    const index = {
+      anchorIds: new Set<string>(),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set<string>(),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
+    const result = validateFile(
+      path.join(tmpDir, 'world/road-spine.json'),
+      tmpDir,
+      index,
+    );
     expect(result.status).toBe('pass');
     expect(result.errors).toHaveLength(0);
     expect(result.contentType).toBe('road-spine');
@@ -196,8 +212,18 @@ describe('validateFile — road spine', () => {
 
   it('fails on invalid road spine', () => {
     writeContentFile('world/road-spine.json', { totalDistance: -1 });
-    const index = { anchorIds: new Set<string>(), questIds: new Set<string>(), npcArchetypes: new Set<string>(), encounterIds: new Set<string>(), featureIds: new Set<string>() };
-    const result = validateFile(path.join(tmpDir, 'world/road-spine.json'), tmpDir, index);
+    const index = {
+      anchorIds: new Set<string>(),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set<string>(),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
+    const result = validateFile(
+      path.join(tmpDir, 'world/road-spine.json'),
+      tmpDir,
+      index,
+    );
     expect(result.status).toBe('fail');
     expect(result.errors.length).toBeGreaterThan(0);
   });
@@ -206,7 +232,13 @@ describe('validateFile — road spine', () => {
     const fullPath = path.join(tmpDir, 'world/bad.json');
     fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, '{ invalid json }');
-    const index = { anchorIds: new Set<string>(), questIds: new Set<string>(), npcArchetypes: new Set<string>(), encounterIds: new Set<string>(), featureIds: new Set<string>() };
+    const index = {
+      anchorIds: new Set<string>(),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set<string>(),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
     const result = validateFile(fullPath, tmpDir, index);
     expect(result.status).toBe('fail');
     expect(result.errors[0]).toContain('Failed to parse JSON');
@@ -216,8 +248,18 @@ describe('validateFile — road spine', () => {
 describe('validateFile — quests', () => {
   it('validates micro quest with no schema errors', () => {
     writeContentFile('side-quests/micro/lost-merchant.json', VALID_MICRO_QUEST);
-    const index = { anchorIds: new Set(['anchor-01']), questIds: new Set<string>(), npcArchetypes: new Set(['merchant']), encounterIds: new Set<string>(), featureIds: new Set<string>() };
-    const result = validateFile(path.join(tmpDir, 'side-quests/micro/lost-merchant.json'), tmpDir, index);
+    const index = {
+      anchorIds: new Set(['anchor-01']),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set(['merchant']),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
+    const result = validateFile(
+      path.join(tmpDir, 'side-quests/micro/lost-merchant.json'),
+      tmpDir,
+      index,
+    );
     expect(result.status).not.toBe('fail');
     expect(result.errors).toHaveLength(0);
     expect(result.contentType).toBe('quest');
@@ -226,25 +268,59 @@ describe('validateFile — quests', () => {
 
   it('validates meso quest with branches and no schema errors', () => {
     writeContentFile('side-quests/meso/poisoned-well.json', VALID_MESO_QUEST);
-    const index = { anchorIds: new Set(['anchor-01']), questIds: new Set<string>(), npcArchetypes: new Set(['healer']), encounterIds: new Set<string>(), featureIds: new Set<string>() };
-    const result = validateFile(path.join(tmpDir, 'side-quests/meso/poisoned-well.json'), tmpDir, index);
+    const index = {
+      anchorIds: new Set(['anchor-01']),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set(['healer']),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
+    const result = validateFile(
+      path.join(tmpDir, 'side-quests/meso/poisoned-well.json'),
+      tmpDir,
+      index,
+    );
     expect(result.status).not.toBe('fail');
     expect(result.errors).toHaveLength(0);
     expect(result.questDetails?.[0].hasBranches).toBe(true);
   });
 
   it('validates main-quest directory', () => {
-    const mainQuest = { ...VALID_MESO_QUEST, id: 'main-chapter-01', tier: 'macro' };
+    const mainQuest = {
+      ...VALID_MESO_QUEST,
+      id: 'main-chapter-01',
+      tier: 'macro',
+    };
     writeContentFile('main-quest/chapter-01.json', mainQuest);
-    const index = { anchorIds: new Set(['anchor-01']), questIds: new Set<string>(), npcArchetypes: new Set(['healer']), encounterIds: new Set<string>(), featureIds: new Set<string>() };
-    const result = validateFile(path.join(tmpDir, 'main-quest/chapter-01.json'), tmpDir, index);
+    const index = {
+      anchorIds: new Set(['anchor-01']),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set(['healer']),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
+    const result = validateFile(
+      path.join(tmpDir, 'main-quest/chapter-01.json'),
+      tmpDir,
+      index,
+    );
     expect(result.contentType).toBe('quest');
   });
 
   it('warns for unknown file location', () => {
     writeContentFile('random/file.json', { foo: 'bar' });
-    const index = { anchorIds: new Set<string>(), questIds: new Set<string>(), npcArchetypes: new Set<string>(), encounterIds: new Set<string>(), featureIds: new Set<string>() };
-    const result = validateFile(path.join(tmpDir, 'random/file.json'), tmpDir, index);
+    const index = {
+      anchorIds: new Set<string>(),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set<string>(),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
+    const result = validateFile(
+      path.join(tmpDir, 'random/file.json'),
+      tmpDir,
+      index,
+    );
     expect(result.status).toBe('warn');
     expect(result.contentType).toBe('unknown');
   });
@@ -253,8 +329,18 @@ describe('validateFile — quests', () => {
 describe('validateFile — NPCs', () => {
   it('passes valid NPC', () => {
     writeContentFile('npcs/merchant.json', VALID_NPC);
-    const index = { anchorIds: new Set<string>(), questIds: new Set<string>(), npcArchetypes: new Set<string>(), encounterIds: new Set<string>(), featureIds: new Set<string>() };
-    const result = validateFile(path.join(tmpDir, 'npcs/merchant.json'), tmpDir, index);
+    const index = {
+      anchorIds: new Set<string>(),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set<string>(),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
+    const result = validateFile(
+      path.join(tmpDir, 'npcs/merchant.json'),
+      tmpDir,
+      index,
+    );
     expect(result.status).toBe('pass');
     expect(result.contentType).toBe('npc');
   });
@@ -263,8 +349,18 @@ describe('validateFile — NPCs', () => {
 describe('validateFile — features', () => {
   it('passes valid feature', () => {
     writeContentFile('features/stone-bridge.json', VALID_FEATURE);
-    const index = { anchorIds: new Set<string>(), questIds: new Set<string>(), npcArchetypes: new Set<string>(), encounterIds: new Set<string>(), featureIds: new Set<string>() };
-    const result = validateFile(path.join(tmpDir, 'features/stone-bridge.json'), tmpDir, index);
+    const index = {
+      anchorIds: new Set<string>(),
+      questIds: new Set<string>(),
+      npcArchetypes: new Set<string>(),
+      encounterIds: new Set<string>(),
+      featureIds: new Set<string>(),
+    };
+    const result = validateFile(
+      path.join(tmpDir, 'features/stone-bridge.json'),
+      tmpDir,
+      index,
+    );
     expect(result.status).toBe('pass');
     expect(result.contentType).toBe('feature');
   });
@@ -276,7 +372,8 @@ describe('estimateQuestDuration', () => {
       steps: [
         {
           type: 'dialogue',
-          dialogue: 'one two three four five six seven eight nine ten ' +
+          dialogue:
+            'one two three four five six seven eight nine ten ' +
             'eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty ' +
             'twentyone twentytwo twentythree twentyfour twentyfive twentysix twentyseven twentyeight twentynine thirty ' +
             'thirtyone thirtytwo thirtythree thirtyfour thirtyfive thirtysix thirtyseven thirtyeight thirtynine forty ' +
@@ -344,7 +441,11 @@ describe('calculateSubstanceScore', () => {
   it('calculates dialogue density', () => {
     const quest = {
       steps: [
-        { type: 'dialogue', dialogue: 'one two three four five six seven eight nine ten eleven twelve' },
+        {
+          type: 'dialogue',
+          dialogue:
+            'one two three four five six seven eight nine ten eleven twelve',
+        },
         { type: 'travel' },
       ],
     };
@@ -375,13 +476,21 @@ describe('checkQuestBranches', () => {
   });
 
   it('warns for meso quest without branches', () => {
-    const result = checkQuestBranches({ tier: 'meso', id: 'test-meso', steps: [] });
+    const result = checkQuestBranches({
+      tier: 'meso',
+      id: 'test-meso',
+      steps: [],
+    });
     expect(result).not.toBeNull();
     expect(result).toContain('missing A/B branches');
   });
 
   it('warns for macro quest without branches', () => {
-    const result = checkQuestBranches({ tier: 'macro', id: 'test-macro', steps: [] });
+    const result = checkQuestBranches({
+      tier: 'macro',
+      id: 'test-macro',
+      steps: [],
+    });
     expect(result).not.toBeNull();
     expect(result).toContain('missing A/B branches');
   });
@@ -480,7 +589,9 @@ describe('runValidation — integration', () => {
 
     const report = runValidation(tmpDir);
     const questResult = report.results.find((r) => r.file.includes('bad-ref'));
-    expect(questResult?.warnings.some((w) => w.includes('nonexistent-anchor'))).toBe(true);
+    expect(
+      questResult?.warnings.some((w) => w.includes('nonexistent-anchor')),
+    ).toBe(true);
   });
 
   it('handles empty content directory', () => {

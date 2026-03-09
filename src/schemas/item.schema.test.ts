@@ -1,12 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ItemDefinitionSchema } from './item.schema';
 
 describe('Item Schema', () => {
   it('validates a complete item definition', () => {
     const item = {
       id: 'merchant-map',
-      name: 'Merchant\'s Map',
-      description: 'A hand-drawn map showing hidden paths along the King\'s Road.',
+      name: "Merchant's Map",
+      description:
+        "A hand-drawn map showing hidden paths along the King's Road.",
       type: 'key_item',
       effect: { stat: 'navigation', value: 1 },
       stackable: false,

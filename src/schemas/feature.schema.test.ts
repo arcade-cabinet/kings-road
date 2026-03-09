@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { FeatureDefinitionSchema } from './feature.schema';
 
 describe('Feature Schema', () => {
@@ -7,10 +7,12 @@ describe('Feature Schema', () => {
       id: 'feat-stone-bridge-01',
       tier: 'minor',
       name: 'Old Stone Bridge',
-      description: 'A weathered stone bridge spanning a gentle brook, covered in moss.',
+      description:
+        'A weathered stone bridge spanning a gentle brook, covered in moss.',
       visualType: 'stone_bridge',
       interactable: true,
-      dialogueOnInteract: 'The stones here have been worn smooth by centuries of travelers.',
+      dialogueOnInteract:
+        'The stones here have been worn smooth by centuries of travelers.',
     };
     expect(() => FeatureDefinitionSchema.parse(feature)).not.toThrow();
   });

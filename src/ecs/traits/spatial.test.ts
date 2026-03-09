@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createWorld } from 'koota';
-import { Position, Velocity, Rotation } from './spatial';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { Position, Rotation, Velocity } from './spatial';
 
 describe('Spatial Traits', () => {
   let world: ReturnType<typeof createWorld>;

@@ -1,0 +1,32 @@
+/* Game CSS */
+@import "tailwindcss";
+
+/* Google Fonts - warm, pastoral medieval aesthetic */
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Crimson+Text:ital@0;1&display=swap');
+
+/* Base styles - warm pastoral medieval theme */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #f5f0e8;
+    color: #3d2b1f;
+  }
+}
+
+/* Game-specific utilities */
+@layer utilities {
+  .font-lora {
+    font-family: 'Lora', serif;
+  }
+  .font-crimson {
+    font-family: 'Crimson Text', serif;
+  }
+}

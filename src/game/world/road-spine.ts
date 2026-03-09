@@ -1,5 +1,9 @@
-import { RoadSpineSchema, type RoadSpine, type AnchorPoint } from '../../schemas/world.schema';
 import roadSpineData from '../../../content/world/road-spine.json';
+import {
+  type AnchorPoint,
+  type RoadSpine,
+  RoadSpineSchema,
+} from '../../schemas/world.schema';
 
 let cachedSpine: RoadSpine | null = null;
 
@@ -49,7 +53,9 @@ export function getAnchorAtDistance(
  */
 export function getNextAnchor(currentDistance: number): AnchorPoint | null {
   const spine = loadRoadSpine();
-  return spine.anchors.find((a) => a.distanceFromStart > currentDistance) ?? null;
+  return (
+    spine.anchors.find((a) => a.distanceFromStart > currentDistance) ?? null
+  );
 }
 
 /**
