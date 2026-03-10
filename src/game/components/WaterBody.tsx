@@ -18,15 +18,17 @@ export function WaterBody({
   config,
 }: WaterBodyProps) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const elapsedRef = useRef(0);
 
   const material = useMemo(() => {
     const waterConfig = config ?? getWaterPreset(waterType);
     return createWaterMaterial(waterConfig);
   }, [waterType, config]);
 
-  useFrame((state) => {
+  useFrame((_state, delta) => {
+    elapsedRef.current += delta;
     if (material.uniforms.uTime) {
-      material.uniforms.uTime.value = state.clock.elapsedTime;
+      material.uniforms.uTime.value = elapsedRef.current;
     }
   });
 

@@ -1,5 +1,8 @@
+/** @deprecated Use InputManager providers instead. This file is no longer imported. */
+
 import { useCallback, useEffect, useRef } from 'react';
 import { useGameStore } from '../stores/gameStore';
+import { useInventoryStore } from '../stores/inventoryStore';
 
 export function useKeyboardInput() {
   const setKey = useGameStore((state) => state.setKey);
@@ -7,9 +10,42 @@ export function useKeyboardInput() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (inDialogue) return;
-
       const k = e.code;
+
+      // ESC toggles pause (works even in dialogue / inventory)
+      if (k === 'Escape') {
+        e.preventDefault();
+        const {
+          gameActive,
+          inDialogue: dlg,
+          togglePause,
+          closeDialogue,
+        } = useGameStore.getState();
+        if (!gameActive) return;
+        if (dlg) {
+          closeDialogue();
+        } else if (useInventoryStore.getState().isOpen) {
+          useInventoryStore.getState().close();
+        } else {
+          togglePause();
+        }
+        return;
+      }
+
+      if (
+        inDialogue ||
+        useGameStore.getState().paused ||
+        useInventoryStore.getState().isOpen
+      )
+        return;
+
+      // I toggles inventory
+      if (k === 'KeyI') {
+        e.preventDefault();
+        useInventoryStore.getState().toggle();
+        return;
+      }
+
       if (
         ['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(k)
       ) {
@@ -119,7 +155,13 @@ export function useMouseInput() {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDown.current || !gameActive || inDialogue) return;
+      if (
+        !isDown.current ||
+        !gameActive ||
+        inDialogue ||
+        useGameStore.getState().paused
+      )
+        return;
 
       const state = useGameStore.getState();
       const dx = e.clientX - mousePos.current.x;

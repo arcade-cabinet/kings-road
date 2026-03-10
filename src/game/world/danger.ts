@@ -1,31 +1,59 @@
+import type { KingdomMap, KingdomRegion } from '../../schemas/kingdom.schema';
 import type { ChunkType } from '../types';
+import { getRegionAt } from './kingdom-gen';
 
 /**
- * Danger gradient based on distance from King's Road.
+ * Danger gradient driven by the kingdom map's region system.
  *
- * Tier 0 (safe):      Town chunks, or on the King's Road (cx === 0)
- * Tier 1 (mild):      Road shoulder (|cx| === 1) — bandits (rare), wildlife
- * Tier 2 (moderate):  Wilderness (|cx| === 2) — wolves, brigands
- * Tier 3 (dangerous): Deep wild (|cx| >= 3) — monsters, undead
- * Tier 4 (extreme):   Dungeon interior — bosses, guardians
+ * Tier 0 (safe):      Town chunks, Road chunks, or regions with dangerTier 0
+ * Tier 1 (mild):      Regions with dangerTier 1 — bandits (rare), wildlife
+ * Tier 2 (moderate):  Regions with dangerTier 2 — wolves, brigands
+ * Tier 3 (dangerous): Regions with dangerTier 3 — monsters, undead
+ * Tier 4 (extreme):   Dungeon chunks, or regions with dangerTier 4
+ *
+ * Falls back to tier 1 for wilderness tiles outside any authored region.
  */
 export function getDangerTier(
   cx: number,
-  _cz: number,
+  cz: number,
   chunkType: ChunkType,
+  kingdomMap?: KingdomMap | null,
 ): number {
   if (chunkType === 'TOWN') return 0;
   if (chunkType === 'DUNGEON') return 4;
-  if (cx === 0) return 0; // On the King's Road
-  const dist = Math.abs(cx);
-  if (dist === 1) return 1;
-  if (dist === 2) return 2;
-  return 3;
+  if (chunkType === 'ROAD') return 0;
+
+  // Look up the authored region for this chunk
+  if (kingdomMap) {
+    const region = getRegionAt(kingdomMap, cx, cz);
+    if (region) {
+      return region.dangerTier ?? 1;
+    }
+  }
+
+  // Wilderness outside any region — mild danger
+  return 1;
+}
+
+/**
+ * Get the kingdom region at a chunk position (convenience re-export for callers).
+ */
+export function getRegionDangerTier(
+  kingdomMap: KingdomMap,
+  cx: number,
+  cz: number,
+): { tier: number; region: KingdomRegion | undefined } {
+  const region = getRegionAt(kingdomMap, cx, cz);
+  return { tier: region?.dangerTier ?? 1, region };
 }
 
 /**
  * Get encounter chance per tick based on danger tier.
  * Higher tiers = more frequent encounters.
+ *
+ * These are per-frame probabilities, checked every ENCOUNTER_COOLDOWN seconds.
+ * At 60fps with 15s cooldown: tier 1 ≈ 1 encounter per ~16 min of walking,
+ * tier 4 ≈ 1 encounter per ~50 seconds of walking in the wilds.
  */
 export function getEncounterChance(tier: number): number {
   switch (tier) {

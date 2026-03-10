@@ -2,6 +2,8 @@ node_modules/
 dist/
 coverage/
 playwright-report/
+playwright-ct-report/
+playwright/.cache/
 test-results/
 .vite/
 *.tsbuildinfo
@@ -9,3 +11,15 @@ vite.config.d.ts
 .DS_Store
 .ralph-tui/
 content/validation-report.json
+content/game-config.json
+
+# Compiled content database (built from content/ by compile-content-db.ts)
+config/game.db
+public/game.db
+
+# Expo / React Native
+.expo/
+ios/
+android/
+expo-env.d.ts
+kings-road/

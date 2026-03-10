@@ -1,83 +1,129 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { useGameStore } from '../../stores/gameStore';
+import {
+  type ActiveQuest,
+  getQuestDefinition,
+  useQuestStore,
+} from '../../stores/questStore';
+import { Minimap } from './Minimap';
 
-// Animated stat bar component with glow effects
+// ── Design tokens ────────────────────────────────────────────────────
+const PARCHMENT = 'rgba(245, 240, 232, 0.85)';
+const PARCHMENT_BORDER = '#c4a747';
+const PARCHMENT_BORDER_SUBTLE = 'rgba(196, 167, 71, 0.4)';
+const GOLD_TEXT = '#8b6f47';
+
+const WEATHER_LABELS: Record<string, string> = {
+  clear: 'Fair',
+  overcast: 'Overcast',
+  foggy: 'Fog',
+  rainy: 'Rain',
+  stormy: 'Storm',
+};
+const HEALTH_FILL = '#a03030';
+const STAMINA_FILL = '#3d7a3d';
+
+// ── Stat bar — illuminated manuscript margin style ───────────────────
 function StatBar({
   value,
   maxValue = 100,
-  color,
-  glowColor,
-  showLabel = false,
-  icon,
+  label,
+  fillColor,
 }: {
   value: number;
   maxValue?: number;
-  color: string;
-  glowColor: string;
-  showLabel?: boolean;
-  icon?: React.ReactNode;
+  label: string;
+  fillColor: string;
 }) {
   const percentage = Math.max(0, Math.min(100, (value / maxValue) * 100));
   const isLow = percentage < 25;
 
   return (
     <div className="flex items-center gap-2">
-      {icon && (
-        <div
-          className={cn('text-xs', isLow && 'animate-pulse')}
-          style={{ color }}
-        >
-          {icon}
-        </div>
-      )}
-      <div className="relative w-44 md:w-52 h-2.5 bg-stone-800/70 border border-stone-600/50 rounded-sm overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
-
-        {/* Main bar */}
+      <span
+        className="font-lora text-[10px] font-bold uppercase tracking-widest w-5 text-right"
+        style={{ color: GOLD_TEXT }}
+      >
+        {label}
+      </span>
+      <div
+        className="relative w-40 md:w-48 h-3 overflow-hidden"
+        style={{
+          background: PARCHMENT,
+          border: `1.5px solid ${PARCHMENT_BORDER}`,
+          borderRadius: '1px',
+        }}
+      >
+        {/* Fill bar */}
         <div
           className={cn(
-            'h-full transition-all duration-200 relative',
+            'h-full transition-all duration-300 relative',
             isLow && 'animate-pulse',
           )}
           style={{
             width: `${percentage}%`,
-            background: `linear-gradient(to right, ${color}88, ${color})`,
+            background: `linear-gradient(to bottom, ${fillColor}dd, ${fillColor})`,
           }}
         >
-          {/* Shine effect */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent h-1/2" />
+          {/* Parchment texture overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent h-1/2" />
         </div>
 
-        {/* Glow effect when low */}
-        {isLow && (
-          <div
-            className="absolute inset-0 animate-pulse"
-            style={{ boxShadow: `inset 0 0 10px ${glowColor}` }}
-          />
-        )}
-
-        {/* Tick marks */}
+        {/* Quarter tick marks — manuscript ruling lines */}
         <div className="absolute inset-0 flex">
-          {['q1', 'q2', 'q3', 'q4'].map((id) => (
+          {['q1', 'q2', 'q3'].map((id) => (
             <div
               key={id}
-              className="flex-1 border-r border-stone-700/30 last:border-r-0"
+              className="flex-1"
+              style={{ borderRight: `1px solid ${PARCHMENT_BORDER_SUBTLE}` }}
             />
           ))}
+          <div className="flex-1" />
         </div>
+
+        {/* Golden corner accents */}
+        <div
+          className="absolute top-0 left-0 w-1 h-1"
+          style={{
+            borderTop: `1px solid ${PARCHMENT_BORDER}`,
+            borderLeft: `1px solid ${PARCHMENT_BORDER}`,
+          }}
+        />
+        <div
+          className="absolute top-0 right-0 w-1 h-1"
+          style={{
+            borderTop: `1px solid ${PARCHMENT_BORDER}`,
+            borderRight: `1px solid ${PARCHMENT_BORDER}`,
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-1 h-1"
+          style={{
+            borderBottom: `1px solid ${PARCHMENT_BORDER}`,
+            borderLeft: `1px solid ${PARCHMENT_BORDER}`,
+          }}
+        />
+        <div
+          className="absolute bottom-0 right-0 w-1 h-1"
+          style={{
+            borderBottom: `1px solid ${PARCHMENT_BORDER}`,
+            borderRight: `1px solid ${PARCHMENT_BORDER}`,
+          }}
+        />
       </div>
-      {showLabel && (
-        <span className="text-xs text-yellow-900 font-bold min-w-[32px]">
-          {Math.round(value)}
-        </span>
-      )}
+      {/* Numeric value */}
+      <span
+        className="font-lora text-[10px] font-bold min-w-[24px]"
+        style={{ color: GOLD_TEXT }}
+      >
+        {Math.round(value)}
+      </span>
     </div>
   );
 }
 
-// Compass component
+// ── Compass — medieval brass strip ───────────────────────────────────
 function Compass({ yaw }: { yaw: number }) {
   const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
   const compassItems = (['a', 'b', 'c'] as const).flatMap((group) =>
@@ -86,50 +132,70 @@ function Compass({ yaw }: { yaw: number }) {
   const normalizedYaw = ((((-yaw * 180) / Math.PI) % 360) + 360) % 360;
 
   return (
-    <div className="relative w-20 h-6 bg-yellow-100/80 border border-yellow-700/50 rounded overflow-hidden">
+    <div
+      className="relative w-24 h-7 overflow-hidden"
+      style={{
+        background: PARCHMENT,
+        border: `1.5px solid ${PARCHMENT_BORDER}`,
+      }}
+    >
       <div
-        className="absolute whitespace-nowrap text-xs font-bold tracking-wider flex items-center h-full transition-transform duration-100"
-        style={{
-          transform: `translateX(${-normalizedYaw * 0.55 + 40}px)`,
-        }}
+        className="absolute whitespace-nowrap font-lora text-xs font-bold tracking-wider flex items-center h-full transition-transform duration-100"
+        style={{ transform: `translateX(${-normalizedYaw * 0.66 + 48}px)` }}
       >
         {compassItems.map(({ key, dir }) => (
           <span
             key={key}
             className={cn(
-              'w-10 text-center',
+              'w-12 text-center',
               dir === 'N'
-                ? 'text-red-400'
-                : dir === 'S'
-                  ? 'text-yellow-700'
-                  : 'text-yellow-900',
+                ? 'text-red-700'
+                : dir.length === 1
+                  ? 'text-yellow-900'
+                  : 'text-yellow-800/60',
             )}
           >
             {dir}
           </span>
         ))}
       </div>
-      {/* Center indicator */}
-      <div className="absolute left-1/2 top-0 w-px h-full bg-amber-400/80 -translate-x-1/2" />
-      <div className="absolute left-1/2 top-0 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[4px] border-l-transparent border-r-transparent border-t-amber-400 -translate-x-1/2" />
+      {/* Center indicator — golden pointer */}
+      <div
+        className="absolute left-1/2 top-0 w-px h-full -translate-x-1/2"
+        style={{ backgroundColor: PARCHMENT_BORDER }}
+      />
+      <div
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{
+          top: '-1px',
+          width: 0,
+          height: 0,
+          borderLeft: '4px solid transparent',
+          borderRight: '4px solid transparent',
+          borderTop: `5px solid ${PARCHMENT_BORDER}`,
+        }}
+      />
     </div>
   );
 }
 
-// Sun/moon indicator
+// ── Day/night indicator — sun/moon in a brass medallion ──────────────
 function DayNightIndicator({ timeOfDay }: { timeOfDay: number }) {
   const isDay = timeOfDay > 0.25 && timeOfDay < 0.75;
   const sunMoonY = Math.sin((timeOfDay - 0.25) * Math.PI * 2);
 
   return (
-    <div className="relative w-8 h-8 bg-stone-950/60 border border-stone-700/40 rounded-full overflow-hidden">
+    <div
+      className="relative w-8 h-8 rounded-full overflow-hidden"
+      style={{ border: `1.5px solid ${PARCHMENT_BORDER}` }}
+    >
       {/* Sky gradient */}
       <div
         className="absolute inset-0"
         style={{
           background: isDay
-            ? 'linear-gradient(to bottom, #4488cc, #88aacc)'
-            : 'linear-gradient(to bottom, #0a0a1a, #1a1a2a)',
+            ? 'linear-gradient(to bottom, #87CEEB, #b8d4e8)'
+            : 'linear-gradient(to bottom, #1a1a3a, #2a2a4a)',
         }}
       />
 
@@ -138,8 +204,8 @@ function DayNightIndicator({ timeOfDay }: { timeOfDay: number }) {
         className={cn(
           'absolute left-1/2 w-3 h-3 rounded-full -translate-x-1/2 transition-all duration-1000',
           isDay
-            ? 'bg-amber-300 shadow-[0_0_8px_#fcd34d]'
-            : 'bg-stone-300 shadow-[0_0_6px_#e5e5e5]',
+            ? 'bg-amber-300 shadow-[0_0_6px_#c4a747]'
+            : 'bg-stone-200 shadow-[0_0_4px_#e5e5e5]',
         )}
         style={{
           top: `${50 - sunMoonY * 30}%`,
@@ -148,11 +214,182 @@ function DayNightIndicator({ timeOfDay }: { timeOfDay: number }) {
       />
 
       {/* Horizon line */}
-      <div className="absolute bottom-1/3 left-0 right-0 h-px bg-yellow-700/50" />
+      <div
+        className="absolute bottom-1/3 left-0 right-0 h-px"
+        style={{ backgroundColor: PARCHMENT_BORDER_SUBTLE }}
+      />
     </div>
   );
 }
 
+// ── Quest tracker — parchment card showing active quest objective ────
+function QuestTracker() {
+  const activeQuests = useQuestStore((s) => s.activeQuests);
+
+  if (activeQuests.length === 0) return null;
+
+  // Show the first active quest (main quests take priority)
+  const sorted = [...activeQuests].sort((a, b) => {
+    const aMain = a.questId.startsWith('main-') ? 0 : 1;
+    const bMain = b.questId.startsWith('main-') ? 0 : 1;
+    return aMain - bMain;
+  });
+  const quest = sorted[0];
+
+  return <QuestTrackerCard quest={quest} />;
+}
+
+function QuestTrackerCard({ quest }: { quest: ActiveQuest }) {
+  const def = getQuestDefinition(quest.questId);
+  if (!def) return null;
+
+  // Get current step description
+  let stepDescription = '';
+  let steps: {
+    description?: string;
+    type: string;
+    npcArchetype?: string;
+    destination?: string;
+  }[] = [];
+
+  if (quest.branch && def.branches) {
+    steps = def.branches[quest.branch].steps;
+  } else if (def.steps) {
+    steps = def.steps;
+  }
+
+  const currentStep = steps[quest.currentStep];
+  if (currentStep) {
+    if (currentStep.description) {
+      stepDescription = currentStep.description;
+    } else if (currentStep.type === 'dialogue' && currentStep.npcArchetype) {
+      stepDescription = `Speak with the ${currentStep.npcArchetype}`;
+    } else if (currentStep.type === 'travel' && currentStep.destination) {
+      stepDescription = 'Travel onward';
+    } else {
+      stepDescription = `${currentStep.type.charAt(0).toUpperCase()}${currentStep.type.slice(1)}`;
+    }
+  }
+
+  const isMain = def.id.startsWith('main-');
+
+  return (
+    <div
+      className="min-w-[180px] max-w-[240px] p-2.5"
+      style={{
+        background: PARCHMENT,
+        border: `1.5px solid ${PARCHMENT_BORDER}`,
+      }}
+    >
+      {/* Quest title */}
+      <div className="flex items-center gap-1.5 mb-1">
+        <span
+          className="text-[10px] font-bold"
+          style={{ color: isMain ? '#c4a747' : GOLD_TEXT }}
+        >
+          {isMain ? '\u25C6' : '\u25C7'}
+        </span>
+        <span
+          className="font-lora text-xs font-bold truncate"
+          style={{ color: '#3d3a34' }}
+        >
+          {def.title}
+        </span>
+      </div>
+      {/* Current objective */}
+      {stepDescription && (
+        <div
+          className="text-[10px] leading-tight pl-4"
+          style={{ color: GOLD_TEXT, fontFamily: 'Crimson Text, serif' }}
+        >
+          {stepDescription.length > 80
+            ? `${stepDescription.slice(0, 77)}...`
+            : stepDescription}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── First-time controls tooltip — shows once per session ─────────────
+const TOOLTIP_KEY = 'kings-road:controls-seen';
+
+function ControlsTooltip() {
+  const gameActive = useGameStore((state) => state.gameActive);
+  const [visible, setVisible] = useState(false);
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    if (!gameActive) return;
+
+    try {
+      if (sessionStorage.getItem(TOOLTIP_KEY)) return;
+    } catch {
+      // sessionStorage unavailable
+    }
+
+    setVisible(true);
+    setFading(false);
+
+    const fadeTimer = setTimeout(() => setFading(true), 27000);
+    const hideTimer = setTimeout(() => {
+      setVisible(false);
+      try {
+        sessionStorage.setItem(TOOLTIP_KEY, '1');
+      } catch {
+        // ignore
+      }
+    }, 30000);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [gameActive]);
+
+  if (!visible) return null;
+
+  return (
+    <div
+      className={cn(
+        'absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:block',
+        'transition-opacity duration-[3000ms]',
+        fading ? 'opacity-0' : 'opacity-100',
+      )}
+    >
+      <div
+        className="px-4 py-2 backdrop-blur-sm"
+        style={{
+          background: PARCHMENT,
+          border: `1px solid ${PARCHMENT_BORDER_SUBTLE}`,
+        }}
+      >
+        <div
+          className="font-lora text-xs tracking-wider font-medium flex items-center gap-4"
+          style={{ color: '#3d3a34' }}
+        >
+          <span>
+            <span className="font-bold">WASD</span> Move
+          </span>
+          <span style={{ color: PARCHMENT_BORDER_SUBTLE }}>|</span>
+          <span>
+            <span className="font-bold">Mouse</span> Look
+          </span>
+          <span style={{ color: PARCHMENT_BORDER_SUBTLE }}>|</span>
+          <span>
+            <span className="font-bold">E</span> Interact
+          </span>
+          <span style={{ color: PARCHMENT_BORDER_SUBTLE }}>|</span>
+          <span>
+            <span className="font-bold">ESC</span> Pause
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main HUD ─────────────────────────────────────────────────────────
 export function GameHUD() {
   const gameActive = useGameStore((state) => state.gameActive);
   const health = useGameStore((state) => state.health);
@@ -166,6 +403,13 @@ export function GameHUD() {
   );
   const inDialogue = useGameStore((state) => state.inDialogue);
   const cameraYaw = useGameStore((state) => state.cameraYaw);
+  const inDungeon = useGameStore((state) => state.inDungeon);
+  const activeDungeonName = useGameStore(
+    (state) => state.activeDungeon?.name ?? '',
+  );
+  const weatherCondition = useGameStore(
+    (state) => state.currentWeather.condition,
+  );
 
   const [bannerVisible, setBannerVisible] = useState(false);
   const [bannerAnimating, setBannerAnimating] = useState(false);
@@ -191,7 +435,6 @@ export function GameHUD() {
     }
   }, [currentChunkName, gameActive]);
 
-  // Format time display
   const formatTime = () => {
     const tHours = timeOfDay * 24;
     let hours = Math.floor(tHours);
@@ -201,17 +444,19 @@ export function GameHUD() {
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')} ${ampm}`;
   };
 
-  // Get chunk type display name and icon
   const getChunkTypeInfo = () => {
+    if (inDungeon) {
+      return { name: `Dungeon: ${activeDungeonName}`, icon: '\u25C8' };
+    }
     switch (currentChunkType) {
       case 'TOWN':
-        return { name: 'Settlement', icon: '⌂' };
+        return { name: 'Settlement', icon: '\u2302' };
       case 'DUNGEON':
-        return { name: 'Ancient Ruins', icon: '◈' };
+        return { name: 'Ancient Ruins', icon: '\u25C8' };
       case 'ROAD':
-        return { name: "The King's Road", icon: '═' };
+        return { name: "The King's Road", icon: '\u2550' };
       default:
-        return { name: 'Wilderness', icon: '♣' };
+        return { name: 'Wilderness', icon: '\u2663' };
     }
   };
 
@@ -221,37 +466,79 @@ export function GameHUD() {
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10">
-      {/* Crosshair */}
+      {/* Crosshair — subtle golden dot */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <div className="relative w-6 h-6">
-          {/* Outer ring */}
-          <div className="absolute inset-0 border border-white/20 rounded-full" />
-          {/* Center dot */}
-          <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-white/80 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
-          {/* Cardinal lines */}
-          <div className="absolute top-0 left-1/2 w-px h-1.5 bg-white/40 -translate-x-1/2" />
-          <div className="absolute bottom-0 left-1/2 w-px h-1.5 bg-white/40 -translate-x-1/2" />
-          <div className="absolute left-0 top-1/2 w-1.5 h-px bg-white/40 -translate-y-1/2" />
-          <div className="absolute right-0 top-1/2 w-1.5 h-px bg-white/40 -translate-y-1/2" />
+        <div className="relative w-5 h-5">
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{ border: `1px solid rgba(196, 167, 71, 0.25)` }}
+          />
+          <div
+            className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full -translate-x-1/2 -translate-y-1/2"
+            style={{
+              backgroundColor: 'rgba(245, 240, 232, 0.8)',
+              boxShadow: '0 0 3px rgba(0,0,0,0.6)',
+            }}
+          />
         </div>
       </div>
 
-      {/* Interaction Prompt */}
+      {/* Interaction Prompt — parchment pill */}
       {currentInteractable && !inDialogue && (
         <div className="absolute top-[calc(50%+35px)] left-1/2 -translate-x-1/2">
-          <div className="relative bg-yellow-100/80 border border-yellow-700/30 px-4 py-2 rounded">
+          <div
+            className="relative px-5 py-2"
+            style={{
+              background: PARCHMENT,
+              border: `1.5px solid ${PARCHMENT_BORDER}`,
+              borderRadius: '2px',
+            }}
+          >
             {/* Corner accents */}
-            <div className="absolute -top-px -left-px w-2 h-2 border-t border-l border-yellow-700" />
-            <div className="absolute -top-px -right-px w-2 h-2 border-t border-r border-yellow-700" />
-            <div className="absolute -bottom-px -left-px w-2 h-2 border-b border-l border-yellow-700" />
-            <div className="absolute -bottom-px -right-px w-2 h-2 border-b border-r border-yellow-700" />
+            <div
+              className="absolute -top-px -left-px w-2.5 h-2.5"
+              style={{
+                borderTop: `2px solid ${PARCHMENT_BORDER}`,
+                borderLeft: `2px solid ${PARCHMENT_BORDER}`,
+              }}
+            />
+            <div
+              className="absolute -top-px -right-px w-2.5 h-2.5"
+              style={{
+                borderTop: `2px solid ${PARCHMENT_BORDER}`,
+                borderRight: `2px solid ${PARCHMENT_BORDER}`,
+              }}
+            />
+            <div
+              className="absolute -bottom-px -left-px w-2.5 h-2.5"
+              style={{
+                borderBottom: `2px solid ${PARCHMENT_BORDER}`,
+                borderLeft: `2px solid ${PARCHMENT_BORDER}`,
+              }}
+            />
+            <div
+              className="absolute -bottom-px -right-px w-2.5 h-2.5"
+              style={{
+                borderBottom: `2px solid ${PARCHMENT_BORDER}`,
+                borderRight: `2px solid ${PARCHMENT_BORDER}`,
+              }}
+            />
 
-            <div className="font-lora text-sm font-bold text-yellow-900 uppercase tracking-wider flex items-center gap-2">
-              <span className="text-yellow-700 text-xs bg-yellow-200/50 px-1.5 py-0.5 rounded">
+            <div className="font-lora text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+              <span
+                className="text-xs px-1.5 py-0.5"
+                style={{
+                  color: PARCHMENT_BORDER,
+                  backgroundColor: 'rgba(196, 167, 71, 0.15)',
+                  border: `1px solid ${PARCHMENT_BORDER_SUBTLE}`,
+                }}
+              >
                 [E]
               </span>
-              {currentInteractable.actionVerb}
-              <span className="text-yellow-900">
+              <span style={{ color: GOLD_TEXT }}>
+                {currentInteractable.actionVerb}
+              </span>
+              <span style={{ color: '#3d3a34' }}>
                 {currentInteractable.name}
               </span>
             </div>
@@ -259,30 +546,23 @@ export function GameHUD() {
         </div>
       )}
 
-      {/* Player Stats - Top Left */}
-      <div className="absolute top-6 left-6 flex flex-col gap-2">
-        <StatBar
-          value={health}
-          color="#c4695a"
-          glowColor="#d9796366"
-          icon={<span>❤</span>}
-        />
-        <StatBar
-          value={stamina}
-          color="#6b8f5e"
-          glowColor="#6b8f5e66"
-          icon={<span className={cn(isSprinting && 'animate-bounce')}>⚡</span>}
-        />
+      {/* Player Stats — Top Left */}
+      <div className="absolute top-6 left-6 flex flex-col gap-1.5">
+        <StatBar value={health} label="HP" fillColor={HEALTH_FILL} />
+        <StatBar value={stamina} label="SP" fillColor={STAMINA_FILL} />
 
         {/* Sprint indicator */}
         {isSprinting && (
-          <div className="text-xs text-yellow-700 font-bold tracking-wider animate-pulse ml-6">
+          <div
+            className="font-lora text-[10px] font-bold tracking-[0.2em] uppercase animate-pulse ml-7"
+            style={{ color: GOLD_TEXT }}
+          >
             SPRINTING
           </div>
         )}
       </div>
 
-      {/* Location Banner */}
+      {/* Location Banner — golden serif, centered */}
       <div
         className={cn(
           'absolute top-6 left-1/2 -translate-x-1/2 text-center transition-all duration-500',
@@ -292,68 +572,146 @@ export function GameHUD() {
           bannerAnimating && 'scale-110',
         )}
       >
-        <div className="relative bg-yellow-100/60 border border-yellow-700/30 px-8 py-4 backdrop-blur-sm">
-          {/* Decorative corners */}
-          <div className="absolute -top-px left-4 right-4 h-px bg-gradient-to-r from-transparent via-yellow-700/50 to-transparent" />
-          <div className="absolute -bottom-px left-4 right-4 h-px bg-gradient-to-r from-transparent via-yellow-700/50 to-transparent" />
+        <div
+          className="relative px-10 py-4 backdrop-blur-sm"
+          style={{
+            background: 'rgba(245, 240, 232, 0.6)',
+            border: `1px solid ${PARCHMENT_BORDER_SUBTLE}`,
+          }}
+        >
+          {/* Decorative ruling lines */}
+          <div
+            className="absolute -top-px left-6 right-6 h-px"
+            style={{
+              background: `linear-gradient(to right, transparent, ${PARCHMENT_BORDER}80, transparent)`,
+            }}
+          />
+          <div
+            className="absolute -bottom-px left-6 right-6 h-px"
+            style={{
+              background: `linear-gradient(to right, transparent, ${PARCHMENT_BORDER}80, transparent)`,
+            }}
+          />
 
           <div
-            className="font-lora text-2xl md:text-3xl font-black text-yellow-900 tracking-[0.15em] uppercase"
-            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+            className="font-lora text-2xl md:text-3xl font-black tracking-[0.15em] uppercase"
+            style={{
+              color: '#3d3a34',
+              textShadow: `0 1px 8px rgba(0,0,0,0.5), 0 0 20px rgba(196, 167, 71, 0.2)`,
+            }}
           >
             {currentChunkName}
           </div>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <span className="text-yellow-800/80">{chunkInfo.icon}</span>
-            <span className="text-xs text-yellow-900 tracking-[0.3em] uppercase font-bold">
+          <div className="flex items-center justify-center gap-2 mt-1.5">
+            <span style={{ color: PARCHMENT_BORDER }}>{chunkInfo.icon}</span>
+            <span
+              className="font-lora text-[10px] tracking-[0.3em] uppercase font-bold"
+              style={{ color: GOLD_TEXT }}
+            >
               {chunkInfo.name}
             </span>
-            <span className="text-yellow-800/80">{chunkInfo.icon}</span>
+            <span style={{ color: PARCHMENT_BORDER }}>{chunkInfo.icon}</span>
           </div>
         </div>
       </div>
 
-      {/* Top Right - Time, Compass, Gems */}
-      <div className="absolute top-6 right-6 flex flex-col items-end gap-3">
-        {/* Time and day/night */}
-        <div className="flex items-center gap-3">
+      {/* Top Right — Time, Compass, Quest Tracker, Minimap */}
+      <div className="absolute top-6 right-6 flex flex-col items-end gap-2.5">
+        {/* Time, weather, and day/night */}
+        <div className="flex items-center gap-2.5">
           <div
-            className="font-lora text-lg text-yellow-700/90 tracking-wider"
-            style={{ textShadow: '0 0 10px rgba(212, 175, 55, 0.3)' }}
+            className="font-lora text-base tracking-wider"
+            style={{
+              color: GOLD_TEXT,
+              textShadow: '0 0 8px rgba(196, 167, 71, 0.25)',
+            }}
           >
             {formatTime()}
           </div>
+          <span
+            className="font-crimson text-xs italic tracking-wide"
+            style={{ color: PARCHMENT_BORDER }}
+          >
+            {WEATHER_LABELS[weatherCondition] ?? 'Fair'}
+          </span>
           <DayNightIndicator timeOfDay={timeOfDay} />
         </div>
 
         {/* Compass */}
         <Compass yaw={cameraYaw} />
+
+        {/* Quest Tracker */}
+        <QuestTracker />
+
+        {/* Minimap */}
+        <Minimap />
       </div>
 
-      {/* Controls Hint - Bottom */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:block">
-        <div className="bg-yellow-100/40 border border-yellow-700/30 px-4 py-2 rounded backdrop-blur-sm">
-          <div className="text-xs text-yellow-900 tracking-wider font-medium flex items-center gap-4">
-            <span>
-              <span className="text-yellow-900 font-bold">WASD</span> Move
-            </span>
-            <span className="text-yellow-800">|</span>
-            <span>
-              <span className="text-yellow-900 font-bold">Mouse</span> Look
-            </span>
-            <span className="text-yellow-800">|</span>
-            <span>
-              <span className="text-yellow-900 font-bold">E</span> Interact
-            </span>
-            <span className="text-yellow-800">|</span>
-            <span>
-              <span className="text-yellow-900 font-bold">SPACE</span> Jump
-            </span>
-            <span className="text-yellow-800">|</span>
-            <span>
-              <span className="text-yellow-900 font-bold">SHIFT</span> Walk
-            </span>
-          </div>
+      {/* Dungeon room description — shown when inside a dungeon */}
+      {inDungeon && <DungeonRoomInfo />}
+
+      {/* First-time controls tooltip — fades after 30s */}
+      <ControlsTooltip />
+    </div>
+  );
+}
+
+// ── Dungeon room info — bottom-center parchment card ─────────────────
+
+function DungeonRoomInfo() {
+  const activeDungeon = useGameStore((s) => s.activeDungeon);
+  if (!activeDungeon) return null;
+
+  const currentRoom =
+    activeDungeon.spatial.rooms[activeDungeon.currentRoomIndex];
+  if (!currentRoom) return null;
+
+  const room = currentRoom.room;
+  const exitCount = currentRoom.exits.length;
+  const exitLabel = exitCount === 1 ? '1 exit' : `${exitCount} exits`;
+
+  return (
+    <div className="absolute bottom-16 left-1/2 -translate-x-1/2 max-w-md">
+      <div
+        className="px-5 py-3 backdrop-blur-sm"
+        style={{
+          background: PARCHMENT,
+          border: `1.5px solid ${PARCHMENT_BORDER}`,
+        }}
+      >
+        {/* Room name */}
+        <div
+          className="font-lora text-sm font-bold tracking-wider uppercase mb-1"
+          style={{ color: '#3d3a34' }}
+        >
+          {room.name}
+        </div>
+        {/* Room description (truncated) */}
+        <div
+          className="text-xs leading-relaxed mb-1.5"
+          style={{ color: GOLD_TEXT, fontFamily: 'Crimson Text, serif' }}
+        >
+          {room.description.length > 160
+            ? `${room.description.slice(0, 157)}...`
+            : room.description}
+        </div>
+        {/* Room metadata */}
+        <div className="flex items-center gap-3">
+          <span
+            className="text-[10px] font-bold tracking-wider uppercase"
+            style={{ color: PARCHMENT_BORDER }}
+          >
+            {room.type}
+          </span>
+          <span className="text-[10px]" style={{ color: PARCHMENT_BORDER }}>
+            |
+          </span>
+          <span
+            className="text-[10px] tracking-wider"
+            style={{ color: GOLD_TEXT }}
+          >
+            {exitLabel}
+          </span>
         </div>
       </div>
     </div>

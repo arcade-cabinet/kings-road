@@ -13,6 +13,9 @@
     { "archetype": "herb_garden", "label": "Sister Maeve's Garden", "position": [3, -3], "rotation": -5 },
     { "archetype": "cottage", "label": "Abbot's Quarters", "position": [-2, 4], "rotation": 15 }
   ],
+  "spawns": [
+    { "id": "road-entrance", "tile": [0, -4], "facing": "north" }
+  ],
   "npcs": [
     { "id": "abbot-gregorius", "archetype": "priest", "fixed": true, "building": "Chapel of the Weary Pilgrim", "name": "Abbot Gregorius" },
     { "id": "sister-maeve", "archetype": "healer", "fixed": true, "building": "Sister Maeve's Garden", "name": "Sister Maeve" },

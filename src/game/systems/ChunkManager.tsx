@@ -1,27 +1,38 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import type { KingdomMap, Settlement } from '../../schemas/kingdom.schema';
 import { Chunk } from '../components/Chunk';
 import { useGameStore } from '../stores/gameStore';
+import { useWorldStore } from '../stores/worldStore';
 import type {
   AABB,
   ChunkData,
   Interactable,
   PlacedBuildingData,
+  PlacedFeatureData,
   PlacedNPCData,
 } from '../types';
 import { cyrb128, mulberry32 } from '../utils/random';
 import {
   BLOCK_SIZE,
   CHUNK_SIZE,
-  getChunkName,
-  getChunkType,
+  chunkToWorldOrigin,
+  VIEW_DISTANCE,
+  worldToChunk,
+} from '../utils/worldCoords';
+import {
+  getChunkTypeFromKingdom,
   getRandomDialogue,
   getRandomNPCName,
-  VIEW_DISTANCE,
+  getTerrainHeight,
 } from '../utils/worldGen';
+import type { PlacedFeature } from '../world/feature-placement';
+import { getRegionAt } from '../world/kingdom-gen';
 import {
-  getTownConfig,
+  generateNPCFromPool,
+  getNPCPool,
+  getTownConfigBySettlement,
   resolveBuildingArchetype,
   resolveNPCBlueprint,
 } from '../world/town-configs';
@@ -33,18 +44,42 @@ function generateChunkData(
   cz: number,
   seedPhrase: string,
   chunkDeltas: Record<string, { gems: number[] }>,
+  kingdomMap: KingdomMap,
+  featureIndex?: Map<string, PlacedFeature[]>,
 ): ChunkData {
   const key = `${cx},${cz}`;
-  const type = getChunkType(cx, cz, seedPhrase);
-  let name = getChunkName(cx, cz, type, seedPhrase);
+
+  // Kingdom-map-aware type resolution
+  let type: ChunkData['type'];
+  let name: string;
+  let kingdomTile: ChunkData['kingdomTile'];
+  let biome: ChunkData['biome'];
+  let settlement: Settlement | undefined;
+  const resolved = getChunkTypeFromKingdom(kingdomMap, cx, cz);
+  if (!resolved) {
+    // Outside map bounds or ocean — skip rendering
+    type = 'WILD';
+    name = 'The Ocean';
+    biome = 'ocean';
+  } else {
+    type = resolved.type;
+    name = resolved.name;
+    kingdomTile = resolved.tile;
+    biome = resolved.tile.biome;
+    settlement = resolved.settlement;
+  }
+
   const rng = mulberry32(cyrb128(seedPhrase + key));
 
   const collidables: AABB[] = [];
   const interactables: Interactable[] = [];
   const collectedGems = new Set<number>(chunkDeltas[key]?.gems || []);
 
-  const oX = cx * CHUNK_SIZE;
-  const oZ = cz * CHUNK_SIZE;
+  const { x: oX, z: oZ } = chunkToWorldOrigin(cx, cz);
+
+  // Terrain height sampler — places objects on the heightmap surface
+  const groundY = (wx: number, wz: number): number =>
+    kingdomMap ? getTerrainHeight(kingdomMap, wx, wz) : 0;
 
   // Helper to add AABB
   const addAABB = (x: number, z: number, width: number, depth: number) => {
@@ -73,7 +108,7 @@ function generateChunkData(
 
     interactables.push({
       id: `${key}-npc-${interactables.length}`,
-      position: new THREE.Vector3(x, 0, z),
+      position: new THREE.Vector3(x, groundY(x, z), z),
       radius: 4.0,
       type: npcType,
       name: npcName,
@@ -180,24 +215,73 @@ function generateChunkData(
       addAABB(px, pz, BLOCK_SIZE * 0.5 * s, BLOCK_SIZE * 0.5 * s);
     }
 
-    // Occasional wanderer in wilderness
-    if (rng() > 0.85) {
-      addInteractable(
-        oX + 20 + rng() * (CHUNK_SIZE - 40),
-        oZ + 20 + rng() * (CHUNK_SIZE - 40),
+    // Wilderness NPC spawning — frequency gated by region danger tier
+    const region = getRegionAt(kingdomMap, cx, cz);
+    const dangerTier = region?.dangerTier ?? 0;
+    // Higher danger = fewer NPCs: tier 0→0.82, tier 1→0.87, tier 2→0.92, tier 3→0.95, tier 4→0.98
+    const spawnThreshold = 0.82 + dangerTier * 0.04;
+
+    if (rng() > spawnThreshold) {
+      const npcX = oX + 20 + rng() * (CHUNK_SIZE - 40);
+      const npcZ = oZ + 20 + rng() * (CHUNK_SIZE - 40);
+
+      // Pick a wilderness NPC archetype (weighted toward wanderers and pilgrims)
+      const wildernessArchetypes = [
         'wanderer',
-      );
+        'wanderer',
+        'wanderer',
+        'pilgrim',
+        'merchant',
+        'farmer',
+      ];
+      const archetype =
+        wildernessArchetypes[Math.floor(rng() * wildernessArchetypes.length)];
+      const pool = getNPCPool(archetype);
+
+      if (pool) {
+        const npcSeed = `wild:${cx},${cz}`;
+        const blueprint = generateNPCFromPool(pool, npcSeed);
+
+        const npcType = (
+          ['blacksmith', 'innkeeper', 'merchant', 'wanderer'].includes(
+            archetype,
+          )
+            ? archetype
+            : 'wanderer'
+        ) as Interactable['type'];
+
+        const greeting =
+          blueprint.dialogue?.greeting?.[0] ?? 'Well met, traveller.';
+
+        const interactable: Interactable = {
+          id: `${key}-wild-npc`,
+          position: new THREE.Vector3(npcX, groundY(npcX, npcZ), npcZ),
+          radius: 4.0,
+          type: npcType,
+          name: blueprint.name ?? 'Wanderer',
+          dialogueText: greeting,
+          actionVerb: blueprint.behavior?.interactionVerb ?? 'TALK',
+        };
+
+        interactables.push(interactable);
+        // Store as npcBlueprint below (we'll attach it after the town section)
+      } else {
+        // Fallback to legacy wanderer
+        addInteractable(npcX, npcZ, 'wanderer');
+      }
     }
   }
 
-  // Config-driven town: if a town config is anchored at these coords, overlay it
+  // Config-driven town: use settlement from kingdom map
   let placedBuildings: PlacedBuildingData[] | undefined;
   let npcBlueprints: PlacedNPCData[] | undefined;
 
-  const townConfig = getTownConfig(cx, cz);
+  const townConfig = settlement
+    ? getTownConfigBySettlement(settlement)
+    : undefined;
+
   if (townConfig && type === 'TOWN') {
-    const oXTown = cx * CHUNK_SIZE;
-    const oZTown = cz * CHUNK_SIZE;
+    const { x: oXTown, z: oZTown } = chunkToWorldOrigin(cx, cz);
     const placed = layoutTown(townConfig, oXTown, oZTown);
 
     placedBuildings = placed
@@ -267,7 +351,7 @@ function generateChunkData(
 
       const interactable: Interactable = {
         id: `${key}-bp-${npcPlacement.id}`,
-        position: new THREE.Vector3(npcX, 0, npcZ),
+        position: new THREE.Vector3(npcX, groundY(npcX, npcZ), npcZ),
         radius: 4.0,
         type: npcType,
         name: npcPlacement.name ?? blueprint.name ?? npcPlacement.id,
@@ -283,6 +367,50 @@ function generateChunkData(
     name = townConfig.name;
   }
 
+  // Look up pre-placed features from the kingdom map feature index
+  let placedFeatures: PlacedFeatureData[] | undefined;
+  if (featureIndex) {
+    const gridKey = `${cx},${cz}`;
+    const features = featureIndex.get(gridKey);
+    if (features && features.length > 0) {
+      placedFeatures = features.map((f) => {
+        // Place feature within the chunk using a seeded sub-position
+        const featureRng = mulberry32(cyrb128(`${seedPhrase}:fpos:${f.id}`));
+        const margin = CHUNK_SIZE * 0.1;
+        const wx = oX + margin + featureRng() * (CHUNK_SIZE - 2 * margin);
+        const wz = oZ + margin + featureRng() * (CHUNK_SIZE - 2 * margin);
+
+        return {
+          id: f.id,
+          definition: f.definition,
+          worldPosition: [wx, groundY(wx, wz), wz] as [number, number, number],
+          rotation: f.rotation,
+        };
+      });
+
+      // Add interactables for interactable features
+      for (const pf of placedFeatures) {
+        if (pf.definition.interactable) {
+          const interactable: Interactable = {
+            id: pf.id,
+            position: new THREE.Vector3(
+              pf.worldPosition[0],
+              groundY(pf.worldPosition[0], pf.worldPosition[2]),
+              pf.worldPosition[2],
+            ),
+            radius: pf.definition.tier === 'major' ? 6 : 4,
+            type: 'wanderer',
+            name: pf.definition.name,
+            dialogueText:
+              pf.definition.dialogueOnInteract ?? pf.definition.description,
+            actionVerb: 'EXAMINE',
+          };
+          interactables.push(interactable);
+        }
+      }
+    }
+  }
+
   return {
     cx,
     cz,
@@ -294,15 +422,19 @@ function generateChunkData(
     collectedGems,
     placedBuildings,
     npcBlueprints,
+    kingdomTile,
+    biome,
+    placedFeatures,
   };
 }
 
 export function ChunkManager() {
   const seedPhrase = useGameStore((state) => state.seedPhrase);
-  const playerPosition = useGameStore((state) => state.playerPosition);
   const activeChunks = useGameStore((state) => state.activeChunks);
   const chunkDeltas = useGameStore((state) => state.chunkDeltas);
   const gameActive = useGameStore((state) => state.gameActive);
+  const kingdomMap = useWorldStore((state) => state.kingdomMap);
+  const featureIndex = useWorldStore((state) => state.featureIndex);
 
   const addChunk = useGameStore((state) => state.addChunk);
   const removeChunk = useGameStore((state) => state.removeChunk);
@@ -321,19 +453,29 @@ export function ChunkManager() {
 
   // Update chunks based on player position
   useFrame(() => {
-    if (!gameActive || !seedPhrase) return;
+    if (!gameActive || !seedPhrase || !kingdomMap) return;
 
-    const currentCx = Math.floor(playerPosition.x / CHUNK_SIZE);
-    const currentCz = Math.floor(playerPosition.z / CHUNK_SIZE);
+    const playerPosition = useGameStore.getState().playerPosition;
+    const { cx: currentCx, cz: currentCz } = worldToChunk(
+      playerPosition.x,
+      playerPosition.z,
+    );
     const newKey = `${currentCx},${currentCz}`;
 
     // Update location banner when entering new chunk
     if (lastChunkKey.current !== newKey) {
       lastChunkKey.current = newKey;
 
-      const type = getChunkType(currentCx, currentCz, seedPhrase);
-      const name = getChunkName(currentCx, currentCz, type, seedPhrase);
-      setCurrentChunk(newKey, name, type);
+      const resolved = getChunkTypeFromKingdom(
+        kingdomMap,
+        currentCx,
+        currentCz,
+      );
+      setCurrentChunk(
+        newKey,
+        resolved?.name ?? 'The Ocean',
+        resolved?.type ?? 'WILD',
+      );
     }
 
     // Determine which chunks should be active
@@ -353,6 +495,8 @@ export function ChunkManager() {
             cz,
             seedPhrase,
             chunkDeltas || {},
+            kingdomMap,
+            featureIndex.size > 0 ? featureIndex : undefined,
           );
           if (chunkData) {
             addChunk(chunkData);

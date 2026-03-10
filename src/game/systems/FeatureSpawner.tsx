@@ -1,82 +1,51 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import {
+  getAllFeatures,
+  getPacingConfig,
+  isContentStoreReady,
+} from '../../db/content-queries';
 import type { FeatureDefinition } from '../../schemas/feature.schema';
 import { useGameStore } from '../stores/gameStore';
+import { useWorldStore } from '../stores/worldStore';
 import type { Interactable } from '../types';
 import { cyrb128, mulberry32 } from '../utils/random';
 
-// --- Static content imports ---
+// --- Lazy-initialized registries (populated on first access from content store) ---
 
-import abandonedCampJson from '../../../content/features/abandoned_camp.json';
-import ancientOakJson from '../../../content/features/ancient_oak.json';
-import ancientRuinsJson from '../../../content/features/ancient_ruins.json';
-import berryBushJson from '../../../content/features/berry_bush.json';
-import birdNestJson from '../../../content/features/bird_nest.json';
-import crossroadsSignJson from '../../../content/features/crossroads_sign.json';
-import dragonBonesJson from '../../../content/features/dragon_bones.json';
-import enchantedGroveJson from '../../../content/features/enchanted_grove.json';
-import fairyCircleJson from '../../../content/features/fairy_circle.json';
-import fallenLogJson from '../../../content/features/fallen_log.json';
-import foxDenJson from '../../../content/features/fox_den.json';
-import hermitCaveJson from '../../../content/features/hermit_cave.json';
-import hunterBlindJson from '../../../content/features/hunter_blind.json';
-import milestoneMarkerJson from '../../../content/features/milestone_marker.json';
-import mushroomRingJson from '../../../content/features/mushroom_ring.json';
-import oldWellJson from '../../../content/features/old_well.json';
-import ruinedFarmsteadJson from '../../../content/features/ruined_farmstead.json';
-import standingStoneJson from '../../../content/features/standing_stone.json';
-import stoneBridgeJson from '../../../content/features/stone_bridge.json';
-import streamCrossingJson from '../../../content/features/stream_crossing.json';
-import watchtowerRuinJson from '../../../content/features/watchtower_ruin.json';
-import waysideShrineJson from '../../../content/features/wayside_shrine.json';
-import weatherVaneJson from '../../../content/features/weather_vane.json';
-import wildflowerPatchJson from '../../../content/features/wildflower_patch.json';
-import windChimesJson from '../../../content/features/wind_chimes.json';
+let featuresInitialized = false;
+let ALL_FEATURES: FeatureDefinition[] = [];
+let FEATURES_BY_TIER: Record<string, FeatureDefinition[]> = {};
+let AMBIENT_INTERVAL: [number, number] = [8, 15];
+let MINOR_INTERVAL: [number, number] = [20, 40];
+let MAJOR_INTERVAL: [number, number] = [60, 120];
 
-import pacingJson from '../../../content/pacing/config.json';
+function ensureFeatureData(): boolean {
+  if (featuresInitialized) return true;
+  if (!isContentStoreReady()) return false;
 
-// --- Registries by tier ---
+  ALL_FEATURES = getAllFeatures();
+  FEATURES_BY_TIER = {
+    ambient: ALL_FEATURES.filter((f) => f.tier === 'ambient'),
+    minor: ALL_FEATURES.filter((f) => f.tier === 'minor'),
+    major: ALL_FEATURES.filter((f) => f.tier === 'major'),
+  };
 
-const ALL_FEATURES: FeatureDefinition[] = [
-  abandonedCampJson,
-  ancientOakJson,
-  ancientRuinsJson,
-  berryBushJson,
-  birdNestJson,
-  crossroadsSignJson,
-  dragonBonesJson,
-  enchantedGroveJson,
-  fairyCircleJson,
-  fallenLogJson,
-  foxDenJson,
-  hermitCaveJson,
-  hunterBlindJson,
-  milestoneMarkerJson,
-  mushroomRingJson,
-  oldWellJson,
-  ruinedFarmsteadJson,
-  standingStoneJson,
-  stoneBridgeJson,
-  streamCrossingJson,
-  watchtowerRuinJson,
-  waysideShrineJson,
-  weatherVaneJson,
-  wildflowerPatchJson,
-  windChimesJson,
-] as unknown as FeatureDefinition[];
+  const pacing = getPacingConfig() as {
+    ambientInterval?: [number, number];
+    minorInterval?: [number, number];
+    majorInterval?: [number, number];
+  } | null;
+  if (pacing) {
+    if (pacing.ambientInterval) AMBIENT_INTERVAL = pacing.ambientInterval;
+    if (pacing.minorInterval) MINOR_INTERVAL = pacing.minorInterval;
+    if (pacing.majorInterval) MAJOR_INTERVAL = pacing.majorInterval;
+  }
 
-const FEATURES_BY_TIER: Record<string, FeatureDefinition[]> = {
-  ambient: ALL_FEATURES.filter((f) => f.tier === 'ambient'),
-  minor: ALL_FEATURES.filter((f) => f.tier === 'minor'),
-  major: ALL_FEATURES.filter((f) => f.tier === 'major'),
-};
-
-// --- Pacing intervals (seconds) ---
-
-const AMBIENT_INTERVAL = pacingJson.ambientInterval as [number, number];
-const MINOR_INTERVAL = pacingJson.minorInterval as [number, number];
-const MAJOR_INTERVAL = pacingJson.majorInterval as [number, number];
+  featuresInitialized = true;
+  return true;
+}
 
 /** Pick a random value within an interval range */
 function randomInRange(rng: () => number, range: [number, number]): number {
@@ -355,12 +324,17 @@ const INITIAL_GRACE = 3;
 
 export function FeatureSpawner() {
   const gameActive = useGameStore((s) => s.gameActive);
-  const playerPosition = useGameStore((s) => s.playerPosition);
   const currentChunkType = useGameStore((s) => s.currentChunkType);
   const seedPhrase = useGameStore((s) => s.seedPhrase);
   const addGlobalInteractables = useGameStore((s) => s.addGlobalInteractables);
   const removeGlobalInteractables = useGameStore(
     (s) => s.removeGlobalInteractables,
+  );
+
+  // When kingdom map has pre-placed features, skip timer-based spawning.
+  // Features are placed deterministically by the chunk system instead.
+  const hasKingdomFeatures = useWorldStore(
+    (s) => s.featurePlacements.length > 0,
   );
 
   const spawnedRef = useRef<SpawnedFeature[]>([]);
@@ -377,6 +351,12 @@ export function FeatureSpawner() {
 
   useFrame((_, delta) => {
     if (!gameActive || !seedPhrase) return;
+
+    // Skip timer-based spawning when kingdom map features are active
+    if (hasKingdomFeatures) return;
+
+    // Content store must be ready before we can spawn features
+    if (!ensureFeatureData()) return;
 
     // Only spawn in ROAD and WILD chunks
     if (currentChunkType !== 'ROAD' && currentChunkType !== 'WILD') return;
@@ -414,6 +394,8 @@ export function FeatureSpawner() {
     }
 
     if (tiersToSpawn.length === 0) return;
+
+    const playerPosition = useGameStore.getState().playerPosition;
 
     // Spawn one feature per triggered tier
     for (const tier of tiersToSpawn) {
@@ -487,8 +469,8 @@ export function FeatureSpawner() {
     }
   });
 
-  // Don't render if not active
-  if (!gameActive) return null;
+  // Don't render if not active or kingdom map features are handling it
+  if (!gameActive || hasKingdomFeatures) return null;
 
   return (
     <>

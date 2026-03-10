@@ -22,6 +22,9 @@
     { "archetype": "stable", "label": "Garrison Stables", "position": [-5, -4], "rotation": 0 },
     { "archetype": "smithy", "label": "The Armoury", "position": [5, -4], "rotation": 0 }
   ],
+  "spawns": [
+    { "id": "south-gate", "tile": [0, -7], "facing": "north" }
+  ],
   "npcs": [
     { "id": "lord-ashwick", "archetype": "noble", "fixed": true, "building": "Ashwick Manor", "name": "Lord Ashwick" },
     { "id": "captain-roderick", "archetype": "knight", "fixed": true, "building": "Ravensgate Barracks", "name": "Captain Roderick" },

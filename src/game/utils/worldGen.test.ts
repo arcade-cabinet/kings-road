@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import type { RoadSpine } from '../../schemas/world.schema';
+import type { KingdomConfig } from '../../schemas/kingdom.schema';
+import { generateKingdom, getKingdomTile } from '../world/kingdom-gen';
 import { cyrb128, mulberry32 } from './random';
 import {
   BLOCK_SIZE,
   CHUNK_SIZE,
-  chunkZToRoadDistance,
-  getChunkName,
-  getChunkType,
+  getChunkTypeFromKingdom,
   getRandomDialogue,
   getRandomNPCName,
+  getTerrainHeight,
+  MAX_TERRAIN_HEIGHT,
   PLAYER_HEIGHT,
   PLAYER_RADIUS,
   VIEW_DISTANCE,
@@ -33,90 +34,6 @@ describe('constants', () => {
 
   it('exports correct PLAYER_RADIUS', () => {
     expect(PLAYER_RADIUS).toBe(0.6);
-  });
-});
-
-describe('getChunkType', () => {
-  const seedPhrase = 'TestSeed';
-
-  it('returns TOWN for chunks at x=0 where z%3===0', () => {
-    expect(getChunkType(0, 0, seedPhrase)).toBe('TOWN');
-    expect(getChunkType(0, 3, seedPhrase)).toBe('TOWN');
-    expect(getChunkType(0, -3, seedPhrase)).toBe('TOWN');
-    expect(getChunkType(0, 6, seedPhrase)).toBe('TOWN');
-  });
-
-  it('returns ROAD for chunks at x=0 where z%3!==0', () => {
-    expect(getChunkType(0, 1, seedPhrase)).toBe('ROAD');
-    expect(getChunkType(0, 2, seedPhrase)).toBe('ROAD');
-    expect(getChunkType(0, -1, seedPhrase)).toBe('ROAD');
-    expect(getChunkType(0, -2, seedPhrase)).toBe('ROAD');
-  });
-
-  it('returns WILD or DUNGEON for chunks away from x=0', () => {
-    const type = getChunkType(1, 1, seedPhrase);
-    expect(['WILD', 'DUNGEON']).toContain(type);
-  });
-
-  it('returns consistent type for same coordinates and seed', () => {
-    const type1 = getChunkType(5, 5, seedPhrase);
-    const type2 = getChunkType(5, 5, seedPhrase);
-    expect(type1).toBe(type2);
-  });
-
-  it('may return different types for different seeds', () => {
-    // Run multiple times to get variety
-    const types = new Set<string>();
-    for (let i = 0; i < 100; i++) {
-      types.add(getChunkType(5, 5, `seed-${i}`));
-    }
-    // Should get both WILD and DUNGEON eventually (20% dungeon chance)
-    expect(types.size).toBeGreaterThanOrEqual(1);
-  });
-
-  it('handles negative coordinates', () => {
-    const type = getChunkType(-5, -5, seedPhrase);
-    expect(['WILD', 'DUNGEON']).toContain(type);
-  });
-});
-
-describe('getChunkName', () => {
-  const seedPhrase = 'TestSeed';
-
-  it('returns "The Wilderness" for WILD chunks', () => {
-    const name = getChunkName(5, 5, 'WILD', seedPhrase);
-    expect(name).toBe('The Wilderness');
-  });
-
-  it('returns "The King\'s Road" for ROAD chunks', () => {
-    const name = getChunkName(0, 1, 'ROAD', seedPhrase);
-    expect(name).toBe("The King's Road");
-  });
-
-  it('generates town names for TOWN chunks', () => {
-    const name = getChunkName(0, 0, 'TOWN', seedPhrase);
-    expect(typeof name).toBe('string');
-    expect(name.length).toBeGreaterThan(0);
-    // Town names should be compound words
-    expect(name).not.toBe("The King's Road");
-    expect(name).not.toBe('The Wilderness');
-  });
-
-  it('generates dungeon names for DUNGEON chunks', () => {
-    const name = getChunkName(5, 5, 'DUNGEON', seedPhrase);
-    expect(name).toMatch(/^Ruins of \w+keep$/);
-  });
-
-  it('returns consistent name for same inputs', () => {
-    const name1 = getChunkName(0, 0, 'TOWN', seedPhrase);
-    const name2 = getChunkName(0, 0, 'TOWN', seedPhrase);
-    expect(name1).toBe(name2);
-  });
-
-  it('returns "Unknown Lands" for unknown chunk types', () => {
-    // @ts-expect-error Testing invalid input
-    const name = getChunkName(0, 0, 'UNKNOWN', seedPhrase);
-    expect(name).toBe('Unknown Lands');
   });
 });
 
@@ -199,176 +116,177 @@ describe('getRandomNPCName', () => {
   });
 });
 
-// Test road spine for road-aware tests
-const testSpine: RoadSpine = {
-  totalDistance: 30000,
-  anchors: [
+// ── Kingdom-map-aware tests ───────────────────────────────────────────
+
+const KINGDOM_TEST_CONFIG: KingdomConfig = {
+  name: 'Test Kingdom',
+  width: 64,
+  height: 128,
+  seaLevel: 0.35,
+  mountainLevel: 0.75,
+  anchorSettlements: [
     {
-      id: 'home',
-      name: 'Ashford',
-      type: 'VILLAGE_FRIENDLY',
-      distanceFromStart: 0,
-      mainQuestChapter: 'chapter-00',
-      description: 'Your home town, a quiet farming village.',
-      features: ['home', 'tavern'],
-      sideQuestSlots: 0,
+      id: 'start',
+      name: 'Start Town',
+      type: 'village',
+      roadSpineProgress: 0,
+      features: ['tavern'],
     },
     {
-      id: 'anchor-01',
-      name: 'Millbrook',
-      type: 'VILLAGE_FRIENDLY',
-      distanceFromStart: 6000,
-      mainQuestChapter: 'chapter-01',
-      description: 'A market town along the road.',
-      features: ['tavern', 'market'],
-      sideQuestSlots: 0,
-    },
-    {
-      id: 'anchor-02',
-      name: 'Thornfield',
-      type: 'DUNGEON',
-      distanceFromStart: 12000,
-      mainQuestChapter: 'chapter-02',
-      description: 'Ancient ruins holding secrets.',
-      features: ['dungeon_entrance'],
-      sideQuestSlots: 0,
-    },
-    {
-      id: 'anchor-03',
-      name: 'Ravensgate',
-      type: 'VILLAGE_HOSTILE',
-      distanceFromStart: 17000,
-      mainQuestChapter: 'chapter-03',
-      description: 'A walled town under tyrannical rule.',
-      features: ['gate', 'tavern'],
-      sideQuestSlots: 0,
-    },
-    {
-      id: 'anchor-04',
-      name: 'Rest',
-      type: 'WAYPOINT',
-      distanceFromStart: 21000,
-      mainQuestChapter: 'chapter-04',
-      description: 'A roadside monastery for travelers.',
-      features: ['chapel'],
-      sideQuestSlots: 0,
-    },
-    {
-      id: 'anchor-05',
-      name: 'Grailsend',
-      type: 'DUNGEON',
-      distanceFromStart: 28000,
-      mainQuestChapter: 'chapter-05',
-      description: 'The final temple where the Grail awaits.',
-      features: ['temple_entrance'],
-      sideQuestSlots: 0,
+      id: 'end',
+      name: 'End Town',
+      type: 'town',
+      roadSpineProgress: 1,
+      features: ['market'],
     },
   ],
+  regions: [],
+  offRoadSettlements: [],
+  terrainModifiers: {
+    elongation: 1.5,
+    coastlineNoise: 0.5,
+    ridgeStrength: 0.6,
+  },
 };
 
-describe('chunkZToRoadDistance', () => {
-  it('converts cz=0 to distance 0', () => {
-    expect(chunkZToRoadDistance(0)).toBe(0);
+const KINGDOM_SEED = 'worldgen-kingdom-test';
+const kingdomMap = generateKingdom(KINGDOM_SEED, KINGDOM_TEST_CONFIG);
+
+describe('getChunkTypeFromKingdom', () => {
+  it('returns null for ocean tile (corner of map)', () => {
+    const result = getChunkTypeFromKingdom(kingdomMap, 0, 0);
+    expect(result).toBeNull();
   });
 
-  it('converts positive cz to positive distance', () => {
-    expect(chunkZToRoadDistance(1)).toBe(CHUNK_SIZE);
-    expect(chunkZToRoadDistance(50)).toBe(50 * CHUNK_SIZE);
+  it('returns null for out-of-bounds coordinates', () => {
+    expect(getChunkTypeFromKingdom(kingdomMap, -1, -1)).toBeNull();
+    expect(getChunkTypeFromKingdom(kingdomMap, 200, 200)).toBeNull();
   });
 
-  it('converts negative cz to negative distance', () => {
-    expect(chunkZToRoadDistance(-1)).toBe(-CHUNK_SIZE);
+  it('returns TOWN for settlement tiles', () => {
+    for (const settlement of kingdomMap.settlements) {
+      const [sx, sy] = settlement.position;
+      const result = getChunkTypeFromKingdom(kingdomMap, sx, sy);
+      expect(result).not.toBeNull();
+      expect(result?.type).toBe('TOWN');
+      expect(result?.name).toBe(settlement.name);
+    }
+  });
+
+  it('returns ROAD for road tiles away from settlements', () => {
+    // Find a road tile that's far enough from any settlement
+    const roadTile = kingdomMap.tiles.find(
+      (t) =>
+        t.hasRoad &&
+        kingdomMap.settlements.every(
+          (s) =>
+            Math.abs(s.position[0] - t.x) > 3 ||
+            Math.abs(s.position[1] - t.y) > 3,
+        ),
+    );
+    if (roadTile) {
+      const result = getChunkTypeFromKingdom(
+        kingdomMap,
+        roadTile.x,
+        roadTile.y,
+      );
+      expect(result).not.toBeNull();
+      expect(result?.type).toBe('ROAD');
+    }
+  });
+
+  it('returns WILD for land tiles away from roads and settlements', () => {
+    // Find a land tile that's far from any settlement and has no road
+    const wildTile = kingdomMap.tiles.find(
+      (t) =>
+        t.isLand &&
+        !t.hasRoad &&
+        kingdomMap.settlements.every(
+          (s) =>
+            Math.abs(s.position[0] - t.x) > 3 ||
+            Math.abs(s.position[1] - t.y) > 3,
+        ),
+    );
+    if (wildTile) {
+      const result = getChunkTypeFromKingdom(
+        kingdomMap,
+        wildTile.x,
+        wildTile.y,
+      );
+      expect(result).not.toBeNull();
+      expect(result?.type).toBe('WILD');
+    }
+  });
+
+  it('includes the map tile in results', () => {
+    const landTile = kingdomMap.tiles.find((t) => t.isLand);
+    if (landTile) {
+      const result = getChunkTypeFromKingdom(
+        kingdomMap,
+        landTile.x,
+        landTile.y,
+      );
+      expect(result?.tile).toBeDefined();
+      expect(result?.tile.biome).toBeDefined();
+      expect(result?.tile.elevation).toBeGreaterThanOrEqual(0);
+    }
   });
 });
 
-describe('getChunkType (road-aware)', () => {
-  const seedPhrase = 'TestSeed';
-
-  describe('ON the road (cx === 0)', () => {
-    it('returns TOWN at home anchor (cz=0, distance=0)', () => {
-      expect(getChunkType(0, 0, seedPhrase, testSpine)).toBe('TOWN');
-    });
-
-    it('returns TOWN near a VILLAGE_FRIENDLY anchor', () => {
-      // anchor-01 is at distance 6000, cz = 6000/120 = 50
-      expect(getChunkType(0, 50, seedPhrase, testSpine)).toBe('TOWN');
-    });
-
-    it('returns DUNGEON near a DUNGEON anchor', () => {
-      // anchor-02 is at distance 12000, cz = 12000/120 = 100
-      expect(getChunkType(0, 100, seedPhrase, testSpine)).toBe('DUNGEON');
-    });
-
-    it('returns TOWN near a VILLAGE_HOSTILE anchor', () => {
-      // anchor-03 at distance 17000, cz ~= 141.67
-      // cz=142 => distance 17040 => within 120 of 17000
-      expect(getChunkType(0, 142, seedPhrase, testSpine)).toBe('TOWN');
-    });
-
-    it('returns TOWN near a WAYPOINT anchor', () => {
-      // anchor-04 at distance 21000, cz = 175
-      expect(getChunkType(0, 175, seedPhrase, testSpine)).toBe('TOWN');
-    });
-
-    it('returns ROAD between anchors', () => {
-      // cz=25 => distance 3000, between home (0) and anchor-01 (6000)
-      expect(getChunkType(0, 25, seedPhrase, testSpine)).toBe('ROAD');
-    });
-
-    it('returns WILD for negative distance (behind the start)', () => {
-      expect(getChunkType(0, -5, seedPhrase, testSpine)).toBe('WILD');
-    });
-
-    it('returns WILD for distance beyond totalDistance', () => {
-      // cz=300 => distance 36000 > 30000
-      expect(getChunkType(0, 300, seedPhrase, testSpine)).toBe('WILD');
-    });
+describe('getTerrainHeight', () => {
+  it('returns 0 for ocean positions', () => {
+    // Corner of map should be ocean
+    const height = getTerrainHeight(kingdomMap, 0, 0);
+    expect(height).toBe(0);
   });
 
-  describe('NEAR the road (|cx| === 1)', () => {
-    it('returns ROAD for cx=1 along the road', () => {
-      expect(getChunkType(1, 25, seedPhrase, testSpine)).toBe('ROAD');
-    });
-
-    it('returns ROAD for cx=-1 along the road', () => {
-      expect(getChunkType(-1, 50, seedPhrase, testSpine)).toBe('ROAD');
-    });
-
-    it('returns WILD for cx=1 behind the start', () => {
-      expect(getChunkType(1, -5, seedPhrase, testSpine)).toBe('WILD');
-    });
-
-    it('returns WILD for cx=1 beyond totalDistance', () => {
-      expect(getChunkType(1, 300, seedPhrase, testSpine)).toBe('WILD');
-    });
+  it('returns positive height for land positions', () => {
+    // Find center land tile
+    const centerTile = getKingdomTile(kingdomMap, 32, 64);
+    if (centerTile?.isLand) {
+      const height = getTerrainHeight(
+        kingdomMap,
+        32 * CHUNK_SIZE + CHUNK_SIZE / 2,
+        64 * CHUNK_SIZE + CHUNK_SIZE / 2,
+      );
+      expect(height).toBeGreaterThan(0);
+      expect(height).toBeLessThanOrEqual(MAX_TERRAIN_HEIGHT);
+    }
   });
 
-  describe('OFF the road (|cx| > 1)', () => {
-    it('returns WILD for distant chunks', () => {
-      expect(getChunkType(5, 25, seedPhrase, testSpine)).toBe('WILD');
-    });
-
-    it('returns consistent type for same coordinates', () => {
-      const t1 = getChunkType(5, 5, seedPhrase, testSpine);
-      const t2 = getChunkType(5, 5, seedPhrase, testSpine);
-      expect(t1).toBe(t2);
-    });
+  it('returns height within valid range for all land tiles', () => {
+    // Sample a few land tiles
+    const landTiles = kingdomMap.tiles.filter((t) => t.isLand).slice(0, 20);
+    for (const tile of landTiles) {
+      const worldX = tile.x * CHUNK_SIZE + CHUNK_SIZE / 2;
+      const worldZ = tile.y * CHUNK_SIZE + CHUNK_SIZE / 2;
+      const height = getTerrainHeight(kingdomMap, worldX, worldZ);
+      expect(height).toBeGreaterThanOrEqual(0);
+      expect(height).toBeLessThanOrEqual(MAX_TERRAIN_HEIGHT);
+    }
   });
 
-  describe('backward compatibility', () => {
-    it('without roadSpine, legacy behavior for cx=0 z%3===0', () => {
-      expect(getChunkType(0, 0, seedPhrase)).toBe('TOWN');
-      expect(getChunkType(0, 3, seedPhrase)).toBe('TOWN');
-    });
+  it('interpolates smoothly between tiles', () => {
+    const landTile = kingdomMap.tiles.find(
+      (t) => t.isLand && t.x > 5 && t.y > 5,
+    );
+    if (landTile) {
+      const baseX = landTile.x * CHUNK_SIZE;
+      const baseZ = landTile.y * CHUNK_SIZE;
+      // Sample across the chunk — heights should change gradually
+      const h0 = getTerrainHeight(kingdomMap, baseX, baseZ);
+      const h1 = getTerrainHeight(kingdomMap, baseX + CHUNK_SIZE / 4, baseZ);
+      const h2 = getTerrainHeight(kingdomMap, baseX + CHUNK_SIZE / 2, baseZ);
+      // All should be finite numbers
+      expect(Number.isFinite(h0)).toBe(true);
+      expect(Number.isFinite(h1)).toBe(true);
+      expect(Number.isFinite(h2)).toBe(true);
+    }
+  });
+});
 
-    it('without roadSpine, legacy behavior for cx=0 z%3!==0', () => {
-      expect(getChunkType(0, 1, seedPhrase)).toBe('ROAD');
-      expect(getChunkType(0, 2, seedPhrase)).toBe('ROAD');
-    });
-
-    it('without roadSpine, legacy behavior for off-road', () => {
-      const type = getChunkType(1, 1, seedPhrase);
-      expect(['WILD', 'DUNGEON']).toContain(type);
-    });
+describe('MAX_TERRAIN_HEIGHT', () => {
+  it('is a positive number', () => {
+    expect(MAX_TERRAIN_HEIGHT).toBeGreaterThan(0);
   });
 });

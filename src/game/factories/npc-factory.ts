@@ -1,6 +1,7 @@
 import type * as THREE from 'three';
 import type { NPCDefinition } from '../../schemas/npc.schema';
 import type { NPCBlueprint } from '../../schemas/npc-blueprint.schema';
+import type { ChibiConfig } from './chibi-generator';
 import { generateFaceTexture } from './face-texture';
 
 export interface NPCRenderData {
@@ -49,6 +50,98 @@ export function buildNPCRenderData(blueprint: NPCBlueprint): NPCRenderData {
     clothSecondary: clothPalette.secondary ?? clothPalette.primary,
     skinColor,
     accessories: accessories ?? [],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Blueprint → ChibiConfig bridge
+// ---------------------------------------------------------------------------
+
+const BLUEPRINT_SKIN_COLORS = [
+  '#ffdbac',
+  '#f1c27d',
+  '#e0ac69',
+  '#c68642',
+  '#8d5524',
+];
+
+/** Map weapon accessory names to ChibiConfig weaponType */
+function inferWeapon(accessories: string[]): ChibiConfig['weaponType'] {
+  if (accessories.includes('hammer') || accessories.includes('tongs'))
+    return 'mace';
+  if (accessories.includes('holy_book')) return 'holy_book';
+  if (accessories.includes('scroll')) return 'staff';
+  return 'none';
+}
+
+/** Map archetype string to a job class for rendering. */
+function inferJob(archetype: string): ChibiConfig['job'] {
+  switch (archetype) {
+    case 'blacksmith':
+    case 'guard':
+    case 'captain':
+    case 'knight':
+    case 'jailer':
+    case 'watchman':
+      return 'warrior';
+    case 'priest':
+    case 'healer':
+      return 'cleric';
+    case 'scholar':
+    case 'hermit':
+      return 'mage';
+    case 'merchant':
+    case 'farmer':
+    case 'miller':
+    case 'innkeeper':
+    case 'stablehand':
+      return 'ranger';
+    case 'bandit':
+      return 'rogue';
+    default:
+      return 'ranger';
+  }
+}
+
+/**
+ * Convert an NPCBlueprint into a ChibiConfig for the upgraded renderer.
+ * Bridges the existing content pipeline with the new chibi character system.
+ */
+export function blueprintToChibiConfig(blueprint: NPCBlueprint): ChibiConfig {
+  const { face, bodyBuild, clothPalette, accessories = [] } = blueprint;
+
+  // Map blueprint hairStyle (4 options) to ChibiConfig hairStyle (8 options)
+  const hairStyle: ChibiConfig['hairStyle'] =
+    face.hairStyle === 'bald' ||
+    face.hairStyle === 'short' ||
+    face.hairStyle === 'long' ||
+    face.hairStyle === 'hooded'
+      ? face.hairStyle
+      : 'short';
+
+  return {
+    race: 'human',
+    job: inferJob(blueprint.archetype),
+    skinTone: BLUEPRINT_SKIN_COLORS[face.skinTone] ?? BLUEPRINT_SKIN_COLORS[2],
+    hairColor: face.hairColor,
+    eyeColor:
+      face.eyeColor === 'brown'
+        ? '#4a3728'
+        : face.eyeColor === 'blue'
+          ? '#3a5f8a'
+          : face.eyeColor === 'green'
+            ? '#2e5e3e'
+            : '#6b6b6b',
+    primaryColor: clothPalette.primary,
+    secondaryColor: clothPalette.secondary ?? clothPalette.primary,
+    accentColor: '#d4af37',
+    expression: 'neutral',
+    headSize: 1.15,
+    bodyPlumpness: bodyBuild.width,
+    hairStyle,
+    facialHair: face.facialHair,
+    hasCloak: accessories.includes('shawl') || accessories.includes('robes'),
+    weaponType: inferWeapon(accessories),
   };
 }
 

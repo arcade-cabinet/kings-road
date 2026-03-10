@@ -14,6 +14,9 @@
     { "archetype": "cottage", "label": "Goodwife Maren's House", "position": [4, 2], "rotation": -8 },
     { "archetype": "house_large", "label": "Old Tomas's House", "position": [-3, 3], "overrides": { "stories": 2 } }
   ],
+  "spawns": [
+    { "id": "home", "tile": [0, 4], "facing": "south" }
+  ],
   "npcs": [
     { "id": "aldric", "archetype": "blacksmith", "fixed": true, "building": "Aldric's Forge", "name": "Aldric" },
     { "id": "bess", "archetype": "innkeeper", "fixed": true, "building": "The Golden Meadow", "name": "Bess" },

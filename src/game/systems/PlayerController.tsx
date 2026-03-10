@@ -1,9 +1,14 @@
 import { useFrame, useThree } from '@react-three/fiber';
-import { useRef } from 'react';
+import type { RapierRigidBody } from '@react-three/rapier';
+import { CapsuleCollider, RigidBody, useRapier } from '@react-three/rapier';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { inputManager } from '../input/InputManager';
 import { useGameStore } from '../stores/gameStore';
-import type { AABB } from '../types';
-import { PLAYER_HEIGHT, PLAYER_RADIUS } from '../utils/worldGen';
+import { useInventoryStore } from '../stores/inventoryStore';
+import { useWorldStore } from '../stores/worldStore';
+import { getTerrainHeight, PLAYER_HEIGHT } from '../utils/worldGen';
+import { DUNGEON_DEPTH } from '../world/dungeon-generator';
 
 // Physics constants
 const GRAVITY = 25.0;
@@ -11,198 +16,273 @@ const JUMP_FORCE = 6.5;
 const ACCELERATION = 35.0;
 const BASE_SPEED = 5.5;
 const SPRINT_MULTIPLIER = 1.8;
-const WALK_MULTIPLIER = 0.5;
 const FRICTION = 20.0;
-const TURN_ACCEL = 12.0;
-const MAX_TURN = 2.5;
-const TURN_FRICTION = 15.0;
 
-function validateMovement(
-  currentPos: THREE.Vector3 | null | undefined,
-  nextX: number,
-  nextZ: number,
-  aabbs: AABB[] | null | undefined,
-): { x: number; z: number } {
-  let outX = nextX;
-  let outZ = nextZ;
+// Camera constants
+const PITCH_MIN = -Math.PI / 2.5;
+const PITCH_MAX = Math.PI / 2.5;
 
-  // Safety check
-  if (!currentPos || !aabbs) {
-    return { x: outX, z: outZ };
-  }
+// Capsule dimensions: total height = 2*HALF_HEIGHT + 2*RADIUS = PLAYER_HEIGHT
+const CAPSULE_RADIUS = 0.3;
+const CAPSULE_HALF_HEIGHT = (PLAYER_HEIGHT - 2 * CAPSULE_RADIUS) / 2;
+// Body center offset from feet: the capsule center is this far above the ground
+const BODY_CENTER_Y = CAPSULE_HALF_HEIGHT + CAPSULE_RADIUS;
+// Eye offset from body center: camera sits at the top of the capsule
+const EYE_OFFSET = CAPSULE_HALF_HEIGHT + CAPSULE_RADIUS;
 
-  for (const b of aabbs) {
-    if (!b) continue;
-    // Check X collision
-    if (
-      outX > b.minX - PLAYER_RADIUS &&
-      outX < b.maxX + PLAYER_RADIUS &&
-      currentPos.z > b.minZ - PLAYER_RADIUS &&
-      currentPos.z < b.maxZ + PLAYER_RADIUS
-    ) {
-      outX = currentPos.x;
-    }
-    // Check Z collision
-    if (
-      currentPos.x > b.minX - PLAYER_RADIUS &&
-      currentPos.x < b.maxX + PLAYER_RADIUS &&
-      outZ > b.minZ - PLAYER_RADIUS &&
-      outZ < b.maxZ + PLAYER_RADIUS
-    ) {
-      outZ = currentPos.z;
-    }
-  }
-
-  return { x: outX, z: outZ };
-}
+// Reusable vectors to avoid per-frame allocations
+const _forward = new THREE.Vector3();
+const _right = new THREE.Vector3();
+const _upAxis = new THREE.Vector3(0, 1, 0);
 
 export function PlayerController() {
   const { camera } = useThree();
+  const { world } = useRapier();
+  const rigidBodyRef = useRef<RapierRigidBody>(null);
+  const controllerRef = useRef<ReturnType<
+    typeof world.createCharacterController
+  > | null>(null);
   const headBobTimer = useRef(0);
   const moveVec = useRef(new THREE.Vector3());
+  const velocityYRef = useRef(0);
+  const forwardSpeedRef = useRef(0);
+  const strafeSpeedRef = useRef(0);
 
   // Store selectors - only subscribe to what we need for performance
-  const keys = useGameStore((state) => state.keys);
-  const joystickVector = useGameStore((state) => state.joystickVector);
-  const joystickDist = useGameStore((state) => state.joystickDist);
   const inDialogue = useGameStore((state) => state.inDialogue);
   const inCombat = useGameStore((state) => state.inCombat);
+  const paused = useGameStore((state) => state.paused);
   const gameActive = useGameStore((state) => state.gameActive);
-  const globalAABBs = useGameStore((state) => state.globalAABBs);
+  const inventoryOpen = useInventoryStore((state) => state.isOpen);
+
+  // Create Rapier character controller
+  useEffect(() => {
+    const controller = world.createCharacterController(0.01);
+    // Allow stepping up small obstacles (stairs, curbs)
+    controller.enableAutostep(0.5, 0.2, true);
+    // Snap to ground when walking down slopes
+    controller.enableSnapToGround(0.5);
+    // Slide along walls
+    controller.setSlideEnabled(true);
+    controllerRef.current = controller;
+
+    return () => {
+      world.removeCharacterController(controller);
+      controllerRef.current = null;
+    };
+  }, [world]);
 
   useFrame((_, delta) => {
-    if (!gameActive || inDialogue || inCombat) return;
+    if (!rigidBodyRef.current || !controllerRef.current) return;
 
     const dt = Math.min(delta, 0.1);
-    const state = useGameStore.getState();
+    const input = inputManager.poll(dt);
 
-    // Get movement input
-    let targetMove = 0;
-    let targetTurn = 0;
-
-    if (keys.w) targetMove = 1;
-    if (keys.s) targetMove = -1;
-    if (keys.a || keys.q) targetTurn = 1;
-    if (keys.d || keys.e) targetTurn = -1;
-
-    // Touch/joystick input
-    if (joystickDist > 0) {
-      targetMove = -joystickVector.y;
-      targetTurn = -joystickVector.x;
+    // --- UI toggles (one-shot actions) ---
+    if (input.pause) {
+      const gs = useGameStore.getState();
+      const inv = useInventoryStore.getState();
+      if (gs.inDialogue) gs.closeDialogue();
+      else if (inv.isOpen) inv.close();
+      else gs.togglePause();
+    }
+    if (input.inventory && !inDialogue && !paused) {
+      useInventoryStore.getState().toggle();
+    }
+    if (input.interact && !inDialogue && !paused && !inventoryOpen) {
+      const interactable = useGameStore.getState().currentInteractable;
+      if (interactable) {
+        useGameStore
+          .getState()
+          .openDialogue(interactable.name, interactable.dialogueText);
+      }
     }
 
+    // Don't process movement when game is paused/inactive/in menus/dead
+    const isDead = useGameStore.getState().isDead;
+    if (
+      !gameActive ||
+      paused ||
+      inDialogue ||
+      inCombat ||
+      inventoryOpen ||
+      isDead
+    ) {
+      inputManager.postFrame();
+      return;
+    }
+
+    const state = useGameStore.getState();
+    const controller = controllerRef.current;
+    const body = rigidBodyRef.current;
+
+    // --- Look: apply deltas to yaw and pitch ---
+    const newYaw = state.cameraYaw - input.lookDeltaX;
+    const newPitch = Math.max(
+      PITCH_MIN,
+      Math.min(PITCH_MAX, state.cameraPitch - input.lookDeltaY),
+    );
+    useGameStore.getState().setCameraYaw(newYaw);
+    useGameStore.getState().setCameraPitch(newPitch);
+
+    // --- Movement input ---
+    const targetForward = input.moveZ; // +1 forward, -1 backward
+    const targetStrafe = input.moveX; // +1 right, -1 left
+    const hasMovement =
+      Math.abs(targetForward) > 0.01 || Math.abs(targetStrafe) > 0.01;
+
     // Sprint/walk speed
-    // SHIFT = walk slow (regen stamina)
-    // Joystick pushed far = sprint (drain stamina)
-    // Default = normal walk (regen stamina)
     let isSprinting = false;
     let maxSpeed = BASE_SPEED;
 
-    if (keys.shift && targetMove > 0) {
-      // Walking mode - slow and regenerate stamina faster
-      maxSpeed = BASE_SPEED * WALK_MULTIPLIER;
-      useGameStore.getState().setStamina(state.stamina + dt * 20);
-    } else if (
-      (joystickDist > 65 || keys.shift === false) &&
-      targetMove > 0 &&
-      state.stamina > 0 &&
-      joystickDist > 50
-    ) {
-      // Sprint when joystick is pushed far (mobile)
+    if (input.sprint && hasMovement && state.stamina > 0) {
       isSprinting = true;
       useGameStore.getState().setStamina(state.stamina - dt * 25);
       maxSpeed = BASE_SPEED * SPRINT_MULTIPLIER;
     } else {
-      // Normal movement - regenerate stamina
-      useGameStore.getState().setStamina(state.stamina + dt * 15);
+      const regenRate = hasMovement ? 15 : 20;
+      useGameStore.getState().setStamina(state.stamina + dt * regenRate);
     }
-
     useGameStore.getState().setIsSprinting(isSprinting);
 
-    // Turning
-    let newAngularVelocity = state.angularVelocity;
-    if (targetTurn !== 0) {
-      newAngularVelocity += targetTurn * TURN_ACCEL * dt;
+    // Forward/back velocity (acceleration/friction model)
+    if (Math.abs(targetForward) > 0.01) {
+      forwardSpeedRef.current += targetForward * ACCELERATION * dt;
     } else {
-      const sign = Math.sign(newAngularVelocity);
-      newAngularVelocity -= sign * TURN_FRICTION * dt;
-      if (Math.abs(newAngularVelocity) < 0.1) newAngularVelocity = 0;
+      const sign = Math.sign(forwardSpeedRef.current);
+      forwardSpeedRef.current -= sign * FRICTION * dt * 2;
+      if (Math.abs(forwardSpeedRef.current) < 0.5) forwardSpeedRef.current = 0;
     }
-    newAngularVelocity = Math.max(
-      -MAX_TURN,
-      Math.min(MAX_TURN, newAngularVelocity),
+    forwardSpeedRef.current = Math.max(
+      -maxSpeed,
+      Math.min(maxSpeed, forwardSpeedRef.current),
     );
 
-    const newYaw = state.cameraYaw + newAngularVelocity * dt;
-    useGameStore.getState().setAngularVelocity(newAngularVelocity);
-    useGameStore.getState().setCameraYaw(newYaw);
-
-    // Movement velocity
-    let newVelocity = state.velocity;
-    if (targetMove !== 0) {
-      newVelocity += targetMove * ACCELERATION * dt;
+    // Strafe velocity (same model)
+    if (Math.abs(targetStrafe) > 0.01) {
+      strafeSpeedRef.current += targetStrafe * ACCELERATION * dt;
     } else {
-      const sign = Math.sign(newVelocity);
-      newVelocity -= sign * FRICTION * dt * 2;
-      if (Math.abs(newVelocity) < 0.5) newVelocity = 0;
+      const sign = Math.sign(strafeSpeedRef.current);
+      strafeSpeedRef.current -= sign * FRICTION * dt * 2;
+      if (Math.abs(strafeSpeedRef.current) < 0.5) strafeSpeedRef.current = 0;
     }
-    newVelocity = Math.max(-maxSpeed, Math.min(maxSpeed, newVelocity));
-    useGameStore.getState().setVelocity(newVelocity);
+    strafeSpeedRef.current = Math.max(
+      -maxSpeed,
+      Math.min(maxSpeed, strafeSpeedRef.current),
+    );
 
-    // Jump
-    let velocityY = state.playerVelocityY;
-    const isGrounded = state.playerPosition.y <= PLAYER_HEIGHT + 0.1;
+    // Store legacy velocity for other systems (head bob, etc.)
+    const combinedSpeed = Math.sqrt(
+      forwardSpeedRef.current * forwardSpeedRef.current +
+        strafeSpeedRef.current * strafeSpeedRef.current,
+    );
+    useGameStore.getState().setVelocity(combinedSpeed);
 
-    if (keys.space && isGrounded) {
-      velocityY = JUMP_FORCE;
-      useGameStore.getState().setKey('space', false);
+    // Get current body position
+    const pos = body.translation();
+
+    // Jump — use Rapier ground detection
+    const isGrounded = controllerRef.current.computedGrounded();
+    if (input.jump && isGrounded) {
+      velocityYRef.current = JUMP_FORCE;
     }
 
-    // Gravity
-    velocityY -= GRAVITY * dt;
-
-    // Update Y position
-    let newY = state.playerPosition.y + velocityY * dt;
-    if (newY < PLAYER_HEIGHT) {
-      newY = PLAYER_HEIGHT;
-      velocityY = 0;
+    // Gravity (applied manually since body is kinematic)
+    velocityYRef.current -= GRAVITY * dt;
+    if (isGrounded && velocityYRef.current < 0) {
+      velocityYRef.current = 0;
     }
-    useGameStore.getState().setPlayerVelocityY(velocityY);
-    useGameStore.getState().setIsGrounded(newY <= PLAYER_HEIGHT + 0.1);
 
-    // Calculate horizontal movement
-    const playerPos = state.playerPosition.clone();
-    playerPos.y = newY;
+    // Compute desired horizontal movement
+    // Forward vector: facing direction projected onto XZ plane
+    _forward.set(0, 0, -1).applyAxisAngle(_upAxis, newYaw);
+    // Right vector: perpendicular to forward on XZ plane
+    _right.set(_forward.z, 0, -_forward.x);
 
-    if (Math.abs(newVelocity) > 0) {
-      moveVec.current
-        .set(0, 0, -1)
-        .applyAxisAngle(new THREE.Vector3(0, 1, 0), newYaw)
-        .multiplyScalar(newVelocity * dt);
+    moveVec.current.set(0, 0, 0);
+    if (Math.abs(forwardSpeedRef.current) > 0) {
+      moveVec.current.addScaledVector(_forward, forwardSpeedRef.current * dt);
+    }
+    if (Math.abs(strafeSpeedRef.current) > 0) {
+      moveVec.current.addScaledVector(_right, strafeSpeedRef.current * dt);
+    }
+    // Add vertical movement (gravity + jump)
+    moveVec.current.y = velocityYRef.current * dt;
 
-      const nextPos = validateMovement(
-        playerPos,
-        playerPos.x + moveVec.current.x,
-        playerPos.z + moveVec.current.z,
-        globalAABBs,
+    // Use Rapier character controller for collision resolution
+    const collider = body.collider(0);
+    if (collider) {
+      controller.computeColliderMovement(collider, moveVec.current);
+      const corrected = controller.computedMovement();
+
+      // Compute terrain-aware floor height (dungeon uses fixed depth)
+      const gameState = useGameStore.getState();
+      let terrainY: number;
+      if (gameState.inDungeon) {
+        terrainY = DUNGEON_DEPTH;
+      } else {
+        const kingdomMap = useWorldStore.getState().kingdomMap;
+        terrainY = kingdomMap
+          ? getTerrainHeight(
+              kingdomMap,
+              pos.x + corrected.x,
+              pos.z + corrected.z,
+            )
+          : 0;
+      }
+      const minBodyY = terrainY + BODY_CENTER_Y;
+
+      // Apply corrected movement to body
+      const newPos = {
+        x: pos.x + corrected.x,
+        y: Math.max(minBodyY, pos.y + corrected.y),
+        z: pos.z + corrected.z,
+      };
+
+      body.setNextKinematicTranslation(newPos);
+
+      // Sync game store (eye-level position for other systems)
+      const eyePos = new THREE.Vector3(
+        newPos.x,
+        newPos.y + EYE_OFFSET,
+        newPos.z,
       );
+      useGameStore.getState().setPlayerPosition(eyePos);
+      useGameStore.getState().setIsGrounded(controller.computedGrounded());
+      useGameStore.getState().setPlayerVelocityY(velocityYRef.current);
 
-      playerPos.x = nextPos.x;
-      playerPos.z = nextPos.z;
+      // Update camera to eye position
+      camera.position.copy(eyePos);
 
-      // Head bob
-      headBobTimer.current += dt * Math.abs(newVelocity);
+      // Head bob when moving
+      if (combinedSpeed > 0) {
+        headBobTimer.current += dt * combinedSpeed;
+        camera.position.y += Math.sin(headBobTimer.current) * 0.1;
+      }
     }
 
-    useGameStore.getState().setPlayerPosition(playerPos);
-
-    // Update camera
-    camera.position.copy(playerPos);
-    camera.position.y += Math.sin(headBobTimer.current) * 0.1;
     camera.rotation.order = 'YXZ';
     camera.rotation.y = newYaw;
-    camera.rotation.x = state.cameraPitch;
+    camera.rotation.x = newPitch;
+
+    inputManager.postFrame();
   });
 
-  return null;
+  // Initial position: convert eye-level store position to body center
+  const playerPosition = useGameStore((state) => state.playerPosition);
+
+  return (
+    <RigidBody
+      ref={rigidBodyRef}
+      type="kinematicPosition"
+      colliders={false}
+      position={[
+        playerPosition.x,
+        playerPosition.y - EYE_OFFSET,
+        playerPosition.z,
+      ]}
+    >
+      <CapsuleCollider args={[CAPSULE_HALF_HEIGHT, CAPSULE_RADIUS]} />
+    </RigidBody>
+  );
 }

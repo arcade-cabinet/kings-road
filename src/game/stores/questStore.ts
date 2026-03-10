@@ -1,77 +1,23 @@
 import { create } from 'zustand';
+import {
+  getAllQuests as getAllQuestsFromStore,
+  getQuest,
+  isContentStoreReady,
+} from '../../db/content-queries';
 import type { QuestDefinition } from '../../schemas/quest.schema';
-
-// --- Static quest imports (bundled by Vite) ---
-
-import chapter00 from '../../../content/quests/main/chapter-00.json';
-import chapter01 from '../../../content/quests/main/chapter-01.json';
-import chapter02 from '../../../content/quests/main/chapter-02.json';
-import chapter03 from '../../../content/quests/main/chapter-03.json';
-import chapter04 from '../../../content/quests/main/chapter-04.json';
-import chapter05 from '../../../content/quests/main/chapter-05.json';
-import aldricsMissingHammer from '../../../content/quests/side/aldrics-missing-hammer.json';
-import banditAmbush from '../../../content/quests/side/bandit-ambush.json';
-import besssSecretRecipe from '../../../content/quests/side/besss-secret-recipe.json';
-import fatherCedricsLostHymnal from '../../../content/quests/side/father-cedrics-lost-hymnal.json';
-import lordAshwicksSecret from '../../../content/quests/side/lord-ashwicks-secret.json';
-import lostPilgrim from '../../../content/quests/side/lost-pilgrim.json';
-import merchantsBrokenCart from '../../../content/quests/side/merchants-broken-cart.json';
-import sisterMaevesGarden from '../../../content/quests/side/sister-maeves-garden.json';
-import strangeShrine from '../../../content/quests/side/strange-shrine.json';
-import theBridgeTroll from '../../../content/quests/side/the-bridge-troll.json';
-import theCartographersMap from '../../../content/quests/side/the-cartographers-map.json';
-import theCursedRing from '../../../content/quests/side/the-cursed-ring.json';
-import theDeserter from '../../../content/quests/side/the-deserter.json';
-import theHerbalistsJourney from '../../../content/quests/side/the-herbalists-journey.json';
-import theMissingManuscript from '../../../content/quests/side/the-missing-manuscript.json';
-import theMissingMerchant from '../../../content/quests/side/the-missing-merchant.json';
-import thePoisonedWell from '../../../content/quests/side/the-poisoned-well.json';
-import theUnderground from '../../../content/quests/side/the-underground.json';
-import woundedSoldier from '../../../content/quests/side/wounded-soldier.json';
-
-// --- Quest Registry ---
-
-const ALL_QUESTS: QuestDefinition[] = [
-  chapter00,
-  chapter01,
-  chapter02,
-  chapter03,
-  chapter04,
-  chapter05,
-  aldricsMissingHammer,
-  banditAmbush,
-  besssSecretRecipe,
-  fatherCedricsLostHymnal,
-  lordAshwicksSecret,
-  lostPilgrim,
-  merchantsBrokenCart,
-  sisterMaevesGarden,
-  strangeShrine,
-  theBridgeTroll,
-  theCartographersMap,
-  theCursedRing,
-  theDeserter,
-  theHerbalistsJourney,
-  theMissingMerchant,
-  theMissingManuscript,
-  thePoisonedWell,
-  theUnderground,
-  woundedSoldier,
-] as unknown as QuestDefinition[];
-
-const QUEST_BY_ID = new Map<string, QuestDefinition>();
-for (const q of ALL_QUESTS) {
-  QUEST_BY_ID.set(q.id, q);
-}
+import type { QuestGraph, ResolvedQuest } from '../world/quest-resolver';
+import { resolveQuestGraph } from '../world/quest-resolver';
 
 /** Look up a quest definition by id. */
 export function getQuestDefinition(id: string): QuestDefinition | undefined {
-  return QUEST_BY_ID.get(id);
+  if (!isContentStoreReady()) return undefined;
+  return getQuest(id) as QuestDefinition | undefined;
 }
 
 /** Get all registered quest definitions. */
 export function getAllQuests(): QuestDefinition[] {
-  return ALL_QUESTS;
+  if (!isContentStoreReady()) return [];
+  return getAllQuestsFromStore() as QuestDefinition[];
 }
 
 // --- Active quest state ---
@@ -82,11 +28,36 @@ export interface ActiveQuest {
   branch?: 'A' | 'B';
 }
 
+/**
+ * Quest events track player actions that can satisfy step conditions.
+ * Events are consumed (cleared) once the QuestSystem processes them.
+ */
+export interface QuestEvents {
+  /** NPC archetype of the last completed dialogue (set on dialogue close). */
+  lastDialogueArchetype: string | null;
+  /** Name of the NPC from the last completed dialogue. */
+  lastDialogueName: string | null;
+  /** Set to true when combat ends in victory. */
+  combatVictory: boolean;
+  /** Encounter ID of the last combat victory (if quest-initiated). */
+  lastEncounterId: string | null;
+  /** Number of monsters killed in the last combat. */
+  lastCombatKills: number;
+  /** Total monsters defeated since game start (cumulative). */
+  totalMonstersDefeated: number;
+}
+
 interface QuestState {
   activeQuests: ActiveQuest[];
   completedQuests: string[];
   /** Track quests already triggered so they don't re-fire. */
   triggeredQuests: string[];
+  /** Deterministic narrative spine resolved from the seed at New Game. */
+  questGraph: QuestGraph | null;
+  /** Transient events consumed by QuestSystem for step evaluation. */
+  events: QuestEvents;
+  /** XP earned from quest completions (cumulative). */
+  questXpEarned: number;
 
   // Actions
   activateQuest: (questId: string, branch?: 'A' | 'B') => void;
@@ -95,13 +66,46 @@ interface QuestState {
   completeQuest: (questId: string) => void;
   failQuest: (questId: string) => void;
   markTriggered: (questId: string) => void;
+  /** Record a completed dialogue interaction. */
+  recordDialogue: (npcArchetype: string, npcName: string) => void;
+  /** Record a combat victory. */
+  recordCombatVictory: (
+    encounterId: string | null,
+    monstersKilled: number,
+  ) => void;
+  /** Clear transient events after QuestSystem has consumed them. */
+  consumeEvents: () => void;
+  /** Resolve all quest branches from the seed. Call once at New Game. */
+  resolveNarrative: (seedPhrase: string) => void;
+  /** Look up a resolved quest by id. */
+  getResolvedQuest: (questId: string) => ResolvedQuest | undefined;
+  /** Restore quest state from save data (preserves currentStep). */
+  restoreQuests: (
+    activeQuests: ActiveQuest[],
+    completedQuests: string[],
+    triggeredQuests: string[],
+  ) => void;
+  /** Add XP from quest rewards. */
+  addQuestXp: (amount: number) => void;
   resetQuests: () => void;
 }
 
-export const useQuestStore = create<QuestState>((set) => ({
+const EMPTY_EVENTS: QuestEvents = {
+  lastDialogueArchetype: null,
+  lastDialogueName: null,
+  combatVictory: false,
+  lastEncounterId: null,
+  lastCombatKills: 0,
+  totalMonstersDefeated: 0,
+};
+
+export const useQuestStore = create<QuestState>((set, get) => ({
   activeQuests: [],
   completedQuests: [],
   triggeredQuests: [],
+  questGraph: null,
+  events: { ...EMPTY_EVENTS },
+  questXpEarned: 0,
 
   activateQuest: (questId, branch) =>
     set((state) => {
@@ -154,10 +158,65 @@ export const useQuestStore = create<QuestState>((set) => ({
         : [...state.triggeredQuests, questId],
     })),
 
+  recordDialogue: (npcArchetype, npcName) =>
+    set((state) => ({
+      events: {
+        ...state.events,
+        lastDialogueArchetype: npcArchetype,
+        lastDialogueName: npcName,
+      },
+    })),
+
+  recordCombatVictory: (encounterId, monstersKilled) =>
+    set((state) => ({
+      events: {
+        ...state.events,
+        combatVictory: true,
+        lastEncounterId: encounterId,
+        lastCombatKills: monstersKilled,
+        totalMonstersDefeated:
+          state.events.totalMonstersDefeated + monstersKilled,
+      },
+    })),
+
+  consumeEvents: () =>
+    set((state) => ({
+      events: {
+        ...EMPTY_EVENTS,
+        // Preserve cumulative counters
+        totalMonstersDefeated: state.events.totalMonstersDefeated,
+      },
+    })),
+
+  addQuestXp: (amount) =>
+    set((state) => ({
+      questXpEarned: state.questXpEarned + amount,
+    })),
+
+  resolveNarrative: (seedPhrase) =>
+    set({
+      questGraph: resolveQuestGraph(
+        getAllQuestsFromStore() as QuestDefinition[],
+        seedPhrase,
+      ),
+    }),
+
+  getResolvedQuest: (questId) => get().questGraph?.byId.get(questId),
+
+  restoreQuests: (activeQuests, completedQuests, triggeredQuests) =>
+    set({
+      activeQuests: activeQuests.map((q) => ({ ...q })),
+      completedQuests: [...completedQuests],
+      triggeredQuests: [...triggeredQuests],
+    }),
+
   resetQuests: () =>
     set({
       activeQuests: [],
       completedQuests: [],
       triggeredQuests: [],
+      questGraph: null,
+      events: { ...EMPTY_EVENTS },
+      questXpEarned: 0,
     }),
 }));

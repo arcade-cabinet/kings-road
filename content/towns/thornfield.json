@@ -11,6 +11,9 @@
     { "archetype": "guard_post", "label": "Warden's Watch", "position": [3, -3], "rotation": -8 },
     { "archetype": "watchtower", "label": "Crumbling Lookout", "position": [5, 2], "rotation": 0 }
   ],
+  "spawns": [
+    { "id": "road-entrance", "tile": [0, -4], "facing": "north" }
+  ],
   "npcs": [
     { "id": "ruin-keeper", "archetype": "scholar", "fixed": true, "building": "Ruin-Keeper's Camp", "name": "Ruin-Keeper Aldhelm" },
     { "id": "camp-warden", "archetype": "knight", "fixed": true, "building": "Warden's Watch", "name": "Warden Bryce" },

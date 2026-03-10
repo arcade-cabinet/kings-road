@@ -11,6 +11,9 @@
     { "archetype": "cottage", "label": "Pilgrim's Camp", "position": [-4, -2], "rotation": 15 },
     { "archetype": "chapel", "label": "Wayside Shrine", "position": [3, -1], "rotation": -10 }
   ],
+  "spawns": [
+    { "id": "road-entrance", "tile": [0, -3], "facing": "north" }
+  ],
   "npcs": [
     { "id": "the-guardian", "archetype": "knight", "fixed": true, "building": "Temple Entrance", "name": "The Guardian" },
     { "id": "the-oracle", "archetype": "scholar", "fixed": true, "building": "Temple Entrance", "name": "The Oracle" },

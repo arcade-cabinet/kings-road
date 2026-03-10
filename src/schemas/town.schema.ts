@@ -30,6 +30,16 @@ export const BuildingPlacementSchema = z.object({
 });
 export type BuildingPlacement = z.infer<typeof BuildingPlacementSchema>;
 
+export const FacingDirection = z.enum(['north', 'south', 'east', 'west']);
+export type FacingDirection = z.infer<typeof FacingDirection>;
+
+export const SpawnPointSchema = z.object({
+  id: z.string().min(1),
+  tile: z.tuple([z.number(), z.number()]),
+  facing: FacingDirection,
+});
+export type SpawnPoint = z.infer<typeof SpawnPointSchema>;
+
 export const TownNPCPlacementSchema = z.object({
   id: z.string(),
   archetype: z.string(),
@@ -50,5 +60,6 @@ export const TownConfigSchema = z.object({
   center: z.tuple([z.number(), z.number()]),
   buildings: z.array(BuildingPlacementSchema),
   npcs: z.array(TownNPCPlacementSchema),
+  spawns: z.array(SpawnPointSchema).optional(),
 });
 export type TownConfig = z.infer<typeof TownConfigSchema>;

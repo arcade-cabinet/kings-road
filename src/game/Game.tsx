@@ -1,24 +1,68 @@
 import { useEffect } from 'react';
+import { GameErrorBoundary } from './components/ErrorBoundary';
 import { GameScene } from './components/GameScene';
+import { CombatHUD } from './components/ui/CombatHUD';
+import { DeathOverlay } from './components/ui/DeathOverlay';
 import { DialogueBox } from './components/ui/DialogueBox';
 import { GameHUD } from './components/ui/GameHUD';
+import { InventoryScreen } from './components/ui/InventoryScreen';
+import { LoadingOverlay } from './components/ui/LoadingOverlay';
 import { MainMenu } from './components/ui/MainMenu';
-import { MobileControls } from './components/ui/MobileControls';
+import { PauseMenu } from './components/ui/PauseMenu';
 import { QuestLog } from './components/ui/QuestLog';
-import {
-  useKeyboardInput,
-  useMouseInput,
-  useTouchInput,
-} from './hooks/useInput';
-
-function InputHandlers() {
-  useKeyboardInput();
-  useMouseInput();
-  useTouchInput();
-  return null;
-}
+import { TouchOverlay } from './input/providers/TouchProvider';
+import { useInputManager } from './input/useInputManager';
+import { useGameStore } from './stores/gameStore';
+import { useInventoryStore } from './stores/inventoryStore';
 
 export function Game() {
+  // Register all input providers (keyboard/mouse, gamepad, touch)
+  useInputManager();
+
+  const gameActive = useGameStore((s) => s.gameActive);
+  const paused = useGameStore((s) => s.paused);
+  const inDialogue = useGameStore((s) => s.inDialogue);
+  const inCombat = useGameStore((s) => s.inCombat);
+  const inventoryOpen = useInventoryStore((s) => s.isOpen);
+
+  // Request pointer lock on click when game is active
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      // Don't request pointer lock if clicking a UI button
+      if (
+        e.target instanceof HTMLElement &&
+        (e.target.closest('button') || e.target.closest('[role="button"]'))
+      ) {
+        return;
+      }
+      const state = useGameStore.getState();
+      const inv = useInventoryStore.getState();
+      if (
+        state.gameActive &&
+        !state.paused &&
+        !state.inDialogue &&
+        !state.inCombat &&
+        !inv.isOpen
+      ) {
+        document.body.requestPointerLock().catch(() => {
+          // Pointer lock can fail if document isn't focused or valid — safe to ignore
+        });
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
+
+  // Exit pointer lock when entering UI modes
+  useEffect(() => {
+    if (paused || inDialogue || inCombat || inventoryOpen || !gameActive) {
+      if (document.pointerLockElement) {
+        document.exitPointerLock();
+      }
+    }
+  }, [paused, inDialogue, inCombat, inventoryOpen, gameActive]);
+
   // Prevent default touch behaviors
   useEffect(() => {
     const preventDefaults = (e: TouchEvent) => {
@@ -37,18 +81,22 @@ export function Game() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-black select-none">
-      {/* Input handling */}
-      <InputHandlers />
-
       {/* 3D Scene */}
-      <GameScene />
+      <GameErrorBoundary>
+        <GameScene />
+      </GameErrorBoundary>
 
       {/* UI Layers */}
       <MainMenu />
+      <LoadingOverlay />
       <GameHUD />
+      <CombatHUD />
+      <DeathOverlay />
+      <PauseMenu />
       <DialogueBox />
       <QuestLog />
-      <MobileControls />
+      <InventoryScreen />
+      <TouchOverlay />
     </div>
   );
 }

@@ -22,6 +22,7 @@ import {
 import { FeatureDefinitionSchema } from '../src/schemas/feature.schema';
 import { GameConfigSchema } from '../src/schemas/game-config.schema';
 import { ItemDefinitionSchema } from '../src/schemas/item.schema';
+import { KingdomConfigSchema } from '../src/schemas/kingdom.schema';
 import { MonsterArchetypeSchema } from '../src/schemas/monster.schema';
 import { NPCDefinitionSchema } from '../src/schemas/npc.schema';
 import { NPCBlueprintSchema } from '../src/schemas/npc-blueprint.schema';
@@ -101,8 +102,11 @@ function getSchemaForFile(
   if (normalized === 'game-config.json') {
     return { schema: GameConfigSchema, contentType: 'game-config' };
   }
-  if (normalized.startsWith('world/')) {
+  if (normalized === 'world/road-spine.json') {
     return { schema: RoadSpineSchema, contentType: 'road-spine' };
+  }
+  if (normalized === 'world/kingdom-config.json') {
+    return { schema: KingdomConfigSchema, contentType: 'kingdom-config' };
   }
   if (
     normalized.startsWith('main-quest/') ||

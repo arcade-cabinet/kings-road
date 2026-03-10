@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { generateFaceTexture } from './face-texture';
+import type { ChibiFaceInput } from './face-texture';
+import { createChibiFaceTexture, generateFaceTexture } from './face-texture';
 
 describe('generateFaceTexture', () => {
   it('returns a texture for valid face config', () => {
@@ -48,5 +49,67 @@ describe('generateFaceTexture', () => {
     };
     const texture = generateFaceTexture(face);
     expect(texture).toBeDefined();
+  });
+});
+
+describe('createChibiFaceTexture', () => {
+  const baseConfig: ChibiFaceInput = {
+    skinTone: '#ffdbac',
+    eyeColor: '#4488cc',
+    hairColor: '#4a3020',
+    hairStyle: 'short',
+    facialHair: 'none',
+    expression: 'neutral',
+  };
+
+  const expressions: ChibiFaceInput['expression'][] = [
+    'neutral',
+    'happy',
+    'angry',
+    'sad',
+    'surprised',
+    'sleeping',
+    'speaking',
+  ];
+
+  const hairStyles: ChibiFaceInput['hairStyle'][] = [
+    'bald',
+    'short',
+    'long',
+    'ponytail',
+    'topknot',
+    'braided',
+    'wild',
+    'hooded',
+  ];
+
+  for (const expression of expressions) {
+    it(`produces a texture for expression: ${expression}`, () => {
+      const tex = createChibiFaceTexture({ ...baseConfig, expression });
+      expect(tex).toBeDefined();
+      expect(tex.image).toBeDefined();
+    });
+  }
+
+  for (const hairStyle of hairStyles) {
+    it(`produces a texture for hair style: ${hairStyle}`, () => {
+      const tex = createChibiFaceTexture({ ...baseConfig, hairStyle });
+      expect(tex).toBeDefined();
+      expect(tex.image).toBeDefined();
+    });
+  }
+
+  it('accepts the race parameter', () => {
+    const tex = createChibiFaceTexture({
+      ...baseConfig,
+      race: 'elf',
+    });
+    expect(tex).toBeDefined();
+    expect(tex.image).toBeDefined();
+  });
+
+  it('returns a THREE.CanvasTexture', () => {
+    const tex = createChibiFaceTexture(baseConfig);
+    expect(tex.constructor.name).toBe('CanvasTexture');
   });
 });
