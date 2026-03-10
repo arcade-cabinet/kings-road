@@ -90,9 +90,11 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
   const isHighlighted = currentInteractable?.id === npcId && npcId !== '';
   const accentColor = TYPE_ACCENTS[npcType] ?? '#88aacc';
 
+  const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+
   // Determine model path based on archetype
   const modelName = MODEL_MAPPING[npcType] || 'basemesh';
-  const { scene } = useGLTF(`/assets/npcs/${modelName}.glb`);
+  const { scene } = useGLTF(`${BASE_URL}/assets/npcs/${modelName}.glb`);
   
   // Clone scene so multiple NPCs don't share the same instance state
   const clonedScene = useMemo(() => scene.clone(), [scene]);
@@ -230,6 +232,7 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
 }
 
 // Preload common models
+const PRELOAD_BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
 Object.values(MODEL_MAPPING).forEach((model) => {
-  useGLTF.preload(`/assets/npcs/${model}.glb`);
+  useGLTF.preload(`${PRELOAD_BASE_URL}/assets/npcs/${model}.glb`);
 });

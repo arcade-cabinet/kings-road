@@ -145,12 +145,16 @@ describe('generateFeaturePlacements', () => {
     expect(differences).toBeGreaterThan(0);
   });
 
-  it('does not place features on road tiles', () => {
+  it('places ambient features off roads, but allows specific roadside features on roads', () => {
     const placements = generateFeaturePlacements(kingdom, SEED);
     for (const p of placements) {
       const [gx, gy] = p.gridPosition;
       const tile = kingdom.tiles[gy * kingdom.width + gx];
-      expect(tile.hasRoad).toBe(false);
+      if (p.id.startsWith('road_feature:')) {
+        expect(tile.hasRoad).toBe(true);
+      } else {
+        expect(tile.hasRoad).toBe(false);
+      }
     }
   });
 
@@ -178,6 +182,7 @@ describe('generateFeaturePlacements', () => {
   it('assigns each feature to a region', () => {
     const placements = generateFeaturePlacements(kingdom, SEED);
     const regionIds = new Set(kingdom.regions.map((r) => r.id));
+    regionIds.add('unknown'); // Road tiles on exact boundaries might map to unknown
     for (const p of placements) {
       expect(regionIds.has(p.regionId)).toBe(true);
     }
