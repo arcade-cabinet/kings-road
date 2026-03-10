@@ -16,7 +16,9 @@ import { initContentStore } from './content-queries';
 /** Load game content from the JSON bundle and initialize the content store */
 export async function loadContentDb(): Promise<void> {
   // Fetch the compiled JSON content bundle
-  const response = await fetch('/game-content.json');
+  // Expo sets EXPO_BASE_URL from experiments.baseUrl (e.g. "/kings-road")
+  const base = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+  const response = await fetch(`${base}/game-content.json`);
   if (!response.ok) {
     throw new Error(`Failed to fetch game-content.json: ${response.status}`);
   }
