@@ -3,6 +3,7 @@ dist/
 coverage/
 playwright-report/
 playwright-ct-report/
+playwright/.cache/
 test-results/
 .vite/
 *.tsbuildinfo
