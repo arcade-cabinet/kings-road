@@ -7,6 +7,11 @@
     "icon": "./assets/icon.png",
     "scheme": "kingsroad",
     "userInterfaceStyle": "light",
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/icon.png"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.kingsroad.game"
@@ -27,7 +32,8 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "baseUrl": "/kings-road"
     }
   }
 }
