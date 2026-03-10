@@ -13,8 +13,8 @@ vite.config.d.ts
 content/validation-report.json
 content/game-config.json
 
-# Compiled content (built from content/ by compile-content-db.ts)
-config/
+# Compiled content database (built from content/ by compile-content-db.ts)
+config/game.db
 public/game.db
 
 # Expo / React Native

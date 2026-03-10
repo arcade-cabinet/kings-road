@@ -1,0 +1,81 @@
+{
+  "$schema": "../src/schemas/tuning.schema.ts",
+  "_comment": "Gameplay tuning values. Edit here, not in TypeScript source files.",
+
+  "world": {
+    "chunkSize": 120,
+    "blockSize": 5,
+    "viewDistance": 1,
+    "maxTerrainHeight": 30,
+    "oceanHeight": -2
+  },
+
+  "player": {
+    "height": 1.6,
+    "radius": 0.6,
+    "walkSpeed": 8,
+    "sprintSpeed": 14,
+    "jumpForce": 10,
+    "gravity": -25,
+    "staminaMax": 100,
+    "staminaDrainRate": 15,
+    "staminaRegenRate": 10,
+    "healthMax": 100
+  },
+
+  "camera": {
+    "fov": 75,
+    "near": 0.1,
+    "far": 250,
+    "pitchMin": -1.2,
+    "pitchMax": 1.2,
+    "mouseSensitivity": 0.002,
+    "defaultYaw": 3.14159
+  },
+
+  "dayNight": {
+    "cycleDurationSeconds": 600,
+    "startHour": 8,
+    "dawnHour": 6,
+    "duskHour": 18
+  },
+
+  "npc": {
+    "interactionRadius": 4.0,
+    "wildernessSpawnBaseThreshold": 0.82,
+    "wildernessSpawnDangerStep": 0.04,
+    "wildernessArchetypes": ["wanderer", "wanderer", "wanderer", "pilgrim", "merchant", "farmer"]
+  },
+
+  "vegetation": {
+    "treeScaleMin": 0.7,
+    "treeScaleRange": 0.8,
+    "bushScaleMin": 0.4,
+    "bushScaleRange": 0.6,
+    "grassScaleMin": 0.3,
+    "grassScaleRange": 0.4,
+    "boulderScaleMin": 0.5,
+    "boulderScaleRange": 1.0
+  },
+
+  "rendering": {
+    "terrainSegments": 16,
+    "bloomIntensity": 0.3,
+    "bloomThreshold": 0.8,
+    "vignetteOffset": 0.3,
+    "vignetteDarkness": 0.3,
+    "fogNear": 80,
+    "fogFar": 200,
+    "shadowMapType": "PCFShadowMap",
+    "dpr": [1, 1.5],
+    "ambientLightIntensity": 0.35,
+    "ambientLightColor": "0xffeedd"
+  },
+
+  "ui": {
+    "locationBannerDuration": 5000,
+    "minimapUpdateFps": 10,
+    "minimapFogRadius": 3,
+    "loadingFadeMs": 600
+  }
+}
