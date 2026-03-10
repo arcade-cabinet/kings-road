@@ -1,14 +1,12 @@
+/*
+ * Fonts: loaded via Google Fonts CDN for Metro compatibility.
+ * Metro's CSS does not support local url() resource imports from node_modules.
+ * CSS spec: @import must precede all rules except @charset and @layer.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
 /* Game CSS */
 @import "tailwindcss";
-
-/* Google Fonts via @fontsource — bundled locally, no CDN fetch */
-@import '@fontsource/lora/400.css';
-@import '@fontsource/lora/600.css';
-@import '@fontsource/lora/700.css';
-@import '@fontsource/crimson-text/400.css';
-@import '@fontsource/crimson-text/400-italic.css';
-@import '@fontsource/crimson-text/600.css';
-@import '@fontsource/crimson-text/600-italic.css';
 
 /* Base styles - warm pastoral medieval theme */
 @layer base {

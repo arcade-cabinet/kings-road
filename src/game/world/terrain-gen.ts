@@ -275,7 +275,7 @@ function generateRivers(
 
   // Simple LCG for deterministic river source selection
   let s = seed;
-  const rng = () => {
+  const _rng = () => {
     s = (s * 1664525 + 1013904223) >>> 0;
     return (s >>> 0) / 4294967296;
   };
@@ -381,7 +381,7 @@ export function generateTerrain(
   seed: string,
   config: KingdomConfig,
 ): TerrainData {
-  const { width, height, seaLevel, mountainLevel } = config;
+  const { width, height, seaLevel } = config;
   const modifiers = config.terrainModifiers ?? {
     elongation: 1.5,
     coastlineNoise: 0.5,

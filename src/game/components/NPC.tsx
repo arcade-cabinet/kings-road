@@ -13,11 +13,9 @@ import type { Interactable } from '../types';
 // Reusable vector — avoids per-NPC per-frame allocation
 const _toPlayer = new THREE.Vector3();
 
-// Use @fontsource woff2 for drei <Text> (troika-three-text needs a URL)
-const FONT_URL = new URL(
-  '@fontsource/lora/files/lora-latin-700-normal.woff2',
-  import.meta.url,
-).href;
+// Troika-three-text needs a direct URL to a woff2 font file
+const FONT_URL =
+  'https://fonts.gstatic.com/s/lora/v36/0QIvMX1D_JOuMwf7I-NP.woff2';
 
 interface NPCProps {
   interactable: Interactable;
