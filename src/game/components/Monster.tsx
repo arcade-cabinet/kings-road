@@ -16,6 +16,9 @@ interface MonsterProps {
 const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
 const SKELETON_PATH = `${BASE_URL}/assets/monsters/Skeleton_warrior-transformed.glb`;
 const BAT_PATH = `${BASE_URL}/assets/monsters/Bat-transformed.glb`;
+const WEREWOLF_PATH = `${BASE_URL}/assets/monsters/werewolf-transformed.glb`;
+const BLOODWRAITH_PATH = `${BASE_URL}/assets/monsters/bloodwraith-transformed.glb`;
+const PLAGUE_DOCTOR_PATH = `${BASE_URL}/assets/monsters/plague_doctor-transformed.glb`;
 
 function GeometryMesh({
   part,
@@ -61,6 +64,9 @@ export function Monster({ archetype, position }: MonsterProps) {
 
   const skeleton = useGLTF(SKELETON_PATH) as any;
   const bat = useGLTF(BAT_PATH) as any;
+  const werewolf = useGLTF(WEREWOLF_PATH) as any;
+  const bloodwraith = useGLTF(BLOODWRAITH_PATH) as any;
+  const plagueDoctor = useGLTF(PLAGUE_DOCTOR_PATH) as any;
 
   const renderData = useMemo(
     () => buildMonsterRenderData(archetype),
@@ -78,7 +84,7 @@ export function Monster({ archetype, position }: MonsterProps) {
     groupRef.current.rotation.y = Math.sin(t * 0.6) * 0.08;
     
     if (modelRef.current) {
-      if (archetype.id === 'butterfly_swarm' || archetype.id === 'wraith') {
+      if (['butterfly_swarm', 'wraith', 'bat', 'bloodwraith'].includes(archetype.id)) {
          // Hover/Fluttering movement
          modelRef.current.position.y = 1.0 + Math.sin(t * 4) * 0.2;
          modelRef.current.rotation.z = Math.sin(t * 10) * 0.1;
@@ -109,8 +115,30 @@ export function Monster({ archetype, position }: MonsterProps) {
         return <primitive object={cloned} />;
       }
     }
+
+    // 3. New Horror Monsters
+    if (archetype.id === 'wolf' || archetype.id === 'werewolf') {
+      if (werewolf.scene) {
+        const cloned = werewolf.scene.clone();
+        return <primitive object={cloned} />;
+      }
+    }
+
+    if (archetype.id === 'bloodwraith' || archetype.id === 'ancient_horror') {
+      if (bloodwraith.scene) {
+        const cloned = bloodwraith.scene.clone();
+        return <primitive object={cloned} />;
+      }
+    }
+
+    if (archetype.id === 'plague_doctor' || archetype.id === 'cultist') {
+      if (plagueDoctor.scene) {
+        const cloned = plagueDoctor.scene.clone();
+        return <primitive object={cloned} />;
+      }
+    }
     
-    // 3. Fallback Primitives
+    // 4. Fallback Primitives
     return bodyParts.map((part) => (
       <GeometryMesh
         key={`${part.type}-${part.position.join(',')}`}
@@ -118,7 +146,7 @@ export function Monster({ archetype, position }: MonsterProps) {
         color={part === bodyParts[0] ? primaryColor : secondaryColor}
       />
     ));
-  }, [archetype.id, skeleton.scene, bat.scene, bodyParts, primaryColor, secondaryColor]);
+  }, [archetype.id, skeleton.scene, bat.scene, werewolf.scene, bloodwraith.scene, plagueDoctor.scene, bodyParts, primaryColor, secondaryColor]);
 
   return (
     <group ref={groupRef} position={position} scale={scale}>
@@ -137,3 +165,6 @@ export function Monster({ archetype, position }: MonsterProps) {
 
 useGLTF.preload(SKELETON_PATH);
 useGLTF.preload(BAT_PATH);
+useGLTF.preload(WEREWOLF_PATH);
+useGLTF.preload(BLOODWRAITH_PATH);
+useGLTF.preload(PLAGUE_DOCTOR_PATH);

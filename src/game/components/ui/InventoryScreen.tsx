@@ -26,6 +26,10 @@ const ITEM_MODELS = {
   sword: `${BASE_URL}/assets/items/Sword-transformed.glb`,
   treasure: `${BASE_URL}/assets/items/Treasure-transformed.glb`,
   stew: `${BASE_URL}/assets/items/stew-transformed.glb`,
+  cleaver: `${BASE_URL}/assets/items/cleaver-transformed.glb`,
+  machete: `${BASE_URL}/assets/items/machete-transformed.glb`,
+  traps: `${BASE_URL}/assets/items/traps-transformed.glb`,
+  bottles: `${BASE_URL}/assets/items/bottles-transformed.glb`,
 };
 
 const ITEM_ICONS: Record<string, string> = {
@@ -75,12 +79,24 @@ function ItemModelPreview({ itemId }: { itemId: string }) {
   let modelPath = ITEM_MODELS.treasure;
   let nodeName = 'coin';
 
-  if (itemId.includes('sword')) {
+  if (itemId.includes('iron_sword')) {
     modelPath = ITEM_MODELS.sword;
     nodeName = 'Sword';
-  } else if (itemId.includes('potion') || itemId.includes('stew')) {
+  } else if (itemId.includes('cleaver')) {
+    modelPath = ITEM_MODELS.cleaver;
+    nodeName = 'cleaver';
+  } else if (itemId.includes('machete')) {
+    modelPath = ITEM_MODELS.machete;
+    nodeName = 'machete';
+  } else if (itemId.includes('potion')) {
+    modelPath = ITEM_MODELS.bottles;
+    nodeName = 'Bottle_Variant_1';
+  } else if (itemId.includes('stew')) {
     modelPath = ITEM_MODELS.stew;
     nodeName = 'bowl_01';
+  } else if (itemId.includes('trap')) {
+    modelPath = ITEM_MODELS.traps;
+    nodeName = 'Bear_Trap';
   } else if (itemId.includes('map') || itemId.includes('book') || itemId.includes('key')) {
     modelPath = ITEM_MODELS.treasure;
     nodeName = 'Grail_1';
@@ -569,3 +585,7 @@ export function InventoryScreen() {
 useGLTF.preload(ITEM_MODELS.sword);
 useGLTF.preload(ITEM_MODELS.treasure);
 useGLTF.preload(ITEM_MODELS.stew);
+useGLTF.preload(ITEM_MODELS.cleaver);
+useGLTF.preload(ITEM_MODELS.machete);
+useGLTF.preload(ITEM_MODELS.traps);
+useGLTF.preload(ITEM_MODELS.bottles);
