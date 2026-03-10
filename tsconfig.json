@@ -30,7 +30,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "scripts"],
-  "exclude": ["app"],
+  "include": ["src", "scripts", "app"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
