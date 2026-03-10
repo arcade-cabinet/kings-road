@@ -6,9 +6,24 @@ import type { AudioZone } from '../audio/ambient-mixer';
 import { computeAmbientMix } from '../audio/ambient-mixer';
 import type { AudioLayer } from '../audio/layer-factory';
 import { createAllLayers } from '../audio/layer-factory';
+import { useCombatStore } from '../stores/combatStore';
 import { useGameStore } from '../stores/gameStore';
 import { useWorldStore, worldToGrid } from '../stores/worldStore';
 import { CHUNK_SIZE } from '../utils/worldCoords';
+
+// ── One-shot Synths ──────────────────────────────────────────────
+
+const hitSynth = new Tone.NoiseSynth({
+  noise: { type: 'white' },
+  envelope: { attack: 0.001, decay: 0.1, sustain: 0 },
+}).toDestination();
+
+const damageSynth = new Tone.MembraneSynth({
+  pitchDecay: 0.05,
+  octaves: 4,
+  oscillator: { type: 'sine' },
+  envelope: { attack: 0.001, decay: 0.2, sustain: 0.01, release: 0.4 },
+}).toDestination();
 
 /** Biomes that emit water audio */
 const WATER_BIOMES: Set<KingdomBiome> = new Set([
@@ -85,6 +100,9 @@ export function AudioSystem() {
   const layersRef = useRef<AudioLayer[]>([]);
   const zonesRef = useRef<AudioZone[]>([]);
   const zoneTimerRef = useRef(0);
+  
+  const lastHitRef = useRef(0);
+  const lastDamageRef = useRef(0);
 
   // Initialize on first user interaction
   useEffect(() => {
@@ -130,6 +148,21 @@ export function AudioSystem() {
     if (!initialized || layersRef.current.length === 0) return;
 
     const { playerPosition, timeOfDay } = useGameStore.getState();
+    const { lastHitTime, lastDamageTime } = useCombatStore.getState();
+
+    // ── Combat SFX ──────────────────────────────────────────────────
+    
+    if (lastHitTime > lastHitRef.current) {
+      lastHitRef.current = lastHitTime;
+      hitSynth.triggerAttackRelease('16n');
+    }
+    
+    if (lastDamageTime > lastDamageRef.current) {
+      lastDamageRef.current = lastDamageTime;
+      damageSynth.triggerAttackRelease('G1', '8n');
+    }
+
+    // ── Ambient Mixing ──────────────────────────────────────────────
 
     // Rebuild audio zones periodically (not every frame)
     zoneTimerRef.current += delta;

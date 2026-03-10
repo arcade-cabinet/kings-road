@@ -1,7 +1,8 @@
+import { useGLTF } from '@react-three/drei';
 import { useMemo } from 'react';
+import * as THREE from 'three';
 import type { BuildingArchetype } from '../../schemas/building.schema';
-import { generateBuildingGeometry } from '../factories/building-factory';
-import { getMaterials } from '../utils/textures';
+import { hashString } from '../factories/chibi-generator';
 
 interface BuildingProps {
   archetype: BuildingArchetype;
@@ -10,133 +11,90 @@ interface BuildingProps {
   label?: string;
 }
 
+// Ensure the GLB is loaded. This should match the path we copied the file to.
+const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const GLB_PATH = `${BASE_URL}/assets/buildings/Village_Buildings-transformed.glb`;
+
 export function Building({
   archetype,
   position,
   rotation = 0,
-  label: _label,
+  label = '',
 }: BuildingProps) {
-  const materials = useMemo(() => getMaterials(), []);
-  const geometry = useMemo(
-    () => generateBuildingGeometry(archetype),
-    [archetype],
-  );
+  const { nodes, materials } = useGLTF(GLB_PATH) as any;
 
-  const wallMaterial = useMemo(() => {
-    switch (archetype.wallMaterial) {
-      case 'stone':
-        return materials.dungeonWall;
-      case 'timber_frame':
-        return materials.wood;
-      case 'brick':
-        return materials.dungeonWall;
-      default:
-        return materials.townWall;
-    }
-  }, [archetype.wallMaterial, materials]);
+  // Use a deterministic seed based on position and label to pick a building variant
+  const seed = useMemo(() => {
+    return hashString(`${label}-${position[0]}-${position[2]}`);
+  }, [label, position]);
 
-  const roofMaterial = useMemo(() => {
-    switch (archetype.roofStyle) {
-      case 'slate':
-        return materials.dungeonWall;
-      case 'flat':
-        return materials.wood;
-      default:
-        return materials.roof;
-    }
-  }, [archetype.roofStyle, materials]);
+  // The Village_Buildings pack has several pre-assembled "Cubes" that act as complete houses.
+  // We'll pick one of them deterministically.
+  const buildingVariants = useMemo(() => {
+    if (!nodes) return [];
+    return [
+      { base: nodes.Cube001, win: nodes.Cube001_1, door: nodes.Cube001_2 },
+      { base: nodes.Cube002, win: nodes.Cube002_1, door: nodes.Cube002_2 },
+      { base: nodes.Cube005, win: nodes.Cube005_1, door: nodes.Cube005_2 },
+      { base: nodes.Cube009, win: nodes.Cube009_2, door: nodes.Cube009_1 },
+      { base: nodes.Cube016, win: nodes.Cube016_1, door: nodes.Cube016_2 },
+    ].filter((v) => v.base && v.win && v.door);
+  }, [nodes]);
+
+  const variant = useMemo(() => {
+    if (buildingVariants.length === 0) return null;
+    return buildingVariants[seed % buildingVariants.length];
+  }, [buildingVariants, seed]);
+
+  // Adjust scaling and positioning to match the game's unit scale (1 unit = 1 meter).
+  // The PSX models might be scaled differently, so we apply a uniform scale.
+  // We also want to rotate the building to face the road (passed via `rotation`).
+  const modelScale = 1.0; 
+  const rotY = (rotation * Math.PI) / 180;
+
+  // Fallback to a simple box if the model fails to load
+  if (!variant) {
+    return (
+      <group position={position} rotation={[0, rotY, 0]}>
+        <mesh position={[0, 2, 0]} castShadow receiveShadow>
+          <boxGeometry args={[4, 4, 4]} />
+          <meshStandardMaterial color="#8B5A2B" />
+        </mesh>
+      </group>
+    );
+  }
 
   return (
-    <group position={position} rotation={[0, (rotation * Math.PI) / 180, 0]}>
-      {/* Wall segments */}
-      {geometry.walls.map((seg) => (
-        <mesh
-          key={`wall-${seg.wall}-${seg.x}-${seg.y}-${seg.z}`}
-          position={[seg.x, seg.y, seg.z]}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry args={[seg.sx, seg.sy, seg.sz]} />
-          <primitive object={wallMaterial} attach="material" />
-        </mesh>
-      ))}
-
-      {/* Floor plates */}
-      {geometry.floors.map((floor) => (
-        <mesh
-          key={`floor-${floor.x}-${floor.y}-${floor.z}`}
-          position={[floor.x, floor.y, floor.z]}
-          receiveShadow
-        >
-          <boxGeometry args={[floor.sx, floor.sy, floor.sz]} />
-          <primitive object={materials.wood} attach="material" />
-        </mesh>
-      ))}
-
-      {/* Stairs */}
-      {geometry.stairs.map((step) => (
-        <mesh
-          key={`stair-${step.x}-${step.y}-${step.z}`}
-          position={[step.x, step.y, step.z]}
-          castShadow
-        >
-          <boxGeometry args={[step.sx, step.sy, step.sz]} />
-          <primitive object={materials.wood} attach="material" />
-        </mesh>
-      ))}
-
-      {/* Doors */}
-      {geometry.doors.map((door) => (
-        <mesh
-          key={`door-${door.x}-${door.y}-${door.z}`}
-          position={[door.x, door.y, door.z]}
-          rotation={[0, door.rotY, 0]}
-        >
-          <boxGeometry args={[1.4, 2.4, 0.1]} />
-          <primitive object={materials.door} attach="material" />
-        </mesh>
-      ))}
-
-      {/* Windows */}
-      {geometry.windows.map((win) => (
-        <mesh
-          key={`win-${win.x}-${win.y}-${win.z}`}
-          position={[win.x, win.y, win.z]}
-          rotation={[0, win.rotY, 0]}
-        >
-          <boxGeometry args={[1.4, 0.9, 0.05]} />
-          <primitive object={materials.windowGlow} attach="material" />
-        </mesh>
-      ))}
-
-      {/* Roof */}
-      <mesh
-        position={[
-          geometry.roofCenter.x,
-          geometry.roofCenter.y,
-          geometry.roofCenter.z,
-        ]}
-        castShadow
-      >
-        {archetype.roofStyle === 'flat' ? (
-          <boxGeometry
-            args={[
-              geometry.roofSize.width + 0.4,
-              0.3,
-              geometry.roofSize.depth + 0.4,
-            ]}
-          />
-        ) : (
-          <coneGeometry
-            args={[
-              Math.max(geometry.roofSize.width, geometry.roofSize.depth) * 0.7,
-              archetype.stories * 1.5,
-              4,
-            ]}
+    <group position={position} rotation={[0, rotY, 0]}>
+      {/* We group the extracted meshes and apply a generic scale. 
+          The origin of these meshes in the GLB might be offset, so we center them. */}
+      <group scale={[modelScale, modelScale, modelScale]}>
+        <mesh 
+          geometry={variant.base.geometry} 
+          material={materials.House_Wood} 
+          castShadow 
+          receiveShadow 
+        />
+        <mesh 
+          geometry={variant.win.geometry} 
+          material={materials.Window} 
+        />
+        <mesh 
+          geometry={variant.door.geometry} 
+          material={materials.Door} 
+        />
+        {/* If the building is an inn or tavern, maybe add the Chimny or Gazeebo? */}
+        {(archetype.id === 'inn' || archetype.id === 'tavern') && nodes.Chimny && (
+          <mesh 
+            geometry={nodes.Chimny.geometry} 
+            material={materials.House_Plaster} 
+            position={[0, 2, 0]} // rough offset
+            castShadow
           />
         )}
-        <primitive object={roofMaterial} attach="material" />
-      </mesh>
+      </group>
     </group>
   );
 }
+
+useGLTF.preload(GLB_PATH);

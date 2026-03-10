@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { useGameStore } from '../../stores/gameStore';
+import { Portrait3D } from './Portrait3D';
 
 // ---------------------------------------------------------------------------
 // Typewriter hook
@@ -191,42 +192,7 @@ const DEFAULT_PORTRAIT = NPC_PORTRAITS.wanderer;
 // ---------------------------------------------------------------------------
 
 function NPCPortrait({ npcType }: { npcType?: string }) {
-  const portrait = NPC_PORTRAITS[npcType ?? ''] ?? DEFAULT_PORTRAIT;
-
-  return (
-    <div
-      className="relative w-[72px] h-[72px] shrink-0 border-2 overflow-hidden"
-      style={{
-        backgroundColor: portrait.bgColor,
-        borderColor: portrait.accentColor,
-        boxShadow: `inset 0 0 16px ${portrait.accentColor}33`,
-      }}
-    >
-      {/* Decorative inner frame */}
-      <div
-        className="absolute inset-[3px] border"
-        style={{ borderColor: `${portrait.accentColor}55` }}
-      />
-
-      {/* Silhouette icon */}
-      <svg
-        viewBox="0 0 24 24"
-        className="absolute inset-0 w-full h-full p-2 opacity-70"
-        aria-hidden="true"
-      >
-        <path d={portrait.silhouette} fill={portrait.accentColor} />
-      </svg>
-
-      {/* Parchment texture overlay */}
-      <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle at 30% 40%, rgba(255,255,255,0.3), transparent 60%)',
-        }}
-      />
-    </div>
-  );
+  return <Portrait3D type={npcType ?? 'wanderer'} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -339,6 +305,7 @@ export function DialogueBox() {
   const inDialogue = useGameStore((state) => state.inDialogue);
   const dialogueName = useGameStore((state) => state.dialogueName);
   const dialogueText = useGameStore((state) => state.dialogueText);
+  const dialogueType = useGameStore((state) => state.dialogueType);
   const currentInteractable = useGameStore(
     (state) => state.currentInteractable,
   );
@@ -488,7 +455,7 @@ export function DialogueBox() {
           <div className="p-5 md:p-6">
             {/* Header — portrait + NPC name + archetype label */}
             <div className="flex items-start gap-4 mb-1">
-              <NPCPortrait npcType={npcType} />
+              <NPCPortrait npcType={dialogueType} />
 
               <div className="pt-1 min-w-0 flex-1">
                 {/* NPC Name — Lora serif, golden */}
@@ -507,7 +474,7 @@ export function DialogueBox() {
                   className="text-[11px] uppercase tracking-[0.2em] mt-1.5 font-semibold"
                   style={{ color: '#8b6f47' }}
                 >
-                  {portrait.label}
+                  {NPC_PORTRAITS[dialogueType]?.label ?? dialogueType}
                 </div>
               </div>
             </div>

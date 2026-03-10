@@ -1,11 +1,6 @@
-/**
- * InventoryScreen — full-screen overlay showing the player's inventory.
- *
- * Opens with 'I' key. Grid-based item display with equipment slots,
- * item tooltips on hover, and gold display. Medieval satchel aesthetic.
- */
-
-import { useState } from 'react';
+import { OrbitControls, Stage, useGLTF } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import { Suspense, useState } from 'react';
 import type { ItemStack } from '../../../ecs/traits/inventory';
 import type { ItemDefinition } from '../../../schemas/item.schema';
 import { useGameStore } from '../../stores/gameStore';
@@ -26,6 +21,39 @@ const SLOT_BG = 'rgba(245, 240, 232, 0.6)';
 const SLOT_BORDER = 'rgba(139, 111, 71, 0.3)';
 const SLOT_HOVER = 'rgba(196, 167, 71, 0.2)';
 
+const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const ITEM_MODELS = {
+  sword: `${BASE_URL}/assets/items/Sword-transformed.glb`,
+  treasure: `${BASE_URL}/assets/items/Treasure-transformed.glb`,
+  stew: `${BASE_URL}/assets/items/stew-transformed.glb`,
+  cleaver: `${BASE_URL}/assets/items/cleaver-transformed.glb`,
+  machete: `${BASE_URL}/assets/items/machete-transformed.glb`,
+  traps: `${BASE_URL}/assets/items/traps-transformed.glb`,
+  bottles: `${BASE_URL}/assets/items/bottles-transformed.glb`,
+};
+
+const ITEM_ICONS: Record<string, string> = {
+  iron_sword: '⚔️',
+  steel_sword: '🗡️',
+  health_potion: '🧪',
+  mana_potion: '🔮',
+  bread: '🍞',
+  stew: '🍲',
+  gold: '💰',
+  key: '🔑',
+  map: '📜',
+  shield: '🛡️',
+  armor: '👕',
+  helmet: '🪖',
+  boots: '👞',
+  ring: '💍',
+  amulet: '📿',
+  book: '📖',
+  gem: '💎',
+  hammer: '🔨',
+  pickaxe: '⛏️',
+};
+
 const EQUIP_SLOTS = [
   'head',
   'chest',
@@ -45,6 +73,91 @@ const ITEM_TYPE_LABELS: Record<string, string> = {
   crafting_material: 'Material',
 };
 
+// ── 3D Item Preview ──────────────────────────────────────────────────────
+
+function ItemModelPreview({ itemId }: { itemId: string }) {
+  let modelPath = ITEM_MODELS.treasure;
+  let nodeName = 'coin';
+
+  if (itemId.includes('iron_sword')) {
+    modelPath = ITEM_MODELS.sword;
+    nodeName = 'Sword';
+  } else if (itemId.includes('cleaver')) {
+    modelPath = ITEM_MODELS.cleaver;
+    nodeName = 'cleaver';
+  } else if (itemId.includes('machete')) {
+    modelPath = ITEM_MODELS.machete;
+    nodeName = 'machete';
+  } else if (itemId.includes('potion')) {
+    modelPath = ITEM_MODELS.bottles;
+    nodeName = 'Bottle_Variant_1';
+  } else if (itemId.includes('stew')) {
+    modelPath = ITEM_MODELS.stew;
+    nodeName = 'bowl_01';
+  } else if (itemId.includes('trap')) {
+    modelPath = ITEM_MODELS.traps;
+    nodeName = 'Bear_Trap';
+  } else if (
+    itemId.includes('map') ||
+    itemId.includes('book') ||
+    itemId.includes('key')
+  ) {
+    modelPath = ITEM_MODELS.treasure;
+    nodeName = 'Grail_1';
+  } else if (itemId.includes('gem') || itemId.includes('diamond')) {
+    modelPath = ITEM_MODELS.treasure;
+    nodeName = 'Diamond';
+  }
+
+  const { nodes } = useGLTF(modelPath) as any;
+  const mesh =
+    nodes[nodeName] ||
+    Object.values(nodes).find((n: any) => n?.isMesh || n?.geometry);
+
+  if (!mesh) return null;
+
+  return (
+    <mesh geometry={mesh.geometry} castShadow receiveShadow>
+      <meshStandardMaterial color="#c4a747" roughness={0.4} metalness={0.8} />
+    </mesh>
+  );
+}
+
+function ItemPreviewPane({ itemId }: { itemId: string | null }) {
+  if (!itemId) {
+    return (
+      <div className="w-full h-full flex items-center justify-center border border-dashed border-amber-900/20 opacity-30">
+        <span className="font-lora text-[10px] uppercase tracking-widest">
+          No Item Selected
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full relative bg-amber-900/5 rounded shadow-inner overflow-hidden">
+      <Canvas shadows dpr={[1, 2]}>
+        <Suspense fallback={null}>
+          <Stage intensity={0.5} environment="city" adjustCamera={1.2}>
+            <ItemModelPreview itemId={itemId} />
+          </Stage>
+        </Suspense>
+        <OrbitControls
+          autoRotate
+          autoRotateSpeed={4}
+          enableZoom={false}
+          enablePan={false}
+        />
+      </Canvas>
+      <div className="absolute bottom-2 right-2 opacity-20 pointer-events-none">
+        <span className="font-lora text-[8px] uppercase tracking-tighter">
+          3DPSX PREVIEW
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ── Item tooltip ─────────────────────────────────────────────────────────
 
 function ItemTooltip({
@@ -57,7 +170,7 @@ function ItemTooltip({
   if (!def) {
     return (
       <div
-        className="absolute z-50 px-3 py-2 pointer-events-none -translate-y-full -top-2 left-1/2 -translate-x-1/2 min-w-[160px]"
+        className="absolute z-50 px-3 py-2 pointer-events-none translate-y-2 top-full left-1/2 -translate-x-1/2 min-w-[160px]"
         style={{
           background: PARCHMENT,
           border: `1px solid ${SLOT_BORDER}`,
@@ -75,7 +188,7 @@ function ItemTooltip({
 
   return (
     <div
-      className="absolute z-50 px-4 py-3 pointer-events-none -translate-y-full -top-2 left-1/2 -translate-x-1/2 min-w-[200px] max-w-[260px]"
+      className="absolute z-50 px-4 py-3 pointer-events-none translate-y-2 top-full left-1/2 -translate-x-1/2 min-w-[200px] max-w-[260px]"
       style={{
         background: PARCHMENT,
         border: `1.5px solid ${SLOT_BORDER}`,
@@ -167,31 +280,47 @@ function ItemTooltip({
 
 // ── Inventory slot ───────────────────────────────────────────────────────
 
-function InventorySlot({ item }: { item: ItemStack | null }) {
+function InventorySlot({
+  item,
+  onHover,
+}: {
+  item: ItemStack | null;
+  onHover: (id: string | null) => void;
+}) {
   const [hovered, setHovered] = useState(false);
   const def = item ? getItemInfo(item.itemId) : undefined;
   const rarityColor = def ? getRarityColor(def.rarity) : undefined;
 
+  const handleEnter = () => {
+    setHovered(true);
+    onHover(item?.itemId ?? null);
+  };
+
+  const handleLeave = () => {
+    setHovered(false);
+    onHover(null);
+  };
+
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: tooltip hover on inventory slot
     <div
-      className="relative w-14 h-14 flex items-center justify-center cursor-default"
+      className="relative w-14 h-14 flex items-center justify-center cursor-default group"
       style={{
         background: hovered && item ? SLOT_HOVER : SLOT_BG,
         border: `1px solid ${item && rarityColor ? `${rarityColor}60` : SLOT_BORDER}`,
-        transition: 'background 150ms',
+        transition: 'all 150ms',
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
     >
       {item && def ? (
         <>
-          {/* Item icon — uses first letter as placeholder */}
+          {/* Item icon — uses emoji or fallback */}
           <div
-            className="font-lora text-lg font-bold select-none"
-            style={{ color: rarityColor ?? ACCENT }}
+            className="text-2xl select-none transition-transform group-hover:scale-110"
+            title={def.name}
           >
-            {def.name.charAt(0).toUpperCase()}
+            {ITEM_ICONS[item.itemId] || ITEM_ICONS[def.type] || '📦'}
           </div>
 
           {/* Stack count badge */}
@@ -226,41 +355,54 @@ function InventorySlot({ item }: { item: ItemStack | null }) {
 
 // ── Equipment slot ───────────────────────────────────────────────────────
 
-function EquipmentSlot({ slot }: { slot: string }) {
+function EquipmentSlot({
+  slot,
+  onHover,
+}: {
+  slot: string;
+  onHover: (id: string | null) => void;
+}) {
   const equipped = useInventoryStore((s) => s.equipped);
   const itemId = equipped[slot as keyof typeof equipped];
   const [hovered, setHovered] = useState(false);
   const def = itemId ? getItemInfo(itemId) : undefined;
   const rarityColor = def ? getRarityColor(def.rarity) : undefined;
 
+  const handleEnter = () => {
+    setHovered(true);
+    onHover(itemId);
+  };
+
+  const handleLeave = () => {
+    setHovered(false);
+    onHover(null);
+  };
+
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: tooltip hover on equipment slot
     <div
-      className="relative flex items-center gap-2 py-1.5 px-2"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="relative flex items-center gap-2 py-1.5 px-2 group"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
     >
       {/* Slot icon */}
       <div
-        className="w-10 h-10 flex items-center justify-center"
+        className="w-10 h-10 flex items-center justify-center transition-all group-hover:border-amber-600/60"
         style={{
           background: itemId ? SLOT_HOVER : SLOT_BG,
           border: `1px solid ${rarityColor ? `${rarityColor}60` : SLOT_BORDER}`,
         }}
       >
-        {def ? (
-          <span
-            className="font-lora text-sm font-bold"
-            style={{ color: rarityColor ?? ACCENT }}
-          >
-            {def.name.charAt(0)}
+        {itemId && def ? (
+          <span className="text-xl select-none">
+            {ITEM_ICONS[itemId] || ITEM_ICONS[slot] || '🛡️'}
           </span>
         ) : (
           <span
-            className="font-lora text-[10px] uppercase tracking-wider"
-            style={{ color: `${ACCENT}40` }}
+            className="font-lora text-[10px] uppercase tracking-wider opacity-40"
+            style={{ color: ACCENT }}
           >
-            --
+            {getSlotLabel(slot).slice(0, 2)}
           </span>
         )}
       </div>
@@ -308,6 +450,8 @@ export function InventoryScreen() {
   const close = useInventoryStore((s) => s.close);
   const gameActive = useGameStore((s) => s.gameActive);
 
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+
   if (!isOpen || !gameActive) return null;
 
   // Build slot array with empty slots
@@ -320,12 +464,12 @@ export function InventoryScreen() {
     <div
       className="absolute inset-0 z-[54] flex items-center justify-center"
       style={{
-        background: 'rgba(20, 16, 10, 0.5)',
-        backdropFilter: 'blur(3px)',
+        background: 'rgba(15, 12, 8, 0.65)',
+        backdropFilter: 'blur(5px)',
       }}
     >
       <div
-        className="relative flex gap-6 px-10 py-8 shadow-2xl max-h-[85vh]"
+        className="relative flex gap-8 px-10 py-8 shadow-2xl max-h-[90vh]"
         style={{
           background: PARCHMENT,
           border: `1.5px solid ${SLOT_BORDER}`,
@@ -345,8 +489,8 @@ export function InventoryScreen() {
           }}
         />
 
-        {/* Left: Equipment */}
-        <div className="flex flex-col w-48">
+        {/* Left: Equipment & Preview */}
+        <div className="flex flex-col w-56">
           <h3
             className="font-lora text-lg font-bold tracking-[0.1em] uppercase mb-3"
             style={{
@@ -354,8 +498,13 @@ export function InventoryScreen() {
               textShadow: '0 0 15px rgba(196, 167, 71, 0.12)',
             }}
           >
-            Equipment
+            Adventurer
           </h3>
+
+          {/* 3D Preview Box */}
+          <div className="w-full aspect-square mb-4">
+            <ItemPreviewPane itemId={hoveredItemId} />
+          </div>
 
           <div
             className="h-px mb-3"
@@ -364,9 +513,13 @@ export function InventoryScreen() {
             }}
           />
 
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-0.5 max-h-[300px] overflow-y-auto">
             {EQUIP_SLOTS.map((slot) => (
-              <EquipmentSlot key={slot} slot={slot} />
+              <EquipmentSlot
+                key={slot}
+                slot={slot}
+                onHover={setHoveredItemId}
+              />
             ))}
           </div>
         </div>
@@ -418,19 +571,29 @@ export function InventoryScreen() {
           />
 
           {/* Grid */}
-          <div className="grid grid-cols-5 gap-1">
+          <div className="grid grid-cols-5 gap-1.5">
             {slots.map((item, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: fixed-size slot grid, items don't reorder
-              <InventorySlot key={i} item={item} />
+              <InventorySlot key={i} item={item} onHover={setHoveredItemId} />
             ))}
           </div>
 
           {/* Slots counter */}
           <div
-            className="font-lora text-[10px] tracking-wider mt-2 text-right"
+            className="font-lora text-[10px] tracking-wider mt-4 text-right italic"
             style={{ color: ACCENT }}
           >
-            {items.length} / {maxSlots} slots
+            Capacity: {items.length} / {maxSlots}
+          </div>
+
+          {/* Hints */}
+          <div className="mt-auto pt-4 flex gap-4 opacity-50">
+            <span className="font-lora text-[9px] uppercase tracking-widest">
+              [I] Close
+            </span>
+            <span className="font-lora text-[9px] uppercase tracking-widest">
+              [DRAG] Equip
+            </span>
           </div>
         </div>
 
@@ -438,12 +601,20 @@ export function InventoryScreen() {
         <button
           type="button"
           onClick={close}
-          className="absolute top-3 right-4 font-lora text-sm font-bold tracking-wider cursor-pointer transition-colors hover:opacity-80"
+          className="absolute top-3 right-4 font-lora text-sm font-bold tracking-wider cursor-pointer transition-colors hover:text-red-800"
           style={{ color: ACCENT }}
         >
-          [ESC]
+          [✕]
         </button>
       </div>
     </div>
   );
 }
+
+useGLTF.preload(ITEM_MODELS.sword);
+useGLTF.preload(ITEM_MODELS.treasure);
+useGLTF.preload(ITEM_MODELS.stew);
+useGLTF.preload(ITEM_MODELS.cleaver);
+useGLTF.preload(ITEM_MODELS.machete);
+useGLTF.preload(ITEM_MODELS.traps);
+useGLTF.preload(ITEM_MODELS.bottles);

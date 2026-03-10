@@ -36,6 +36,10 @@ interface CombatUIState {
   damagePopups: DamagePopup[];
   /** Accumulated damage taken this combat (for shake intensity) */
   recentDamageTaken: number;
+  /** Timestamp of last damage taken (for feedback triggers) */
+  lastDamageTime: number;
+  /** Timestamp of last player hit dealt (for feedback triggers) */
+  lastHitTime: number;
   /** Post-combat loot/XP summary */
   summary: CombatSummary | null;
   /** Attack cooldown (seconds remaining) */
@@ -70,6 +74,8 @@ export const useCombatStore = create<CombatUIState>((set) => ({
   phase: 'idle',
   damagePopups: [],
   recentDamageTaken: 0,
+  lastDamageTime: 0,
+  lastHitTime: 0,
   summary: null,
   attackCooldown: 0,
   playerAttackDamage: 8,
@@ -79,24 +85,34 @@ export const useCombatStore = create<CombatUIState>((set) => ({
       phase: 'active',
       damagePopups: [],
       recentDamageTaken: 0,
+      lastDamageTime: 0,
+      lastHitTime: 0,
       summary: null,
     }),
 
   addDamagePopup: (text, color, x, y, isCritical) =>
-    set((state) => ({
-      damagePopups: [
-        ...state.damagePopups,
-        {
-          id: nextPopupId++,
-          text,
-          color,
-          x,
-          y,
-          createdAt: performance.now(),
-          isCritical,
-        },
-      ],
-    })),
+    set((state) => {
+      const now = performance.now();
+      const isHeal = text.startsWith('+');
+      const isDealt = color === '#ffffff' || color === '#ffcc00'; // Critical or white = player hit
+      
+      return {
+        damagePopups: [
+          ...state.damagePopups,
+          {
+            id: nextPopupId++,
+            text,
+            color,
+            x,
+            y,
+            createdAt: now,
+            isCritical,
+          },
+        ],
+        lastHitTime: isDealt && !isHeal ? now : state.lastHitTime,
+        lastDamageTime: !isDealt && !isHeal ? now : state.lastDamageTime,
+      };
+    }),
 
   clearExpiredPopups: (now) =>
     set((state) => ({

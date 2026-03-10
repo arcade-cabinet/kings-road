@@ -99,6 +99,7 @@ interface GameState {
   currentInteractable: Interactable | null;
   dialogueName: string;
   dialogueText: string;
+  dialogueType: string;
 
   // Input state
   // DEPRECATED: legacy input system — InteractionSystem still reads keys.action
@@ -153,7 +154,7 @@ interface GameState {
   moveToRoom: (roomIndex: number) => void;
 
   setCurrentInteractable: (interactable: Interactable | null) => void;
-  openDialogue: (name: string, text: string) => void;
+  openDialogue: (name: string, text: string, npcType?: string) => void;
   closeDialogue: () => void;
 
   // DEPRECATED: legacy input system — InteractionSystem still reads keys.action
@@ -254,6 +255,7 @@ export const useGameStore = create<GameState>((set, _get) => ({
   currentInteractable: null,
   dialogueName: '',
   dialogueText: '',
+  dialogueType: 'wanderer',
 
   keys: {
     w: false,
@@ -498,11 +500,12 @@ export const useGameStore = create<GameState>((set, _get) => ({
   setCurrentInteractable: (interactable) =>
     set({ currentInteractable: interactable }),
 
-  openDialogue: (name, text) =>
+  openDialogue: (name, text, npcType) =>
     set({
       inDialogue: true,
       dialogueName: name,
       dialogueText: text,
+      dialogueType: npcType ?? 'wanderer',
     }),
 
   closeDialogue: () => set({ inDialogue: false }),
@@ -524,6 +527,6 @@ export const useGameStore = create<GameState>((set, _get) => ({
 }));
 
 // Debug: expose store for DevTools testing (tree-shaken in production)
-if (__DEV__) {
+if (__DEV__ && typeof window !== 'undefined') {
   (window as unknown as Record<string, unknown>).__gameStore = useGameStore;
 }
