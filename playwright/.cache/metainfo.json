@@ -1,0 +1,481 @@
+{
+  "version": "1.58.2",
+  "viteVersion": "6.4.1",
+  "registerSourceHash": "ea233d95b980072c81eb49458aee55f5d33fdb02",
+  "components": [
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_DialogueBox_story_DialogueBoxBlacksmith",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/DialogueBox.ct.tsx",
+      "importSource": "./DialogueBox.story",
+      "remoteName": "DialogueBoxBlacksmith"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_DialogueBox_story_DialogueBoxHidden",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/DialogueBox.ct.tsx",
+      "importSource": "./DialogueBox.story",
+      "remoteName": "DialogueBoxHidden"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_DialogueBox_story_DialogueBoxWanderer",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/DialogueBox.ct.tsx",
+      "importSource": "./DialogueBox.story",
+      "remoteName": "DialogueBoxWanderer"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_ErrorOverlay_ErrorOverlay",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.ct.tsx",
+      "importSource": "./ErrorOverlay",
+      "remoteName": "ErrorOverlay"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_ErrorOverlay_story_ErrorWrapper",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.ct.tsx",
+      "importSource": "./ErrorOverlay.story",
+      "remoteName": "ErrorWrapper"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_GameHUD_story_GameHUDDefault",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.ct.tsx",
+      "importSource": "./GameHUD.story",
+      "remoteName": "GameHUDDefault"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_GameHUD_story_GameHUDHidden",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.ct.tsx",
+      "importSource": "./GameHUD.story",
+      "remoteName": "GameHUDHidden"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_GameHUD_story_GameHUDLowHealth",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.ct.tsx",
+      "importSource": "./GameHUD.story",
+      "remoteName": "GameHUDLowHealth"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_GameHUD_story_GameHUDSprinting",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.ct.tsx",
+      "importSource": "./GameHUD.story",
+      "remoteName": "GameHUDSprinting"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_GameHUD_story_GameHUDWithInteraction",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.ct.tsx",
+      "importSource": "./GameHUD.story",
+      "remoteName": "GameHUDWithInteraction"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_LoadingOverlay_story_LoadingOverlayHidden",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/LoadingOverlay.ct.tsx",
+      "importSource": "./LoadingOverlay.story",
+      "remoteName": "LoadingOverlayHidden"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_LoadingOverlay_story_LoadingOverlayVisible",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/LoadingOverlay.ct.tsx",
+      "importSource": "./LoadingOverlay.story",
+      "remoteName": "LoadingOverlayVisible"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_MainMenu_story_MainMenuDefault",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MainMenu.ct.tsx",
+      "importSource": "./MainMenu.story",
+      "remoteName": "MainMenuDefault"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_MainMenu_story_MainMenuHidden",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MainMenu.ct.tsx",
+      "importSource": "./MainMenu.story",
+      "remoteName": "MainMenuHidden"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_MobileControls_story_MobileControlsDefault",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MobileControls.ct.tsx",
+      "importSource": "./MobileControls.story",
+      "remoteName": "MobileControlsDefault"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_MobileControls_story_MobileControlsHidden",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MobileControls.ct.tsx",
+      "importSource": "./MobileControls.story",
+      "remoteName": "MobileControlsHidden"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_MobileControls_story_MobileControlsWithInteraction",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MobileControls.ct.tsx",
+      "importSource": "./MobileControls.story",
+      "remoteName": "MobileControlsWithInteraction"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_QuestLog_story_QuestLogEmpty",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.ct.tsx",
+      "importSource": "./QuestLog.story",
+      "remoteName": "QuestLogEmpty"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_QuestLog_story_QuestLogExpanded",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.ct.tsx",
+      "importSource": "./QuestLog.story",
+      "remoteName": "QuestLogExpanded"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_QuestLog_story_QuestLogHidden",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.ct.tsx",
+      "importSource": "./QuestLog.story",
+      "remoteName": "QuestLogHidden"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_components_ui_QuestLog_story_QuestLogWithQuests",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.ct.tsx",
+      "importSource": "./QuestLog.story",
+      "remoteName": "QuestLogWithQuests"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_factories_FactoryPreview_story_ChibiConfigGrid",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/factory-visual.ct.tsx",
+      "importSource": "./FactoryPreview.story",
+      "remoteName": "ChibiConfigGrid"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_factories_FactoryPreview_story_FaceTextureGrid",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/factory-visual.ct.tsx",
+      "importSource": "./FactoryPreview.story",
+      "remoteName": "FaceTextureGrid"
+    },
+    {
+      "id": "_Users_jbogaty_src_arcade_cabinet_kings_road_src_game_factories_FactoryPreview_story_FaceTexturePreview",
+      "filename": "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/factory-visual.ct.tsx",
+      "importSource": "./FactoryPreview.story",
+      "remoteName": "FaceTexturePreview"
+    }
+  ],
+  "sources": {
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/playwright/index.html": {
+      "timestamp": 1773078231688.2004
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/playwright/index.tsx": {
+      "timestamp": 1773078232608.5793
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/react@19.2.4/node_modules/react/index.js": {
+      "timestamp": 1766091033768.5754
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/react-dom@19.2.4_react@19.2.4/node_modules/react-dom/client.js": {
+      "timestamp": 1766091033720.1177
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MainMenu.story.tsx": {
+      "timestamp": 1773078707950.5127
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/DialogueBox.story.tsx": {
+      "timestamp": 1773078720548.7715
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.story.tsx": {
+      "timestamp": 1773078567661.774
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.story.tsx": {
+      "timestamp": 1773078731317.3796
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/LoadingOverlay.story.tsx": {
+      "timestamp": 1773078712061.8591
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.story.tsx": {
+      "timestamp": 1773078740509.8003
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.tsx": {
+      "timestamp": 1773077185174.5032
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MobileControls.story.tsx": {
+      "timestamp": 1773078748789.3506
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/FactoryPreview.story.tsx": {
+      "timestamp": 1773078745880.4885
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/react@19.2.4/node_modules/react/cjs/react.production.js": {
+      "timestamp": 1769453035611.1057
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/react-dom@19.2.4_react@19.2.4/node_modules/react-dom/cjs/react-dom-client.production.js": {
+      "timestamp": 1769453035623.933
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/react@19.2.4/node_modules/react/jsx-runtime.js": {
+      "timestamp": 1766091033772.8574
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.tsx": {
+      "timestamp": 1773069800948.6528
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/LoadingOverlay.tsx": {
+      "timestamp": 1773074671429.483
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/DialogueBox.tsx": {
+      "timestamp": 1773038908325.312
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MainMenu.tsx": {
+      "timestamp": 1773038979739.447
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.tsx": {
+      "timestamp": 1773038960629.8381
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/questStore.ts": {
+      "timestamp": 1773069800949.2402
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/gameStore.ts": {
+      "timestamp": 1773069800949.12
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/chibi-generator.ts": {
+      "timestamp": 1773077504977.5166
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MobileControls.tsx": {
+      "timestamp": 1773038760125.941
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/face-texture.ts": {
+      "timestamp": 1773077573840.535
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/scheduler@0.27.0/node_modules/scheduler/index.js": {
+      "timestamp": 1766091033686.839
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/react-dom@19.2.4_react@19.2.4/node_modules/react-dom/index.js": {
+      "timestamp": 1766091033720.8843
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/react@19.2.4/node_modules/react/cjs/react-jsx-runtime.production.js": {
+      "timestamp": 1766091033777.251
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-00.json": {
+      "timestamp": 1773069800945.5078
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-01.json": {
+      "timestamp": 1773069800945.5835
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/index.mjs": {
+      "timestamp": 1765388714875.0525
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-02.json": {
+      "timestamp": 1773069800945.6472
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-05.json": {
+      "timestamp": 1773069800945.8276
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-03.json": {
+      "timestamp": 1773069800945.7092
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-04.json": {
+      "timestamp": 1773069800945.7708
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/aldrics-missing-hammer.json": {
+      "timestamp": 1773069800945.9187
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/bandit-ambush.json": {
+      "timestamp": 1773069800945.9788
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/father-cedrics-lost-hymnal.json": {
+      "timestamp": 1773069800946.0852
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/lost-pilgrim.json": {
+      "timestamp": 1773069800946.2053
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/lord-ashwicks-secret.json": {
+      "timestamp": 1773069800946.1504
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/besss-secret-recipe.json": {
+      "timestamp": 1773069800946.0317
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/sister-maeves-garden.json": {
+      "timestamp": 1773069800946.3225
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/merchants-broken-cart.json": {
+      "timestamp": 1773069800946.2654
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/strange-shrine.json": {
+      "timestamp": 1773069800946.3762
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-bridge-troll.json": {
+      "timestamp": 1773069800946.4307
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-cursed-ring.json": {
+      "timestamp": 1773069800946.5574
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-deserter.json": {
+      "timestamp": 1773069800946.62
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-herbalists-journey.json": {
+      "timestamp": 1773069800946.747
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-missing-manuscript.json": {
+      "timestamp": 1773069800946.9116
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-missing-merchant.json": {
+      "timestamp": 1773069800946.9705
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-poisoned-well.json": {
+      "timestamp": 1773069800947.029
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-underground.json": {
+      "timestamp": 1773069800947.0896
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/wounded-soldier.json": {
+      "timestamp": 1773069800947.1433
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-cartographers-map.json": {
+      "timestamp": 1773069800946.5015
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.module.js": {
+      "timestamp": 1772313834052.9387
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/lib/utils.ts": {
+      "timestamp": 1773046610000
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/random.ts": {
+      "timestamp": 1773038653649.5247
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/worldGen.ts": {
+      "timestamp": 1773038540364.2922
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/scheduler@0.27.0/node_modules/scheduler/cjs/scheduler.production.js": {
+      "timestamp": 1766091033717.3257
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/react-dom@19.2.4_react@19.2.4/node_modules/react-dom/cjs/react-dom.production.js": {
+      "timestamp": 1769453035643.2302
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/react.mjs": {
+      "timestamp": 1765388714875.9888
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/vanilla.mjs": {
+      "timestamp": 1765388714892.8662
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs": {
+      "timestamp": 1767643196551.8137
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/tailwind-merge@3.5.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs": {
+      "timestamp": 1771806702049.3
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.core.js": {
+      "timestamp": 1772258164947.7478
+    },
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/index.css": {
+      "timestamp": 1773075569561.311
+    }
+  },
+  "deps": {
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/DialogueBox.story.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/DialogueBox.story.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/gameStore.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.module.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.core.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/index.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/vanilla.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/react.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/random.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/DialogueBox.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/lib/utils.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/tailwind-merge@3.5.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs"
+    ],
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.tsx"
+    ],
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.story.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.story.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/ErrorOverlay.tsx"
+    ],
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.story.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.story.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/gameStore.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.module.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.core.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/index.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/vanilla.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/react.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/random.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/GameHUD.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/lib/utils.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/tailwind-merge@3.5.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs"
+    ],
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/LoadingOverlay.story.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/LoadingOverlay.story.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/gameStore.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.module.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.core.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/index.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/vanilla.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/react.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/random.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/LoadingOverlay.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/lib/utils.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/tailwind-merge@3.5.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs"
+    ],
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MainMenu.story.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MainMenu.story.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/gameStore.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.module.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.core.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/index.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/vanilla.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/react.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/random.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MainMenu.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/lib/utils.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/tailwind-merge@3.5.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/worldGen.ts"
+    ],
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MobileControls.story.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MobileControls.story.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/gameStore.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.module.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.core.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/index.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/vanilla.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/react.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/random.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/MobileControls.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/lib/utils.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/tailwind-merge@3.5.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs"
+    ],
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.story.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.story.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/gameStore.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.module.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.core.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/index.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/vanilla.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/zustand@5.0.11_@types+react@19.2.14_react@19.2.4_use-sync-external-store@1.6.0_react@19.2.4_/node_modules/zustand/esm/react.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/utils/random.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/stores/questStore.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-00.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-01.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-02.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-03.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-04.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/main/chapter-05.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/aldrics-missing-hammer.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/bandit-ambush.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/besss-secret-recipe.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/father-cedrics-lost-hymnal.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/lord-ashwicks-secret.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/lost-pilgrim.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/merchants-broken-cart.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/sister-maeves-garden.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/strange-shrine.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-bridge-troll.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-cartographers-map.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-cursed-ring.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-deserter.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-herbalists-journey.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-missing-manuscript.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-missing-merchant.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-poisoned-well.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/the-underground.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/content/quests/side/wounded-soldier.json",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/components/ui/QuestLog.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/lib/utils.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/tailwind-merge@3.5.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs"
+    ],
+    "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/FactoryPreview.story.tsx": [
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/FactoryPreview.story.tsx",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/chibi-generator.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/src/game/factories/face-texture.ts",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.module.js",
+      "/Users/jbogaty/src/arcade-cabinet/kings-road/node_modules/.pnpm/three@0.183.2/node_modules/three/build/three.core.js"
+    ]
+  }
+}

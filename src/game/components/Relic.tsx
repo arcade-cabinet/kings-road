@@ -4,6 +4,9 @@ import * as THREE from 'three';
 import { useGameStore } from '../stores/gameStore';
 import { PLAYER_RADIUS } from '../utils/worldGen';
 
+// Reusable vector for collection animation
+const _toPlayer = new THREE.Vector3();
+
 interface RelicProps {
   chunkKey: string;
   gemId: number;
@@ -28,23 +31,26 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
   const [attractAnimation, setAttractAnimation] = useState(0);
   const _particlesRef = useRef<CollectParticle[]>([]);
 
-  const playerPosition = useGameStore((state) => state.playerPosition);
   const collectGem = useGameStore((state) => state.collectGem);
+  const elapsedRef = useRef(0);
 
   // Safe position values
   const posX = position?.[0] ?? 0;
   const posY = position?.[1] ?? 1;
   const posZ = position?.[2] ?? 0;
-  const playerX = playerPosition?.x ?? 0;
-  const playerZ = playerPosition?.z ?? 0;
 
   // Sync with store's collected state
   useEffect(() => {
     if (collected) setIsCollected(true);
   }, [collected]);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (!meshRef.current) return;
+    elapsedRef.current += delta;
+
+    const playerPosition = useGameStore.getState().playerPosition;
+    const playerX = playerPosition?.x ?? 0;
+    const playerZ = playerPosition?.z ?? 0;
 
     // Collection animation - relic flies toward player and shrinks
     if (collectAnimation > 0) {
@@ -63,14 +69,14 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
       meshRef.current.rotation.x += delta * 15;
 
       // Move toward player
-      const toPlayer = new THREE.Vector3(
-        playerPosition.x - position[0],
-        playerPosition.y - position[1],
-        playerPosition.z - position[2],
+      _toPlayer.set(
+        playerX - position[0],
+        (playerPosition?.y ?? 0) - position[1],
+        playerZ - position[2],
       );
       const moveAmount = (1 - newAnim) * 0.3;
-      meshRef.current.position.x = moveAmount * toPlayer.x;
-      meshRef.current.position.z = moveAmount * toPlayer.z;
+      meshRef.current.position.x = moveAmount * _toPlayer.x;
+      meshRef.current.position.z = moveAmount * _toPlayer.z;
 
       // Light intensity
       if (lightRef.current) {
@@ -86,7 +92,7 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
       return;
     }
 
-    const t = state.clock.elapsedTime;
+    const t = elapsedRef.current;
 
     // Calculate distance for proximity effects
     const distSq = (posX - playerX) ** 2 + (posZ - playerZ) ** 2;

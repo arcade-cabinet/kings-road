@@ -17,6 +17,9 @@
     { "archetype": "house_large", "label": "Merchant's Hall", "position": [6, 1], "rotation": 0, "overrides": { "stories": 2 } },
     { "archetype": "stable", "label": "Millbrook Stables", "position": [9, -1], "rotation": 0 }
   ],
+  "spawns": [
+    { "id": "road-entrance", "tile": [0, -3], "facing": "north" }
+  ],
   "npcs": [
     { "id": "martha", "archetype": "innkeeper", "fixed": true, "building": "The Bridge & Barrel", "name": "Martha" },
     { "id": "gerold", "archetype": "merchant", "fixed": true, "building": "Gerold's Dry Goods", "name": "Gerold" },

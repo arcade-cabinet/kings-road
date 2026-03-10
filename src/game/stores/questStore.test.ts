@@ -1,5 +1,79 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+// --- Load quest JSON files for test data ---
+import chapter00 from '../../../content/quests/main/chapter-00.json';
+import chapter01 from '../../../content/quests/main/chapter-01.json';
+import chapter02 from '../../../content/quests/main/chapter-02.json';
+import chapter03 from '../../../content/quests/main/chapter-03.json';
+import chapter04 from '../../../content/quests/main/chapter-04.json';
+import chapter05 from '../../../content/quests/main/chapter-05.json';
+import aldricsMissingHammer from '../../../content/quests/side/aldrics-missing-hammer.json';
+import banditAmbush from '../../../content/quests/side/bandit-ambush.json';
+import besssSecretRecipe from '../../../content/quests/side/besss-secret-recipe.json';
+import fatherCedricsLostHymnal from '../../../content/quests/side/father-cedrics-lost-hymnal.json';
+import lordAshwicksSecret from '../../../content/quests/side/lord-ashwicks-secret.json';
+import lostPilgrim from '../../../content/quests/side/lost-pilgrim.json';
+import merchantsBrokenCart from '../../../content/quests/side/merchants-broken-cart.json';
+import sisterMaevesGarden from '../../../content/quests/side/sister-maeves-garden.json';
+import strangeShrine from '../../../content/quests/side/strange-shrine.json';
+import theBridgeTroll from '../../../content/quests/side/the-bridge-troll.json';
+import theCartographersMap from '../../../content/quests/side/the-cartographers-map.json';
+import theCursedRing from '../../../content/quests/side/the-cursed-ring.json';
+import theDeserter from '../../../content/quests/side/the-deserter.json';
+import theHerbalistsJourney from '../../../content/quests/side/the-herbalists-journey.json';
+import theMissingManuscript from '../../../content/quests/side/the-missing-manuscript.json';
+import theMissingMerchant from '../../../content/quests/side/the-missing-merchant.json';
+import thePoisonedWell from '../../../content/quests/side/the-poisoned-well.json';
+import theUnderground from '../../../content/quests/side/the-underground.json';
+import woundedSoldier from '../../../content/quests/side/wounded-soldier.json';
+import { initContentStore } from '../../db/content-queries';
 import { getAllQuests, getQuestDefinition, useQuestStore } from './questStore';
+
+const TEST_QUESTS = [
+  chapter00,
+  chapter01,
+  chapter02,
+  chapter03,
+  chapter04,
+  chapter05,
+  aldricsMissingHammer,
+  banditAmbush,
+  besssSecretRecipe,
+  fatherCedricsLostHymnal,
+  lordAshwicksSecret,
+  lostPilgrim,
+  merchantsBrokenCart,
+  sisterMaevesGarden,
+  strangeShrine,
+  theBridgeTroll,
+  theCartographersMap,
+  theCursedRing,
+  theDeserter,
+  theHerbalistsJourney,
+  theMissingMerchant,
+  theMissingManuscript,
+  thePoisonedWell,
+  theUnderground,
+  woundedSoldier,
+] as Array<{ id: string }>;
+
+beforeAll(() => {
+  initContentStore({
+    monsters: [],
+    items: [],
+    encounterTables: [],
+    lootTables: [],
+    npcsNamed: [],
+    npcPools: [],
+    buildings: [],
+    towns: [],
+    features: [],
+    quests: TEST_QUESTS.map((q) => ({ id: q.id, data: JSON.stringify(q) })),
+    dungeons: [],
+    encounters: [],
+    roadSpine: null,
+    pacingConfig: null,
+  });
+});
 
 describe('questStore', () => {
   afterEach(() => {
@@ -148,15 +222,69 @@ describe('questStore', () => {
   });
 
   describe('resetQuests', () => {
-    it('clears all quest state', () => {
+    it('clears all quest state including questGraph', () => {
       useQuestStore.getState().activateQuest('main-chapter-00');
       useQuestStore.getState().completeQuest('main-chapter-00');
       useQuestStore.getState().activateQuest('side-lost-pilgrim');
+      useQuestStore.getState().resolveNarrative('reset-test-seed');
       useQuestStore.getState().resetQuests();
       const state = useQuestStore.getState();
       expect(state.activeQuests).toHaveLength(0);
       expect(state.completedQuests).toHaveLength(0);
       expect(state.triggeredQuests).toHaveLength(0);
+      expect(state.questGraph).toBeNull();
+    });
+  });
+
+  describe('resolveNarrative', () => {
+    it('resolves a quest graph from the seed', () => {
+      useQuestStore.getState().resolveNarrative('narrative-test-seed');
+      const { questGraph } = useQuestStore.getState();
+      expect(questGraph).not.toBeNull();
+      expect(questGraph!.seed).toBe('narrative-test-seed');
+      expect(questGraph!.quests.length).toBeGreaterThan(0);
+    });
+
+    it('is deterministic with the same seed', () => {
+      useQuestStore.getState().resolveNarrative('determinism-seed');
+      const graph1Branches = useQuestStore
+        .getState()
+        .questGraph!.quests.map((q) => q.branch);
+
+      useQuestStore.getState().resetQuests();
+      useQuestStore.getState().resolveNarrative('determinism-seed');
+      const graph2Branches = useQuestStore
+        .getState()
+        .questGraph!.quests.map((q) => q.branch);
+
+      expect(graph1Branches).toEqual(graph2Branches);
+    });
+  });
+
+  describe('getResolvedQuest', () => {
+    it('looks up a resolved quest by id', () => {
+      useQuestStore.getState().resolveNarrative('lookup-test-seed');
+      const resolved = useQuestStore
+        .getState()
+        .getResolvedQuest('main-chapter-00');
+      expect(resolved).toBeDefined();
+      expect(resolved!.id).toBe('main-chapter-00');
+      expect(resolved!.title).toBe('The Call');
+    });
+
+    it('returns undefined for unknown quest id', () => {
+      useQuestStore.getState().resolveNarrative('lookup-test-seed');
+      const resolved = useQuestStore
+        .getState()
+        .getResolvedQuest('nonexistent-quest');
+      expect(resolved).toBeUndefined();
+    });
+
+    it('returns undefined when no narrative has been resolved', () => {
+      const resolved = useQuestStore
+        .getState()
+        .getResolvedQuest('main-chapter-00');
+      expect(resolved).toBeUndefined();
     });
   });
 

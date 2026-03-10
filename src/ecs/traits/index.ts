@@ -1,3 +1,5 @@
+export type { EquippedItems, ItemStack } from './inventory';
+export { Equipment, Inventory, MAX_INVENTORY_SLOTS } from './inventory';
 export { Dialogue, Interactable, IsNPC, NPCArchetype } from './npc';
 export { IsAnchor, IsFeature, IsOnRoad, RoadPosition } from './pacing';
 export {

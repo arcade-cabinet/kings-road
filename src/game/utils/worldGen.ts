@@ -1,6 +1,10 @@
-import type { RoadSpine } from '../../schemas/world.schema';
+import type {
+  KingdomMap,
+  MapTile,
+  Settlement,
+} from '../../schemas/kingdom.schema';
 import type { ChunkType } from '../types';
-import { cyrb128, mulberry32 } from './random';
+import { getKingdomTile, getSettlementAt } from '../world/kingdom-gen';
 
 export const CHUNK_SIZE = 120;
 export const BLOCK_SIZE = 5;
@@ -8,158 +12,130 @@ export const VIEW_DISTANCE = 1;
 export const PLAYER_HEIGHT = 1.6;
 export const PLAYER_RADIUS = 0.6;
 
-// Name generators
-const TOWN_PRE = [
-  'Oak',
-  'River',
-  'Stone',
-  'Iron',
-  'Winter',
-  'Summer',
-  'High',
-  'Low',
-  'Kings',
-  'Queens',
-  'Ash',
-  'Pine',
-  'Silver',
-  'Golden',
-  'Black',
-  'White',
-];
-const TOWN_SUF = [
-  'haven',
-  'ford',
-  'gate',
-  'helm',
-  'watch',
-  'wood',
-  'bury',
-  'ton',
-  'ville',
-  'bridge',
-  'keep',
-  'hold',
-  'stead',
-  'mere',
-];
+// ── Height constants ──────────────────────────────────────────────────
 
-/** Pastoral countryside types for chunks off the road. */
-const COUNTRYSIDE_TYPES: ChunkType[] = ['WILD', 'WILD', 'WILD', 'WILD'];
+/** Maximum world-space height for terrain (elevation 1.0 maps to this) */
+export const MAX_TERRAIN_HEIGHT = 30;
+
+/** World-space height for ocean/void tiles */
+export const OCEAN_HEIGHT = -2;
+
+// ── Kingdom-map-aware chunk resolution ────────────────────────────────
 
 /**
- * Map anchor types to chunk types.
- * Anchors are on the road (cx===0) and determine the chunk type at their location.
+ * Derive ChunkType from the kingdom map tile at grid coordinates.
+ *
+ * The kingdom grid uses the same coordinate system as chunks (1 tile = 1 chunk).
+ * Tiles outside the map bounds are treated as ocean (returns null).
+ *
+ * When a settlement is found, it's included in the result so callers can
+ * look up the appropriate town config by settlement ID.
  */
-function anchorTypeToChunkType(anchorType: string): ChunkType {
-  switch (anchorType) {
-    case 'VILLAGE_FRIENDLY':
-    case 'VILLAGE_HOSTILE':
-      return 'TOWN';
-    case 'DUNGEON':
-      return 'DUNGEON';
-    case 'WAYPOINT':
-      return 'TOWN';
+export function getChunkTypeFromKingdom(
+  kingdomMap: KingdomMap,
+  cx: number,
+  cz: number,
+): {
+  type: ChunkType;
+  tile: MapTile;
+  name: string;
+  settlement?: Settlement;
+} | null {
+  const tile = getKingdomTile(kingdomMap, cx, cz);
+  if (!tile || !tile.isLand) return null;
+
+  // Check for settlement at this tile
+  const settlement = getSettlementAt(kingdomMap, cx, cz);
+  if (settlement) {
+    return { type: 'TOWN', tile, name: settlement.name, settlement };
+  }
+
+  // Road tiles
+  if (tile.hasRoad) {
+    return { type: 'ROAD', tile, name: "The King's Road" };
+  }
+
+  // Everything else is wilderness
+  return { type: 'WILD', tile, name: biomeToName(tile.biome) };
+}
+
+/** Map biome to a display name for the location banner. */
+function biomeToName(biome: string): string {
+  switch (biome) {
+    case 'meadow':
+      return 'The Meadows';
+    case 'forest':
+      return 'The Forest';
+    case 'deep_forest':
+      return 'The Deepwood';
+    case 'hills':
+      return 'The Hills';
+    case 'farmland':
+      return 'The Farmlands';
+    case 'moor':
+      return 'The Moors';
+    case 'riverside':
+      return 'The Riverside';
+    case 'coast':
+      return 'The Coast';
+    case 'mountain':
+      return 'The Mountains';
+    case 'swamp':
+      return 'The Marshes';
+    case 'highland':
+      return 'The Highlands';
     default:
-      return 'ROAD';
+      return 'The Wilderness';
   }
 }
 
 /**
- * Convert a chunk's z-coordinate to a road distance.
- * The road runs along the +z axis starting from cz=0.
- * Each chunk spans CHUNK_SIZE world units.
+ * Get terrain elevation at a world position, interpolated from the kingdom grid.
+ *
+ * The kingdom grid has one elevation sample per chunk (CHUNK_SIZE spacing).
+ * We bilinearly interpolate between the four nearest grid points for smooth
+ * terrain within a chunk.
+ *
+ * Returns world-space height (0 for ocean, up to MAX_TERRAIN_HEIGHT for mountains).
  */
-export function chunkZToRoadDistance(cz: number): number {
-  return cz * CHUNK_SIZE;
+export function getTerrainHeight(
+  kingdomMap: KingdomMap,
+  worldX: number,
+  worldZ: number,
+): number {
+  // Convert to continuous grid coordinates
+  const gx = worldX / CHUNK_SIZE;
+  const gz = worldZ / CHUNK_SIZE;
+
+  // Integer grid coordinates of the four surrounding tiles
+  const x0 = Math.floor(gx);
+  const z0 = Math.floor(gz);
+  const x1 = x0 + 1;
+  const z1 = z0 + 1;
+
+  // Fractional position within the cell
+  const fx = gx - x0;
+  const fz = gz - z0;
+
+  // Sample elevation at four corners (0 for out-of-bounds / ocean)
+  const e00 = tileElevation(kingdomMap, x0, z0);
+  const e10 = tileElevation(kingdomMap, x1, z0);
+  const e01 = tileElevation(kingdomMap, x0, z1);
+  const e11 = tileElevation(kingdomMap, x1, z1);
+
+  // Bilinear interpolation
+  const e0 = e00 * (1 - fx) + e10 * fx;
+  const e1 = e01 * (1 - fx) + e11 * fx;
+  const elevation = e0 * (1 - fz) + e1 * fz;
+
+  return elevation * MAX_TERRAIN_HEIGHT;
 }
 
-/**
- * Determine the chunk type for a given grid coordinate.
- *
- * When a roadSpine is provided, the function is road-aware:
- * - Chunks ON the road (cx === 0): type from nearest anchor, or ROAD between anchors
- * - Chunks NEAR the road (|cx| === 1): always ROAD (road shoulder / hedgerows)
- * - Chunks OFF the road (|cx| > 1): pastoral countryside (WILD with seeded variety)
- *
- * Without a roadSpine, falls back to the original hash-based logic.
- */
-export function getChunkType(
-  cx: number,
-  cz: number,
-  seedPhrase: string,
-  roadSpine?: RoadSpine,
-): ChunkType {
-  // Legacy behavior when no road spine is provided
-  if (!roadSpine) {
-    if (cx === 0) {
-      if (Math.abs(cz) % 3 === 0) return 'TOWN';
-      return 'ROAD';
-    }
-    const rng = mulberry32(cyrb128(`${seedPhrase}${cx},${cz}`));
-    if (rng() < 0.2) return 'DUNGEON';
-    return 'WILD';
-  }
-
-  // Road-aware logic
-  const distance = chunkZToRoadDistance(cz);
-
-  // ON the road (cx === 0)
-  if (cx === 0) {
-    // Only consider positive distance (the road runs forward)
-    if (distance < 0 || distance > roadSpine.totalDistance) {
-      return 'WILD';
-    }
-
-    // Check if we're near an anchor
-    const anchorThreshold = CHUNK_SIZE; // within one chunk of an anchor
-    for (const anchor of roadSpine.anchors) {
-      if (Math.abs(anchor.distanceFromStart - distance) < anchorThreshold) {
-        return anchorTypeToChunkType(anchor.type);
-      }
-    }
-
-    // Between anchors: it's road
-    return 'ROAD';
-  }
-
-  // NEAR the road (|cx| === 1) — road shoulder
-  if (
-    Math.abs(cx) === 1 &&
-    distance >= 0 &&
-    distance <= roadSpine.totalDistance
-  ) {
-    return 'ROAD';
-  }
-
-  // OFF the road — pastoral countryside
-  const rng = mulberry32(cyrb128(`${seedPhrase}${cx},${cz}`));
-  return COUNTRYSIDE_TYPES[Math.floor(rng() * COUNTRYSIDE_TYPES.length)];
-}
-
-export function getChunkName(
-  cx: number,
-  cz: number,
-  type: ChunkType,
-  seedPhrase: string,
-): string {
-  const rng = mulberry32(cyrb128(`${seedPhrase}${cx},${cz}`));
-
-  if (type === 'WILD') return 'The Wilderness';
-  if (type === 'ROAD') return "The King's Road";
-
-  if (type === 'TOWN') {
-    const pre = TOWN_PRE[Math.floor(rng() * TOWN_PRE.length)];
-    const suf = TOWN_SUF[Math.floor(rng() * TOWN_SUF.length)];
-    return pre + suf;
-  }
-
-  if (type === 'DUNGEON') {
-    const pre = TOWN_PRE[Math.floor(rng() * TOWN_PRE.length)];
-    return `Ruins of ${pre}keep`;
-  }
-
-  return 'Unknown Lands';
+/** Get elevation for a single grid tile. Returns 0 for ocean/out-of-bounds. */
+function tileElevation(map: KingdomMap, gx: number, gy: number): number {
+  const tile = getKingdomTile(map, gx, gy);
+  if (!tile || !tile.isLand) return 0;
+  return tile.elevation;
 }
 
 // NPC dialogue generators - expanded with more variety

@@ -10,16 +10,25 @@ import { Physics } from '@react-three/rapier';
 import { BlendFunction } from 'postprocessing';
 import { Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
+import { DungeonRenderer } from '../components/DungeonRenderer';
+import { OceanPlane } from '../components/OceanPlane';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { useGameStore } from '../stores/gameStore';
 import { AudioSystem } from '../systems/AudioSystem';
 import { ChunkManager } from '../systems/ChunkManager';
+import { DungeonEntrySystem } from '../systems/DungeonEntrySystem';
 import { EncounterSystem } from '../systems/EncounterSystem';
-import { DayNightCycle, Fog, SkyDome } from '../systems/Environment';
+import {
+  AmbientParticles,
+  DayNightCycle,
+  Fog,
+  SkyDome,
+} from '../systems/Environment';
 import { FeatureSpawner } from '../systems/FeatureSpawner';
 import { InteractionSystem } from '../systems/InteractionSystem';
 import { PlayerController } from '../systems/PlayerController';
 import { QuestSystem } from '../systems/QuestSystem';
+import { WeatherSystem } from '../systems/WeatherSystem';
 
 // Initialize scene with warm pastoral sky background
 function SceneInit() {
@@ -56,6 +65,7 @@ function PostProcessing() {
 function SceneContent() {
   const gameActive = useGameStore((state) => state.gameActive);
   const seedPhrase = useGameStore((state) => state.seedPhrase);
+  const inDungeon = useGameStore((state) => state.inDungeon);
 
   // Always render minimal scene structure to avoid R3F unmount issues
   // Just conditionally render the game content inside
@@ -67,20 +77,34 @@ function SceneContent() {
       {/* Game content - only when active AND we have a seed */}
       {gameActive && seedPhrase && (
         <Physics gravity={[0, -25, 0]} timeStep="vary">
-          {/* Environment */}
-          <Fog />
-          <DayNightCycle />
-          <SkyDome />
+          {/* Overworld — hidden when inside a dungeon */}
+          {!inDungeon && (
+            <>
+              {/* Environment */}
+              <Fog />
+              <DayNightCycle />
+              <SkyDome />
+              <AmbientParticles />
+              <WeatherSystem />
 
-          {/* World */}
-          <ChunkManager />
+              {/* World */}
+              <OceanPlane />
+              <ChunkManager />
 
-          {/* Systems */}
+              {/* Overworld-only systems */}
+              <InteractionSystem />
+              <EncounterSystem />
+              <FeatureSpawner />
+              <QuestSystem />
+            </>
+          )}
+
+          {/* Dungeon interior — shown when inside a dungeon */}
+          {inDungeon && <DungeonRenderer />}
+
+          {/* Always-active systems (work in both overworld and dungeon) */}
           <PlayerController />
-          <InteractionSystem />
-          <EncounterSystem />
-          <FeatureSpawner />
-          <QuestSystem />
+          <DungeonEntrySystem />
           <AudioSystem />
 
           {/* Post Processing */}

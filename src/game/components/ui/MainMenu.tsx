@@ -1,8 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { loadContentDb } from '../../../db/load-content-db';
+import {
+  getMostRecentSave,
+  hasAnySave,
+  restoreGameState,
+} from '../../../db/save-service';
 import { cn } from '../../../lib/utils';
-import { generateSeedPhrase, useGameStore } from '../../stores/gameStore';
-import { CHUNK_SIZE, PLAYER_HEIGHT } from '../../utils/worldGen';
+import {
+  type ActiveDungeon,
+  generateSeedPhrase,
+  useGameStore,
+} from '../../stores/gameStore';
+import { useInventoryStore } from '../../stores/inventoryStore';
+import { useQuestStore } from '../../stores/questStore';
+import { useWorldStore } from '../../stores/worldStore';
+import { CHUNK_SIZE, PLAYER_HEIGHT } from '../../utils/worldCoords';
+import { generateDungeonLayout } from '../../world/dungeon-generator';
+import { getDungeonById } from '../../world/dungeon-registry';
 
 // Particle type for floating embers
 interface Particle {
@@ -128,8 +143,82 @@ export function MainMenu() {
   const setSeedPhrase = useGameStore((state) => state.setSeedPhrase);
   const startGame = useGameStore((state) => state.startGame);
 
-  const [isHovering, setIsHovering] = useState<'reseed' | 'enter' | null>(null);
+  const [isHovering, setIsHovering] = useState<
+    'reseed' | 'enter' | 'continue' | null
+  >(null);
   const [fadeOut, setFadeOut] = useState(false);
+  const [hasSaves, setHasSaves] = useState(false);
+  const [loadingContinue, setLoadingContinue] = useState(false);
+
+  // Check for existing saves on mount
+  useEffect(() => {
+    if (!gameActive) {
+      hasAnySave().then(setHasSaves);
+    }
+  }, [gameActive]);
+
+  const handleContinue = async () => {
+    setLoadingContinue(true);
+    const data = await getMostRecentSave();
+    if (!data) {
+      setLoadingContinue(false);
+      return;
+    }
+
+    setFadeOut(true);
+    setTimeout(async () => {
+      // Load content database
+      useWorldStore.setState({
+        isGenerating: true,
+        generationProgress: 0,
+        generationPhase: 'Loading the scrolls of knowledge...',
+      });
+      await loadContentDb();
+
+      // Regenerate kingdom from saved seed
+      await useWorldStore.getState().generateWorld(data.seedPhrase);
+
+      // Resolve quest narrative
+      useQuestStore.getState().resolveNarrative(data.seedPhrase);
+
+      // Restore all saved state via centralized restoreGameState
+      restoreGameState(data, {
+        startGame: (seed, pos, yaw) => {
+          const position = new THREE.Vector3(pos.x, pos.y, pos.z);
+          startGame(seed, position, yaw);
+        },
+        mergeGameState: (partial) => {
+          useGameStore.setState(partial);
+        },
+        restoreInventory: (items, gold, equipment) => {
+          useInventoryStore.getState().sync(items, 20, gold, equipment);
+        },
+        restoreQuests: (activeQuests, completedQuests, triggeredQuests) => {
+          useQuestStore
+            .getState()
+            .restoreQuests(activeQuests, completedQuests, triggeredQuests);
+        },
+        restoreDungeon: (dungeon) => {
+          const layout = getDungeonById(dungeon.id);
+          if (!layout) return;
+          const spatial = generateDungeonLayout(layout);
+          const active: ActiveDungeon = {
+            id: dungeon.id,
+            name: layout.name,
+            spatial,
+            currentRoomIndex: dungeon.currentRoomIndex,
+            overworldPosition: new THREE.Vector3(
+              dungeon.overworldPosition.x,
+              dungeon.overworldPosition.y,
+              dungeon.overworldPosition.z,
+            ),
+            overworldYaw: dungeon.overworldYaw,
+          };
+          useGameStore.getState().enterDungeon(active);
+        },
+      });
+    }, 600);
+  };
 
   const handleReseed = () => {
     const newSeed = generateSeedPhrase();
@@ -147,13 +236,42 @@ export function MainMenu() {
     // Trigger fade out
     setFadeOut(true);
 
-    // Delay game start for animation, then start atomically
-    setTimeout(() => {
-      startGame(
-        currentSeed,
-        new THREE.Vector3(CHUNK_SIZE / 2, PLAYER_HEIGHT, CHUNK_SIZE / 2),
-        Math.PI,
+    // After the menu fade-out animation, generate the kingdom.
+    // generateWorld is async so the loading screen can update between phases.
+    setTimeout(async () => {
+      // Load content database (monsters, items, encounters, loot, etc.)
+      // into the in-memory ContentStore before any game system reads content.
+      useWorldStore.setState({
+        isGenerating: true,
+        generationProgress: 0,
+        generationPhase: 'Loading the scrolls of knowledge...',
+      });
+      await loadContentDb();
+
+      const generateWorld = useWorldStore.getState().generateWorld;
+      const kingdomMap = await generateWorld(currentSeed);
+
+      // Resolve quest narrative spine (A/B branches) from the seed
+      useQuestStore.getState().resolveNarrative(currentSeed);
+
+      // Find Ashford (first anchor settlement) for spawn position
+      const ashford = kingdomMap.settlements.find((s) => s.id === 'ashford');
+      const spawnGridX =
+        ashford?.position[0] ?? Math.floor(kingdomMap.width / 2);
+      const spawnGridY =
+        ashford?.position[1] ?? Math.floor(kingdomMap.height / 2);
+
+      // Convert grid position to world coordinates (center of the chunk)
+      const spawnWorldX = spawnGridX * CHUNK_SIZE + CHUNK_SIZE / 2;
+      const spawnWorldZ = spawnGridY * CHUNK_SIZE + CHUNK_SIZE / 2;
+      const spawnPos = new THREE.Vector3(
+        spawnWorldX,
+        PLAYER_HEIGHT,
+        spawnWorldZ,
       );
+
+      // Face south (toward the camera's default orientation)
+      startGame(currentSeed, spawnPos, Math.PI);
     }, 600);
   };
 
@@ -254,9 +372,9 @@ export function MainMenu() {
           >
             King's Road
           </h1>
-          {/* Subtitle */}
+          {/* Subtitle — the kingdom name, not a directive */}
           <div className="text-yellow-700/70 text-sm md:text-base tracking-[0.3em] font-light uppercase mt-3 text-center">
-            Seek the Holy Grail
+            The Kingdom of Albion
           </div>
           {/* Decorative line */}
           <div className="w-48 h-px bg-gradient-to-r from-transparent via-yellow-600/30 to-transparent mx-auto mt-4" />
@@ -290,8 +408,43 @@ export function MainMenu() {
             {seedPhrase || 'Generating...'}
           </div>
 
+          {/* Continue button — shown only when saves exist */}
+          {hasSaves && (
+            <div className="flex justify-center mt-6 mb-2">
+              <button
+                type="button"
+                onClick={handleContinue}
+                disabled={loadingContinue}
+                onMouseEnter={() => setIsHovering('continue')}
+                onMouseLeave={() => setIsHovering(null)}
+                className={cn(
+                  'relative border border-yellow-600/50 bg-gradient-to-b from-yellow-100/80 to-yellow-50/80',
+                  'text-yellow-900 px-8 md:px-12 py-3',
+                  'font-lora text-sm font-semibold tracking-wider uppercase',
+                  'transition-all duration-300 cursor-pointer overflow-hidden',
+                  loadingContinue && 'opacity-50 cursor-wait',
+                  isHovering === 'continue' &&
+                    !loadingContinue &&
+                    'border-yellow-500/70 text-yellow-950 shadow-lg shadow-yellow-200/40 scale-105',
+                )}
+              >
+                <div
+                  className={cn(
+                    'absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full transition-transform duration-500',
+                    isHovering === 'continue' &&
+                      !loadingContinue &&
+                      'translate-x-full',
+                  )}
+                />
+                <span className="relative">
+                  {loadingContinue ? 'Loading...' : 'Continue'}
+                </span>
+              </button>
+            </div>
+          )}
+
           {/* Buttons */}
-          <div className="flex gap-4 justify-center mt-8">
+          <div className="flex gap-4 justify-center mt-4">
             <button
               type="button"
               onClick={handleReseed}

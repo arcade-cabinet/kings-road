@@ -1,0 +1,282 @@
+{
+  "name": "The Kingdom of Albion",
+  "width": 128,
+  "height": 256,
+  "seaLevel": 0.35,
+  "mountainLevel": 0.75,
+
+  "anchorSettlements": [
+    {
+      "id": "ashford",
+      "name": "Ashford",
+      "type": "village",
+      "mainQuestChapter": "chapter-00",
+      "description": "Your home town, a quiet farming village at the foot of gentle hills. The King's Road begins here, stretching north toward legend.",
+      "features": ["home", "tavern", "blacksmith", "stable"],
+      "preferredRegion": "ashford-meadows",
+      "roadSpineProgress": 0
+    },
+    {
+      "id": "millbrook",
+      "name": "Millbrook",
+      "type": "town",
+      "mainQuestChapter": "chapter-01",
+      "description": "A prosperous market town where the King's Road crosses the River Mill. Traders from across the realm gather here.",
+      "features": ["tavern", "market", "chapel", "mill", "stable"],
+      "preferredRegion": "millbrook-forests",
+      "roadSpineProgress": 0.2
+    },
+    {
+      "id": "thornfield-ruins",
+      "name": "Thornfield Ruins",
+      "type": "ruin",
+      "mainQuestChapter": "chapter-02",
+      "description": "Ancient ruins perched on a hilltop, said to hold clues to the Grail's location. Pilgrims and fortune-seekers camp at the base.",
+      "features": ["dungeon_entrance", "camp"],
+      "preferredRegion": "thornfield-hills",
+      "roadSpineProgress": 0.4
+    },
+    {
+      "id": "ravensgate",
+      "name": "Ravensgate",
+      "type": "city",
+      "mainQuestChapter": "chapter-03",
+      "description": "A walled city under the iron grip of Lord Ashwick. The King's Road passes through its heavily guarded gates.",
+      "features": ["gate", "prison", "tavern", "market", "barracks", "arena"],
+      "preferredRegion": "ravensgate-moors",
+      "roadSpineProgress": 0.57
+    },
+    {
+      "id": "pilgrims-rest",
+      "name": "The Pilgrim's Rest",
+      "type": "monastery",
+      "mainQuestChapter": "chapter-04",
+      "description": "A monastery clinging to a mountain pass, offering shelter to travellers brave enough to cross the highlands.",
+      "features": ["chapel", "garden", "library", "hospice"],
+      "preferredRegion": "highland-pass",
+      "roadSpineProgress": 0.75
+    },
+    {
+      "id": "grailsend",
+      "name": "Grailsend",
+      "type": "ruin",
+      "mainQuestChapter": "chapter-05",
+      "description": "The final temple at the northern edge of the realm, where the Holy Grail awaits one worthy enough to claim it.",
+      "features": ["temple_entrance", "guardian"],
+      "preferredRegion": "grailsend-highlands",
+      "roadSpineProgress": 1
+    }
+  ],
+
+  "regions": [
+    {
+      "id": "ashford-meadows",
+      "name": "Ashford Meadows",
+      "biome": "meadow",
+      "latitudeRange": [0.0, 0.18],
+      "terrainFeatures": ["rolling_hills", "wildflower_fields", "stone_walls", "grazing_pastures", "hay_bales"],
+      "description": "Gentle rolling farmland stretching to the southern coast. Sheep graze on green hills divided by ancient stone walls.",
+      "dangerTier": 0,
+      "weather": { "defaultWeather": "clear", "rainChance": 0.15, "fogChance": 0.05, "windStrength": 0.1 },
+      "settlements": ["ashford"],
+      "featureDensity": "normal"
+    },
+    {
+      "id": "millbrook-forests",
+      "name": "The Millwood",
+      "biome": "forest",
+      "latitudeRange": [0.15, 0.38],
+      "terrainFeatures": ["dense_canopy", "moss_covered_roots", "forest_clearings", "fallen_logs", "mushroom_rings"],
+      "description": "Ancient woodland where the River Mill winds between towering oaks. Woodcutters and charcoal burners work the forest edges.",
+      "dangerTier": 1,
+      "weather": { "defaultWeather": "overcast", "rainChance": 0.3, "fogChance": 0.2, "fogDensity": 0.4, "windStrength": 0.15 },
+      "settlements": ["millbrook"],
+      "featureDensity": "dense"
+    },
+    {
+      "id": "thornfield-hills",
+      "name": "Thornfield Hills",
+      "biome": "hills",
+      "latitudeRange": [0.33, 0.52],
+      "terrainFeatures": ["rocky_outcrops", "windswept_ridges", "heather_slopes", "ancient_cairns", "standing_stones"],
+      "description": "Exposed hilltops scattered with the ruins of a civilization older than memory. The wind never stops here.",
+      "dangerTier": 2,
+      "weather": { "defaultWeather": "overcast", "rainChance": 0.25, "fogChance": 0.15, "windStrength": 0.5 },
+      "settlements": ["thornfield-ruins"],
+      "featureDensity": "sparse"
+    },
+    {
+      "id": "ravensgate-moors",
+      "name": "The Bleakmoors",
+      "biome": "moor",
+      "latitudeRange": [0.48, 0.68],
+      "terrainFeatures": ["boggy_hollows", "standing_stones", "mist_banks", "peat_pools", "gnarled_trees"],
+      "description": "A desolate moorland under perpetual grey skies. Lord Ashwick's patrols are the only law here.",
+      "dangerTier": 3,
+      "weather": { "defaultWeather": "foggy", "rainChance": 0.35, "fogChance": 0.4, "fogDensity": 0.6, "windStrength": 0.3 },
+      "settlements": ["ravensgate"],
+      "featureDensity": "normal"
+    },
+    {
+      "id": "highland-pass",
+      "name": "The Pilgrim's Way",
+      "biome": "highland",
+      "latitudeRange": [0.65, 0.82],
+      "terrainFeatures": ["mountain_streams", "pine_groves", "cliff_faces", "switchback_paths", "alpine_meadows"],
+      "description": "A narrow pass through the central mountains, kept clear by the monks of the Pilgrim's Rest.",
+      "dangerTier": 3,
+      "weather": { "defaultWeather": "clear", "rainChance": 0.2, "fogChance": 0.3, "fogDensity": 0.5, "windStrength": 0.6 },
+      "settlements": ["pilgrims-rest"],
+      "featureDensity": "sparse"
+    },
+    {
+      "id": "grailsend-highlands",
+      "name": "The Grailsend Highlands",
+      "biome": "mountain",
+      "latitudeRange": [0.78, 1.0],
+      "terrainFeatures": ["steep_cliffs", "snow_patches", "sacred_stones", "eagle_nests", "ancient_carvings"],
+      "description": "Forbidding peaks at the northern edge of the realm. Few return from these heights, but the Grail calls the worthy onward.",
+      "dangerTier": 4,
+      "weather": { "defaultWeather": "overcast", "rainChance": 0.3, "fogChance": 0.35, "fogDensity": 0.7, "windStrength": 0.8 },
+      "settlements": ["grailsend"],
+      "featureDensity": "sparse"
+    },
+    {
+      "id": "western-coast",
+      "name": "The Saltmarsh Coast",
+      "biome": "coast",
+      "latitudeRange": [0.1, 0.5],
+      "longitudeRange": [0.0, 0.25],
+      "terrainFeatures": ["tidal_flats", "sea_caves", "driftwood", "salt_marshes", "fishing_huts"],
+      "description": "A windswept coastline of salt marshes and tidal flats. Fishing villages cling to the rocky shore.",
+      "dangerTier": 1,
+      "weather": { "defaultWeather": "overcast", "rainChance": 0.4, "fogChance": 0.3, "fogDensity": 0.5, "windStrength": 0.7 },
+      "featureDensity": "normal"
+    },
+    {
+      "id": "eastern-downs",
+      "name": "The Chalk Downs",
+      "biome": "farmland",
+      "latitudeRange": [0.1, 0.45],
+      "longitudeRange": [0.7, 1.0],
+      "terrainFeatures": ["chalk_cliffs", "barrow_mounds", "wheat_fields", "windmills", "dovecotes"],
+      "description": "Gentle chalk downland on the eastern side of the realm. Rich farmland feeds the kingdom's towns.",
+      "dangerTier": 1,
+      "weather": { "defaultWeather": "clear", "rainChance": 0.2, "fogChance": 0.1, "windStrength": 0.3 },
+      "featureDensity": "dense"
+    },
+    {
+      "id": "deepwood",
+      "name": "The Deepwood",
+      "biome": "deep_forest",
+      "latitudeRange": [0.25, 0.5],
+      "longitudeRange": [0.15, 0.45],
+      "terrainFeatures": ["ancient_trees", "fairy_circles", "hidden_pools", "overgrown_ruins", "beast_tracks"],
+      "description": "The oldest forest in the realm. Even the King's Road skirts its borders. Strange lights flicker between the trees at night.",
+      "dangerTier": 2,
+      "weather": { "defaultWeather": "foggy", "rainChance": 0.25, "fogChance": 0.5, "fogDensity": 0.6, "windStrength": 0.05 },
+      "featureDensity": "dense"
+    },
+    {
+      "id": "fenlands",
+      "name": "The Fenlands",
+      "biome": "swamp",
+      "latitudeRange": [0.5, 0.7],
+      "longitudeRange": [0.65, 0.95],
+      "terrainFeatures": ["reed_beds", "will_o_wisps", "sunken_ruins", "bog_iron", "stilted_huts"],
+      "description": "Treacherous marshland east of the moors. Home to outcasts, hermits, and things best left undisturbed.",
+      "dangerTier": 3,
+      "weather": { "defaultWeather": "foggy", "rainChance": 0.3, "fogChance": 0.6, "fogDensity": 0.8, "windStrength": 0.1 },
+      "featureDensity": "normal"
+    }
+  ],
+
+  "offRoadSettlements": [
+    {
+      "id": "whitecliff",
+      "name": "Whitecliff",
+      "type": "port",
+      "region": "western-coast",
+      "description": "A small fishing port clinging to white chalk cliffs. Smugglers use the sea caves below.",
+      "features": ["tavern", "dock", "fishmonger"],
+      "population": "small",
+      "roadConnection": "secondary"
+    },
+    {
+      "id": "woodhaven",
+      "name": "Woodhaven",
+      "type": "hamlet",
+      "region": "deepwood",
+      "description": "A tiny settlement of charcoal burners and woodcutters at the edge of the Deepwood.",
+      "features": ["campfire", "woodcutter"],
+      "population": "tiny",
+      "roadConnection": "trail"
+    },
+    {
+      "id": "barrowfield",
+      "name": "Barrowfield",
+      "type": "hamlet",
+      "region": "eastern-downs",
+      "description": "A farming hamlet surrounded by ancient barrow mounds. The locals leave offerings at dusk.",
+      "features": ["tavern", "shrine"],
+      "population": "tiny",
+      "roadConnection": "path"
+    },
+    {
+      "id": "fenwatch",
+      "name": "Fenwatch",
+      "type": "outpost",
+      "region": "fenlands",
+      "description": "A lonely watchtower garrisoned by soldiers nobody else wanted. They watch the marshes for movement.",
+      "features": ["watchtower", "barracks"],
+      "population": "tiny",
+      "roadConnection": "path"
+    },
+    {
+      "id": "saltmarsh",
+      "name": "Saltmarsh",
+      "type": "village",
+      "region": "western-coast",
+      "description": "A weatherbeaten village of salt farmers and net menders. They say a sea serpent lives in the bay.",
+      "features": ["tavern", "market", "dock"],
+      "population": "small",
+      "roadConnection": "secondary"
+    },
+    {
+      "id": "cairnholm",
+      "name": "Cairnholm",
+      "type": "hamlet",
+      "region": "thornfield-hills",
+      "description": "A windswept cluster of stone houses around a cairn said to mark a hero's grave.",
+      "features": ["shrine", "herbalist"],
+      "population": "tiny",
+      "roadConnection": "trail"
+    },
+    {
+      "id": "eagles-perch",
+      "name": "Eagle's Perch",
+      "type": "outpost",
+      "region": "grailsend-highlands",
+      "description": "The last outpost before the Grailsend peaks. Rangers here guide the foolhardy onward.",
+      "features": ["campfire", "ranger_post"],
+      "population": "tiny",
+      "roadConnection": "trail"
+    },
+    {
+      "id": "millbrook-crossing",
+      "name": "The Crossing",
+      "type": "hamlet",
+      "region": "millbrook-forests",
+      "description": "A river crossing on a lesser road through the Millwood. A ferryman charges a coin per head.",
+      "features": ["ferry", "campfire"],
+      "population": "tiny",
+      "roadConnection": "path"
+    }
+  ],
+
+  "terrainModifiers": {
+    "elongation": 1.8,
+    "coastlineNoise": 0.5,
+    "ridgeStrength": 0.6
+  }
+}

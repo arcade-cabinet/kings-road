@@ -1,13 +1,30 @@
-import { CuboidCollider, RigidBody } from '@react-three/rapier';
+import {
+  CuboidCollider,
+  HeightfieldCollider,
+  RigidBody,
+} from '@react-three/rapier';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { useWorldStore } from '../stores/worldStore';
 import type { ChunkData } from '../types';
 import { cyrb128, mulberry32 } from '../utils/random';
-import { getMaterials } from '../utils/textures';
-import { BLOCK_SIZE, CHUNK_SIZE } from '../utils/worldGen';
+import { getBiomeGroundMaterial, getMaterials } from '../utils/textures';
+import type { HeightSampler } from '../utils/vegetation';
+import { placeVegetation } from '../utils/vegetation';
+import {
+  BLOCK_SIZE,
+  CHUNK_SIZE,
+  getTerrainHeight,
+  MAX_TERRAIN_HEIGHT,
+} from '../utils/worldGen';
 import { Building } from './Building';
+import { Feature } from './Feature';
 import { NPC } from './NPC';
 import { Relic } from './Relic';
+import { RoadSurface } from './RoadSurface';
+
+/** Number of subdivisions per chunk edge for terrain mesh */
+const TERRAIN_SEGMENTS = 16;
 
 interface ChunkProps {
   chunkData: ChunkData;
@@ -42,6 +59,12 @@ interface MeshData {
   barrel: MeshInstance[];
   pineTrunk: MeshInstance[];
   pineLeaves: MeshInstance[];
+  oakTrunk: MeshInstance[];
+  oakLeaves: MeshInstance[];
+  bush: MeshInstance[];
+  grassTuft: MeshInstance[];
+  deadTree: MeshInstance[];
+  heather: MeshInstance[];
   boulder: MeshInstance[];
   gems: GemData[];
 }
@@ -189,6 +212,9 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   const oX = cx * CHUNK_SIZE;
   const oZ = cz * CHUNK_SIZE;
 
+  // Kingdom map from world store for heightmap sampling (needed early for vegetation)
+  const kingdomMap = useWorldStore((state) => state.kingdomMap);
+
   // Generate all mesh data for this chunk
   const meshData = useMemo(() => {
     const data: MeshData = {
@@ -202,6 +228,12 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
       barrel: [],
       pineTrunk: [],
       pineLeaves: [],
+      oakTrunk: [],
+      oakLeaves: [],
+      bush: [],
+      grassTuft: [],
+      deadTree: [],
+      heather: [],
       boulder: [],
       gems: [],
     };
@@ -210,15 +242,17 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     const localRng = mulberry32(cyrb128(seedPhrase + key));
 
     if (type === 'TOWN' || type === 'ROAD') {
-      // Central highway stones
-      for (let z = 0; z < CHUNK_SIZE; z += 4) {
-        for (let w = -3; w <= 3; w++) {
-          data.dungeonWall.push({
-            x: oX + CHUNK_SIZE / 2 + w * 4 + localRng() * 2,
-            y: 0.05,
-            z: oZ + z,
-            sy: 0.02,
-          });
+      // Legacy central highway stones — skip when RoadSurface handles rendering
+      if (!chunkData.kingdomTile?.hasRoad) {
+        for (let z = 0; z < CHUNK_SIZE; z += 4) {
+          for (let w = -3; w <= 3; w++) {
+            data.dungeonWall.push({
+              x: oX + CHUNK_SIZE / 2 + w * 4 + localRng() * 2,
+              y: 0.05,
+              z: oZ + z,
+              sy: 0.02,
+            });
+          }
         }
       }
 
@@ -327,59 +361,143 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         sz: mSize,
       });
     } else {
-      // WILD - Forest
-      for (let i = 0; i < 60; i++) {
-        const px = oX + localRng() * CHUNK_SIZE;
-        const pz = oZ + localRng() * CHUNK_SIZE;
-        const s = 0.8 + localRng() * 0.6;
-
-        data.pineTrunk.push({
-          x: px,
-          y: BLOCK_SIZE,
-          z: pz,
-          sx: s,
-          sy: s,
-          sz: s,
-        });
-        data.pineLeaves.push({
-          x: px,
-          y: BLOCK_SIZE * 2.5,
-          z: pz,
-          sx: s,
-          sy: s,
-          sz: s,
-          rotY: localRng() * Math.PI,
-        });
-      }
-
-      // Boulders
-      for (let i = 0; i < 30; i++) {
-        const px = oX + localRng() * CHUNK_SIZE;
-        const pz = oZ + localRng() * CHUNK_SIZE;
-        const s = 0.5 + localRng();
-
-        data.boulder.push({
-          x: px,
-          y: BLOCK_SIZE * 0.3 * s,
-          z: pz,
-          sx: s,
-          sy: s,
-          sz: s,
-          rotY: localRng() * Math.PI,
-        });
-      }
+      // WILD — biome-aware vegetation placement
+      // Pass terrain height sampler so vegetation sits on the heightmap
+      const heightSampler: HeightSampler | undefined = kingdomMap
+        ? (wx: number, wz: number) => getTerrainHeight(kingdomMap, wx, wz)
+        : undefined;
+      const veg = placeVegetation(
+        chunkData.biome,
+        oX,
+        oZ,
+        localRng,
+        heightSampler,
+      );
+      data.pineTrunk.push(...veg.pineTrunk);
+      data.pineLeaves.push(...veg.pineLeaves);
+      data.oakTrunk.push(...veg.oakTrunk);
+      data.oakLeaves.push(...veg.oakLeaves);
+      data.bush.push(...veg.bush);
+      data.grassTuft.push(...veg.grassTuft);
+      data.deadTree.push(...veg.deadTree);
+      data.heather.push(...veg.heather);
+      data.boulder.push(...veg.boulder);
     }
 
     return data;
-  }, [cx, key, type, oX, oZ, seedPhrase, hasConfigTown]);
+  }, [
+    cx,
+    key,
+    type,
+    oX,
+    oZ,
+    seedPhrase,
+    hasConfigTown,
+    chunkData.kingdomTile?.hasRoad,
+    chunkData.biome,
+    kingdomMap,
+  ]);
 
-  // Ground material based on type
-  const groundMaterial =
-    type === 'WILD'
-      ? materials.groundWild
-      : type === 'ROAD'
-        ? materials.groundRoad
-        : materials.groundTown;
+  // Ground material: biome-aware when kingdom tile is present
+  const groundMaterial = useMemo(() => {
+    if (chunkData.biome) {
+      // Kingdom-map-aware: use biome for ground material
+      if (type === 'TOWN') return materials.groundTown;
+      if (type === 'ROAD') return materials.groundRoad;
+      return getBiomeGroundMaterial(chunkData.biome);
+    }
+    // Legacy fallback
+    if (type === 'WILD') return materials.groundWild;
+    if (type === 'ROAD') return materials.groundRoad;
+    return materials.groundTown;
+  }, [chunkData.biome, type, materials]);
+
+  // Terrain material with vertex colors enabled (multiplied with base material color)
+  const terrainMaterial = useMemo(() => {
+    if (!groundMaterial) return null;
+    const mat = groundMaterial.clone();
+    mat.vertexColors = true;
+    return mat;
+  }, [groundMaterial]);
+
+  // Is this an ocean tile? Skip terrain rendering for non-land tiles.
+  const isOcean =
+    chunkData.kingdomTile != null && !chunkData.kingdomTile.isLand;
+
+  // Ground elevation from kingdom tile (world-space height) — legacy flat fallback
+  const groundY = chunkData.kingdomTile
+    ? chunkData.kingdomTile.elevation * MAX_TERRAIN_HEIGHT
+    : 0;
+
+  // Generate heightmap terrain geometry when kingdom map is available
+  const terrainData = useMemo(() => {
+    if (!kingdomMap || !chunkData.kingdomTile || isOcean) return null;
+
+    const segs = TERRAIN_SEGMENTS;
+    const verts = segs + 1;
+
+    // Create subdivided plane in XZ space, centered at origin.
+    // After rotateX(-PI/2), vertices lie in XZ from -CHUNK_SIZE/2 to +CHUNK_SIZE/2.
+    // The mesh is positioned at chunk center so local coords map to world coords.
+    const geo = new THREE.PlaneGeometry(CHUNK_SIZE, CHUNK_SIZE, segs, segs);
+    geo.rotateX(-Math.PI / 2);
+
+    const posAttr = geo.attributes.position;
+    const centerX = oX + CHUNK_SIZE / 2;
+    const centerZ = oZ + CHUNK_SIZE / 2;
+
+    // Heights array for Rapier HeightfieldCollider (row-major: Z rows, X cols)
+    const heights: number[] = new Array(verts * verts);
+
+    // Vertex color buffer for elevation-based tinting
+    const colors = new Float32Array(posAttr.count * 3);
+
+    // Displace each vertex Y using interpolated kingdom map elevation
+    for (let i = 0; i < posAttr.count; i++) {
+      const localX = posAttr.getX(i);
+      const localZ = posAttr.getZ(i);
+      const worldX = centerX + localX;
+      const worldZ = centerZ + localZ;
+      const h = getTerrainHeight(kingdomMap, worldX, worldZ);
+      posAttr.setY(i, h);
+
+      // Elevation-based vertex color: green lowlands -> brown hills -> grey peaks
+      const t = Math.min(Math.max(h / MAX_TERRAIN_HEIGHT, 0), 1);
+      if (t < 0.3) {
+        // Lush green lowlands
+        colors[i * 3] = 0.48 + t * 0.3;
+        colors[i * 3 + 1] = 0.72 - t * 0.2;
+        colors[i * 3 + 2] = 0.28 + t * 0.1;
+      } else if (t < 0.6) {
+        // Olive/brown hills
+        const mt = (t - 0.3) / 0.3;
+        colors[i * 3] = 0.57 + mt * 0.1;
+        colors[i * 3 + 1] = 0.66 - mt * 0.2;
+        colors[i * 3 + 2] = 0.31 + mt * 0.05;
+      } else {
+        // Grey rock peaks
+        const mt = (t - 0.6) / 0.4;
+        colors[i * 3] = 0.67 - mt * 0.1;
+        colors[i * 3 + 1] = 0.46 + mt * 0.14;
+        colors[i * 3 + 2] = 0.36 + mt * 0.2;
+      }
+    }
+
+    // Build heightfield heights in row-major order for Rapier collider
+    for (let iz = 0; iz < verts; iz++) {
+      for (let ix = 0; ix < verts; ix++) {
+        const worldX = oX + (ix / segs) * CHUNK_SIZE;
+        const worldZ = oZ + (iz / segs) * CHUNK_SIZE;
+        heights[iz * verts + ix] = getTerrainHeight(kingdomMap, worldX, worldZ);
+      }
+    }
+
+    posAttr.needsUpdate = true;
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.computeVertexNormals();
+
+    return { geometry: geo, heights };
+  }, [kingdomMap, chunkData.kingdomTile, isOcean, oX, oZ]);
 
   // Safety check - if materials aren't ready, don't render
   if (!groundMaterial || !materials.townWall) {
@@ -387,17 +505,42 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     return null;
   }
 
+  // Ocean chunks: render nothing (water rendering is a separate task)
+  if (isOcean) {
+    return null;
+  }
+
   return (
     <group>
-      {/* Ground plane */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[oX + CHUNK_SIZE / 2, 0, oZ + CHUNK_SIZE / 2]}
-        receiveShadow
-      >
-        <planeGeometry args={[CHUNK_SIZE, CHUNK_SIZE]} />
-        <primitive object={groundMaterial} attach="material" />
-      </mesh>
+      {/* Terrain mesh — heightmap when kingdom map present, flat plane otherwise */}
+      {terrainData && terrainMaterial ? (
+        <mesh
+          geometry={terrainData.geometry}
+          position={[oX + CHUNK_SIZE / 2, 0, oZ + CHUNK_SIZE / 2]}
+          receiveShadow
+        >
+          <primitive object={terrainMaterial} attach="material" />
+        </mesh>
+      ) : (
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[oX + CHUNK_SIZE / 2, groundY, oZ + CHUNK_SIZE / 2]}
+          receiveShadow
+        >
+          <planeGeometry args={[CHUNK_SIZE, CHUNK_SIZE]} />
+          <primitive object={groundMaterial} attach="material" />
+        </mesh>
+      )}
+
+      {/* Road surface overlay — terrain-conforming road mesh */}
+      {kingdomMap && chunkData.kingdomTile?.hasRoad && (
+        <RoadSurface
+          oX={oX}
+          oZ={oZ}
+          kingdomTile={chunkData.kingdomTile}
+          kingdomMap={kingdomMap}
+        />
+      )}
 
       {/* Town walls */}
       <InstancedMeshes
@@ -471,6 +614,48 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         material={materials.pineLeaves}
       />
 
+      {/* Oak trunks */}
+      <InstancedMeshes
+        items={meshData.oakTrunk}
+        geometry="oakTrunk"
+        material={materials.oakTrunk}
+      />
+
+      {/* Oak leaves */}
+      <InstancedMeshes
+        items={meshData.oakLeaves}
+        geometry="oakLeaves"
+        material={materials.oakLeaves}
+      />
+
+      {/* Bushes */}
+      <InstancedMeshes
+        items={meshData.bush}
+        geometry="bush"
+        material={materials.bush}
+      />
+
+      {/* Grass tufts */}
+      <InstancedMeshes
+        items={meshData.grassTuft}
+        geometry="grassTuft"
+        material={materials.grassTuft}
+      />
+
+      {/* Dead trees */}
+      <InstancedMeshes
+        items={meshData.deadTree}
+        geometry="deadTree"
+        material={materials.deadTree}
+      />
+
+      {/* Heather */}
+      <InstancedMeshes
+        items={meshData.heather}
+        geometry="heather"
+        material={materials.heather}
+      />
+
       {/* Boulders */}
       <InstancedMeshes
         items={meshData.boulder}
@@ -503,6 +688,11 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
             npc ? <NPC key={npc.id} interactable={npc} /> : null,
           )}
 
+      {/* Kingdom map placed features */}
+      {chunkData.placedFeatures?.map((feature) => (
+        <Feature key={feature.id} feature={feature} />
+      ))}
+
       {/* Collectible Artifacts */}
       {meshData.gems?.map((gem) =>
         gem ? (
@@ -516,13 +706,25 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         ) : null,
       )}
 
-      {/* Rapier static colliders — ground plane + all obstacles */}
+      {/* Rapier static colliders — ground + all obstacles */}
       <RigidBody type="fixed" colliders={false}>
-        {/* Ground plane collider */}
-        <CuboidCollider
-          args={[CHUNK_SIZE / 2, 0.1, CHUNK_SIZE / 2]}
-          position={[oX + CHUNK_SIZE / 2, -0.1, oZ + CHUNK_SIZE / 2]}
-        />
+        {/* Ground collider: heightfield when terrain data present, flat cuboid otherwise */}
+        {terrainData ? (
+          <HeightfieldCollider
+            args={[
+              TERRAIN_SEGMENTS,
+              TERRAIN_SEGMENTS,
+              terrainData.heights,
+              { x: CHUNK_SIZE, y: 1, z: CHUNK_SIZE },
+            ]}
+            position={[oX + CHUNK_SIZE / 2, 0, oZ + CHUNK_SIZE / 2]}
+          />
+        ) : (
+          <CuboidCollider
+            args={[CHUNK_SIZE / 2, 0.1, CHUNK_SIZE / 2]}
+            position={[oX + CHUNK_SIZE / 2, groundY - 0.1, oZ + CHUNK_SIZE / 2]}
+          />
+        )}
         {/* Obstacle colliders matching the AABB data */}
         {chunkData.collidables.map((aabb) => {
           const w = (aabb.maxX - aabb.minX) / 2;
@@ -614,6 +816,34 @@ function getGeometry(type: string): THREE.BufferGeometry {
       break;
     case 'pineLeaves':
       geo = new THREE.ConeGeometry(BLOCK_SIZE * 1.2, BLOCK_SIZE * 3, 6);
+      break;
+    case 'oakTrunk':
+      geo = new THREE.CylinderGeometry(
+        BLOCK_SIZE * 0.15,
+        BLOCK_SIZE * 0.25,
+        BLOCK_SIZE * 1.6,
+        6,
+      );
+      break;
+    case 'oakLeaves':
+      geo = new THREE.IcosahedronGeometry(BLOCK_SIZE * 1.4, 1);
+      break;
+    case 'bush':
+      geo = new THREE.IcosahedronGeometry(BLOCK_SIZE * 0.5, 1);
+      break;
+    case 'grassTuft':
+      geo = new THREE.ConeGeometry(BLOCK_SIZE * 0.2, BLOCK_SIZE * 0.6, 4);
+      break;
+    case 'deadTree':
+      geo = new THREE.CylinderGeometry(
+        BLOCK_SIZE * 0.05,
+        BLOCK_SIZE * 0.15,
+        BLOCK_SIZE * 2.4,
+        5,
+      );
+      break;
+    case 'heather':
+      geo = new THREE.DodecahedronGeometry(BLOCK_SIZE * 0.35, 0);
       break;
     case 'boulder':
       geo = new THREE.DodecahedronGeometry(BLOCK_SIZE * 0.6, 1);

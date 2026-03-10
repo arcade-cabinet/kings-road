@@ -3,6 +3,13 @@ import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
+// Dev-only playtesting console: window.__DEV__
+if (import.meta.env.DEV) {
+  import('./game/utils/devConsole').then(({ initDevConsole }) =>
+    initDevConsole(),
+  );
+}
+
 /**
  * Global error handlers — catch anything that escapes React error boundaries.
  * Renders a standalone error overlay into a dedicated DOM node so errors

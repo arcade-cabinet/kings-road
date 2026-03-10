@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
+import { initTestContent } from './init-test-content';
+
+// Initialize the content store once for all tests (mirrors runtime game.db loading)
+initTestContent();
 
 // Cleanup after each test
 afterEach(() => {

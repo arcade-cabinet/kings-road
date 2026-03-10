@@ -354,6 +354,30 @@ export function getMaterials() {
       color: 0x3a6a2a,
       roughness: 1.0,
     }),
+    oakTrunk: new THREE.MeshStandardMaterial({
+      color: 0x6b4a2a,
+      roughness: 0.95,
+    }),
+    oakLeaves: new THREE.MeshStandardMaterial({
+      color: 0x5a8a3a,
+      roughness: 1.0,
+    }),
+    bush: new THREE.MeshStandardMaterial({
+      color: 0x4a7a30,
+      roughness: 1.0,
+    }),
+    grassTuft: new THREE.MeshStandardMaterial({
+      color: 0x6a9a48,
+      roughness: 1.0,
+    }),
+    deadTree: new THREE.MeshStandardMaterial({
+      color: 0x6a5a48,
+      roughness: 1.0,
+    }),
+    heather: new THREE.MeshStandardMaterial({
+      color: 0x8a5a8a,
+      roughness: 1.0,
+    }),
     boulder: new THREE.MeshStandardMaterial({
       map: createProceduralTexture('stone_block'),
       color: 0xa89078,
@@ -398,4 +422,74 @@ export function updateWindowEmissive(intensity: number) {
   if (materialsCache?.windowGlow) {
     materialsCache.windowGlow.emissiveIntensity = intensity;
   }
+}
+
+// ── Biome ground materials ────────────────────────────────────────────
+
+const biomeGroundCache: Record<string, THREE.MeshStandardMaterial> = {};
+
+/**
+ * Map a kingdom biome to a ground material color/style.
+ * Creates materials lazily and caches them.
+ */
+export function getBiomeGroundMaterial(
+  biome: string,
+): THREE.MeshStandardMaterial {
+  if (biomeGroundCache[biome]) return biomeGroundCache[biome];
+
+  const mats = getMaterials();
+  let mat: THREE.MeshStandardMaterial;
+
+  switch (biome) {
+    case 'meadow':
+      mat = new THREE.MeshStandardMaterial({ color: 0x7ab648, roughness: 1.0 });
+      break;
+    case 'farmland':
+      mat = new THREE.MeshStandardMaterial({ color: 0x9a8a50, roughness: 1.0 });
+      break;
+    case 'forest':
+      mat = new THREE.MeshStandardMaterial({ color: 0x4a7a38, roughness: 1.0 });
+      break;
+    case 'deep_forest':
+      mat = new THREE.MeshStandardMaterial({ color: 0x2a5a22, roughness: 1.0 });
+      break;
+    case 'hills':
+      mat = new THREE.MeshStandardMaterial({
+        color: 0x8a9a60,
+        roughness: 0.95,
+      });
+      break;
+    case 'highland':
+      mat = new THREE.MeshStandardMaterial({ color: 0x7a8858, roughness: 0.9 });
+      break;
+    case 'mountain':
+      mat = new THREE.MeshStandardMaterial({
+        color: 0x8a8a8a,
+        roughness: 0.85,
+      });
+      break;
+    case 'moor':
+      mat = new THREE.MeshStandardMaterial({ color: 0x6a6a48, roughness: 1.0 });
+      break;
+    case 'swamp':
+      mat = new THREE.MeshStandardMaterial({ color: 0x4a5a30, roughness: 1.0 });
+      break;
+    case 'riverside':
+      mat = new THREE.MeshStandardMaterial({ color: 0x5a9a48, roughness: 1.0 });
+      break;
+    case 'coast':
+      mat = new THREE.MeshStandardMaterial({
+        color: 0xc8b888,
+        roughness: 0.95,
+      });
+      break;
+    case 'ocean':
+      mat = mats.water;
+      break;
+    default:
+      mat = mats.groundWild;
+  }
+
+  biomeGroundCache[biome] = mat;
+  return mat;
 }

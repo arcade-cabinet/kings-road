@@ -2,6 +2,7 @@ node_modules/
 dist/
 coverage/
 playwright-report/
+playwright-ct-report/
 test-results/
 .vite/
 *.tsbuildinfo
@@ -9,6 +10,11 @@ vite.config.d.ts
 .DS_Store
 .ralph-tui/
 content/validation-report.json
+content/game-config.json
+
+# Compiled content (built from content/ by compile-content-db.ts)
+config/
+public/game.db
 
 # Expo / React Native
 .expo/

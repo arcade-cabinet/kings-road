@@ -111,15 +111,37 @@ Centered layout on warm cream background. Title "King's Road" in Lora serif, sub
 
 - **Top Left**: Health and stamina bars in warm tones (sage green health, amber stamina)
 - **Top Center**: Location banner with fade animation
-- **Top Right**: Time display (12-hour format)
+- **Top Right**: Time display (12-hour format), weather label ("Fair"/"Overcast"/"Fog"/"Rain"/"Storm"), day/night indicator
 - **Center**: Crosshair and interaction prompt ("[E] TALK Name")
-- **Bottom**: Control hints (desktop only)
+- **Bottom**: First-time controls tooltip (desktop only, fades after 30s, once per session)
 
-All HUD elements use semi-transparent warm cream backgrounds with soft shadows. Text in warm charcoal.
+All HUD elements use semi-transparent warm cream backgrounds with soft shadows. Text in warm charcoal. Full keybindings are available in the Pause Menu > Settings > Controls tab.
 
 ### Dialogue Box
 
-Parchment-styled panel with decorative corner elements. NPC name in honey gold with underline. Dialogue text in italicized Crimson Text. Single "Farewell" dismiss button in warm amber.
+Illuminated manuscript scroll design:
+- **Parchment background** (`#f5f0e8`) with subtle radial gradient texture, golden accent bands top/bottom
+- **Scroll corner ornaments** in Aged Wood (`#8b6f47`) with decorative dots
+- **NPC portrait** — archetype-based SVG silhouette on tinted background (72x72px), inner decorative frame
+- **NPC name** in Lora serif, Honey Gold (`#c4a747`), bold tracking-wide
+- **Archetype label** below name in small caps Aged Wood
+- **Manuscript divider** — gradient rule with central diamond ornament
+- **Dialogue text** in Crimson Text italic, Warm Charcoal (`#3d3a34`), decorative curly quotes
+- **Choice buttons** styled as medieval tabs — left bar accent, letter prefix (A., B., C.), gradient background
+- **Animation** — 3-phase (entering/open/closing) with scale+translate+opacity transitions
+- **Typewriter effect** at 25ms per character with pulsing cursor
+- **Keyboard support** — ESC to close, Space/Enter to skip typewriter
+- Covers all 21 NPC archetypes from the schema
+
+### Settings Panel
+
+Tabbed panel accessible from Pause Menu > Settings. Three tabs:
+- **Audio**: Master volume, Music, SFX, Ambient — warm-toned slider controls with percentage display
+- **Display**: Render quality (Low/Med/High), Shadows toggle, View distance (Near/Normal/Far), Fullscreen toggle
+- **Controls**: Keybindings table (same manuscript style as previous standalone Controls page)
+- "Reset Defaults" button (danger variant) and "Back" button at bottom
+- All settings persisted to localStorage (`kings-road:settings`)
+- Styled with same parchment background and golden accents as Pause Menu
 
 ### Mobile Controls
 

@@ -51,15 +51,17 @@ function GeometryMesh({
 
 export function Monster({ archetype, position }: MonsterProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const elapsedRef = useRef(0);
 
   const renderData = useMemo(
     () => buildMonsterRenderData(archetype),
     [archetype],
   );
 
-  useFrame((state) => {
+  useFrame((_state, delta) => {
     if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
+    elapsedRef.current += delta;
+    const t = elapsedRef.current;
     groupRef.current.rotation.y = Math.sin(t * 0.6) * 0.08;
     groupRef.current.position.y = Math.sin(t * 1.2) * 0.03;
   });

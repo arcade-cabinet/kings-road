@@ -3,6 +3,8 @@
  */
 import type * as THREE from 'three';
 import type { BuildingArchetype } from '../schemas/building.schema';
+import type { FeatureDefinition } from '../schemas/feature.schema';
+import type { KingdomBiome, MapTile } from '../schemas/kingdom.schema';
 import type { MonsterArchetype } from '../schemas/monster.schema';
 import type { NPCBlueprint } from '../schemas/npc-blueprint.schema';
 
@@ -46,6 +48,18 @@ export interface PlacedNPCData {
   blueprint: NPCBlueprint;
 }
 
+/** A feature placed in the world from the kingdom map feature placement */
+export interface PlacedFeatureData {
+  /** Feature definition from content JSON */
+  definition: FeatureDefinition;
+  /** World-space position [x, y, z] */
+  worldPosition: [number, number, number];
+  /** Y rotation in radians */
+  rotation: number;
+  /** Feature instance id */
+  id: string;
+}
+
 /** Data for a single world chunk */
 export interface ChunkData {
   cx: number;
@@ -60,6 +74,12 @@ export interface ChunkData {
   placedBuildings?: PlacedBuildingData[];
   /** NPCs with blueprint data for config-driven rendering */
   npcBlueprints?: PlacedNPCData[];
+  /** Kingdom map tile for this chunk (present when kingdom map is active) */
+  kingdomTile?: MapTile;
+  /** Biome for this chunk (from kingdom map or fallback) */
+  biome?: KingdomBiome;
+  /** Features placed by the kingdom map feature placement system */
+  placedFeatures?: PlacedFeatureData[];
 }
 
 /** Player input state */

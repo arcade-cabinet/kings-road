@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { useGameStore } from '../../stores/gameStore';
+import { useWorldStore } from '../../stores/worldStore';
 
-const LOADING_STAGES = [
+/** Fallback stage messages shown while chunks are loading (after generation) */
+const CHUNK_LOADING_STAGES = [
   'Awakening the physics engine...',
-  'Charting the realm...',
   'Summoning inhabitants...',
   'Opening the gates...',
 ];
@@ -14,38 +15,57 @@ const MIN_DISPLAY_MS = 2000;
 
 export function LoadingOverlay() {
   const gameActive = useGameStore((state) => state.gameActive);
+  const seedPhrase = useGameStore((state) => state.seedPhrase);
   const activeChunks = useGameStore((state) => state.activeChunks);
+
+  const isGenerating = useWorldStore((state) => state.isGenerating);
+  const generationProgress = useWorldStore((state) => state.generationProgress);
+  const generationPhase = useWorldStore((state) => state.generationPhase);
+
   const [visible, setVisible] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
-  const [stageIndex, setStageIndex] = useState(0);
+  const [chunkStageIndex, setChunkStageIndex] = useState(0);
   const [startTime, setStartTime] = useState(0);
 
-  // Show overlay when game becomes active
+  // Track whether we already showed for this game session — prevents the
+  // show->fade->reset loop where (gameActive && !visible && !fadeOut) re-fires.
+  const hasShownRef = useRef(false);
+
+  // Show overlay when generation begins (before gameActive)
   useEffect(() => {
-    if (gameActive && !visible && !fadeOut) {
+    if (isGenerating && !hasShownRef.current) {
+      hasShownRef.current = true;
       setVisible(true);
       setFadeOut(false);
-      setStageIndex(0);
+      setChunkStageIndex(0);
       setStartTime(Date.now());
     }
-  }, [gameActive, visible, fadeOut]);
+  }, [isGenerating]);
 
-  // Advance stages over time
+  // Reset tracking when game is deactivated (back to menu)
   useEffect(() => {
-    if (!visible || fadeOut) return;
+    if (!gameActive && !isGenerating) {
+      hasShownRef.current = false;
+    }
+  }, [gameActive, isGenerating]);
+
+  // Advance chunk-loading stages over time (after generation completes)
+  useEffect(() => {
+    if (!visible || fadeOut || isGenerating) return;
 
     const interval = setInterval(() => {
-      setStageIndex((prev) =>
-        prev < LOADING_STAGES.length - 1 ? prev + 1 : prev,
+      setChunkStageIndex((prev) =>
+        prev < CHUNK_LOADING_STAGES.length - 1 ? prev + 1 : prev,
       );
-    }, 500);
+    }, 600);
 
     return () => clearInterval(interval);
-  }, [visible, fadeOut]);
+  }, [visible, fadeOut, isGenerating]);
 
   // Fade out once chunks are loaded and minimum time has passed
   useEffect(() => {
     if (!visible || fadeOut) return;
+    if (isGenerating) return;
     if (activeChunks.size === 0) return;
 
     const elapsed = Date.now() - startTime;
@@ -61,14 +81,21 @@ export function LoadingOverlay() {
     }, remaining);
 
     return () => clearTimeout(timeout);
-  }, [visible, fadeOut, activeChunks.size, startTime]);
+  }, [visible, fadeOut, isGenerating, activeChunks.size, startTime]);
 
   if (!visible) return null;
 
-  const progress = Math.min(
-    100,
-    ((stageIndex + 1) / LOADING_STAGES.length) * 100,
-  );
+  // During generation: use worldStore progress. After: interpolate chunk loading.
+  const genPercent = generationProgress * 80; // generation is 0-80%
+  const chunkPercent = isGenerating
+    ? 0
+    : ((chunkStageIndex + 1) / CHUNK_LOADING_STAGES.length) * 20; // chunks are 80-100%
+  const progress = Math.min(100, genPercent + chunkPercent);
+
+  // Phase text: during generation show real phase, after show chunk stages
+  const phaseText = isGenerating
+    ? generationPhase || 'Preparing...'
+    : CHUNK_LOADING_STAGES[chunkStageIndex];
 
   return (
     <div
@@ -81,7 +108,7 @@ export function LoadingOverlay() {
           'radial-gradient(ellipse at center, #f5f1e8 0%, #ede8dc 50%, #e8d7c3 100%)',
       }}
     >
-      {/* Decorative rune circle — slow spin */}
+      {/* Decorative rune circle -- slow spin */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-[0.04] pointer-events-none">
         <svg
           viewBox="0 0 200 200"
@@ -106,6 +133,18 @@ export function LoadingOverlay() {
             strokeWidth="0.4"
             strokeDasharray="6 3"
           />
+          {[0, 60, 120, 180, 240, 300].map((angle) => (
+            <line
+              key={`rune-${angle}`}
+              x1="100"
+              y1="5"
+              x2="100"
+              y2="20"
+              stroke="#c4a747"
+              strokeWidth="0.5"
+              transform={`rotate(${angle} 100 100)`}
+            />
+          ))}
         </svg>
       </div>
 
@@ -113,7 +152,7 @@ export function LoadingOverlay() {
       <div className="relative z-10 flex flex-col items-center">
         {/* Title */}
         <h2
-          className="font-lora text-3xl font-bold tracking-[0.05em] mb-8"
+          className="font-lora text-3xl font-bold tracking-[0.05em] mb-2"
           style={{
             color: '#8b6f47',
             textShadow: '0 0 20px rgba(196, 167, 71, 0.15)',
@@ -122,18 +161,33 @@ export function LoadingOverlay() {
           Preparing the Realm
         </h2>
 
+        {/* Seed name */}
+        {seedPhrase && (
+          <div className="flex items-center gap-3 mb-8">
+            <span className="w-6 h-px bg-gradient-to-r from-transparent to-yellow-600/30" />
+            <span
+              className="font-lora text-lg font-semibold tracking-wider"
+              style={{ color: '#a68b5b' }}
+            >
+              {seedPhrase}
+            </span>
+            <span className="w-6 h-px bg-gradient-to-l from-transparent to-yellow-600/30" />
+          </div>
+        )}
+
         {/* Progress bar container */}
         <div className="w-64 md:w-80">
-          <div className="h-1 bg-yellow-900/10 overflow-hidden">
+          {/* Progress track */}
+          <div className="h-1.5 bg-yellow-900/10 overflow-hidden rounded-full">
             <div
-              className="h-full bg-gradient-to-r from-yellow-600/60 to-yellow-500/80 transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-yellow-700/50 via-yellow-500/80 to-yellow-400/90 transition-all duration-500 ease-out rounded-full"
               style={{ width: `${progress}%` }}
             />
           </div>
 
-          {/* Stage text */}
-          <p className="text-yellow-800/60 text-xs tracking-wider mt-4 text-center font-light italic">
-            {LOADING_STAGES[stageIndex]}
+          {/* Phase text */}
+          <p className="text-yellow-800/60 text-xs tracking-wider mt-4 text-center font-light italic min-h-[1.25rem]">
+            {phaseText}
           </p>
         </div>
       </div>

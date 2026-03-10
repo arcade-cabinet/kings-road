@@ -1,3 +1,6 @@
+// Tests for legacy input hooks (useInput.ts). These hooks have been superseded
+// by InputManager providers but the tests are retained to guard the store interface.
+
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useGameStore } from '../stores/gameStore';

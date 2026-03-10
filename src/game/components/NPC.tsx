@@ -10,6 +10,9 @@ import { blueprintToChibiConfig } from '../factories/npc-factory';
 import { useGameStore } from '../stores/gameStore';
 import type { Interactable } from '../types';
 
+// Reusable vector — avoids per-NPC per-frame allocation
+const _toPlayer = new THREE.Vector3();
+
 // Use @fontsource woff2 for drei <Text> (troika-three-text needs a URL)
 const FONT_URL = new URL(
   '@fontsource/lora/files/lora-latin-700-normal.woff2',
@@ -70,7 +73,6 @@ export function NPC({ interactable, blueprint }: NPCProps) {
   const currentInteractable = useGameStore(
     (state) => state.currentInteractable,
   );
-  const playerPosition = useGameStore((state) => state.playerPosition);
 
   const [highlightIntensity, setHighlightIntensity] = useState(0);
 
@@ -110,12 +112,15 @@ export function NPC({ interactable, blueprint }: NPCProps) {
 
   // Blueprint accessories (if blueprint-driven)
   const accessories = blueprint?.accessories ?? [];
+  const elapsedRef = useRef(0);
 
   // Animation
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
+    const playerPosition = useGameStore.getState().playerPosition;
     if (!groupRef.current || !npcPosition || !playerPosition) return;
+    elapsedRef.current += delta;
 
-    const t = state.clock.elapsedTime;
+    const t = elapsedRef.current;
     const idleOffset = npcId.charCodeAt(0) * 0.1;
 
     // Smooth highlight transition
@@ -125,14 +130,14 @@ export function NPC({ interactable, blueprint }: NPCProps) {
     );
 
     // Face player when close
-    const toPlayer = new THREE.Vector3(
+    _toPlayer.set(
       playerPosition.x - npcPosition.x,
       0,
       playerPosition.z - npcPosition.z,
     );
-    const distToPlayer = toPlayer.length();
+    const distToPlayer = _toPlayer.length();
     if (distToPlayer < 8 && distToPlayer > 2) {
-      const targetAngle = Math.atan2(toPlayer.x, toPlayer.z);
+      const targetAngle = Math.atan2(_toPlayer.x, _toPlayer.z);
       const currentAngle = groupRef.current.rotation.y;
       const angleDiff =
         ((targetAngle - currentAngle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;

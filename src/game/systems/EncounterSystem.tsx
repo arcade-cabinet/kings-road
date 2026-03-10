@@ -1,65 +1,29 @@
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
-import type { EncounterTable } from '../../schemas/encounter-table.schema';
-import type { MonsterArchetype } from '../../schemas/monster.schema';
+import { useCallback, useEffect, useRef } from 'react';
+import {
+  getEncounterTable,
+  getMonster,
+  isContentStoreReady,
+} from '../../db/content-queries';
 import { Monster } from '../components/Monster';
+import { inputManager } from '../input/InputManager';
+import { useCombatStore } from '../stores/combatStore';
 import { useGameStore } from '../stores/gameStore';
+import { useQuestStore } from '../stores/questStore';
+import { useWorldStore } from '../stores/worldStore';
 import type { ActiveEncounter, SpawnedMonster } from '../types';
+import { createRng } from '../utils/random';
 import { CHUNK_SIZE } from '../utils/worldGen';
 import { getDangerTier, getEncounterChance } from '../world/danger';
-
-// --- Static content imports (bundled by Vite) ---
-
-import tier0Json from '../../../content/encounters/tier-0.json';
-import tier1Json from '../../../content/encounters/tier-1.json';
-import tier2Json from '../../../content/encounters/tier-2.json';
-import tier3Json from '../../../content/encounters/tier-3.json';
-import tier4Json from '../../../content/encounters/tier-4.json';
-import ancientHorrorJson from '../../../content/monsters/ancient_horror.json';
-import banditJson from '../../../content/monsters/bandit.json';
-import banditLeaderJson from '../../../content/monsters/bandit_leader.json';
-import basiliskJson from '../../../content/monsters/basilisk.json';
-import direWolfJson from '../../../content/monsters/dire_wolf.json';
-import dragonJson from '../../../content/monsters/dragon.json';
-import drakeJson from '../../../content/monsters/drake.json';
-import giantRatJson from '../../../content/monsters/giant_rat.json';
-import giantSpiderJson from '../../../content/monsters/giant_spider.json';
-import lichLordJson from '../../../content/monsters/lich_lord.json';
-import necromancerJson from '../../../content/monsters/necromancer.json';
-import skeletonJson from '../../../content/monsters/skeleton.json';
-import slimeJson from '../../../content/monsters/slime.json';
-import trollJson from '../../../content/monsters/troll.json';
-import wolfJson from '../../../content/monsters/wolf.json';
-import wraith from '../../../content/monsters/wraith.json';
-
-// --- Registries ---
-
-const MONSTER_ARCHETYPES: Record<string, MonsterArchetype> = {
-  wolf: wolfJson as unknown as MonsterArchetype,
-  bandit: banditJson as unknown as MonsterArchetype,
-  giant_rat: giantRatJson as unknown as MonsterArchetype,
-  skeleton: skeletonJson as unknown as MonsterArchetype,
-  slime: slimeJson as unknown as MonsterArchetype,
-  dire_wolf: direWolfJson as unknown as MonsterArchetype,
-  bandit_leader: banditLeaderJson as unknown as MonsterArchetype,
-  giant_spider: giantSpiderJson as unknown as MonsterArchetype,
-  wraith: wraith as unknown as MonsterArchetype,
-  troll: trollJson as unknown as MonsterArchetype,
-  drake: drakeJson as unknown as MonsterArchetype,
-  necromancer: necromancerJson as unknown as MonsterArchetype,
-  basilisk: basiliskJson as unknown as MonsterArchetype,
-  dragon: dragonJson as unknown as MonsterArchetype,
-  lich_lord: lichLordJson as unknown as MonsterArchetype,
-  ancient_horror: ancientHorrorJson as unknown as MonsterArchetype,
-};
-
-const ENCOUNTER_TABLES: Record<number, EncounterTable> = {
-  0: tier0Json as unknown as EncounterTable,
-  1: tier1Json as unknown as EncounterTable,
-  2: tier2Json as unknown as EncounterTable,
-  3: tier3Json as unknown as EncounterTable,
-  4: tier4Json as unknown as EncounterTable,
-};
+import {
+  clearCombat,
+  getCombatMonsters,
+  initCombat,
+  isCombatOver,
+  monstersTurn,
+  playerAttackNearest,
+  resolveCombat,
+} from './combat-resolver';
 
 // --- Constants ---
 
@@ -69,38 +33,52 @@ const ENCOUNTER_COOLDOWN = 15;
 /** Seconds of walking before first encounter can trigger (grace period) */
 const INITIAL_GRACE_PERIOD = 5;
 
+/** Seconds between player auto-attacks when holding attack */
+const PLAYER_ATTACK_INTERVAL = 0.8;
+
+/** Seconds between monster attack waves */
+const MONSTER_ATTACK_INTERVAL = 1.5;
+
+/** Seconds to display the loot summary before auto-dismissing */
+const SUMMARY_DISPLAY_TIME = 3;
+
 // --- Encounter rolling logic ---
 
+/**
+ * Roll an encounter from the tier table using seeded RNG.
+ * Monsters and encounter tables come from the content DB
+ * (populated at startup by load-content-db.ts).
+ */
 function rollEncounterTable(
   tier: number,
   playerX: number,
   playerZ: number,
+  rng: () => number,
 ): ActiveEncounter | null {
-  const table = ENCOUNTER_TABLES[tier];
+  const table = getEncounterTable(tier);
   if (!table || table.entries.length === 0) return null;
 
   // Weighted random selection
   const totalWeight = table.entries.reduce((sum, e) => sum + e.weight, 0);
-  let roll = Math.random() * totalWeight;
+  let roll = rng() * totalWeight;
 
   for (const entry of table.entries) {
     roll -= entry.weight;
     if (roll <= 0) {
-      const archetype = MONSTER_ARCHETYPES[entry.monsterId];
+      const archetype = getMonster(entry.monsterId);
       if (!archetype) return null;
 
       // Determine count from range
       const [minCount, maxCount] = entry.count;
-      const count =
-        minCount + Math.floor(Math.random() * (maxCount - minCount + 1));
+      const count = minCount + Math.floor(rng() * (maxCount - minCount + 1));
 
       // Spawn monsters in a semicircle in front of the player
       const monsters: SpawnedMonster[] = [];
       for (let i = 0; i < count; i++) {
         const angle = ((i - (count - 1) / 2) * Math.PI) / 4;
-        const dist = 6 + Math.random() * 3;
+        const dist = 6 + rng() * 3;
         monsters.push({
-          id: `enc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${i}`,
+          id: `enc-${Math.floor(rng() * 0xffffffff).toString(36)}-${i}`,
           archetype,
           position: [
             playerX + Math.sin(angle) * dist,
@@ -121,54 +99,207 @@ function rollEncounterTable(
 
 export function EncounterSystem() {
   const gameActive = useGameStore((s) => s.gameActive);
+  const seedPhrase = useGameStore((s) => s.seedPhrase);
   const inCombat = useGameStore((s) => s.inCombat);
   const inDialogue = useGameStore((s) => s.inDialogue);
+  const paused = useGameStore((s) => s.paused);
   const activeEncounter = useGameStore((s) => s.activeEncounter);
-  const playerPosition = useGameStore((s) => s.playerPosition);
   const currentChunkType = useGameStore((s) => s.currentChunkType);
   const startCombat = useGameStore((s) => s.startCombat);
   const endCombat = useGameStore((s) => s.endCombat);
+  const setHealth = useGameStore((s) => s.setHealth);
+  const isDead = useGameStore((s) => s.isDead);
+  const die = useGameStore((s) => s.die);
+  const kingdomMap = useWorldStore((s) => s.kingdomMap);
+
+  const combatPhase = useCombatStore((s) => s.phase);
+  const startCombatUI = useCombatStore((s) => s.startCombatUI);
+  const addDamagePopup = useCombatStore((s) => s.addDamagePopup);
+  const clearExpiredPopups = useCombatStore((s) => s.clearExpiredPopups);
+  const setRecentDamageTaken = useCombatStore((s) => s.setRecentDamageTaken);
+  const showSummary = useCombatStore((s) => s.showSummary);
+  const dismissSummary = useCombatStore((s) => s.dismissSummary);
+  const setAttackCooldown = useCombatStore((s) => s.setAttackCooldown);
+  const playerAttackDamage = useCombatStore((s) => s.playerAttackDamage);
 
   const cooldownRef = useRef(INITIAL_GRACE_PERIOD);
-  const combatTimerRef = useRef(0);
+  const playerAttackTimerRef = useRef(0);
+  const monsterAttackTimerRef = useRef(0);
+  const summaryTimerRef = useRef(0);
+  const rollCountRef = useRef(0);
+  const combatRngRef = useRef<(() => number) | null>(null);
+  const combatInitializedRef = useRef(false);
+
+  // Initialize combat-resolver when a new encounter starts
+  useEffect(() => {
+    if (inCombat && activeEncounter && !combatInitializedRef.current) {
+      initCombat(
+        activeEncounter.monsters.map((m) => ({
+          id: m.id,
+          archetype: m.archetype,
+        })),
+      );
+      combatInitializedRef.current = true;
+      playerAttackTimerRef.current = 0;
+      monsterAttackTimerRef.current = 0;
+      summaryTimerRef.current = 0;
+      combatRngRef.current = createRng(
+        `${seedPhrase}-combat-${rollCountRef.current}`,
+      );
+      startCombatUI();
+    }
+    if (!inCombat) {
+      combatInitializedRef.current = false;
+    }
+  }, [inCombat, activeEncounter, seedPhrase, startCombatUI]);
+
+  // Handle attack — player attacks nearest alive monster
+  const doPlayerAttack = useCallback(() => {
+    if (!combatRngRef.current) return;
+
+    const result = playerAttackNearest(
+      playerAttackDamage,
+      combatRngRef.current,
+    );
+    if (!result) return;
+
+    // Show damage popup (randomize position slightly for visual variety)
+    const popupX = 0.45 + Math.random() * 0.1;
+    const popupY = 0.3 + Math.random() * 0.1;
+    const color = result.isCritical ? '#ffd700' : '#ffffff';
+    const text = result.isCritical
+      ? `${result.damage} CRIT!`
+      : `${result.damage}`;
+    addDamagePopup(text, color, popupX, popupY, result.isCritical);
+
+    if (result.isDead) {
+      addDamagePopup('Defeated!', '#66bb6a', popupX, popupY - 0.05, false);
+    }
+  }, [playerAttackDamage, addDamagePopup]);
 
   useFrame((_, delta) => {
-    if (!gameActive || inDialogue) return;
+    if (!gameActive || inDialogue || paused || !kingdomMap || isDead) return;
+    if (!isContentStoreReady()) return;
 
     const dt = Math.min(delta, 0.1);
 
-    // If in combat, tick a basic auto-resolve timer
-    if (inCombat && activeEncounter) {
-      combatTimerRef.current += dt;
-      // Auto-resolve combat after 3 seconds (placeholder until full combat system)
-      if (combatTimerRef.current >= 3) {
-        combatTimerRef.current = 0;
-        cooldownRef.current = 0;
-        endCombat();
+    // Clean up expired damage popups
+    clearExpiredPopups(performance.now());
+
+    // ── Active combat loop ──────────────────────────────────────────
+    if (inCombat && activeEncounter && combatInitializedRef.current) {
+      const rng = combatRngRef.current;
+      if (!rng) return;
+
+      // Show loot summary phase — auto-dismiss after timer
+      if (combatPhase === 'summary') {
+        summaryTimerRef.current += dt;
+        if (summaryTimerRef.current >= SUMMARY_DISPLAY_TIME) {
+          dismissSummary();
+          clearCombat();
+          cooldownRef.current = 0;
+          endCombat();
+        }
+        return;
       }
+
+      // Check if combat is over (all monsters dead)
+      if (isCombatOver()) {
+        const result = resolveCombat(rng);
+        showSummary({
+          xpGained: result.totalXp,
+          loot: result.allLoot,
+          monstersKilled: result.monstersKilled.length,
+        });
+        summaryTimerRef.current = 0;
+        // Record victory for quest system immediately (no frame-delay)
+        useQuestStore
+          .getState()
+          .recordCombatVictory(null, result.monstersKilled.length);
+        return;
+      }
+
+      // Player attacks on cooldown when action key is held
+      const input = inputManager.poll(0);
+      if (input.attack || input.interact) {
+        playerAttackTimerRef.current += dt;
+        if (playerAttackTimerRef.current >= PLAYER_ATTACK_INTERVAL) {
+          playerAttackTimerRef.current = 0;
+          doPlayerAttack();
+        }
+        setAttackCooldown(
+          Math.max(0, PLAYER_ATTACK_INTERVAL - playerAttackTimerRef.current),
+        );
+      } else {
+        // Reset so first press triggers immediately
+        playerAttackTimerRef.current = PLAYER_ATTACK_INTERVAL;
+        setAttackCooldown(0);
+      }
+
+      // Monsters attack on their own timer
+      monsterAttackTimerRef.current += dt;
+      if (monsterAttackTimerRef.current >= MONSTER_ATTACK_INTERVAL) {
+        monsterAttackTimerRef.current = 0;
+        const aliveMonsters = getCombatMonsters().filter(
+          (m) => m.currentHp > 0,
+        );
+        if (aliveMonsters.length > 0) {
+          const { totalDamage, attacks } = monstersTurn(rng);
+          if (totalDamage > 0) {
+            const currentHealth = useGameStore.getState().health;
+            setHealth(currentHealth - totalDamage);
+            setRecentDamageTaken(totalDamage);
+
+            // Show monster damage popups
+            for (const atk of attacks) {
+              const popupX = 0.45 + Math.random() * 0.1;
+              const popupY = 0.55 + Math.random() * 0.1;
+              addDamagePopup(
+                `-${atk.damage}`,
+                '#ff4444',
+                popupX,
+                popupY,
+                false,
+              );
+            }
+
+            // Check for player death
+            if (currentHealth - totalDamage <= 0) {
+              clearCombat();
+              die();
+              return;
+            }
+          }
+        }
+      }
+
       return;
     }
 
-    // Tick cooldown
+    // ── Encounter rolling (out of combat) ───────────────────────────
     if (cooldownRef.current < ENCOUNTER_COOLDOWN) {
       cooldownRef.current += dt;
       return;
     }
 
-    // Determine danger tier from player chunk position
+    const playerPosition = useGameStore.getState().playerPosition;
     const cx = Math.floor(playerPosition.x / CHUNK_SIZE);
     const cz = Math.floor(playerPosition.z / CHUNK_SIZE);
-    const tier = getDangerTier(cx, cz, currentChunkType);
+    const tier = getDangerTier(cx, cz, currentChunkType, kingdomMap);
 
-    // Roll for encounter
     const chance = getEncounterChance(tier);
     if (chance <= 0) return;
 
-    if (Math.random() < chance) {
+    const rollSeed = `${seedPhrase}-enc-${cx}-${cz}-${rollCountRef.current}`;
+    const rng = createRng(rollSeed);
+    rollCountRef.current += 1;
+
+    if (rng() < chance) {
       const encounter = rollEncounterTable(
         tier,
         playerPosition.x,
         playerPosition.z,
+        rng,
       );
       if (encounter) {
         startCombat(encounter);

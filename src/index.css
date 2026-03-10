@@ -7,6 +7,8 @@
 @import '@fontsource/lora/700.css';
 @import '@fontsource/crimson-text/400.css';
 @import '@fontsource/crimson-text/400-italic.css';
+@import '@fontsource/crimson-text/600.css';
+@import '@fontsource/crimson-text/600-italic.css';
 
 /* Base styles - warm pastoral medieval theme */
 @layer base {

@@ -1,3 +1,5 @@
+/** @deprecated Replaced by TouchOverlay. This file is no longer imported in Game.tsx. */
+
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { useGameStore } from '../../stores/gameStore';
