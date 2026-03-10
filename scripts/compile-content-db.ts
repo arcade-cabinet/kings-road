@@ -640,12 +640,13 @@ async function main() {
   const JSON_PATH = path.join(CONFIG, 'game-content.json');
   fs.writeFileSync(JSON_PATH, JSON.stringify(jsonBundle));
 
-  // Copy to public/ for static serving
+  // Copy to public/ for static serving (Expo copies public/ into dist/)
   const publicDir = path.join(ROOT, 'public');
-  if (fs.existsSync(publicDir)) {
-    fs.copyFileSync(DB_PATH, path.join(publicDir, 'game.db'));
-    fs.copyFileSync(JSON_PATH, path.join(publicDir, 'game-content.json'));
+  if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir, { recursive: true });
   }
+  fs.copyFileSync(DB_PATH, path.join(publicDir, 'game.db'));
+  fs.copyFileSync(JSON_PATH, path.join(publicDir, 'game-content.json'));
 
   const dbStats = fs.statSync(DB_PATH);
   const jsonStats = fs.statSync(JSON_PATH);
