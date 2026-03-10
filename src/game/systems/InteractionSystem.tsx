@@ -63,6 +63,7 @@ export function InteractionSystem() {
       openDialogue(
         foundInteractable.name ?? 'Unknown',
         foundInteractable.dialogueText ?? '...',
+        foundInteractable.type,
       );
     }
   });

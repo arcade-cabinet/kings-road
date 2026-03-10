@@ -1,3 +1,4 @@
+import { useProgress } from '@react-three/drei';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { useGameStore } from '../../stores/gameStore';
@@ -22,25 +23,30 @@ export function LoadingOverlay() {
   const generationProgress = useWorldStore((state) => state.generationProgress);
   const generationPhase = useWorldStore((state) => state.generationPhase);
 
+  // Real-time asset loading progress from Three.js
+  const { progress: assetProgress, active: assetsLoading } = useProgress();
+
   const [visible, setVisible] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [chunkStageIndex, setChunkStageIndex] = useState(0);
   const [startTime, setStartTime] = useState(0);
 
-  // Track whether we already showed for this game session — prevents the
-  // show->fade->reset loop where (gameActive && !visible && !fadeOut) re-fires.
+  // Track whether we already showed for this game session
   const hasShownRef = useRef(false);
 
-  // Show overlay when generation begins (before gameActive)
+  // Show overlay when generation begins or when a significant asset load is triggered
   useEffect(() => {
-    if (isGenerating && !hasShownRef.current) {
-      hasShownRef.current = true;
+    const isMajorAssetLoad = assetsLoading && assetProgress < 100;
+    
+    // Only show if we aren't already visible/fading, and it's either the initial generation 
+    // or a significant mid-game asset load (e.g. entering a new zone)
+    if ((isGenerating || isMajorAssetLoad) && !visible && gameActive) {
       setVisible(true);
       setFadeOut(false);
       setChunkStageIndex(0);
       setStartTime(Date.now());
     }
-  }, [isGenerating]);
+  }, [isGenerating, assetsLoading, assetProgress, visible, gameActive]);
 
   // Reset tracking when game is deactivated (back to menu)
   useEffect(() => {
@@ -62,10 +68,10 @@ export function LoadingOverlay() {
     return () => clearInterval(interval);
   }, [visible, fadeOut, isGenerating]);
 
-  // Fade out once chunks are loaded and minimum time has passed
+  // Fade out once chunks are loaded, assets are hot, and minimum time has passed
   useEffect(() => {
     if (!visible || fadeOut) return;
-    if (isGenerating) return;
+    if (isGenerating || (assetsLoading && assetProgress < 100)) return;
     if (activeChunks.size === 0) return;
 
     const elapsed = Date.now() - startTime;
@@ -81,21 +87,33 @@ export function LoadingOverlay() {
     }, remaining);
 
     return () => clearTimeout(timeout);
-  }, [visible, fadeOut, isGenerating, activeChunks.size, startTime]);
+  }, [visible, fadeOut, isGenerating, assetsLoading, assetProgress, activeChunks.size, startTime]);
 
   if (!visible) return null;
 
-  // During generation: use worldStore progress. After: interpolate chunk loading.
-  const genPercent = generationProgress * 80; // generation is 0-80%
-  const chunkPercent = isGenerating
-    ? 0
-    : ((chunkStageIndex + 1) / CHUNK_LOADING_STAGES.length) * 20; // chunks are 80-100%
-  const progress = Math.min(100, genPercent + chunkPercent);
+  // Weighted progress calculation:
+  // 1. World Generation (0-60%)
+  // 2. Asset Downloading (60-90%)
+  // 3. Finalizing/Physics (90-100%)
+  let displayProgress = 0;
+  if (isGenerating) {
+    displayProgress = generationProgress * 60;
+  } else if (assetsLoading) {
+    displayProgress = 60 + (assetProgress / 100) * 30;
+  } else {
+    displayProgress = 90 + ((chunkStageIndex + 1) / CHUNK_LOADING_STAGES.length) * 10;
+  }
+  const progress = Math.min(100, displayProgress);
 
-  // Phase text: during generation show real phase, after show chunk stages
-  const phaseText = isGenerating
-    ? generationPhase || 'Preparing...'
-    : CHUNK_LOADING_STAGES[chunkStageIndex];
+  // Phase text logic
+  let phaseText = '';
+  if (isGenerating) {
+    phaseText = generationPhase || 'Weaving the landscape...';
+  } else if (assetsLoading && assetProgress < 100) {
+    phaseText = 'Unrolling the ancient scrolls...';
+  } else {
+    phaseText = CHUNK_LOADING_STAGES[chunkStageIndex];
+  }
 
   return (
     <div
