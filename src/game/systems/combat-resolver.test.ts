@@ -295,6 +295,11 @@ describe('combat-resolver', () => {
       playerAttack('slime-1', 100, fixedRng(0.5));
       expect(isCombatOver()).toBe(false);
     });
+
+    it('returns true when monster array is empty (cleared)', () => {
+      clearCombat();
+      expect(isCombatOver()).toBe(true);
+    });
   });
 
   describe('rollLoot', () => {

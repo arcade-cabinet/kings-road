@@ -62,7 +62,7 @@ export function getCombatMonsters(): readonly CombatMonster[] {
 /** Check if all monsters are dead */
 export function isCombatOver(): boolean {
   return (
-    activeCombatMonsters.length > 0 &&
+    activeCombatMonsters.length === 0 ||
     activeCombatMonsters.every((m) => m.currentHp <= 0)
   );
 }
