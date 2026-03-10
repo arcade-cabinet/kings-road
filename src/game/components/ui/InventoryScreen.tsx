@@ -1,6 +1,6 @@
+import { OrbitControls, Stage, useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Stage, useProgress, useGLTF } from '@react-three/drei';
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useState } from 'react';
 import type { ItemStack } from '../../../ecs/traits/inventory';
 import type { ItemDefinition } from '../../../schemas/item.schema';
 import { useGameStore } from '../../stores/gameStore';
@@ -97,7 +97,11 @@ function ItemModelPreview({ itemId }: { itemId: string }) {
   } else if (itemId.includes('trap')) {
     modelPath = ITEM_MODELS.traps;
     nodeName = 'Bear_Trap';
-  } else if (itemId.includes('map') || itemId.includes('book') || itemId.includes('key')) {
+  } else if (
+    itemId.includes('map') ||
+    itemId.includes('book') ||
+    itemId.includes('key')
+  ) {
     modelPath = ITEM_MODELS.treasure;
     nodeName = 'Grail_1';
   } else if (itemId.includes('gem') || itemId.includes('diamond')) {
@@ -106,13 +110,15 @@ function ItemModelPreview({ itemId }: { itemId: string }) {
   }
 
   const { nodes } = useGLTF(modelPath) as any;
-  const mesh = nodes[nodeName] || Object.values(nodes)[0];
+  const mesh =
+    nodes[nodeName] ||
+    Object.values(nodes).find((n: any) => n?.isMesh || n?.geometry);
 
   if (!mesh) return null;
 
   return (
-    <mesh geometry={mesh.geometry} material={mesh.material} castShadow receiveShadow>
-       <meshStandardMaterial {...(mesh.material as any)} roughness={0.4} metalness={0.8} />
+    <mesh geometry={mesh.geometry} castShadow receiveShadow>
+      <meshStandardMaterial color="#c4a747" roughness={0.4} metalness={0.8} />
     </mesh>
   );
 }
@@ -121,7 +127,9 @@ function ItemPreviewPane({ itemId }: { itemId: string | null }) {
   if (!itemId) {
     return (
       <div className="w-full h-full flex items-center justify-center border border-dashed border-amber-900/20 opacity-30">
-        <span className="font-lora text-[10px] uppercase tracking-widest">No Item Selected</span>
+        <span className="font-lora text-[10px] uppercase tracking-widest">
+          No Item Selected
+        </span>
       </div>
     );
   }
@@ -134,10 +142,17 @@ function ItemPreviewPane({ itemId }: { itemId: string | null }) {
             <ItemModelPreview itemId={itemId} />
           </Stage>
         </Suspense>
-        <OrbitControls autoRotate autoRotateSpeed={4} enableZoom={false} enablePan={false} />
+        <OrbitControls
+          autoRotate
+          autoRotateSpeed={4}
+          enableZoom={false}
+          enablePan={false}
+        />
       </Canvas>
       <div className="absolute bottom-2 right-2 opacity-20 pointer-events-none">
-         <span className="font-lora text-[8px] uppercase tracking-tighter">3DPSX PREVIEW</span>
+        <span className="font-lora text-[8px] uppercase tracking-tighter">
+          3DPSX PREVIEW
+        </span>
       </div>
     </div>
   );
@@ -265,10 +280,10 @@ function ItemTooltip({
 
 // ── Inventory slot ───────────────────────────────────────────────────────
 
-function InventorySlot({ 
-  item, 
-  onHover 
-}: { 
+function InventorySlot({
+  item,
+  onHover,
+}: {
   item: ItemStack | null;
   onHover: (id: string | null) => void;
 }) {
@@ -340,7 +355,13 @@ function InventorySlot({
 
 // ── Equipment slot ───────────────────────────────────────────────────────
 
-function EquipmentSlot({ slot, onHover }: { slot: string; onHover: (id: string | null) => void }) {
+function EquipmentSlot({
+  slot,
+  onHover,
+}: {
+  slot: string;
+  onHover: (id: string | null) => void;
+}) {
   const equipped = useInventoryStore((s) => s.equipped);
   const itemId = equipped[slot as keyof typeof equipped];
   const [hovered, setHovered] = useState(false);
@@ -482,7 +503,7 @@ export function InventoryScreen() {
 
           {/* 3D Preview Box */}
           <div className="w-full aspect-square mb-4">
-             <ItemPreviewPane itemId={hoveredItemId} />
+            <ItemPreviewPane itemId={hoveredItemId} />
           </div>
 
           <div
@@ -494,7 +515,11 @@ export function InventoryScreen() {
 
           <div className="flex flex-col gap-0.5 max-h-[300px] overflow-y-auto">
             {EQUIP_SLOTS.map((slot) => (
-              <EquipmentSlot key={slot} slot={slot} onHover={setHoveredItemId} />
+              <EquipmentSlot
+                key={slot}
+                slot={slot}
+                onHover={setHoveredItemId}
+              />
             ))}
           </div>
         </div>
@@ -560,11 +585,15 @@ export function InventoryScreen() {
           >
             Capacity: {items.length} / {maxSlots}
           </div>
-          
+
           {/* Hints */}
           <div className="mt-auto pt-4 flex gap-4 opacity-50">
-             <span className="font-lora text-[9px] uppercase tracking-widest">[I] Close</span>
-             <span className="font-lora text-[9px] uppercase tracking-widest">[DRAG] Equip</span>
+            <span className="font-lora text-[9px] uppercase tracking-widest">
+              [I] Close
+            </span>
+            <span className="font-lora text-[9px] uppercase tracking-widest">
+              [DRAG] Equip
+            </span>
           </div>
         </div>
 

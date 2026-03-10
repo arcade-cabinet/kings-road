@@ -247,7 +247,18 @@ export function CombatHUD() {
   const inCombat = useGameStore((s) => s.inCombat);
   const phase = useCombatStore((s) => s.phase);
   const popups = useCombatStore((s) => s.damagePopups);
+  const lastDamageTime = useCombatStore((s) => s.lastDamageTime);
   const shake = useScreenShake();
+
+  const [damageFlash, setDamageFlash] = useState(0);
+
+  useEffect(() => {
+    if (lastDamageTime > 0) {
+      setDamageFlash(1);
+      const timeout = setTimeout(() => setDamageFlash(0), 150);
+      return () => clearTimeout(timeout);
+    }
+  }, [lastDamageTime]);
 
   if (!inCombat && phase === 'idle') return null;
 
@@ -258,6 +269,12 @@ export function CombatHUD() {
         transform: `translate(${shake.x}px, ${shake.y}px)`,
       }}
     >
+      {/* Damage Flash Overlay */}
+      <div 
+        className="absolute inset-0 bg-red-900 transition-opacity duration-150"
+        style={{ opacity: damageFlash * 0.25 }}
+      />
+
       {/* Floating damage numbers */}
       {popups.map((p) => (
         <DamageNumber key={p.id} popup={p} />

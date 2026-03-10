@@ -28,11 +28,20 @@ const MODEL_MAPPING: Record<string, string> = {
   healer: 'student',
   scholar: 'student',
   priest: 'student',
-  wanderer: 'basemesh',
-  villager: 'basemesh',
+  wanderer: 'villagers',
+  villager: 'villagers',
+  blacksmith: 'villagers',
   bandit: 'ninja',
   ninja: 'ninja',
   archer: 'archer',
+};
+
+// Sub-node mapping for the villagers mega-pack
+const VILLAGER_NODES: Record<string, string> = {
+  villager: 'Woman_2',
+  wanderer: 'Male_2',
+  blacksmith: 'Male_1', // Armored male
+  peasant: 'Male_3',
 };
 
 // Display titles for all archetypes
@@ -94,10 +103,29 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
 
   // Determine model path based on archetype
   const modelName = MODEL_MAPPING[npcType] || 'basemesh';
-  const { scene } = useGLTF(`${BASE_URL}/assets/npcs/${modelName}.glb`);
+  const isMegaPack = modelName === 'villagers';
   
-  // Clone scene so multiple NPCs don't share the same instance state
-  const clonedScene = useMemo(() => scene.clone(), [scene]);
+  const { scene, nodes } = useGLTF(`${BASE_URL}/assets/npcs/${modelName}.glb`) as any;
+  
+  // Clone scene or extract specific node from mega-pack
+  const clonedScene = useMemo(() => {
+    if (isMegaPack) {
+      const nodeName = VILLAGER_NODES[npcType] || VILLAGER_NODES.wanderer;
+      const targetNode = nodes[nodeName];
+      if (targetNode) {
+        // If it's a SkinnedMesh, we need its group structure or at least a clone
+        // For simplicity in this hybrid approach, we clone the scene but hide other nodes
+        const sceneClone = scene.clone();
+        sceneClone.traverse((child: any) => {
+          if (child.isMesh || child.isSkinnedMesh) {
+            child.visible = child.name === nodeName;
+          }
+        });
+        return sceneClone;
+      }
+    }
+    return scene.clone();
+  }, [scene, nodes, isMegaPack, npcType]);
 
   const elapsedRef = useRef(0);
 
@@ -233,6 +261,9 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
 
 // Preload common models
 const PRELOAD_BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
-Object.values(MODEL_MAPPING).forEach((model) => {
+const MODELS_TO_PRELOAD = new Set(Object.values(MODEL_MAPPING));
+MODELS_TO_PRELOAD.add('basemesh');
+
+for (const model of MODELS_TO_PRELOAD) {
   useGLTF.preload(`${PRELOAD_BASE_URL}/assets/npcs/${model}.glb`);
-});
+}

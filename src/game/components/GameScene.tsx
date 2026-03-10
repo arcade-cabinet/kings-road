@@ -27,6 +27,8 @@ import {
 import { FeatureSpawner } from '../systems/FeatureSpawner';
 import { InteractionSystem } from '../systems/InteractionSystem';
 import { PlayerController } from '../systems/PlayerController';
+import { CombatFeedback } from '../systems/CombatFeedback';
+import { CombatParticles } from '../components/CombatParticles';
 import { QuestSystem } from '../systems/QuestSystem';
 import { WeatherSystem } from '../systems/WeatherSystem';
 
@@ -104,6 +106,8 @@ function SceneContent() {
 
           {/* Always-active systems (work in both overworld and dungeon) */}
           <PlayerController />
+          <CombatFeedback />
+          <CombatParticles />
           <DungeonEntrySystem />
           <AudioSystem />
 

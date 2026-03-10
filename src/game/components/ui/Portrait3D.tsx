@@ -1,7 +1,6 @@
+import { Stage, useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { PerspectiveCamera, Stage, useGLTF } from '@react-three/drei';
 import { Suspense, useMemo } from 'react';
-import * as THREE from 'three';
 
 const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
 
@@ -23,7 +22,6 @@ const MODEL_MAPPING: Record<string, string> = {
 
 interface Portrait3DProps {
   type: string;
-  expression?: 'neutral' | 'happy' | 'angry' | 'sad' | 'surprised' | 'speaking';
 }
 
 function NPCModel({ type }: { type: string }) {
@@ -31,7 +29,9 @@ function NPCModel({ type }: { type: string }) {
   const { scene } = useGLTF(`${BASE_URL}/assets/npcs/${modelName}.glb`);
   const cloned = useMemo(() => scene.clone(), [scene]);
 
-  return <primitive object={cloned} scale={[1.8, 1.8, 1.8]} position={[0, -1, 0]} />;
+  return (
+    <primitive object={cloned} scale={[1.8, 1.8, 1.8]} position={[0, -1, 0]} />
+  );
 }
 
 export function Portrait3D({ type }: Portrait3DProps) {
@@ -42,7 +42,7 @@ export function Portrait3D({ type }: Portrait3DProps) {
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={1} />
           <Stage intensity={0.2} environment="apartment" adjustCamera={false}>
-             <NPCModel type={type} />
+            <NPCModel type={type} />
           </Stage>
         </Suspense>
       </Canvas>
@@ -55,7 +55,8 @@ export function Portrait3D({ type }: Portrait3DProps) {
   );
 }
 
-// Preload common portraits
-Object.values(MODEL_MAPPING).forEach((model) => {
+// Preload common portraits (deduplicated)
+const uniqueModels = Array.from(new Set(Object.values(MODEL_MAPPING)));
+for (const model of uniqueModels) {
   useGLTF.preload(`${BASE_URL}/assets/npcs/${model}.glb`);
-});
+}

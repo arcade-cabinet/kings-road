@@ -1,7 +1,7 @@
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import * as THREE from 'three';
+import type * as THREE from 'three';
 import type { MonsterArchetype } from '../../schemas/monster.schema';
 import {
   buildMonsterRenderData,
@@ -19,6 +19,13 @@ const BAT_PATH = `${BASE_URL}/assets/monsters/Bat-transformed.glb`;
 const WEREWOLF_PATH = `${BASE_URL}/assets/monsters/werewolf-transformed.glb`;
 const BLOODWRAITH_PATH = `${BASE_URL}/assets/monsters/bloodwraith-transformed.glb`;
 const PLAGUE_DOCTOR_PATH = `${BASE_URL}/assets/monsters/plague_doctor-transformed.glb`;
+
+const HOVER_ARCHETYPES = new Set([
+  'butterfly_swarm',
+  'wraith',
+  'bat',
+  'bloodwraith',
+]);
 
 function GeometryMesh({
   part,
@@ -79,18 +86,18 @@ export function Monster({ archetype, position }: MonsterProps) {
     if (!groupRef.current) return;
     elapsedRef.current += delta;
     const t = elapsedRef.current;
-    
+
     // Base idle rotation/bob
     groupRef.current.rotation.y = Math.sin(t * 0.6) * 0.08;
-    
+
     if (modelRef.current) {
-      if (['butterfly_swarm', 'wraith', 'bat', 'bloodwraith'].includes(archetype.id)) {
-         // Hover/Fluttering movement
-         modelRef.current.position.y = 1.0 + Math.sin(t * 4) * 0.2;
-         modelRef.current.rotation.z = Math.sin(t * 10) * 0.1;
+      if (HOVER_ARCHETYPES.has(archetype.id)) {
+        // Hover/Fluttering movement
+        modelRef.current.position.y = 1.0 + Math.sin(t * 4) * 0.2;
+        modelRef.current.rotation.z = Math.sin(t * 10) * 0.1;
       } else {
-         // Standard breathing bob
-         modelRef.current.position.y = Math.sin(t * 1.2) * 0.03;
+        // Standard breathing bob
+        modelRef.current.position.y = Math.sin(t * 1.2) * 0.03;
       }
     } else {
       groupRef.current.position.y = Math.sin(t * 1.2) * 0.03;
@@ -98,16 +105,37 @@ export function Monster({ archetype, position }: MonsterProps) {
   });
 
   // --- Hybrid Model Selection ---
-  
+
   const modelContent = useMemo(() => {
+    const seed = hashString(archetype.id + position.join(','));
+
     // 1. Skeletons & Undead Knights
     if (['skeleton', 'shadow_knight', 'lich_lord'].includes(archetype.id)) {
       if (skeleton.scene) {
         const cloned = skeleton.scene.clone();
+
+        // Procedural Armor Variety for Skeletons
+        cloned.traverse((child: any) => {
+          if (
+            child.name.startsWith('Chest_Armor_') ||
+            child.name.startsWith('Helmet_')
+          ) {
+            const variantNum = parseInt(child.name.split('_').pop() || '1', 10);
+            const targetChest = (seed % 3) + 1;
+            const targetHelmet = ((seed >> 2) % 3) + 1;
+
+            if (child.name.startsWith('Chest_Armor_')) {
+              child.visible = variantNum === targetChest;
+            } else if (child.name.startsWith('Helmet_')) {
+              child.visible = variantNum === targetHelmet;
+            }
+          }
+        });
+
         return <primitive object={cloned} />;
       }
     }
-    
+
     // 2. Flying / Hovering entities
     if (['butterfly_swarm', 'wraith', 'bat'].includes(archetype.id)) {
       if (bat.scene) {
@@ -137,7 +165,7 @@ export function Monster({ archetype, position }: MonsterProps) {
         return <primitive object={cloned} />;
       }
     }
-    
+
     // 4. Fallback Primitives
     return bodyParts.map((part) => (
       <GeometryMesh
@@ -146,7 +174,18 @@ export function Monster({ archetype, position }: MonsterProps) {
         color={part === bodyParts[0] ? primaryColor : secondaryColor}
       />
     ));
-  }, [archetype.id, skeleton.scene, bat.scene, werewolf.scene, bloodwraith.scene, plagueDoctor.scene, bodyParts, primaryColor, secondaryColor]);
+  }, [
+    archetype.id,
+    skeleton.scene,
+    bat.scene,
+    werewolf.scene,
+    bloodwraith.scene,
+    plagueDoctor.scene,
+    bodyParts,
+    primaryColor,
+    secondaryColor,
+    position.join,
+  ]);
 
   return (
     <group ref={groupRef} position={position} scale={scale}>
@@ -156,9 +195,7 @@ export function Monster({ archetype, position }: MonsterProps) {
         <meshBasicMaterial color="#000000" transparent opacity={0.3} />
       </mesh>
 
-      <group ref={modelRef}>
-        {modelContent}
-      </group>
+      <group ref={modelRef}>{modelContent}</group>
     </group>
   );
 }

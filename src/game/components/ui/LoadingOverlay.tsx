@@ -1,5 +1,5 @@
 import { useProgress } from '@react-three/drei';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { useGameStore } from '../../stores/gameStore';
 import { useWorldStore } from '../../stores/worldStore';
@@ -31,14 +31,11 @@ export function LoadingOverlay() {
   const [chunkStageIndex, setChunkStageIndex] = useState(0);
   const [startTime, setStartTime] = useState(0);
 
-  // Track whether we already showed for this game session
-  const hasShownRef = useRef(false);
-
   // Show overlay when generation begins or when a significant asset load is triggered
   useEffect(() => {
     const isMajorAssetLoad = assetsLoading && assetProgress < 100;
-    
-    // Only show if we aren't already visible/fading, and it's either the initial generation 
+
+    // Only show if we aren't already visible/fading, and it's either the initial generation
     // or a significant mid-game asset load (e.g. entering a new zone)
     if ((isGenerating || isMajorAssetLoad) && !visible && gameActive) {
       setVisible(true);
@@ -47,13 +44,6 @@ export function LoadingOverlay() {
       setStartTime(Date.now());
     }
   }, [isGenerating, assetsLoading, assetProgress, visible, gameActive]);
-
-  // Reset tracking when game is deactivated (back to menu)
-  useEffect(() => {
-    if (!gameActive && !isGenerating) {
-      hasShownRef.current = false;
-    }
-  }, [gameActive, isGenerating]);
 
   // Advance chunk-loading stages over time (after generation completes)
   useEffect(() => {
@@ -87,7 +77,15 @@ export function LoadingOverlay() {
     }, remaining);
 
     return () => clearTimeout(timeout);
-  }, [visible, fadeOut, isGenerating, assetsLoading, assetProgress, activeChunks.size, startTime]);
+  }, [
+    visible,
+    fadeOut,
+    isGenerating,
+    assetsLoading,
+    assetProgress,
+    activeChunks.size,
+    startTime,
+  ]);
 
   if (!visible) return null;
 
@@ -101,7 +99,8 @@ export function LoadingOverlay() {
   } else if (assetsLoading) {
     displayProgress = 60 + (assetProgress / 100) * 30;
   } else {
-    displayProgress = 90 + ((chunkStageIndex + 1) / CHUNK_LOADING_STAGES.length) * 10;
+    displayProgress =
+      90 + ((chunkStageIndex + 1) / CHUNK_LOADING_STAGES.length) * 10;
   }
   const progress = Math.min(100, displayProgress);
 
