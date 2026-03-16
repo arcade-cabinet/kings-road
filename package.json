@@ -38,7 +38,7 @@
     "@types/three": "^0.183.1",
     "@typescript/native-preview": "7.0.0-dev.20260308.1",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.44.2",
+    "drizzle-orm": "^0.45.1",
     "expo": "~55.0.5",
     "expo-constants": "~55.0.7",
     "expo-device": "~55.0.9",
