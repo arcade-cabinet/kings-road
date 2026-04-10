@@ -1,3 +1,10 @@
+---
+title: World Generation
+updated: 2026-04-09
+status: current
+domain: technical
+---
+
 # World Generation
 
 This document details the world generation system in King's Road.

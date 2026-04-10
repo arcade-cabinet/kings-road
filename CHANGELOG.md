@@ -1,3 +1,10 @@
+---
+title: Changelog
+updated: 2026-04-09
+status: current
+domain: technical
+---
+
 # Changelog
 
 All notable changes to King's Road will be documented in this file.
@@ -9,98 +16,112 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-#### Config-Driven Content System
-- **Zod schema layer** (`src/schemas/`) -- 8 schemas defining all game content
-  - `world.schema.ts` -- Road spine, anchor points, regions, biomes
-  - `quest.schema.ts` -- Macro/meso/micro tiers with A/B branching
-  - `npc.schema.ts` -- NPC archetypes with name and greeting pools
-  - `feature.schema.ts` -- Ambient/minor/major roadside features
-  - `item.schema.ts` -- Key items, consumables, equipment, quest items
-  - `encounter.schema.ts` -- Combat, puzzle, social, stealth, survival
-  - `pacing.schema.ts` -- Pacing intervals for feature placement
-  - `game-config.schema.ts` -- Master config combining all sub-schemas
-
-#### Koota ECS Architecture
-- **ECS world** (`src/ecs/world.ts`) -- Koota world instance
-- **Traits** (`src/ecs/traits/`) -- Position, Velocity, Rotation, Health, Stamina, Movement, PlayerInput, DistanceTraveled, QuestLog, IsQuestGiver, IsNPC, NPCArchetype, Dialogue, Interactable, RoadPosition, IsOnRoad, IsAnchor, IsFeature
-- **Actions** (`src/ecs/actions/`) -- Player spawning and input handling
-- **WorldProvider** -- Koota React integration at app root
-
-#### Content Pipeline
-- **Validation script** (`scripts/validate-trove.ts`) -- Validates all JSON content against Zod schemas, checks referential integrity, estimates quest duration, verifies A/B branch coverage, calculates substance score
-- **Content contribution guide** (`content/CONTRIBUTING.md`) -- Tone guide, schema examples, length requirements, enum reference
-- **Road spine** (`content/world/road-spine.json`) -- 6 anchors from Ashford to Grailsend
-- **Ralph-TUI PRD** (`docs/prd/kings-road-content-generation.md`) -- Content generation specification
+- `docs/TESTING.md`, `docs/STATE.md`, `docs/LORE.md` -- standardized documentation
+- YAML frontmatter on all root and docs markdown files
 
 ### Changed
 
-#### Rebrand to King's Road
-- Package renamed from generic Vite scaffold to `kings-road`
-- HTML title updated to "King's Road"
-- Main menu: "Aetheria / Infinite RPG Engine" replaced with "King's Road / Seek the Holy Grail"
-- Pastoral warm color palette replacing dark fantasy aesthetic
-  - Background: `#030202` (black) to `#f5f0e8` (warm cream)
-  - Text: light-on-dark to dark-on-light (warm charcoal `#3d3a34`)
-  - Accents: blood red to honey gold and warm brown
-- Typography: Cinzel replaced with Lora (display) and Crimson Text (body)
-- Scene: black void replaced with sky blue (`#87CEEB`), drei Sky component
-- Lighting: cold blue ambient to warm golden sunlight (`#fff8e7`, `#ffd700`)
-- Post-processing: reduced vignette darkness (0.6 to 0.3)
-- Seed phrase vocabulary: grimdark words to pastoral (Golden, Verdant, Meadow, Glen)
-- Procedural textures: dark gray stone to honey limestone, warm oak, lush green grass
-- NPC dialogue: dark fantasy removed, pastoral pilgrimage theme
-- BloodGem renamed to Relic with warm visual treatment
-- HUD: dark overlay to warm parchment palette
-- DialogueBox and MobileControls: warm palette treatment
+- Updated CLAUDE.md, AGENTS.md, README.md for current codebase state (Expo/Metro build, full factory systems, SQLite save layer)
+- Removed stale plan/implementation documents from `docs/plans/`
 
-#### Cleanup
-- Removed dead `next` and `next-themes` tsconfig path aliases
-- Removed Onlook/PageFreezer injection scripts from `index.html`
-- Fixed THREE.js shadow map deprecation warning
+---
+
+## [1.3.0] - 2026-04-09
+
+### Added (feat: Fix web build and integrate 3DPSX Chibi NPCs -- #13)
+
+- 3DPSX chibi NPC character system via `chibi-generator.ts`
+- Face texture generation for NPC caricature portraits (`face-texture.ts`)
+- NPC pool integration tests
 
 ### Fixed
-- White screen after starting new game (scene background initialization)
-- Game state properly resets on new game via `resetGame` action
 
-### Removed
-- 40+ unused npm dependencies (radix-ui, cmdk, sonner, recharts, etc.)
-- Unused type declaration files (next.d.ts, styled-jsx.d.ts, modules.d.ts)
-- ThemeProvider wrapper
-- styled-jsx babel plugin
-- Unused CSS animations and shadcn theme variables
+- Web build compatibility for GitHub Pages
 
-## [1.0.0] - 2024-01-XX
+---
 
-### Added
+## [1.2.0] - 2026-03-14
 
-#### Core Systems
-- **Game Store** (`gameStore.ts`) -- Zustand-based centralized state management
-- **Player Controller** (`PlayerController.tsx`) -- First-person movement with AABB collision, head bob, sprint/walk
-- **Chunk Manager** (`ChunkManager.tsx`) -- Dynamic chunk loading/unloading, NPC spawning, collision generation
-- **Environment System** (`Environment.tsx`) -- Day/night cycle, directional sun/moon, player lantern, sky dome, fog
-- **Interaction System** (`InteractionSystem.tsx`) -- Raycasting-based NPC detection with line-of-sight
+### Added (feat: migrate web build from Vite to Expo/Metro -- #11)
 
-#### World Generation
-- Seed-based procedural generation (mulberry32 PRNG, cyrb128 hash)
-- Chunk types: TOWN, ROAD, DUNGEON, WILD
-- Modular building system (inn, blacksmith, houses)
-- Procedural maze dungeons via random walk
-- Per-chunk seeded RNG for reproducible worlds
+- Expo SDK 55 as build platform, replacing standalone Vite
+- `expo-sqlite` for save state and content DB
+- Drizzle ORM (`drizzle-orm`, `drizzle-kit`) for type-safe SQLite access
+- `src/db/schema.ts` -- content tables (monsters, items, quests, towns, etc.) and save state tables (save slots, player state, quest progress, inventory, chunk deltas, unlocked perks)
+- `scripts/compile-content-db.ts` -- build-time content compilation to SQLite
+- `src/db/save-service.ts` -- save slot management
+- Tone.js audio system (`src/game/audio/`)
+- Weather system (`src/game/systems/WeatherSystem.tsx`, `src/schemas/weather.schema.ts`)
+- Skill tree system (`src/schemas/skill-tree.schema.ts`)
+- Crafting schema (`src/schemas/crafting.schema.ts`)
+- Kingdom-level world generation (`src/game/world/kingdom-gen.ts`)
+- Dungeon generator (`src/game/world/dungeon-generator.ts`)
+- Town layout system (`src/game/world/town-layout.ts`)
+- Road network system (`src/game/world/road-network.ts`)
 
-#### 3D Components
+---
+
+## [1.1.0] - 2026-03-09
+
+### Added (feat: dungeon persistence, combat fixes, kingdom map gen -- #9)
+
+- `DungeonEntrySystem.tsx` -- dungeon transitions
+- `EncounterSystem.tsx` -- combat trigger system
+- `combat-resolver.ts` + tests -- deterministic combat resolution
+- `quest-step-executor.ts` + tests -- quest step state machine
+- `QuestSystem.tsx` -- quest progression
+- `inventoryStore.ts`, `combatStore.ts`, `questStore.ts`, `worldStore.ts`, `settingsStore.ts`
+- Monster factory (`src/game/factories/monster-factory.ts`)
+- Building factory (`src/game/factories/building-factory.ts`)
+- NPC factory (`src/game/factories/npc-factory.ts`)
+- Loot resolver (`src/game/world/loot-resolver.ts`)
+- `InventoryScreen.tsx`, `Minimap.tsx`, `DeathOverlay.tsx`, `CombatHUD.tsx`, `PauseMenu.tsx`, `SettingsPanel.tsx`
+- `Portrait3D.tsx` for NPC portraits
+- Dungeon renderer and dungeon props
+
+---
+
+## [1.0.0] - 2026-03-03
+
+### Added (feat: Engine v2 -- config-driven blueprint architecture -- #5)
+
+- Building, NPC, and monster schema layer (`src/schemas/building.schema.ts`, `npc-blueprint.schema.ts`, `monster.schema.ts`, `town.schema.ts`, `kingdom.schema.ts`, `encounter-table.schema.ts`)
+- Factory pattern for all entity types
+- Content trove with NPC archetypes, features, and quests (`content/`)
+- Pacing engine for deterministic feature placement (`src/game/world/pacing-engine.ts`)
+- Road spine loader with Zod validation (`src/game/world/road-spine.ts`)
+- Terrain and simplex noise generation (`src/game/world/terrain-gen.ts`, `simplex.ts`)
+- `validate-trove.ts` content validation script
+
+### Changed (feat: King's Road -- pastoral redesign -- d15b2d2)
+
+- Rebranded from generic Vite/Aetheria scaffold to King's Road
+- Warm cream color palette replacing dark fantasy aesthetic
+- Typography: Lora (display) + Crimson Text (body), replacing Cinzel
+- Scene: sky blue (`#87CEEB`) replacing black void
+- Lighting: warm golden sunlight replacing cold blue ambient
+- Post-processing: reduced vignette intensity (0.6 to 0.3)
+- Seed vocabulary: pastoral words replacing grimdark
+- NPC dialogue: pastoral pilgrimage theme replacing dark fantasy
+- HUD: warm parchment palette
+- Removed 40+ unused npm dependencies (radix-ui, cmdk, sonner, recharts, etc.)
+- Fixed THREE.js shadow map deprecation warning
+
+### Added (initial engine -- 60157af to d15b2d2)
+
+- Koota ECS world, traits, and actions (`src/ecs/`)
+- Zod schemas: world, quest, NPC, feature, item, encounter, pacing (`src/schemas/`)
+- Content validation pipeline (`scripts/validate-trove.ts`)
+- Road spine JSON with 6 anchor points (`content/world/road-spine.json`)
+- Game Store (Zustand) for centralized state
+- Player Controller: first-person movement with AABB collision, head bob, sprint/walk
+- Chunk Manager: dynamic chunk loading/unloading, NPC spawning
+- Environment System: day/night cycle, sun/moon, player lantern, fog
+- Interaction System: raycasting-based NPC detection
+- Seed-based procedural world generation (mulberry32 PRNG, cyrb128 hash)
 - Instanced mesh rendering for static geometry
-- NPC component with idle animation and type-specific accessories
-- Collectible component with floating animation and glow
-
-#### UI Components
-- Main menu with seed phrase display
-- HUD with health/stamina bars, location banner, time display
-- Dialogue box with decorative corners
-- Mobile controls with virtual joystick
-
-#### Input System
-- Keyboard (WASD/QE), mouse drag, touch joystick
-- Sprint via joystick distance or mobile
-
-#### Post Processing
-- SMAA anti-aliasing, bloom, vignette
+- NPC component with idle animation
+- Collectible (Relic) with floating animation
+- Main menu, HUD, dialogue box, mobile controls
+- SMAA, bloom, vignette post-processing
+- Keyboard, mouse drag, touch joystick input

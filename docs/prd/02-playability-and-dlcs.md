@@ -1,3 +1,10 @@
+---
+title: Playability Analysis and Future Expansions
+updated: 2026-04-09
+status: current
+domain: product
+---
+
 # Playability Analysis & Future Expansions (DLCs)
 
 ## 1. Playability Gaps & UX Improvements

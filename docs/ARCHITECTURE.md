@@ -1,35 +1,49 @@
+---
+title: Architecture
+updated: 2026-04-09
+status: current
+domain: technical
+---
+
 # Architecture
 
 This document describes the high-level architecture of King's Road.
 
 ## Overview
 
-King's Road is a config-driven RPG engine. Content is authored as JSON, validated against Zod schemas at build time, consumed by a Koota ECS world at runtime, and rendered by React Three Fiber. The rendering layer from the original prototype (instanced meshes, chunk streaming, procedural textures) is preserved and adapted as the visual output of the ECS pipeline.
+King's Road is a config-driven RPG engine. Content is authored as JSON, validated against Zod schemas, compiled into a SQLite database at build time, consumed by a Koota ECS world at runtime, and rendered by React Three Fiber. Factory systems (building, NPC, monster) instantiate typed entities from JSON archetypes.
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                        Content Layer                              │
 │  Zod Schemas (src/schemas/) --> JSON Trove (content/)             │
-│  validate-trove.ts checks schemas + referential integrity         │
+│  validate-content.ts: schema conformance + referential integrity  │
+├──────────────────────────────────────────────────────────────────┤
+│                        Database Layer                             │
+│  compile-content-db.ts --> SQLite (expo-sqlite + Drizzle ORM)    │
+│  Content tables: monsters, items, quests, buildings, towns, etc. │
+│  Save tables: save_slots, player_state, quest_progress, etc.     │
 ├──────────────────────────────────────────────────────────────────┤
 │                        ECS Layer (Koota)                          │
 │  World (src/ecs/world.ts)                                        │
 │  Traits: Position, Health, QuestLog, NPCArchetype, RoadPosition  │
 │  Actions: spawnPlayer, updateInput                                │
 ├──────────────────────────────────────────────────────────────────┤
+│                        Factory Layer                              │
+│  BuildingFactory | NPCFactory | MonsterFactory | ChibiGenerator  │
+│  Input: JSON archetype  Output: ECS entity + Three.js geometry   │
+├──────────────────────────────────────────────────────────────────┤
 │                        Rendering Layer (R3F)                      │
-│  Canvas --> SceneInit --> Environment --> ChunkManager --> Chunks  │
-│  PlayerController --> Camera                                      │
-│  InteractionSystem --> DialogueBox                                │
+│  Canvas --> Environment --> ChunkManager --> Systems              │
+│  PlayerController, QuestSystem, EncounterSystem, AudioSystem     │
 ├──────────────────────────────────────────────────────────────────┤
 │                        UI Layer                                    │
-│  MainMenu | GameHUD | DialogueBox | MobileControls                │
+│  MainMenu | GameHUD | DialogueBox | PauseMenu | InventoryScreen  │
+│  QuestLog | Minimap | CombatHUD | MobileControls                 │
 ├──────────────────────────────────────────────────────────────────┤
-│                        State Layer (Legacy)                        │
-│  Zustand Store (gameStore.ts) -- migrating to Koota traits        │
-├──────────────────────────────────────────────────────────────────┤
-│                        Utilities                                   │
-│  types.ts | random.ts | worldGen.ts | textures.ts                 │
+│                        State Layer                                 │
+│  Zustand: gameStore, worldStore, questStore, combatStore,        │
+│           inventoryStore, settingsStore                           │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -120,55 +134,131 @@ R3F rendering (instanced meshes, NPCs, features)
 
 ```
 src/
-├── schemas/                  # Zod schemas (source of truth for content shapes)
-│   ├── world.schema.ts       # RoadSpineSchema, AnchorPointSchema, RegionSchema
-│   ├── quest.schema.ts       # QuestDefinitionSchema, QuestStepSchema, QuestBranchSchema
-│   ├── npc.schema.ts         # NPCDefinitionSchema, NPCArchetype enum
-│   ├── feature.schema.ts     # FeatureDefinitionSchema, FeatureTier enum
-│   ├── item.schema.ts        # ItemDefinitionSchema
-│   ├── encounter.schema.ts   # EncounterDefinitionSchema
-│   ├── pacing.schema.ts      # PacingConfigSchema
-│   └── game-config.schema.ts # GameConfigSchema (combines all)
+├── schemas/                     # Zod schemas (source of truth for content shapes)
+│   ├── world.schema.ts          # RoadSpineSchema, AnchorPointSchema, RegionSchema
+│   ├── quest.schema.ts          # QuestDefinitionSchema with A/B branching
+│   ├── npc.schema.ts            # NPCDefinitionSchema, NPCArchetype enum
+│   ├── npc-blueprint.schema.ts  # Named story NPCs
+│   ├── feature.schema.ts        # FeatureDefinitionSchema, FeatureTier enum
+│   ├── building.schema.ts       # BuildingArchetype for town construction
+│   ├── town.schema.ts           # TownConfig: layout, NPCs, buildings
+│   ├── monster.schema.ts        # MonsterArchetype with stats and appearance
+│   ├── dungeon.schema.ts        # DungeonLayout with room graphs
+│   ├── encounter.schema.ts      # Narrative encounter definitions
+│   ├── encounter-table.schema.ts# Random encounter pools
+│   ├── item.schema.ts           # ItemDefinitionSchema
+│   ├── pacing.schema.ts         # PacingConfigSchema for feature intervals
+│   ├── weather.schema.ts        # Weather system configuration
+│   ├── dialogue.schema.ts       # DialogueLine validation
+│   ├── skill-tree.schema.ts     # Player skill tree perks
+│   ├── crafting.schema.ts       # Crafting recipes
+│   ├── kingdom.schema.ts        # Kingdom-level world structure
+│   └── game-config.schema.ts   # Master config combining all sub-schemas
 │
-├── ecs/                      # Koota ECS layer
-│   ├── world.ts              # createWorld() -- single instance
-│   ├── traits/               # Composable data components
-│   │   ├── spatial.ts        # Position, Velocity, Rotation
-│   │   ├── player.ts         # IsPlayer, Health, Stamina, Movement, etc.
-│   │   ├── quest.ts          # QuestLog, IsQuestGiver
-│   │   ├── npc.ts            # IsNPC, NPCArchetype, Dialogue, Interactable
-│   │   └── pacing.ts         # RoadPosition, IsOnRoad, IsAnchor, IsFeature
-│   └── actions/              # Entity spawning and state mutations
+├── ecs/                         # Koota ECS layer
+│   ├── world.ts                 # createWorld() -- single instance
+│   ├── traits/                  # Composable data components
+│   │   ├── spatial.ts           # Position, Velocity, Rotation
+│   │   ├── player.ts            # IsPlayer, Health, Stamina, Movement, etc.
+│   │   ├── quest.ts             # QuestLog, IsQuestGiver
+│   │   ├── npc.ts               # IsNPC, NPCArchetype, Dialogue, Interactable
+│   │   └── pacing.ts            # RoadPosition, IsOnRoad, IsAnchor, IsFeature
+│   └── actions/                 # Entity spawning and state mutations
+│
+├── db/                          # Database layer (Drizzle ORM + expo-sqlite)
+│   ├── schema.ts                # Content tables + save state tables
+│   ├── content-queries.ts       # Type-safe queries for content data
+│   ├── load-content-db.ts       # DB initialization at runtime
+│   └── save-service.ts          # Save slot management
 │
 ├── game/
-│   ├── Game.tsx              # Root game component (menu vs active game)
+│   ├── Game.tsx                 # Root game component (menu vs active game)
 │   ├── components/
-│   │   ├── ui/               # 2D overlay components
-│   │   ├── GameScene.tsx      # R3F Canvas, SceneInit, post-processing
-│   │   ├── Chunk.tsx          # Instanced mesh rendering per chunk
-│   │   ├── NPC.tsx            # Character model with idle animation
-│   │   └── Relic.tsx          # Collectible with float/glow animation
+│   │   ├── ui/                  # 2D overlay components
+│   │   │   ├── MainMenu.tsx     # Title screen with seed phrase
+│   │   │   ├── GameHUD.tsx      # Health/stamina/location/time
+│   │   │   ├── DialogueBox.tsx  # NPC conversation, A/B choices
+│   │   │   ├── PauseMenu.tsx    # Pause with settings access
+│   │   │   ├── SettingsPanel.tsx# Audio/display/controls settings
+│   │   │   ├── QuestLog.tsx     # Active/completed quest list
+│   │   │   ├── InventoryScreen.tsx
+│   │   │   ├── Minimap.tsx
+│   │   │   ├── CombatHUD.tsx
+│   │   │   ├── DeathOverlay.tsx
+│   │   │   └── MobileControls.tsx
+│   │   ├── GameScene.tsx        # R3F Canvas, SceneInit, post-processing
+│   │   ├── Chunk.tsx            # Instanced mesh rendering per chunk
+│   │   ├── Building.tsx         # Factory-built structures
+│   │   ├── NPC.tsx              # Chibi character with idle animation
+│   │   ├── Monster.tsx          # Monster entity component
+│   │   ├── Feature.tsx          # Roadside point of interest
+│   │   ├── DungeonRenderer.tsx  # Dungeon room rendering
+│   │   └── Relic.tsx            # Collectible with float/glow animation
 │   ├── systems/
-│   │   ├── PlayerController.tsx  # Movement, physics, camera
-│   │   ├── ChunkManager.tsx      # Chunk streaming, NPC spawning
-│   │   ├── Environment.tsx       # Sky, lighting, day/night cycle
-│   │   └── InteractionSystem.tsx # NPC detection
+│   │   ├── PlayerController.tsx # Movement, physics, camera
+│   │   ├── ChunkManager.tsx     # Chunk streaming, entity spawning
+│   │   ├── Environment.tsx      # Sky, lighting, day/night cycle
+│   │   ├── InteractionSystem.tsx# NPC detection and dialogue trigger
+│   │   ├── QuestSystem.tsx      # Quest step execution and progression
+│   │   ├── EncounterSystem.tsx  # Combat encounter triggers
+│   │   ├── DungeonEntrySystem.tsx
+│   │   ├── WeatherSystem.tsx
+│   │   ├── AudioSystem.tsx      # Tone.js ambient audio
+│   │   ├── combat-resolver.ts   # Deterministic combat resolution
+│   │   └── quest-step-executor.ts # Quest step state machine
+│   ├── world/
+│   │   ├── road-spine.ts        # Road spine loader with Zod validation
+│   │   ├── pacing-engine.ts     # Deterministic feature placement
+│   │   ├── dungeon-generator.ts # Procedural dungeon room graphs
+│   │   ├── town-layout.ts       # Town building placement
+│   │   ├── town-configs.ts      # Town configuration loader
+│   │   ├── kingdom-gen.ts       # Kingdom-level world structure
+│   │   ├── road-network.ts      # Road network connections
+│   │   ├── terrain-gen.ts       # Simplex noise terrain
+│   │   ├── simplex.ts           # Simplex noise implementation
+│   │   ├── feature-placement.ts # Feature placement on road/off-road
+│   │   ├── dungeon-registry.ts  # Dungeon anchor assignments
+│   │   ├── loot-resolver.ts     # Loot table resolution
+│   │   └── quest-resolver.ts    # Quest trigger evaluation
+│   ├── factories/
+│   │   ├── building-factory.ts  # BuildingArchetype --> Three.js geometry
+│   │   ├── npc-factory.ts       # NPCDefinition --> chibi entity
+│   │   ├── monster-factory.ts   # MonsterArchetype --> monster entity
+│   │   ├── chibi-generator.ts   # Chibi character geometry
+│   │   └── face-texture.ts      # Procedural NPC face textures
+│   ├── audio/
+│   │   ├── ambient-mixer.ts     # Tone.js ambient layer management
+│   │   └── layer-factory.ts     # Audio layer instantiation
 │   ├── hooks/
-│   │   └── useInput.ts       # Keyboard, mouse, touch input
+│   │   └── useInput.ts          # Keyboard, mouse, touch input
 │   ├── stores/
-│   │   └── gameStore.ts      # Legacy Zustand store
+│   │   ├── gameStore.ts         # Core game state (position, time, seed)
+│   │   ├── worldStore.ts        # Chunk data, AABBs, interactables
+│   │   ├── questStore.ts        # Active/completed quests
+│   │   ├── combatStore.ts       # Combat state
+│   │   ├── inventoryStore.ts    # Player inventory
+│   │   └── settingsStore.ts     # Audio/display/control settings (localStorage)
 │   └── utils/
-│       ├── random.ts         # Seeded RNG (mulberry32, cyrb128)
-│       ├── worldGen.ts       # Chunk type assignment, NPC generation
-│       └── textures.ts       # Procedural canvas textures
+│       ├── random.ts            # Seeded RNG (mulberry32, cyrb128)
+│       └── textures.ts          # Procedural canvas textures
 │
-content/                      # JSON content trove
-├── world/
-│   └── road-spine.json       # 6 anchors, 30km road
-├── CONTRIBUTING.md           # Authoring guide
+content/                         # JSON content trove
+├── world/road-spine.json        # 6 anchors, 30km road
+├── main-quest/                  # Chapter JSONs
+├── side-quests/                 # macro/, meso/, micro/
+├── npcs/                        # NPC archetype definition files
+├── features/                    # Roadside feature definitions
+├── buildings/                   # Building archetype configs
+├── towns/                       # Town configuration files
+├── monsters/                    # Monster archetype configs
+├── dungeons/                    # Dungeon layout files
+├── encounters/                  # Narrative encounter definitions
+└── CONTRIBUTING.md              # Authoring guide and tone rules
 │
 scripts/
-└── validate-trove.ts         # Content validation pipeline
+├── validate-content.ts          # Content validation pipeline
+├── compile-content-db.ts        # Compile JSON content to SQLite
+└── assemble-game-config.ts      # Assemble master game config
 ```
 
 ## Road Spine System

@@ -1,54 +1,63 @@
+---
+title: CLAUDE.md
+updated: 2026-04-09
+status: current
+domain: technical
+---
+
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Project-specific guidance for Claude Code sessions on King's Road.
 
 ## Commands
 
 ```bash
-pnpm dev                    # Dev server at localhost:5173
-pnpm build                  # Production build (outputs dist/)
+pnpm dev                    # Dev server at localhost:5173 (Expo web)
+pnpm build                  # Production build (expo export --platform web)
 pnpm test                   # Run all Vitest unit tests
 pnpm test -- src/schemas/   # Run tests in a specific directory
 pnpm test:watch             # Watch mode
 pnpm test:coverage          # Coverage report (80% thresholds)
-pnpm test:e2e               # Playwright e2e tests (requires build first)
+pnpm test:e2e               # Playwright e2e tests
+pnpm test:ct                # Playwright component tests
+pnpm test:all               # Coverage + CT + e2e
 pnpm tsc --noEmit           # Full TypeScript check
 pnpm tscgo --noEmit         # Fast TypeScript check (native compiler)
-npx tsx scripts/validate-trove.ts  # Validate JSON content against Zod schemas
+npx tsx scripts/validate-content.ts  # Validate JSON content against Zod schemas
+npx tsx scripts/compile-content-db.ts  # Compile content JSON into SQLite DB
 pnpm exec biome check .     # Lint and format check
 ```
 
 ## Architecture
 
 ```
-Zod Schemas (src/schemas/) --> JSON Content (content/) --> Koota ECS (src/ecs/) --> R3F Rendering (src/game/)
+Zod Schemas (src/schemas/) --> JSON Content (content/) --> SQLite DB (src/db/) --> ECS (src/ecs/) --> R3F Rendering (src/game/)
 ```
 
-All game content is JSON validated against Zod schemas. Koota ECS consumes config at runtime. React Three Fiber renders the ECS world. The Zustand store in `gameStore.ts` is legacy — new state should use Koota traits.
+All game content is JSON validated against Zod schemas. A build script compiles content into a SQLite database via Drizzle ORM. Koota ECS consumes config at runtime. React Three Fiber renders the ECS world.
 
 ## Key Directories
 
 | Directory | Purpose |
 |-----------|---------|
-| `src/schemas/` | Zod schemas for all content types (world, quest, NPC, feature, item, encounter, pacing) |
+| `src/schemas/` | Zod schemas for all content types (world, quest, NPC, feature, item, building, monster, dungeon, town, weather, dialogue, skill-tree) |
 | `src/ecs/` | Koota ECS world, traits (Position, Health, QuestLog, etc.), and actions |
+| `src/db/` | Drizzle ORM schema, SQLite content DB loader, save service |
 | `src/game/components/` | R3F 3D components and `ui/` overlay components |
-| `src/game/systems/` | Game logic: PlayerController, ChunkManager, Environment, InteractionSystem |
-| `src/game/stores/gameStore.ts` | Legacy Zustand store (being migrated to Koota) |
-| `src/game/utils/` | Seeded RNG (`random.ts`), world generation (`worldGen.ts`), textures (`textures.ts`) |
-| `src/game/world/` | Road spine loader and pacing engine |
-| `content/` | JSON content trove — quests, NPCs, features, road spine |
+| `src/game/systems/` | Game logic: PlayerController, ChunkManager, QuestSystem, EncounterSystem, etc. |
+| `src/game/world/` | Road spine, pacing engine, dungeon generator, town layout, kingdom gen |
+| `src/game/factories/` | Building, NPC, monster, chibi-generator factories |
+| `src/game/stores/` | Zustand stores (game, world, quest, combat, inventory, settings) |
+| `src/game/audio/` | Ambient mixer, audio layer factory |
+| `content/` | JSON content trove — quests, NPCs, features, towns, monsters, dungeons |
 | `scripts/` | Build and validation scripts |
-| `.claude/` | Claude Code agents, commands, hooks, settings |
 
 ## Content Pipeline
 
-To add game content (quests, NPCs, features):
-
-1. Write JSON following schemas in `src/schemas/`
-2. Place in appropriate `content/` subdirectory (see `content/CONTRIBUTING.md`)
-3. Run `npx tsx scripts/validate-trove.ts` to validate
-4. Schema validation checks types, referential integrity, A/B branches, dialogue word counts
+1. Author JSON in `content/` following schemas in `src/schemas/`
+2. Validate: `npx tsx scripts/validate-content.ts`
+3. Compile DB: `npx tsx scripts/compile-content-db.ts` (runs automatically on `pnpm dev` and `pnpm build`)
+4. See `content/CONTRIBUTING.md` for tone guide and authoring rules
 
 Quest tiers: `macro` (1-2h, must branch), `meso` (15-45min, must branch), `micro` (5-15min, linear ok).
 
@@ -64,6 +73,7 @@ Quest tiers: `macro` (1-2h, must branch), `meso` (15-45min, must branch), `micro
 - Do not store Three.js objects in React state (use refs)
 - Do not create new React context providers (use Koota or Zustand)
 - Do not put content JSON in `src/` (it belongs in `content/`)
+- Max 300 LOC per file
 
 ## Mood
 
@@ -71,11 +81,10 @@ Pastoral, romanticized medieval English. Warm cream backgrounds (#f5f0e8), golde
 
 ## Road Spine
 
-The world is organized along a 1D road from Ashford (distance 0) to Grailsend (distance 28000). Six anchor points define the main quest chapters. The pacing engine in `src/game/world/pacing-engine.ts` generates deterministic feature placements along this spine. See `content/world/road-spine.json`.
+The world is organized along a 1D road from Ashford (distance 0) to Grailsend (distance 28000). Six anchor points define the main quest chapters. The pacing engine in `src/game/world/pacing-engine.ts` generates deterministic feature placements. See `content/world/road-spine.json`.
 
-## CI/CD
+## Save System
 
-- **CI** (`.github/workflows/ci.yml`): Biome lint, TypeScript check, unit tests, content validation — runs on push to main and PRs
-- **CD** (`.github/workflows/cd.yml`): Builds and deploys to GitHub Pages on push to main
-- All GitHub Actions pinned to exact SHAs
-- Dependabot configured for npm and github-actions ecosystems
+Game saves use SQLite (expo-sqlite) with Drizzle ORM. Two layers:
+- **Content tables**: read-only, populated by `scripts/compile-content-db.ts` at build time
+- **Save state tables**: read-write at runtime (save slots, player state, quest progress, inventory, chunk deltas)

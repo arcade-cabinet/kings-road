@@ -1,3 +1,10 @@
+---
+title: Game Systems
+updated: 2026-04-09
+status: current
+domain: technical
+---
+
 # Game Systems
 
 This document details the gameplay systems in King's Road.
