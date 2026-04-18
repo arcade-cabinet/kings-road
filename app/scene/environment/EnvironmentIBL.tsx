@@ -1,12 +1,12 @@
 import { Environment } from '@react-three/drei';
 import { useLoader } from '@react-three/fiber';
 import { useEffect } from 'react';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import * as THREE from 'three';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { BiomeService } from '@/biome';
-import { assetUrl } from '@/lib/assets';
 import { getPlayer } from '@/ecs/actions/game';
 import { useEnvironment } from '@/ecs/hooks/useGameSession';
+import { assetUrl } from '@/lib/assets';
 
 type TimeOfDayBucket = 'dawn' | 'noon' | 'dusk' | 'night';
 
