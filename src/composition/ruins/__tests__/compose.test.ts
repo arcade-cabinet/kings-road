@@ -68,11 +68,16 @@ describe('composeRuins', () => {
 
   it('all assetIds are GLB paths known in RUIN_ASSETS (no undefined paths)', () => {
     const validPaths = new Set(
-      Object.values(RUIN_ASSETS).map((def) => def.path.replace(/^\/assets\//, '')),
+      Object.values(RUIN_ASSETS).map((def) =>
+        def.path.replace(/^\/assets\//, ''),
+      ),
     );
     const result = composeRuins(MOCK_BIOME, MOCK_TOWN, 'asset-check');
     for (const p of result) {
-      expect(validPaths.has(p.assetId), `Unknown assetId path: ${p.assetId}`).toBe(true);
+      expect(
+        validPaths.has(p.assetId),
+        `Unknown assetId path: ${p.assetId}`,
+      ).toBe(true);
     }
   });
 

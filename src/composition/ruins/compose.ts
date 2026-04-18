@@ -1,6 +1,6 @@
 import type { BiomeConfig } from '@/biome';
 import { createRng } from '@/core';
-import { RUIN_ASSETS, getAssetsByCategory, weightedPick } from './assets';
+import { getAssetsByCategory, RUIN_ASSETS, weightedPick } from './assets';
 import type { RuinsPlacement, TownConfig } from './types';
 
 /**
