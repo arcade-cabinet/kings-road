@@ -5,5 +5,8 @@
   "description": "Branches woven between two trees form a rough shelter, the ground beneath scattered with feathers and snare cord.",
   "visualType": "hunter_blind",
   "interactable": true,
-  "dialogueOnInteract": "Inside the blind you find dried venison wrapped in cloth and a handful of iron arrowheads. The hunter will return — but the offering feels deliberate, left for a fellow traveller."
+  "dialogueOnInteract": "Inside the blind you find dried venison wrapped in cloth and a handful of iron arrowheads. The hunter will return \u2014 but the offering feels deliberate, left for a fellow traveller.",
+  "glb": "dungeon/Crates_and_barrels.glb",
+  "glbScale": 0.9,
+  "glbYawRange": 360
 }

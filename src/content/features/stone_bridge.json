@@ -5,5 +5,8 @@
   "description": "A mossy stone bridge arches over a chattering brook, its keystone carved with a faded mason's mark.",
   "visualType": "stone_bridge",
   "interactable": true,
-  "dialogueOnInteract": "You lean over the parapet and peer into the clear water below. A trout darts beneath the shadow of the arch. Someone has scratched initials into the worn stone railing."
+  "dialogueOnInteract": "You lean over the parapet and peer into the clear water below. A trout darts beneath the shadow of the arch. Someone has scratched initials into the worn stone railing.",
+  "glb": "nature/rocks.glb",
+  "glbScale": 2.0,
+  "glbYawRange": 360
 }

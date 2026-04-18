@@ -5,5 +5,8 @@
   "description": "Crumbling stone walls outline what was once a cottage, its hearth open to the sky and brambles climbing the doorframe.",
   "visualType": "ruined_farmstead",
   "interactable": true,
-  "dialogueOnInteract": "Among the rubble you find a child's wooden toy, bleached by rain and sun. The land here was good once. Whatever drove the family away left no other trace."
+  "dialogueOnInteract": "Among the rubble you find a child's wooden toy, bleached by rain and sun. The land here was good once. Whatever drove the family away left no other trace.",
+  "glb": "dungeon/Crates_and_barrels.glb",
+  "glbScale": 1.2,
+  "glbYawRange": 360
 }

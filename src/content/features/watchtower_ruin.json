@@ -5,5 +5,8 @@
   "description": "A crumbling stone tower stands on the hilltop, its upper floors collapsed but its spiral staircase still climbable. Signal-fire scars blacken the parapet.",
   "visualType": "stone_tower_ruin_climbable",
   "interactable": true,
-  "dialogueOnInteract": "You climb the cracked steps to the parapet and the world opens before you. Miles of rolling countryside stretch in every direction — the road a pale ribbon winding through green and gold. From here you can see the next town's smoke and, far distant, the spire of Grailsend catching the sun."
+  "dialogueOnInteract": "You climb the cracked steps to the parapet and the world opens before you. Miles of rolling countryside stretch in every direction \u2014 the road a pale ribbon winding through green and gold. From here you can see the next town's smoke and, far distant, the spire of Grailsend catching the sun.",
+  "glb": "dungeon/MineProps.glb",
+  "glbScale": 1.4,
+  "glbYawRange": 360
 }

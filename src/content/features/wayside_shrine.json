@@ -5,5 +5,8 @@
   "description": "A small stone alcove shelters a carved figure of a saint, fresh wildflowers laid at its feet by some faithful hand.",
   "visualType": "wayside_shrine",
   "interactable": true,
-  "dialogueOnInteract": "You kneel before the shrine and feel a gentle warmth spread through your limbs. The carved saint seems to smile, and for a moment the road ahead feels less lonesome."
+  "dialogueOnInteract": "You kneel before the shrine and feel a gentle warmth spread through your limbs. The carved saint seems to smile, and for a moment the road ahead feels less lonesome.",
+  "glb": "nature/rocks.glb",
+  "glbScale": 1.0,
+  "glbYawRange": 360
 }

@@ -5,5 +5,8 @@
   "description": "A weathered stone post stands at the roadside, its chiselled numerals marking the leagues to distant towns.",
   "visualType": "milestone_marker",
   "interactable": true,
-  "dialogueOnInteract": "You trace the carved letters with your finger. The distances are given in old leagues, a measure no longer used. Someone has added a crude arrow and the word 'HOPE' in charcoal."
+  "dialogueOnInteract": "You trace the carved letters with your finger. The distances are given in old leagues, a measure no longer used. Someone has added a crude arrow and the word 'HOPE' in charcoal.",
+  "glb": "nature/rocks.glb",
+  "glbScale": 0.6,
+  "glbYawRange": 360
 }

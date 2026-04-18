@@ -4,5 +4,8 @@
   "name": "Mushroom Ring",
   "description": "A perfect circle of pale toadstools marks the grass, the kind old wives whisper was trampled flat by dancing fae.",
   "visualType": "mushroom_ring",
-  "interactable": false
+  "interactable": false,
+  "glb": "nature/bush05.glb",
+  "glbScale": 0.6,
+  "glbYawRange": 360
 }

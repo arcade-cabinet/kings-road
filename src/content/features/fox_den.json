@@ -4,5 +4,8 @@
   "name": "Fox Den",
   "description": "A small burrow beneath a mossy bank marks the entrance to a fox's earth, tufts of russet fur caught on the brambles nearby.",
   "visualType": "fox_den",
-  "interactable": false
+  "interactable": false,
+  "glb": "nature/bush01.glb",
+  "glbScale": 0.8,
+  "glbYawRange": 360
 }

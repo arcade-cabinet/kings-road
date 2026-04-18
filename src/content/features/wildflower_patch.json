@@ -4,5 +4,8 @@
   "name": "Wildflower Patch",
   "description": "A sun-dappled carpet of cornflowers and poppies spills across the roadside, humming with the drowsy murmur of bees.",
   "visualType": "wildflower_patch",
-  "interactable": false
+  "interactable": false,
+  "glb": "nature/bush05.glb",
+  "glbScale": 0.8,
+  "glbYawRange": 360
 }

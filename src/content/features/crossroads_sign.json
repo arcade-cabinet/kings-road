@@ -5,5 +5,8 @@
   "description": "A leaning wooden post bears three pointing arms, each painted with a town name in fading letters.",
   "visualType": "crossroads_sign",
   "interactable": true,
-  "dialogueOnInteract": "One arm points east to a town you have never heard of. Another has been snapped off and lies in the weeds. The remaining sign reads 'King's Road — onward' in a steady hand."
+  "dialogueOnInteract": "One arm points east to a town you have never heard of. Another has been snapped off and lies in the weeds. The remaining sign reads 'King's Road \u2014 onward' in a steady hand.",
+  "glb": "nature/tree07.glb",
+  "glbScale": 0.8,
+  "glbYawRange": 360
 }

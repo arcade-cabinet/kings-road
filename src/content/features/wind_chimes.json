@@ -4,5 +4,8 @@
   "name": "Wind Chimes",
   "description": "Lengths of hollow reed and bone dangle from a crooked post, tinkling a wandering melody whenever the breeze stirs.",
   "visualType": "wind_chimes",
-  "interactable": false
+  "interactable": false,
+  "glb": "nature/tree07.glb",
+  "glbScale": 0.7,
+  "glbYawRange": 360
 }
