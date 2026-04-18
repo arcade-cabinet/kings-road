@@ -1,3 +1,12 @@
+// NOTE: This file is over the 300-LOC soft cap. The breakup is planned
+// for the Thornfield Phase 0 `src/composition/` package — prop buckets
+// (crate/barrel/pine/oak/bush/heather/deadTree/boulder) will move to
+// `composition/vegetation/` and `composition/village/`, and this file
+// will orchestrate rendering from the composed output. See
+// docs/superpowers/specs/2026-04-18-thornfield-phase-0.md. We
+// deliberately do NOT carve up the file in this PR because the Phase 0
+// plan reorganizes the whole rendering path — an intermediate reshuffle
+// here would have to be redone immediately.
 import {
   CuboidCollider,
   HeightfieldCollider,
@@ -69,8 +78,15 @@ interface MeshData {
 }
 export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   const { cx, cz, key, type, placedBuildings, npcBlueprints } = chunkData;
-  const hasConfigTown =
-    type === 'TOWN' && placedBuildings && placedBuildings.length > 0;
+  // `placedBuildings` is `undefined` when ChunkManager never resolved a town
+  // config for this chunk. It is `[]` when a config resolved but produced no
+  // building placements — which is still a valid "town config present" state
+  // (empty-layout test fixtures, ghost towns, ruins-without-structures, etc.).
+  // Treat presence of the array as the config-resolved signal; the count is
+  // only used to decide whether to render building meshes.
+  const hasConfigTown = type === 'TOWN' && placedBuildings !== undefined;
+  const hasPlacedBuildings =
+    hasConfigTown && (placedBuildings?.length ?? 0) > 0;
   const materials = useMemo(() => getMaterials(), []);
 
   const oX = cx * CHUNK_SIZE;
@@ -428,17 +444,21 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         material={materials.windowGlow}
       />
 
-      {/* Crates — authored GLB */}
+      {/* Crates — extracted single-node GLB. Previously both crate and
+          barrel pointed at the packed `dungeon/Crates_and_barrels.glb`,
+          which made them render the same sub-mesh (GlbInstancer picks
+          the first mesh it finds). Now each points at its extracted
+          single-node GLB so they visually diverge. */}
       <GlbInstancer
-        glb="dungeon/Crates_and_barrels.glb"
+        glb="dungeon/crates/crate-1.glb"
         items={meshData.crate}
         baseScale={0.6}
       />
 
-      {/* Barrels — authored GLB */}
+      {/* Barrels — distinct extracted single-node GLB. */}
       {meshData.barrel.length > 0 && (
         <GlbInstancer
-          glb="dungeon/Crates_and_barrels.glb"
+          glb="dungeon/crates/barrel-1.glb"
           items={meshData.barrel}
           baseScale={0.5}
         />
@@ -477,8 +497,11 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         baseScale={0.45}
       />
 
-      {/* Config-driven buildings */}
-      {hasConfigTown &&
+      {/* Config-driven buildings — only iterate when the town config
+          actually produced placements. `hasConfigTown` means "config
+          resolved"; `hasPlacedBuildings` additionally means "placement
+          non-empty". */}
+      {hasPlacedBuildings &&
         placedBuildings?.map((b) => (
           <Building
             key={`bldg-${b.label}`}

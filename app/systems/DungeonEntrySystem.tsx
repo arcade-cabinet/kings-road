@@ -42,6 +42,7 @@ import {
 } from '@/world/dungeon-generator';
 import { getAllDungeons } from '@/world/dungeon-registry';
 import { getAnchorById } from '@/world/road-spine';
+import { Model as SupportBeam } from '@app/scene/generated/mine/supportbeam';
 
 const PLAYER_EYE_HEIGHT = 1.6;
 const ENTRANCE_INTERACTION_RADIUS = 6;
@@ -241,8 +242,6 @@ function transitionIntoDungeon(entrance: DungeonEntrance) {
 }
 
 // ── Overworld entrance visual — stone archway ────────────────────────
-
-import { Model as SupportBeam } from '@app/scene/generated/mine/supportbeam';
 
 const darkInteriorMaterial = new THREE.MeshBasicMaterial({
   color: 0x111111,

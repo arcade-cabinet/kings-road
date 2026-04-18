@@ -53,9 +53,12 @@ export function Building({
   rotation = 0,
   label = '',
 }: BuildingProps) {
+  // Depend on the position *primitives* that actually go into the hash,
+  // not the array reference. A parent that rebuilds an identical
+  // `position` array on re-render would otherwise force recomputation.
   const seed = useMemo(
     () => hashString(`${label}-${position[0]}-${position[2]}`),
-    [label, position],
+    [label, position[0], position[2]],
   );
 
   const Variant =

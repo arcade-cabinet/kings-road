@@ -61,6 +61,13 @@ function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {
 
   const transform = POSE_TRANSFORMS[pose];
 
+  // Intentionally discard the GLB's authored material here. Viewmodels
+  // render camera-parented at a fixed distance with no HDRI environment
+  // map bound yet; the authored PSX-pack materials look muddy under
+  // those conditions. A uniform honey-gold PBR reads better in-hand
+  // until the Thornfield Phase 0 lighting pass adds `<Environment>` IBL,
+  // at which point we should revisit this and let the authored material
+  // through. Tracked via the polish-pass Phase 0 spec.
   return (
     <mesh
       geometry={mesh.geometry}
@@ -126,7 +133,7 @@ export function FPSViewmodel() {
 
   return (
     <primitive object={camera}>
-      <BobbedViewmodel pose={viewmodelConfig.handPose}>
+      <BobbedViewmodel>
         <WeaponMesh
           glb={viewmodelConfig.glb}
           pose={viewmodelConfig.handPose}
@@ -145,19 +152,20 @@ export function FPSViewmodel() {
  * so `useFrame` can mutate transform matrices without re-rendering.
  */
 function BobbedViewmodel({
-  pose,
   children,
 }: {
-  pose: HandPose;
   children: React.ReactNode;
 }) {
-  void pose;
   const bobRef = useRef<THREE.Group>(null);
   const elapsed = useRef(0);
 
   useFrame((_state, delta) => {
     if (!bobRef.current) return;
-    const velocity = Math.abs(getPlayer().velocity ?? 0);
+    // `getPlayer()` can return undefined before the PlayerState trait is
+    // attached (brief window during game start). Guard explicitly so the
+    // viewmodel sits still rather than throwing a TypeError.
+    const player = getPlayer();
+    const velocity = player ? Math.abs(player.velocity ?? 0) : 0;
     elapsed.current += delta;
     const moving = Math.min(velocity / 4, 1); // clamp to [0,1]
     const t = elapsed.current;

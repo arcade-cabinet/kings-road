@@ -19,12 +19,17 @@ This makes parallel work safe. Two teammates can rewrite the insides of two diff
 
 Packages are ordered in layers. A package at layer N may import only from layers < N.
 
-```
+```text
 Layer 0  core
          │
 Layer 1  content, assets
          │
-Layer 2  biome, world, ecs, save, platform, audio, combat, benchmark, debug
+Layer 2  biome, platform        (sub-layer 2a — no Layer-2 deps)
+         │
+Layer 2  ecs, world             (sub-layer 2b — may import 2a)
+         │
+Layer 2  audio, combat, save,
+         benchmark, debug       (sub-layer 2c — may import 2a, 2b)
          │
 Layer 3  composition
          │
@@ -33,15 +38,19 @@ Layer 4  app/ (scene, systems, views, components, postprocessing)
 
 - **Layer 0 — `core`**: zero-dep foundation. Types, math, errors. Everyone imports it; it imports nothing internal.
 - **Layer 1 — `content`, `assets`**: schemas, JSON queries, asset URL helpers. Depend only on `core`.
-- **Layer 2 — Domain packages**: each one models one area of the game. May import `core`, `content`, `assets`. May NOT import another Layer-2 package. If two Layer-2 packages need to share something, the shared thing belongs in `core`.
+- **Layer 2 — Domain packages**: each one models one area of the game. May import `core`, `content`, `assets`, and any Layer-2 package listed in a **strictly lower sub-layer** (2a < 2b < 2c). Imports within the same sub-layer or upward are forbidden.
+  - **2a** (`biome`, `platform`) — no Layer-2 dependencies. `biome` is the root config; `platform` is the Capacitor bridge. Both are leaves.
+  - **2b** (`ecs`, `world`) — may import 2a. `world` queries `biome` to know what to generate; `ecs` traits may reference platform paths. `ecs` and `world` do not import each other.
+  - **2c** (`audio`, `combat`, `save`, `benchmark`, `debug`) — may import 2a + 2b. `save` serializes `ecs` state; `combat` reacts to `ecs` events; `debug` spawns into a `biome` via `save` + `ecs`.
+  - If two Layer-2 packages within the *same* sub-layer need to share something, the shared thing belongs in `core` or in a lower sub-layer.
 - **Layer 3 — `composition`**: the only Layer-3 package. It orchestrates Layer-2 domain packages into deterministic composed output (village layouts, vegetation placements, dungeon kits). May import everything below it.
 - **Layer 4 — `app/`**: the R3F render consumer. Reads composition output and renders it. May import everything below it.
 
 Cross-layer import is enforced by:
 
-- `biome.json` import rules (per-package overrides)
-- A `scripts/check-package-boundaries.ts` CI step that walks the import graph and errors on layer violations
-- Code review
+- A `scripts/check-package-boundaries.ts` CI step that walks the import graph. It reads the sub-layer assignment table and fails if any package reaches upward or sideways within its own sub-layer.
+- Barrel-only imports (lint rule).
+- Code review.
 
 ## Package map
 

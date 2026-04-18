@@ -136,9 +136,12 @@ export function PlayerController() {
       inventoryOpen ||
       isDead;
 
-    // Play-time ticks while gameActive and not in a blocking state. Accumulates
-    // into the PlayTime trait so save payloads + the pause-menu "2h 14m walked"
-    // affordance reflect actual play time, not wall-clock time.
+    // Play-time ticks whenever the player is alive and the game isn't
+    // paused. We deliberately continue ticking during dialogue, combat,
+    // and while the inventory is open — those are all states the player
+    // is actively playing in, just not moving through the world. Only
+    // the pause menu, game-not-active (menus/title), and death state
+    // stop the clock.
     if (gameActive && !paused && !isDead) {
       tickPlayTime(dt);
     }

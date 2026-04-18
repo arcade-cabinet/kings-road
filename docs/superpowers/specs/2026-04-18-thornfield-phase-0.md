@@ -60,7 +60,7 @@ If Thornfield hits 30fps floor on the phone, everywhere else will too. If Thornf
 
 ### Asset plumbing
 
-- `assets/pbr/` — PBR loader `loadPbrMaterial('mossy-stone-001')` returns `MeshStandardMaterial` with Color + Normal + Roughness + Displacement.
+- `assets/pbr/` — PBR loader `loadPbrMaterial('mossy-stone')` returns `MeshStandardMaterial` with Color + Normal + Roughness + Displacement. Material IDs are tactile names (no numeric suffix); the underlying AmbientCG-style pack directory may be versioned (e.g. `Moss001`, `Moss002`) but the palette maps a single canonical tactile ID to whichever pack the palette author picked.
 - `assets/pbr/palette.ts` — curated tactile palette: 15 Thornfield materials named by tactile identity (`mossy-stone`, `wet-bark`, `fallen-leaves`, `ivy-ground`, `grave-moss`, `dead-grass`, `packed-mud`, `lichen-stone`, `wet-cobblestone`, `weathered-oak`, `rusted-iron`, `bleached-bone`, `grave-cloth-linen`, `black-ironwork`, `thornfield-cairn-stone`).
 - `assets/hdri/` — HDRI loader. 3 Thornfield HDRIs curated (cold-dawn, overcast-noon, fog-dusk).
 - Ingestion script: `scripts/ingest-pbr.ts` + `scripts/ingest-hdri.ts` — copies from `/Volumes/home/assets/2DPhotorealistic/MATERIAL/1K-JPG/` and `/HDRI/1K/` to `public/` with consistent naming.
@@ -161,19 +161,21 @@ If Thornfield hits 30fps floor on the phone, everywhere else will too. If Thornf
 
 ## Decision boundary
 
+Ranges are mutually exclusive — each threshold band excludes the next. "avg" is the mean of all sampled frame rates across the benchmark suite; "p1-low" is the 1st-percentile frame rate (the worst 1% of frames).
+
 | Benchmark (phone) | Live-fire (phone) | Verdict |
 |---|---|---|
-| ≥ 60fps sustained, p1-low ≥ 45, no thermal throttle | Feels great (≥8/10) | **Stay R3F.** Full speed ahead on remaining biomes. |
-| 45-60fps avg, p1-low ≥ 30, occasional DPR drops | Feels OK (6-8/10) | **Stay R3F.** Scope polish carefully, budget per-biome. |
-| 30-45fps, DPR drops often | Feels laggy (4-6/10) | **Marginal — port to Godot.** R3F ceiling is too close. |
-| < 30fps sustained OR thermal throttle within 10min OR GC stalls visible | Feels bad (<4/10) | **Port to Godot.** Bet the farm. |
+| avg ≥ 60 fps, p1-low ≥ 45, no thermal throttle | Feels great (≥ 8/10) | **Stay R3F.** Full speed ahead on remaining biomes. |
+| 45 ≤ avg < 60, p1-low ≥ 30, occasional DPR drops | Feels OK (6–7/10) | **Stay R3F.** Scope polish carefully, budget per-biome. |
+| 30 ≤ avg < 45, DPR drops often | Feels laggy (4–5/10) | **Marginal — port to Godot.** R3F ceiling is too close. |
+| avg < 30 sustained OR thermal throttle within 10 min OR visible GC stalls | Feels bad (< 4/10) | **Port to Godot.** Bet the farm. |
 | Any benchmark + "feels great" mismatch | — | Investigate first — may be a design problem, not a perf problem. |
 
 ## Success criteria
 
 - `biome.schema.ts` validates `thornfield.json` cleanly.
 - `BiomeService.getCurrentBiome(playerPos)` returns Thornfield for positions in the Thornfield road segment.
-- `loadPbrMaterial('mossy-stone-001')` returns a fully-configured `MeshStandardMaterial`.
+- `loadPbrMaterial('mossy-stone')` returns a fully-configured `MeshStandardMaterial`.
 - `<Environment>` visibly lights the player's equipped metal weapon (reflection of cold-autumn sky).
 - Thornfield terrain is heightmapped — player visibly climbs/descends.
 - Thornfield has ≥ 15 composed authored props visible from the village center.

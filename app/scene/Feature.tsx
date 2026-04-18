@@ -35,6 +35,15 @@ function AuthoredFeature({ feature }: { feature: PlacedFeatureData }) {
 
   const sceneInstance = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
+  // NOTE: This renders one `<primitive>` per feature — one draw call per
+  // placed feature — which scales linearly with feature count and
+  // bypasses InstancedMesh. The Thornfield Phase 0 composition package
+  // (see docs/superpowers/specs/2026-04-18-thornfield-phase-0.md) is the
+  // correct place to fix this: compositors will emit batched placement
+  // arrays (position + rotation + scale per instance) that a single
+  // instanced feature renderer consumes. Not done in this PR because
+  // features need per-instance transforms (yaw jitter + tier scale) that
+  // the current GlbInstancer does not accept.
   return (
     <primitive
       object={sceneInstance}

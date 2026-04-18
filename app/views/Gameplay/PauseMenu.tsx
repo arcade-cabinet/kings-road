@@ -142,7 +142,10 @@ function captureSnapshot() {
       equipment: inv.equipped,
     },
     gs.seedPhrase,
-    Math.floor(getPlayTimeSeconds()),
+    // Preserve sub-second precision across saves — the UI floors to
+    // minutes when displaying, but persisted values should retain full
+    // fidelity so repeated auto-saves don't drift.
+    getPlayTimeSeconds(),
   );
 }
 

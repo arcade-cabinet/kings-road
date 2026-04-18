@@ -1,3 +1,11 @@
+// NOTE: This file is over the 300-LOC soft cap. The breakup is planned
+// for the Thornfield Phase 0 `src/composition/` package — `FeatureMesh`
+// and `AuthoredFeatureMesh` move to `composition/story-props/`, and
+// this file becomes pure orchestration (trigger detection + lifecycle)
+// feeding the composed placement list to a single instanced renderer.
+// See docs/superpowers/specs/2026-04-18-thornfield-phase-0.md. We do
+// NOT carve up the file in this PR because Phase 0 reorganizes the
+// whole path — an intermediate reshuffle here would have to be redone.
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';

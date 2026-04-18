@@ -67,6 +67,8 @@ const ITEM_TYPE_LABELS: Record<string, string> = {
 
 // ── 3D Item Preview ──────────────────────────────────────────────────────
 
+type THREE_Geometry = import('three').BufferGeometry;
+
 /**
  * Renders a 3D preview using the structured viewmodel GLB declared on the
  * item definition. Items without a `viewmodel.glb` throw — no keyword
@@ -86,8 +88,6 @@ function ViewmodelPreview({ glb }: { glb: string }) {
     </mesh>
   );
 }
-
-type THREE_Geometry = import('three').BufferGeometry;
 
 function ItemModelPreview({ itemId }: { itemId: string }) {
   const def = getItemInfo(itemId);
