@@ -2,6 +2,7 @@ import { CloudInstance, Clouds, Sky, Stars } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { BiomeService } from '@/biome';
 import { assetUrl } from '@/lib/assets';
 import {
   getEnvironment,
@@ -117,7 +118,7 @@ export function DayNightCycle() {
       }
     }
 
-    // Update sun light
+    // Update sun light — base intensity from biome if available, else default
     if (sunLightRef.current) {
       sunLightRef.current.position.set(
         camera.position.x + Math.cos(theta) * 100,
@@ -126,10 +127,28 @@ export function DayNightCycle() {
       );
       sunLightRef.current.target.position.copy(camera.position);
       sunLightRef.current.target.updateMatrixWorld();
-      sunLightRef.current.intensity = sunY > 0 ? Math.max(0.2, sunY * 1.8) : 0;
 
-      // Golden-hour amber tint that blends toward white at noon
+      let biomeDirectionalIntensity = 1.8;
+      let biomeDirectionalColor: string | null = null;
+      try {
+        const roadDist = getPlayer().playerPosition?.x ?? 0;
+        const biome = BiomeService.getCurrentBiome(roadDist);
+        biomeDirectionalIntensity = biome.lighting.directionalIntensity;
+        biomeDirectionalColor = biome.lighting.directionalColor;
+      } catch {
+        // BiomeService not yet initialized — use defaults
+      }
+
+      sunLightRef.current.intensity =
+        sunY > 0 ? Math.max(0.2, sunY * biomeDirectionalIntensity) : 0;
+
       if (sunY > 0) {
+        if (biomeDirectionalColor) {
+          // Golden-hour blend: biome directional color at sunrise/set, toward white at noon
+          _amberColor.set(biomeDirectionalColor);
+        } else {
+          _amberColor.setHex(0xffd4a0);
+        }
         sunLightRef.current.color.lerpColors(_amberColor, _noonColor, sunY);
       }
     }

@@ -12,6 +12,7 @@ import { Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
 import { CombatParticles } from './CombatParticles';
 import { DungeonRenderer } from './DungeonRenderer';
+import { EnvironmentIBL } from './environment';
 import { FPSViewmodel } from './FPSViewmodel';
 import { OceanPlane } from './OceanPlane';
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -86,6 +87,9 @@ function SceneContent() {
               <Fog />
               <DayNightCycle />
               <SkyDome />
+              <Suspense fallback={null}>
+                <EnvironmentIBL />
+              </Suspense>
               <AmbientParticles />
               <WeatherSystem />
 
