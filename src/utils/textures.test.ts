@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // We need to test the module in isolation
 describe('textures module', () => {
-  let createProceduralTexture: typeof import('./textures').createProceduralTexture;
+  let loadPbrMaterial: typeof import('./textures').loadPbrMaterial;
   let getMaterials: typeof import('./textures').getMaterials;
   let updateWindowEmissive: typeof import('./textures').updateWindowEmissive;
 
@@ -11,7 +11,7 @@ describe('textures module', () => {
     // Reset module cache to get fresh materials cache each test
     vi.resetModules();
     const module = await import('./textures');
-    createProceduralTexture = module.createProceduralTexture;
+    loadPbrMaterial = module.loadPbrMaterial;
     getMaterials = module.getMaterials;
     updateWindowEmissive = module.updateWindowEmissive;
   });
@@ -20,7 +20,7 @@ describe('textures module', () => {
     vi.resetModules();
   });
 
-  describe('createProceduralTexture', () => {
+  describe('loadPbrMaterial', () => {
     const textureTypes = [
       'plaster',
       'stone_block',
@@ -34,35 +34,36 @@ describe('textures module', () => {
       'cobblestone',
     ] as const;
 
-    it.each(textureTypes)('creates %s texture', (type) => {
-      const texture = createProceduralTexture(type);
-      expect(texture).toBeInstanceOf(THREE.CanvasTexture);
-      expect(texture.wrapS).toBe(THREE.RepeatWrapping);
-      expect(texture.wrapT).toBe(THREE.RepeatWrapping);
+    it.each(textureTypes)('creates %s material', (type) => {
+      const mat = loadPbrMaterial(type);
+      expect(mat).toBeInstanceOf(THREE.MeshStandardMaterial);
     });
 
-    it('uses provided seed for reproducibility', () => {
-      const texture1 = createProceduralTexture('plaster', 12345);
-      const texture2 = createProceduralTexture('plaster', 12345);
-      // Both should be created (can't easily compare canvas content)
-      expect(texture1).toBeTruthy();
-      expect(texture2).toBeTruthy();
+    it('returns cached material on second call', () => {
+      const mat1 = loadPbrMaterial('plaster');
+      const mat2 = loadPbrMaterial('plaster');
+      expect(mat1).toBe(mat2);
     });
 
-    it('uses random seed when not provided', () => {
-      const texture = createProceduralTexture('grass');
-      expect(texture).toBeInstanceOf(THREE.CanvasTexture);
+    it('window type returns canvas-backed material with emissive', () => {
+      const mat = loadPbrMaterial('window');
+      expect(mat).toBeInstanceOf(THREE.MeshStandardMaterial);
+      // emissive is set to 0xffaa44 — non-zero color
+      expect(mat.emissive.r).toBeGreaterThan(0);
     });
 
-    it('sets correct color space', () => {
-      const texture = createProceduralTexture('wood');
-      expect(texture.colorSpace).toBe(THREE.SRGBColorSpace);
+    it('plaster material has roughness 1.0 and metalness 0.0', () => {
+      const mat = loadPbrMaterial('plaster');
+      expect(mat.roughness).toBe(1.0);
+      expect(mat.metalness).toBe(0.0);
     });
 
-    it('handles unknown texture type with default magenta', () => {
-      // @ts-expect-error Testing invalid input for default case
-      const texture = createProceduralTexture('unknown_type');
-      expect(texture).toBeInstanceOf(THREE.CanvasTexture);
+    it('door reuses wood PBR maps', () => {
+      const wood = loadPbrMaterial('wood');
+      const door = loadPbrMaterial('door');
+      // Both use the same underlying maps (same dir), but could be same object
+      expect(wood).toBeInstanceOf(THREE.MeshStandardMaterial);
+      expect(door).toBeInstanceOf(THREE.MeshStandardMaterial);
     });
   });
 
