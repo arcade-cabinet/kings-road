@@ -45,12 +45,14 @@ export class BenchmarkCapture {
   private readonly route: string;
   private readonly startedAt: string;
   private readonly frames: FrameSample[] = [];
-  private lastFrameTime = performance.now();
+  // Sentinel 0 = baseline not yet established. First sample() call sets the
+  // baseline and returns without pushing a sample, so mount/shader-compile
+  // latency doesn't pollute p1Fps with a spurious spike or near-zero reading.
+  private lastFrameTime = 0;
 
   constructor(route: string) {
     this.route = route;
     this.startedAt = new Date().toISOString();
-    this.lastFrameTime = performance.now();
   }
 
   /**
@@ -62,6 +64,10 @@ export class BenchmarkCapture {
     memory: { geometries: number; textures: number };
   }): void {
     const now = performance.now();
+    if (this.lastFrameTime === 0) {
+      this.lastFrameTime = now;
+      return;
+    }
     const frameTimeMs = now - this.lastFrameTime;
     this.lastFrameTime = now;
 

@@ -1,0 +1,1 @@
+export { BiomePostProcessing } from './BiomePostProcessing';
