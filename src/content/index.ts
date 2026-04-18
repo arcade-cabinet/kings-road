@@ -1,5 +1,9 @@
 // All schemas — barrel pass-through, no behavior changes
 
+import roadSpineData from './world/road-spine.json';
+
+export const roadSpine = roadSpineData;
+
 // Content query functions — barrel pass-through, no behavior changes
 export {
   getAllBuildings,

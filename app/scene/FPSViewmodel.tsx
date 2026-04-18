@@ -76,7 +76,7 @@ function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {
       scale={transform.scale}
       castShadow
     >
-      <meshStandardMaterial color="#c4a747" roughness={0.3} metalness={0.8} />
+      <meshStandardMaterial color="#c4a747" roughness={0.3} metalness={0.8} envMapIntensity={1.0} />
     </mesh>
   );
 }
