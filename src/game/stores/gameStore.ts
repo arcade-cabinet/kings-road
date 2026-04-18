@@ -527,6 +527,6 @@ export const useGameStore = create<GameState>((set, _get) => ({
 }));
 
 // Debug: expose store for DevTools testing (tree-shaken in production)
-if (__DEV__ && typeof window !== 'undefined') {
+if (import.meta.env.DEV && typeof window !== 'undefined') {
   (window as unknown as Record<string, unknown>).__gameStore = useGameStore;
 }

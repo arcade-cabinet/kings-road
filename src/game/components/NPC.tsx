@@ -99,7 +99,7 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
   const isHighlighted = currentInteractable?.id === npcId && npcId !== '';
   const accentColor = TYPE_ACCENTS[npcType] ?? '#88aacc';
 
-  const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+  const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   // Determine model path based on archetype
   const modelName = MODEL_MAPPING[npcType] || 'basemesh';
@@ -262,7 +262,7 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
 }
 
 // Preload common models
-const PRELOAD_BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const PRELOAD_BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 const MODELS_TO_PRELOAD = new Set(Object.values(MODEL_MAPPING));
 MODELS_TO_PRELOAD.add('basemesh');
 

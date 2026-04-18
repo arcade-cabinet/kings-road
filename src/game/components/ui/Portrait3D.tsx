@@ -2,7 +2,7 @@ import { Stage, useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useMemo } from 'react';
 
-const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const MODEL_MAPPING: Record<string, string> = {
   guard: 'knight',

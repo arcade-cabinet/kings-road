@@ -14,7 +14,7 @@ interface MonsterProps {
   position: [number, number, number];
 }
 
-const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 const SKELETON_PATH = `${BASE_URL}/assets/monsters/Skeleton_warrior-transformed.glb`;
 const BAT_PATH = `${BASE_URL}/assets/monsters/Bat-transformed.glb`;
 const WEREWOLF_PATH = `${BASE_URL}/assets/monsters/werewolf-transformed.glb`;

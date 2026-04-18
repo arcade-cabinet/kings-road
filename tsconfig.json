@@ -1,12 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "allowJs": true,
@@ -23,24 +19,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
+    "types": ["vite/client", "node"],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"],
+      "@app/*": ["app/*"]
     }
   },
-  "include": [
-    "src",
-    "scripts",
-    "app",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ],
-  "extends": "expo/tsconfig.base"
+  "include": ["src", "app", "scripts", "vite.config.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -11,7 +11,7 @@ import { hashString } from '../factories/chibi-generator';
 import type { PlacedFeatureData } from '../types';
 import { DungeonProp } from './DungeonProp';
 
-const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 const ROCKS_PATH = `${BASE_URL}/assets/nature/rocks-transformed.glb`;
 
 // --- Primitive Fallback ---

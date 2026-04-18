@@ -2,7 +2,7 @@ import { useGLTF } from '@react-three/drei';
 import { useMemo } from 'react';
 import { hashString } from '../factories/chibi-generator';
 
-const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const ASSETS = {
   tree_large: `${BASE_URL}/assets/nature/tree01.glb`,

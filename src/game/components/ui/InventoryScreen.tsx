@@ -21,7 +21,7 @@ const SLOT_BG = 'rgba(245, 240, 232, 0.6)';
 const SLOT_BORDER = 'rgba(139, 111, 71, 0.3)';
 const SLOT_HOVER = 'rgba(196, 167, 71, 0.2)';
 
-const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 const ITEM_MODELS = {
   sword: `${BASE_URL}/assets/items/Sword-transformed.glb`,
   treasure: `${BASE_URL}/assets/items/Treasure-transformed.glb`,

@@ -11,7 +11,7 @@ interface BuildingProps {
 }
 
 // Ensure the GLB is loaded. This should match the path we copied the file to.
-const BASE_URL = (process.env.EXPO_BASE_URL ?? '').replace(/\/+$/, '');
+const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 const GLB_PATH = `${BASE_URL}/assets/buildings/Village_Buildings-transformed.glb`;
 
 export function Building({
