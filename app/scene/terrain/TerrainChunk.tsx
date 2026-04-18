@@ -1,3 +1,4 @@
+import { ContactShadows } from '@react-three/drei';
 import { HeightfieldCollider, RigidBody } from '@react-three/rapier';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -184,6 +185,15 @@ export function TerrainChunk({
           position={[centerX, 0, centerZ]}
         />
       </RigidBody>
+
+      <ContactShadows
+        position={[centerX, 0, centerZ]}
+        opacity={0.4}
+        scale={CHUNK_SIZE}
+        blur={2}
+        far={20}
+        resolution={256}
+      />
     </group>
   );
 }

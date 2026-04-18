@@ -20,6 +20,7 @@ import { cyrb128, mulberry32 } from '@/core';
 import { getBiomeGroundMaterial, getMaterials } from '@/utils/textures';
 import type { HeightSampler } from '@/utils/vegetation';
 import { placeVegetation } from '@/utils/vegetation';
+import { BiomeService } from '@/biome';
 import { GlbInstancer } from './GlbInstancer';
 import {
   BLOCK_SIZE,
@@ -32,6 +33,7 @@ import { Feature } from './Feature';
 import { NPC } from './NPC';
 import { Relic } from './Relic';
 import { RoadSurface } from './RoadSurface';
+import { TerrainChunk } from './terrain';
 
 /** Number of subdivisions per chunk edge for terrain mesh */
 const TERRAIN_SEGMENTS = 16;
@@ -249,6 +251,23 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     kingdomMap,
   ]);
 
+  // Resolve BiomeConfig for this chunk's biome (not all KingdomBiome values are registered).
+  // Returns null when the biome has no registered BiomeConfig (deep_forest, highland, etc.).
+  const biomeConfig = useMemo(() => {
+    if (!chunkData.biome) return null;
+    try {
+      return BiomeService.getBiomeById(chunkData.biome);
+    } catch {
+      return null;
+    }
+  }, [chunkData.biome]);
+
+  // True when the biome declares a procedural heightmap — triggers TerrainChunk dispatch.
+  const useProceduralTerrain =
+    type === 'WILD' &&
+    biomeConfig !== null &&
+    biomeConfig.terrain.heightmap === 'procedural';
+
   // Ground material: biome-aware when kingdom tile is present
   const groundMaterial = useMemo(() => {
     if (chunkData.biome) {
@@ -372,8 +391,15 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
 
   return (
     <group>
-      {/* Terrain mesh — heightmap when kingdom map present, flat plane otherwise */}
-      {terrainData && terrainMaterial ? (
+      {/* Terrain mesh — procedural biome heightmap > kingdom heightmap > flat plane */}
+      {useProceduralTerrain && biomeConfig ? (
+        <TerrainChunk
+          biomeConfig={biomeConfig}
+          seed={seedPhrase}
+          cx={cx}
+          cz={cz}
+        />
+      ) : terrainData && terrainMaterial ? (
         <mesh
           geometry={terrainData.geometry}
           position={[oX + CHUNK_SIZE / 2, 0, oZ + CHUNK_SIZE / 2]}
@@ -545,8 +571,9 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
 
       {/* Rapier static colliders — ground + all obstacles */}
       <RigidBody type="fixed" colliders={false}>
-        {/* Ground collider: heightfield when terrain data present, flat cuboid otherwise */}
-        {terrainData ? (
+        {/* Ground collider: TerrainChunk owns its own collider when procedural;
+            otherwise heightfield from kingdom map or flat cuboid fallback. */}
+        {!useProceduralTerrain && terrainData ? (
           <HeightfieldCollider
             args={[
               TERRAIN_SEGMENTS,
@@ -556,12 +583,12 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
             ]}
             position={[oX + CHUNK_SIZE / 2, 0, oZ + CHUNK_SIZE / 2]}
           />
-        ) : (
+        ) : !useProceduralTerrain ? (
           <CuboidCollider
             args={[CHUNK_SIZE / 2, 0.1, CHUNK_SIZE / 2]}
             position={[oX + CHUNK_SIZE / 2, groundY - 0.1, oZ + CHUNK_SIZE / 2]}
           />
-        )}
+        ) : null}
         {/* Obstacle colliders matching the AABB data */}
         {chunkData.collidables.map((aabb) => {
           const w = (aabb.maxX - aabb.minX) / 2;
