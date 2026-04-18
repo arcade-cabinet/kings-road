@@ -112,7 +112,13 @@ export function DungeonKitRenderer({
         </AccumulativeShadows>
       )}
 
-      <BakeShadows />
+      {/*
+       * BakeShadows freezes shadow-map updates after the first frame. Mount it
+       * ONLY in the 'static' budget — 'off' skips all shadow work, 'temporal'
+       * needs continuous updates for AccumulativeShadows to keep refining and
+       * for any dynamic castShadow lights to keep casting.
+       */}
+      {shadows === 'static' && <BakeShadows />}
     </group>
   );
 }
