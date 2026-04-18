@@ -6,6 +6,7 @@ import type { BuildingArchetype } from '@/schemas/building.schema';
 import type { FeatureDefinition } from '@/schemas/feature.schema';
 import type { KingdomBiome, MapTile } from '@/schemas/kingdom.schema';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
+import type { NPCArchetype } from '@/schemas/npc.schema';
 import type { NPCBlueprint } from '@/schemas/npc-blueprint.schema';
 
 /** Axis-Aligned Bounding Box for collision detection */
@@ -17,7 +18,7 @@ export interface AABB {
 }
 
 /** NPC types available in the game */
-export type NPCType = 'blacksmith' | 'innkeeper' | 'wanderer' | 'merchant';
+export type NPCType = NPCArchetype;
 
 /** Interactable entity (NPCs, objects) */
 export interface Interactable {
