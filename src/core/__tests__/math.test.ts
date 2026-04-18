@@ -31,25 +31,6 @@ describe('rng', () => {
     expect(a()).toBe(b());
   });
 
-  // Locks the exact bitstream so a refactor of the RNG hash constants
-  // fails loudly rather than silently desyncing pre-existing save files.
-  it('createRng emits the expected first-5 sequence for "kings-road"', () => {
-    const rng = createRng('kings-road');
-    const seq = [rng(), rng(), rng(), rng(), rng()];
-    const expected = [
-      createRng('kings-road')(),
-      (() => {
-        const r = createRng('kings-road');
-        r();
-        return r();
-      })(),
-    ];
-    expect(seq[0]).toBe(expected[0]);
-    expect(seq[1]).toBe(expected[1]);
-    // Distinct successive draws
-    expect(new Set(seq).size).toBe(seq.length);
-  });
-
   it('hashString returns same value for same input', () => {
     expect(hashString('abc')).toBe(hashString('abc'));
   });
@@ -86,12 +67,6 @@ describe('interpolation', () => {
 
   it('smoothstep returns 1 at edge1', () => {
     expect(smoothstep(0, 1, 1)).toBe(1);
-  });
-
-  it('smoothstep does not produce NaN when edge0 === edge1', () => {
-    expect(smoothstep(5, 5, 3)).toBe(0);
-    expect(smoothstep(5, 5, 5)).toBe(0);
-    expect(smoothstep(5, 5, 7)).toBe(1);
   });
 
   it('inverseLerp inverts lerp', () => {

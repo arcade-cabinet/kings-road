@@ -18,10 +18,9 @@ export type {
   Vec3,
 } from './types';
 export {
-  asArchetype,
   asBiomeId,
   asEntityId,
   asSeed,
   CHUNK_TYPES,
-  isChunkType,
+  ChunkTypeSchema,
 } from './types';
