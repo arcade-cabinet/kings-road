@@ -34,3 +34,15 @@ directories from `/Volumes/home/assets/HDRI/1K/<pack>/` to `public/assets/hdri/<
 The content curator (team-lead) provides the manifest using `sourceDir` (whole
 directory) rather than a single file path. Thornfield HDRIs (cold-dawn,
 overcast-noon, fog-dusk) are added in task #6.
+
+## Polyhaven packs and the canonical alias
+
+Polyhaven downloads land as `<name>_1k.hdr` / `_2k.hdr` / `_4k.hdr`.
+The ingest script automatically creates a canonical alias `<id>.hdr` after
+copying the whole directory, so the loader never needs to know about resolution
+suffixes.
+
+**Resolution preference: 1K > 2K > 4K.** 1K is the default for IBL ambient
+lighting on mobile builds — it cuts texture RAM roughly in half versus 2K at
+negligible perceptual quality loss for diffuse irradiance. Use 2K or 4K only if
+specular reflections in the scene demand it and you have confirmed the budget.
