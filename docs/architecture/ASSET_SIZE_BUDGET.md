@@ -17,8 +17,8 @@ The correct constraint is **per-chunk resident memory**, not repository disk siz
 
 | Parameter | Value | Source |
 |-----------|-------|--------|
-| `CHUNK_SIZE` | 120 units | `src/world/pacing-engine.ts` |
-| `VIEW_DISTANCE` | 1 | `src/world/pacing-engine.ts` |
+| `CHUNK_SIZE` | 120 units | `src/utils/worldGen.ts` |
+| `VIEW_DISTANCE` | 1 | `src/utils/worldGen.ts` |
 | Active chunk window | (2×1+1)² = **9 chunks** | formula |
 | Per-chunk resident budget | **60 MB** | target (GPU VRAM + CPU RAM) |
 | Max total resident (9 chunks) | **540 MB** | per-chunk budget × window size |
@@ -61,25 +61,26 @@ Biome exit is defined as the player's road-spine position moving more than `CHUN
 
 ## Chunk unload discipline
 
+**Status: required policy — not yet implemented.** `src/assets/gltf.ts` and `src/lib/configure-gltf.ts` currently have no chunk-eviction disposal. This is a known gap; the eviction hook must be wired before the streaming system goes to production. Track implementation alongside `app/scene/Chunk.tsx` chunk lifecycle work.
+
 When a chunk falls outside the active window, all Three.js resources it owns must be explicitly released. `useGLTF` caches by URL — **silence does not free memory**.
 
-Required disposal pattern:
+Required disposal pattern (to be implemented in the chunk eviction path):
 
 ```ts
-// On chunk eviction
+// On chunk eviction — call these for each GLB the chunk loaded
 useGLTF.clear(glbUrl);          // remove from drei/useLoader cache
 geometry.dispose();              // free GPU buffer
 material.dispose();              // free GPU shader / uniforms
 texture.dispose();               // free GPU texture memory
 ```
 
-For biome-shared assets, disposal fires on biome exit, not chunk eviction.
+For biome-shared assets (PBR textures, NPC bundle, HDRI), disposal fires on biome exit, not chunk eviction.
 
-Monitor resident memory during development:
+Monitor resident memory during development to verify eviction is working:
 
 ```ts
 const { gl } = useThree();
-// Log Three.js renderer memory stats
 console.log(gl.info.memory);    // { geometries, textures }
 console.log(gl.info.render);    // { calls, triangles, points, lines }
 ```
@@ -175,7 +176,8 @@ These cannot be configured via `gh api` at the repo level — they must be set i
 
 ## Related
 
-- `src/world/pacing-engine.ts` — `CHUNK_SIZE`, `VIEW_DISTANCE`, chunk window logic.
+- `src/utils/worldGen.ts` — `CHUNK_SIZE = 120`, `VIEW_DISTANCE = 1` definitions.
+- `src/utils/tuning.ts` — re-exports `CHUNK_SIZE` and `VIEW_DISTANCE` from `TUNING.world.*`.
 - `src/utils/textures.ts` — runtime PBR/material texture handling.
 - `scripts/` — asset pipeline scripts; PBR ingest, HDRI downscale, and GLB compression scripts planned here.
 - Issue #81 — `*pr.glb` cleanup tracking.
