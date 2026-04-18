@@ -29,6 +29,7 @@ import {
   getRoomColor,
   ROOM_SIZE,
 } from '@/world/dungeon-generator';
+import { Model as SupportBeam } from './generated/mine/supportbeam';
 import { Model as WallTorch } from './generated/mine/wall-torch';
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -671,25 +672,10 @@ function DungeonEntranceExit({ entranceRoom }: { entranceRoom: PlacedRoom }) {
         decay={2}
         position={[0, 2, 2]}
       />
-      {/* Archway shape — two pillars and a lintel */}
-      <mesh
-        position={[-DOORWAY_WIDTH / 2 - 0.3, DOORWAY_HEIGHT / 2, 0]}
-        castShadow
-      >
-        <boxGeometry args={[0.6, DOORWAY_HEIGHT, 0.6]} />
-        <meshStandardMaterial color={0x5a5a4a} roughness={0.85} />
-      </mesh>
-      <mesh
-        position={[DOORWAY_WIDTH / 2 + 0.3, DOORWAY_HEIGHT / 2, 0]}
-        castShadow
-      >
-        <boxGeometry args={[0.6, DOORWAY_HEIGHT, 0.6]} />
-        <meshStandardMaterial color={0x5a5a4a} roughness={0.85} />
-      </mesh>
-      <mesh position={[0, DOORWAY_HEIGHT + 0.2, 0]} castShadow>
-        <boxGeometry args={[DOORWAY_WIDTH + 1.2, 0.4, 0.6]} />
-        <meshStandardMaterial color={0x5a5a4a} roughness={0.85} />
-      </mesh>
+      {/* Authored mine support-beam as the exit-arch frame. */}
+      <SupportBeam
+        scale={[DOORWAY_WIDTH + 0.6, DOORWAY_HEIGHT + 0.4, 0.6]}
+      />
       {/* Light plane behind to suggest daylight */}
       <mesh position={[0, DOORWAY_HEIGHT / 2, 1]}>
         <planeGeometry args={[DOORWAY_WIDTH, DOORWAY_HEIGHT]} />
