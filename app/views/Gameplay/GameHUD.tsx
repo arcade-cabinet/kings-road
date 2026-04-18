@@ -6,8 +6,6 @@ import {
   getQuestDefinition,
   useQuestStore,
 } from '@/stores/questStore';
-import { Minimap } from './Minimap';
-
 // ── Design tokens ────────────────────────────────────────────────────
 const PARCHMENT = 'rgba(245, 240, 232, 0.85)';
 const PARCHMENT_BORDER = '#c4a747';
@@ -615,7 +613,7 @@ export function GameHUD() {
         </div>
       </div>
 
-      {/* Top Right — Time, Compass, Quest Tracker, Minimap */}
+      {/* Top Right — Time, Compass, Quest Tracker */}
       <div className="absolute top-6 right-6 flex flex-col items-end gap-2.5">
         {/* Time, weather, and day/night */}
         <div className="flex items-center gap-2.5">
@@ -643,8 +641,7 @@ export function GameHUD() {
         {/* Quest Tracker */}
         <QuestTracker />
 
-        {/* Minimap */}
-        <Minimap />
+
       </div>
 
       {/* Dungeon room description — shown when inside a dungeon */}
