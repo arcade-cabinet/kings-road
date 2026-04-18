@@ -1,6 +1,6 @@
 import type { BiomeConfig } from '@/biome';
 import { createRng } from '@/core';
-import { getAssetsByCategory, weightedPick } from './assets';
+import { RUIN_ASSETS, getAssetsByCategory, weightedPick } from './assets';
 import type { RuinsPlacement, TownConfig } from './types';
 
 /**
@@ -90,9 +90,9 @@ export function composeRuins(
     );
 
     for (const pos of positions) {
-      const assetId = weightedPick(assetIds, rng);
+      const ruinId = weightedPick(assetIds, rng);
       placements.push({
-        assetId,
+        assetId: RUIN_ASSETS[ruinId].path.replace(/^\/assets\//, ''),
         position: { x: pos.x, y: town.center.y, z: pos.z },
         rotation: { x: 0, y: rng() * Math.PI * 2, z: 0 },
         scale: 0.85 + rng() * 0.3,

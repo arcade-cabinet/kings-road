@@ -4,7 +4,9 @@ import { DUNGEON_KIT } from '../catalog';
 import { composeDungeonRoom } from '../compose';
 import type { DungeonKitRoom } from '../types';
 
-const VALID_ASSET_IDS = new Set(Object.keys(DUNGEON_KIT));
+const VALID_ASSET_IDS = new Set(
+  Object.values(DUNGEON_KIT).map((def) => def.path.replace(/^\/assets\//, '')),
+);
 
 const TEST_ROOM: DungeonKitRoom = {
   id: 'room-test-01',

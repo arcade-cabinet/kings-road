@@ -47,7 +47,9 @@ export function composeStoryProps(
     );
   }
 
-  const defs = getPropDefsForBiome(biomeId);
+  const allDefs = getPropDefsForBiome(biomeId);
+  // Only place props whose GLB has been ingested — glbPath null means pending ingest.
+  const defs = allDefs.filter((d) => d.glbPath !== null);
   if (defs.length === 0) {
     return [];
   }
@@ -88,7 +90,8 @@ export function composeStoryProps(
     const lateralOffset = (rng() > 0.5 ? 1 : -1) * (3 + rng() * 5);
 
     placements.push({
-      assetId: def.assetId,
+      // glbPath is non-null here — filtered above
+      assetId: def.glbPath!,
       archetype: def.archetype,
       position: {
         x: lateralOffset,

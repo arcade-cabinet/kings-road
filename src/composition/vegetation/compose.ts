@@ -75,7 +75,7 @@ export function composeVegetation(
       const rotation = rng() * Math.PI * 2;
 
       placements.push({
-        assetId: variant.id,
+        assetId: variant.path.replace(/^\/assets\//, ''),
         position: { x: worldX, y: worldY, z: worldZ },
         rotation,
         scale,
