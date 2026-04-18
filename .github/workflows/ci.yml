@@ -44,7 +44,11 @@ jobs:
 
       - name: Asset size gate
         run: |
-          SIZE=$(du -sm public/assets/ | cut -f1)
+          SIZE=$(du -sm public/assets/ 2>/dev/null | cut -f1)
+          if [ -z "$SIZE" ]; then
+            echo "ERROR: public/assets/ not found — check build output"
+            exit 1
+          fi
           echo "public/assets/ is ${SIZE}MB"
           if [ "$SIZE" -gt 100 ]; then
             echo "ERROR: public/assets/ exceeds 100MB baked-in ceiling (${SIZE}MB)"

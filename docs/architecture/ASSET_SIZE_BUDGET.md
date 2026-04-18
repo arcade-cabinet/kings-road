@@ -32,9 +32,9 @@ Measured from `public/assets/` in the worktree — reflects all assets committed
 | sql-wasm | `public/assets/sql-wasm.wasm` | 648 KB | Runtime DB engine — required. |
 | **Total** | `public/assets/` | **~140 MB** | Before PBR textures, HDRI, and terrain heightmaps are added. |
 
-**The baseline is already at 140 MB — we have ~10 MB headroom before the 150 MB hard ceiling.**
+**The baseline is already at 140 MB — only ~10 MB headroom before the 150 MB APK ceiling.** The CI gate (below) enforces a 100 MB baked-in ceiling, which requires ~40 MB of reduction from the current baseline before it will pass. The two highest-impact actions (delete `*pr.glb` duplicates: −28 MB; GLB compression: −30–50 MB) together close that gap.
 
-Phase 0 biome ingestion (`scripts/ingest-pbr.ts`, `scripts/ingest-terrain.ts`) will add PBR texture packs (10–30 MB each) and HDRI files (5–15 MB per .exr). **These CANNOT all ship baked-in.**
+Phase 0 biome ingestion (planned scripts — not yet in the repo) will add PBR texture packs (10–30 MB each) and HDRI files (5–15 MB per .exr). **These CANNOT all ship baked-in.**
 
 ---
 
@@ -91,9 +91,9 @@ Each additional biome streams on first entry and caches locally. Budget per stre
 | NPC bundle (shared) | Baked-in | NPCs appear in biome 1; bundle is ~14 MB cleaned up |
 | Biome 1 buildings + ruins | Baked-in | Phase 0 benchmark requires them on first load |
 | Biome 1 PBR textures | Baked-in | Benchmark must measure full-stack PBR |
-| Biome 1 HDRI | Baked-in | IBL required for benchmark honesty (see PBR_MATERIAL_STANDARD.md) |
-| Biomes 2–6 GLBs | Stream on entry | Lazy-load via `@/assets/gltf.ts` loader |
-| Biomes 2–6 PBR + HDRI | Stream on entry | Same loader path |
+| Biome 1 HDRI | Baked-in | IBL must be present on first load so benchmark lighting matches shipped PBR quality |
+| Biomes 2–6 GLBs | Stream on entry | Lazy-load via the runtime asset streaming pipeline on biome entry |
+| Biomes 2–6 PBR + HDRI | Stream on entry | Stream alongside the biome's GLBs through the same runtime asset pipeline |
 | Terrain heightmaps | Stream on chunk load | Too large for baked-in; chunked by road distance |
 | Audio | Stream on zone enter | Tone.js already does this |
 | Content DB | Baked-in | sql-wasm.wasm + game.db are 1–2 MB; required on cold start |
@@ -154,12 +154,16 @@ ffmpeg -i input.exr -vf scale=2048:-1 output.hdr
 
 ## CI size gate
 
-Add a CI step that fails if `public/assets/` exceeds the baked-in ceiling:
+A CI step in `.github/workflows/ci.yml` (after the build step) fails if `public/assets/` grows past the limit:
 
 ```yaml
 - name: Asset size gate
   run: |
-    SIZE=$(du -sm public/assets/ | cut -f1)
+    SIZE=$(du -sm public/assets/ 2>/dev/null | cut -f1)
+    if [ -z "$SIZE" ]; then
+      echo "ERROR: public/assets/ not found — check build output"
+      exit 1
+    fi
     echo "public/assets/ is ${SIZE}MB"
     if [ "$SIZE" -gt 100 ]; then
       echo "ERROR: public/assets/ exceeds 100MB baked-in ceiling (${SIZE}MB)"
@@ -167,7 +171,7 @@ Add a CI step that fails if `public/assets/` exceeds the baked-in ceiling:
     fi
 ```
 
-This goes in `.github/workflows/ci.yml` after the build step. The 100 MB threshold matches the baked-in budget table above.
+**Current threshold: 100 MB.** The repo baseline is ~140 MB, so CI will fail until the `*pr.glb` duplicates are deleted and GLBs are compressed (see Immediate action items). The threshold is intentionally set at the target, not the current baseline, to make the debt visible and prevent new assets from being added before cleanup lands.
 
 ---
 
@@ -176,10 +180,10 @@ This goes in `.github/workflows/ci.yml` after the build step. The 100 MB thresho
 Priority order before Phase 0 branch cuts:
 
 1. **Delete `*pr.glb` duplicates** from `public/assets/npcs/` — saves ~28 MB, no code change. (Owner: whoever touches NPC loading next.)
-2. **Add asset size CI gate** — prevents future regressions. (Owner: tooling.)
-3. **Run `gltf-transform optimize` on NPC + buildings GLBs** — biggest single compression win. (Owner: assets-agent or tooling.)
-4. **Convert PBR textures to WebP** in `scripts/ingest-pbr.ts` — add `--texture-compress webp` to ingest. (Owner: assets-agent.)
-5. **Downscale HDRI to 2K RGBE** in `scripts/ingest-hdri.ts` — keeps HDRI baked-in budget under 8 MB. (Owner: assets-agent or team-lead.)
+2. **Add asset size CI gate** — done in this PR; currently set to 100 MB target (will fail until #1 + #3 land).
+3. **Run `gltf-transform optimize` on NPC + buildings GLBs** — biggest single compression win. Add a `scripts/compress-assets.ts` that processes `public/assets/**/*.glb`. (Owner: assets-agent or tooling.)
+4. **Convert PBR textures to WebP** when the PBR ingest script is authored — add `--texture-compress webp` flag. (Owner: assets-agent.)
+5. **Downscale HDRI to 2K RGBE** when the HDRI ingest script is authored — keeps HDRI baked-in budget under 8 MB. (Owner: assets-agent or team-lead.)
 
 ---
 
@@ -208,8 +212,6 @@ These cannot be configured via `gh api` at the repo level — they must be set i
 
 ## Related
 
-- `docs/architecture/PBR_MATERIAL_STANDARD.md` — full-stack PBR binding rules (benchmark fidelity depends on this).
-- `scripts/ingest-pbr.ts` — PBR pack ingest (add WebP compression here).
-- `scripts/ingest-hdri.ts` — HDRI ingest (add 2K RGBE downscale here).
-- `scripts/compress-assets.ts` — to be authored: post-ingest GLB compression.
-- `.github/workflows/ci.yml` — add asset size gate step.
+- `src/utils/textures.ts` — current runtime PBR/material texture handling.
+- `scripts/` — existing asset pipeline scripts; PBR ingest, HDRI downscale, and GLB compression scripts are planned and to be authored here.
+- `.github/workflows/ci.yml` — asset size gate step (added in this PR).
