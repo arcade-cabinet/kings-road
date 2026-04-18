@@ -41,15 +41,24 @@ The main quest follows a Holy Grail narrative across 6 anchor points. Side quest
 
 ## Project Structure
 
-```
-app/                      # All TSX: entry, App, Game, scene/, systems/, ui/
+```text
+app/                      # All TSX: entry points + views + components + systems
 ├── main.tsx              # Vite entry point
-├── App.tsx               # Root React tree
+├── App.tsx               # Root React tree (WorldProvider wrap)
 ├── Game.tsx              # Menu vs active game
 ├── ErrorBoundary.tsx
-├── scene/                # R3F 3D components (Chunk, Building, NPC, Feature, etc.)
-├── systems/              # Game logic (PlayerController, ChunkManager, etc.)
-└── ui/                   # 2D overlay and diegetic HUD components
+├── scene/                # R3F 3D components (Chunk, Building, NPC, Feature, ...)
+├── systems/              # R3F useFrame-driven systems (PlayerController, ChunkManager, ...)
+├── views/                # Full-screen views grouped by route
+│   ├── MainMenu/         # Landing: MainMenu, ShaderBackdrop, VellumOrnaments
+│   ├── Gameplay/         # In-game: GameplayFrame, GameHUD, CombatHUD, DialogueBox,
+│   │                     #          InventoryScreen, PauseMenu, LoadingOverlay,
+│   │                     #          QuestLog, Minimap, MobileControls
+│   ├── DeathOverlay.tsx
+│   ├── ErrorOverlay.tsx
+│   └── SettingsPanel.tsx
+├── components/           # Shared UI primitives (Portrait3D, …)
+└── __tests__/            # Vitest browser smoke tests
 
 src/                      # Logical subpackages
 ├── schemas/              # Zod schemas for all content types
@@ -127,7 +136,7 @@ pnpm native:android:debug  # Full Android debug APK pipeline
 pnpm test                  # Vitest unit tests
 pnpm test:watch            # Watch mode
 pnpm test:coverage         # Coverage report (80% thresholds)
-pnpm test:ct               # Playwright component tests
+pnpm test:browser          # Vitest browser mode (component + WebGL smoke)
 pnpm test:e2e              # Playwright end-to-end tests
 pnpm test:all              # All test suites
 

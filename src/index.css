@@ -59,6 +59,19 @@
   src: url('/assets/fonts/crimsontext-italic-400.woff2') format('woff2');
 }
 
+/* Set Forth button sheen — honey-gold light sweeping across the CTA on hover. */
+@keyframes kr-menu-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.kr-menu-sweep {
+  transform: translateX(-100%);
+}
+.group:hover .kr-menu-sweep,
+.group:focus-visible .kr-menu-sweep {
+  animation: kr-menu-sweep 1.2s ease-in-out;
+}
+
 /* Base styles - warm pastoral medieval theme */
 @layer base {
   * {

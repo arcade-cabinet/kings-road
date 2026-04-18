@@ -126,8 +126,9 @@ React at runtime and in tests. It must be updated in the same commit as `questSt
 Each phase is independently verifiable: `pnpm tsc --noEmit` + `pnpm test` must stay green.
 
 ### Phase 0 — Session entity bootstrap (1 commit)
-- Add `sessionEntity` to `src/ecs/world.ts`: `export const sessionEntity = gameWorld.spawn()`
-- This is the anchor for all subsequent Session traits.
+- Add a `getSessionEntity()` accessor to `src/ecs/world.ts` that spawns the session entity lazily on first read and caches it. Do NOT spawn at module scope — module evaluation order is sensitive in Vitest + SSR-style contexts, and `gameWorld.spawn()` at import time would allocate an entity the instant any module imports `world.ts`, including tests that never use it.
+- This function is the anchor for all subsequent Session traits. All callers go through `getSessionEntity()`, never a module-level constant.
+- Add an `unsafe_resetSessionEntity()` helper gated on `import.meta.env.DEV` so per-test cleanup can reset session state deterministically.
 - Tests: tsc clean + existing tests pass (no behaviour change).
 
 ### Phase 1 — inventoryStore → Koota hooks (1 commit)

@@ -85,7 +85,7 @@ The fix: render state *in the world* wherever possible, and treat necessary over
 - Choices → the speech bubble splits into fork, each path shown as a smaller parchment branch the player taps.
 - Long dialogue → the bubble expands vertically; if it exceeds thumb-reach, camera dollies slightly so the bubble is centered.
 
-**Implementation:** replace `app/ui/DialogueBox.tsx` with `app/scene/DialogueBubble.tsx` (in-Canvas). Keep the HTML version as dev-debug fallback gated on `import.meta.env.DEV`.
+**Implementation:** replace `app/views/Gameplay/DialogueBox.tsx` with `app/scene/DialogueBubble.tsx` (in-Canvas). Keep the HTML version as dev-debug fallback gated on `import.meta.env.DEV`.
 
 ### Quest Navigation (currently `Minimap.tsx` + quest log panel)
 
@@ -97,7 +97,7 @@ The fix: render state *in the world* wherever possible, and treat necessary over
 - **Quest log** → replace with a **book-in-inventory** affordance: tap on the journal on the player's belt, book opens as a centered full-screen parchment viewport.
 - **No minimap** at all. The road spine IS the map.
 
-**Implementation:** `app/scene/QuestSigil.tsx` (billboarded 3D marker); `app/ui/JournalBook.tsx` replaces Minimap + QuestLog, triggered by belt-item tap.
+**Implementation:** `app/scene/QuestSigil.tsx` (billboarded 3D marker); `app/views/Gameplay/JournalBook.tsx` replaces Minimap + QuestLog, triggered by belt-item tap.
 
 ### Inventory (currently `InventoryScreen.tsx` grid panel)
 
@@ -119,7 +119,7 @@ The fix: render state *in the world* wherever possible, and treat necessary over
 - A large illuminated-letter "P" fades in at screen center, with small parchment ribbons extending outward offering Resume / Save / Settings / Main Menu.
 - Ambient audio gains a choir-reverb effect, like entering a chapel.
 
-**Implementation:** `app/ui/PauseMenu.tsx` rewritten as parchment/vellum styled; no black overlay.
+**Implementation:** `app/views/Gameplay/PauseMenu.tsx` rewritten as parchment/vellum styled; no black overlay.
 
 ### Loading Screen (currently `LoadingOverlay.tsx` — already pastoral)
 
@@ -139,7 +139,7 @@ The fix: render state *in the world* wherever possible, and treat necessary over
 - Attack cooldown → weapon recoils, can't be swung until settled. No timer ring.
 - Lock-on target → golden reticle painted at the enemy's torso (only during active engagement).
 
-**Implementation:** `app/scene/CombatFeedback.tsx` already exists (was moved into `app/systems/` in the restructure); extend it to emit wound decals instead of the `CombatHUD.tsx` overlay. Delete `CombatHUD.tsx` once the replacement is live.
+**Implementation:** `app/systems/CombatFeedback.tsx` already exists (moved to `app/systems/` in the restructure); extend it to emit wound decals and drive lock-on reticle / weapon recoil state, replacing the `app/views/Gameplay/CombatHUD.tsx` overlay. Delete `CombatHUD.tsx` once the replacement is live.
 
 ### Death Overlay (currently `DeathOverlay.tsx`)
 
@@ -150,7 +150,7 @@ The fix: render state *in the world* wherever possible, and treat necessary over
 - Illuminated "Here lies the pilgrim" text fades in on screen as parchment.
 - Tap anywhere on screen → soft quill scratch sound → camera returns to main menu (no explicit button).
 
-**Implementation:** tweak `app/ui/DeathOverlay.tsx` style; camera work in `app/systems/PlayerController.tsx`.
+**Implementation:** tweak `app/views/DeathOverlay.tsx` style; camera work in `app/systems/PlayerController.tsx`.
 
 ### Mobile Controls (currently `MobileControls.tsx`)
 
@@ -162,7 +162,7 @@ The fix: render state *in the world* wherever possible, and treat necessary over
 - Jump = two-finger tap (documented in settings, not in-game).
 - This matches the new README Touch section already.
 
-**Implementation:** strip visual elements from `app/ui/MobileControls.tsx`; keep gesture handlers.
+**Implementation:** strip visual elements from `app/views/Gameplay/MobileControls.tsx`; keep gesture handlers.
 
 ## Migration Path
 

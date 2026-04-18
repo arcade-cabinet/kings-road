@@ -13,12 +13,12 @@ Findings from `pnpm dev` visual pass via Chrome DevTools MCP. Each entry names t
 
 | Surface | Test file | Last run | Status |
 |---|---|---|---|
-| MainMenu | `app/ui/__tests__/MainMenu.browser.test.tsx` | 2026-04-18 | clean (mobile) |
-| LoadingOverlay | `app/ui/__tests__/LoadingOverlay.browser.test.tsx` | 2026-04-18 | not reached |
-| GameHUD | `app/ui/__tests__/GameHUD.browser.test.tsx` | 2026-04-18 | **mobile-broken** |
-| CombatHUD | `app/ui/__tests__/CombatHUD.browser.test.tsx` | 2026-04-18 | not observed |
-| DialogueBox | `app/ui/__tests__/DialogueBox.browser.test.tsx` | 2026-04-18 | not observed |
-| InventoryScreen | `app/ui/__tests__/InventoryScreen.browser.test.tsx` | 2026-04-18 | not observed |
+| MainMenu | `app/__tests__/MainMenu.browser.test.tsx` | 2026-04-18 | clean (mobile) |
+| LoadingOverlay | `app/__tests__/LoadingOverlay.browser.test.tsx` | 2026-04-18 | not reached |
+| GameHUD | `app/__tests__/GameHUD.browser.test.tsx` | 2026-04-18 | **mobile-broken** |
+| CombatHUD | `app/__tests__/CombatHUD.browser.test.tsx` | 2026-04-18 | not observed |
+| DialogueBox | `app/__tests__/DialogueBox.browser.test.tsx` | 2026-04-18 | not observed |
+| InventoryScreen | `app/__tests__/InventoryScreen.browser.test.tsx` | 2026-04-18 | not observed |
 | World chunk | — | 2026-04-18 | **placeholder-grade** |
 | Dungeon interior | — | — | not observed |
 
@@ -45,7 +45,7 @@ Only the small central strip shows the world. Effectively unplayable.
 - Region name: surface via a small illuminated-letter fade-in on region transitions, not a persistent banner.
 - Time of day: implied by environmental lighting; only show if player explicitly checks an in-world sundial.
 
-Files: `app/ui/GameHUD.tsx`, `app/ui/MobileControls.tsx`, `app/ui/Minimap.tsx`.
+Files: `app/views/Gameplay/GameHUD.tsx`, `app/views/Gameplay/MobileControls.tsx`, `app/views/Gameplay/Minimap.tsx`.
 
 ### GameHUD (desktop 1440×900)
 

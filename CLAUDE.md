@@ -38,9 +38,9 @@ pnpm native:android:debug   # Full Android debug APK pipeline
 # Tests — see docs/TESTING.md for full reference
 pnpm test                   # Vitest unit tests
 pnpm test:coverage          # Coverage report (80% thresholds)
-pnpm test:ct                # Playwright component tests
+pnpm test:browser           # Vitest browser mode (component + WebGL smoke)
 pnpm test:e2e               # Playwright e2e tests
-pnpm test:all               # Coverage + CT + e2e
+pnpm test:all               # Coverage + browser + e2e
 
 # Type checking
 pnpm tsc --noEmit           # Full TypeScript check
@@ -55,15 +55,22 @@ pnpm exec biome check .     # Lint and format check
 
 ## Code Layout
 
-```
-app/                        # All TSX entry points and UI/scene/system components
+```text
+app/                        # All TSX entry points + views + components + systems
 ├── main.tsx                # Vite entry
 ├── App.tsx                 # Root React tree
 ├── Game.tsx                # Menu vs active game
 ├── ErrorBoundary.tsx
 ├── scene/                  # R3F 3D components (Chunk, Building, NPC, etc.)
-├── systems/                # Game logic (PlayerController, ChunkManager, etc.)
-└── ui/                     # 2D overlay components (HUD, menus, dialogue)
+├── systems/                # R3F useFrame-driven systems (PlayerController, ...)
+├── views/                  # Full-screen views grouped by route
+│   ├── MainMenu/           # Landing (MainMenu, ShaderBackdrop, VellumOrnaments)
+│   ├── Gameplay/           # In-game HUD cluster (GameplayFrame, DialogueBox, ...)
+│   ├── DeathOverlay.tsx
+│   ├── ErrorOverlay.tsx
+│   └── SettingsPanel.tsx
+├── components/             # Shared UI primitives (Portrait3D, ...)
+└── __tests__/              # Vitest browser smoke tests
 
 src/                        # Logical subpackages (no game/ subdirectory)
 ├── schemas/                # Zod schemas for all content types

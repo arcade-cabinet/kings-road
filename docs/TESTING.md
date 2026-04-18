@@ -21,14 +21,14 @@ Test strategy, commands, coverage targets, and what each layer verifies.
 ## Commands
 
 ```bash
-pnpm test                  # Vitest unit tests (single run)
+pnpm test                  # Vitest unit tests (single run, happy-dom)
 pnpm test:watch            # Vitest watch mode
 pnpm test:coverage         # Vitest with v8 coverage report
-pnpm test:ct               # Playwright component tests
-pnpm test:ct:ui            # Playwright CT with interactive UI
+pnpm test:browser          # Vitest browser mode (Playwright + Chromium + WebGL)
+pnpm test:browser:update   # Vitest browser, update snapshots
 pnpm test:e2e              # Playwright e2e tests (headless)
 pnpm test:e2e:headed       # Playwright e2e with visible browser
-pnpm test:all              # pnpm test:coverage && pnpm test:ct && pnpm test:e2e
+pnpm test:all              # coverage + browser + e2e
 npx tsx scripts/validate-content.ts  # Content trove validation
 ```
 
@@ -90,30 +90,30 @@ src/
     └── questStore.test.ts
 ```
 
-## Component Tests (Playwright CT)
+## Component Tests (Vitest Browser Mode)
 
-Component tests use `@playwright/experimental-ct-react` to mount UI components in isolation with a real browser:
+Component tests use **Vitest browser mode** (`@vitest/browser` + `@vitest/browser-playwright`) with `vitest-browser-react` for component rendering. This is the modern, Vite-native replacement for the abandoned `@playwright/experimental-ct-react`.
 
-```
-app/ui/
-├── MainMenu.ct.tsx
-├── GameHUD.ct.tsx
-├── DialogueBox.ct.tsx
-├── MobileControls.ct.tsx
-├── QuestLog.ct.tsx
-├── LoadingOverlay.ct.tsx
-└── ErrorOverlay.ct.tsx
+Browser tests live at `app/__tests__/*.browser.test.tsx`:
+
+```text
+app/__tests__/MainMenu.browser.test.tsx
+app/__tests__/GameHUD.browser.test.tsx
+app/__tests__/CombatHUD.browser.test.tsx
+app/__tests__/DialogueBox.browser.test.tsx
+app/__tests__/InventoryScreen.browser.test.tsx
+app/__tests__/LoadingOverlay.browser.test.tsx
+app/__tests__/QuestLog.browser.test.tsx
+app/__tests__/ErrorOverlay.browser.test.tsx
+app/__tests__/MobileControls.browser.test.tsx
 ```
 
 Run with:
 ```bash
-pnpm test:ct
+pnpm test:browser
 ```
 
-Snapshots are stored in `*.ct.tsx-snapshots/`. Update snapshots:
-```bash
-pnpm test:ct -- --update-snapshots
-```
+The runner launches headless Chromium with SwiftShader-backed WebGL (see `vitest.browser.config.ts`). Screenshots are captured automatically on failure and land under `test-results/`. Assertions use the `expect.element(...)` API; snapshot-based regressions are opt-in via `pnpm test:browser:update`.
 
 ## E2E Tests
 
@@ -159,12 +159,12 @@ World generation performance:
 
 ```
 src/benchmarks/
-└── kingdom-gen.bench.test.ts   # Kingdom gen performance
+└── kingdom-gen-regression.test.ts   # Kingdom gen performance
 ```
 
 Run benchmarks:
 ```bash
-pnpm test -- --reporter=verbose src/benchmarks/kingdom-gen.bench.test.ts
+pnpm test -- --reporter=verbose src/benchmarks/kingdom-gen-regression.test.ts
 ```
 
 ## What to Test When
@@ -176,6 +176,6 @@ pnpm test -- --reporter=verbose src/benchmarks/kingdom-gen.bench.test.ts
 | Store logic | `pnpm test -- src/stores/` |
 | World generation | `pnpm test -- src/world/` |
 | Factory logic | `pnpm test -- src/factories/` |
-| UI components | `pnpm test:ct` |
+| UI components | `pnpm test:browser` |
 | Full game | `pnpm test:e2e` |
 | All | `pnpm test:all` |

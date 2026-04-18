@@ -115,7 +115,10 @@ function chunkToRegionLabel(
   chunkType: string | undefined,
 ): string | null {
   if (!chunkName) return null;
-  if (chunkType === 'wilderness') return null;
+  // Featureless wilderness doesn't earn the 'you have arrived' fade-in —
+  // only named places (towns, dungeons, roads) do. ChunkType values are
+  // 'WILD' | 'TOWN' | 'DUNGEON' | 'ROAD' (see src/types/game.ts).
+  if (chunkType === 'WILD') return null;
   return chunkName;
 }
 

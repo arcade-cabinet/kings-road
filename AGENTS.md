@@ -63,7 +63,7 @@ app/main.tsx
 
 | Directory | Purpose |
 |-----------|---------|
-| `app/` | All TSX: entry, App, Game, scene/, systems/, ui/ |
+| `app/` | All TSX: entry, App, Game, scene/, systems/, views/{MainMenu,Gameplay}/, views/{DeathOverlay,ErrorOverlay,SettingsPanel}.tsx, components/ |
 | `src/schemas/` | Zod schemas defining all content types |
 | `src/ecs/` | Koota ECS world, traits, and actions |
 | `src/db/` | Drizzle ORM schema, SQLite loader, save service |
@@ -196,7 +196,7 @@ See `docs/TESTING.md` for the full testing reference. Quick commands:
 
 ```bash
 pnpm test                # Vitest unit tests
-pnpm test:ct             # Playwright component tests
+pnpm test:browser        # Vitest browser mode (component + WebGL smoke)
 pnpm test:e2e            # Playwright e2e tests
 pnpm tsc --noEmit        # Type check
 npx tsx scripts/validate-content.ts  # Content validation

@@ -100,11 +100,17 @@ export function CombatParticles() {
     let particleIdx = 0;
     const burstLifetime = 600;
 
-    // Filter out expired bursts (mutate in place to avoid allocation)
-    burstsRef.current = burstsRef.current.filter(
-      (b) => now - b.startTime < burstLifetime,
-    );
-    const activeBursts = burstsRef.current;
+    // Drop expired bursts in place — no filter() allocation per frame.
+    const bursts = burstsRef.current;
+    let write = 0;
+    for (let read = 0; read < bursts.length; read++) {
+      if (now - bursts[read].startTime < burstLifetime) {
+        if (write !== read) bursts[write] = bursts[read];
+        write++;
+      }
+    }
+    bursts.length = write;
+    const activeBursts = bursts;
 
     // Hide all particles initially
     for (let i = 0; i < PARTICLE_COUNT; i++) {
