@@ -40,5 +40,5 @@ Materials are ingested by `scripts/ingest-pbr.ts` which copies entire pack
 directories from `/Volumes/home/assets/2DPhotorealistic/MATERIAL/1K-JPG/<PackName>/`
 to `public/assets/pbr/<tactile-id>/`.
 
-The content curator (team-lead) provides the manifest (tactile-id + sourcePack pairs)
+The content curator (team-lead) provides the manifest (`id` + `sourceDir` pairs)
 and invokes the script. See `docs/benchmarks/phase-0-curation/thornfield-pbr-picks.md`.
