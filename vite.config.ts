@@ -40,7 +40,7 @@ export default defineConfig({
           three: ['three', '@react-three/fiber', '@react-three/drei'],
           rapier: ['@react-three/rapier'],
           postprocessing: ['@react-three/postprocessing', 'postprocessing'],
-          vendor: ['react', 'react-dom', 'zustand', 'koota', 'zod'],
+          vendor: ['react', 'react-dom', 'koota', 'zod'],
         },
       },
     },
