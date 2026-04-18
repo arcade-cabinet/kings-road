@@ -14,6 +14,10 @@ import { getPlayer } from '@/ecs/actions/game';
 import { useEnvironment } from '@/ecs/hooks/useGameSession';
 import type { BiomeConfig } from '@/biome';
 
+// Stable module-level tuple so ChromaticAberration doesn't see a new array
+// every render and trigger the React-19 StrictMode circular-JSON crash.
+const CHROMA_INITIAL: [number, number] = [0, 0];
+
 /** 0–1 time-of-day → dawn/noon/dusk/night bucket string. */
 function tod(timeOfDay: number): 'dawn' | 'noon' | 'dusk' | 'night' {
   if (timeOfDay < 0.2 || timeOfDay >= 0.85) return 'night';
@@ -135,27 +139,32 @@ export function BiomePostProcessing() {
   return (
     <EffectComposer multisampling={0}>
       <SMAA />
+      {/* Initial props are stable. Real values drive via refs in useFrame above
+          (e.g. chromaEffectRef.current.offset.x) so React never re-reconciles
+          on value change. Passing changing arrays/refs at render time causes
+          @react-three/postprocessing to re-create KawaseBlurPass which then
+          hits a circular-JSON crash in React 19 StrictMode. */}
       <Bloom
         ref={bloomRef}
-        intensity={bloomIntRef.current}
-        luminanceThreshold={bloomThreshRef.current}
+        intensity={0.5}
+        luminanceThreshold={0.9}
         luminanceSmoothing={0.3}
         mipmapBlur
       />
       <ChromaticAberration
         ref={chromaEffectRef}
-        offset={[chromaRef.current, chromaRef.current]}
+        offset={CHROMA_INITIAL}
         blendFunction={BlendFunction.NORMAL}
       />
       <Noise
         ref={noiseEffectRef}
-        opacity={noiseRef.current}
+        opacity={0.05}
         blendFunction={BlendFunction.SCREEN}
       />
       <Vignette
         ref={vignetteRef}
-        offset={vigOffRef.current}
-        darkness={vigDarkRef.current}
+        offset={0.3}
+        darkness={0.5}
         blendFunction={BlendFunction.NORMAL}
       />
     </EffectComposer>

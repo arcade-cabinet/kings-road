@@ -3,7 +3,7 @@
   "name": "Millbrook Forests",
   "description": "Dense canopy forest with mossy roots and forest clearings.",
   "lighting": {
-    "hdri": "forest-dappled",
+    "hdri": "misty-pines",
     "ambientColor": "#406040",
     "ambientIntensity": 0.35,
     "directionalColor": "#c0e0a0",
@@ -13,7 +13,7 @@
     "fogFar": 180
   },
   "terrain": {
-    "heightmap": "forest-floor",
+    "heightmap": "procedural",
     "scale": 1.0,
     "materials": ["forest-soil", "moss-ground", "leaf-litter"],
     "displacementScale": 0.15

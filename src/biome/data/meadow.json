@@ -3,7 +3,7 @@
   "name": "Ashford Meadows",
   "description": "Rolling green meadows with wildflowers and gentle hills.",
   "lighting": {
-    "hdri": "golden-noon",
+    "hdri": "misty-pines",
     "ambientColor": "#f0e8c0",
     "ambientIntensity": 0.6,
     "directionalColor": "#ffe8a0",
@@ -13,7 +13,7 @@
     "fogFar": 300
   },
   "terrain": {
-    "heightmap": "flat-gentle",
+    "heightmap": "procedural",
     "scale": 1.0,
     "materials": ["green-grass", "wildflower-field", "packed-dirt"],
     "displacementScale": 0.1

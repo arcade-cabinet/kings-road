@@ -97,8 +97,12 @@ function SceneContent() {
           {/* First-person viewmodel — renders the equipped weapon */}
           <FPSViewmodel />
 
-          {/* Biome-driven post processing */}
-          <BiomePostProcessing />
+          {/* Biome-driven post processing — temporarily disabled for Phase 0
+              integration validation. @react-three/postprocessing hits a
+              circular-JSON serialization crash under React 19 StrictMode when
+              EffectComposer children change. Task #21 follow-up: upgrade or
+              replace the postprocessing wrapper. */}
+          {/* <BiomePostProcessing /> */}
         </Physics>
       )}
     </>
