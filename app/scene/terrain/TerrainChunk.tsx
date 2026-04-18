@@ -1,8 +1,8 @@
 import { HeightfieldCollider, RigidBody } from '@react-three/rapier';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { loadPbrMaterial } from '@/assets/pbr/loader';
-import type { BiomeConfig } from '@/biome/schema';
+import { loadPbrMaterial } from '@/assets';
+import type { BiomeConfig } from '@/biome';
 import {
   buildDisplacedGeometry,
   buildProceduralHeightmap,
