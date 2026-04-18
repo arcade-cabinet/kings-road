@@ -10,7 +10,7 @@ export interface MetaballBurst {
   duration: number;
 }
 
-/** GLSL fragment shader — raymarch metaballs isosurface inside hull AABB. */
+/** GLSL fragment shader — raymarch metaballs isosurface inside hull sphere. */
 export const bloodMetaballsFrag = /* glsl */ `
   #define METABALL_COUNT 16
   #define MAX_STEPS 32
@@ -18,12 +18,9 @@ export const bloodMetaballsFrag = /* glsl */ `
   #define MAX_DIST 2.0
 
   uniform vec3 u_balls[METABALL_COUNT];
-  uniform float u_age;       // 0 → 1 over burst lifetime
-  uniform vec3 u_origin;
-  uniform mat4 u_modelInv;
+  uniform float u_age; // 0 → 1 over burst lifetime
 
   varying vec3 vWorldPos;
-  varying vec3 vNormal;
 
   // Smooth-min for metaball field blending (k controls blend radius)
   float smin(float a, float b, float k) {
@@ -50,9 +47,11 @@ export const bloodMetaballsFrag = /* glsl */ `
   }
 
   void main() {
-    // Ray from camera through fragment, in world space
-    vec3 ro = cameraPosition;
-    vec3 rd = normalize(vWorldPos - ro);
+    // March from the hull surface fragment inward toward the camera.
+    // Starting at vWorldPos means MAX_DIST is relative to hull diameter (~2m),
+    // not camera distance — so the effect stays visible regardless of player distance.
+    vec3 rd = normalize(vWorldPos - cameraPosition);
+    vec3 ro = vWorldPos;
 
     float t = 0.0;
     bool hit = false;
@@ -86,12 +85,10 @@ export const bloodMetaballsFrag = /* glsl */ `
 
 export const bloodMetaballsVert = /* glsl */ `
   varying vec3 vWorldPos;
-  varying vec3 vNormal;
 
   void main() {
     vec4 wp = modelMatrix * vec4(position, 1.0);
     vWorldPos = wp.xyz;
-    vNormal = normalMatrix * normal;
     gl_Position = projectionMatrix * viewMatrix * wp;
   }
 `;
@@ -106,8 +103,6 @@ export function createBloodMetaballsMaterial(): THREE.ShaderMaterial {
     uniforms: {
       u_balls: { value: balls },
       u_age: { value: 0.0 },
-      u_origin: { value: new THREE.Vector3() },
-      u_modelInv: { value: new THREE.Matrix4() },
     },
     transparent: true,
     depthWrite: false,
@@ -145,6 +140,5 @@ export function tickBloodMetaballs(
   }
 
   mat.uniforms.u_age.value = normAge;
-  mat.uniforms.u_origin.value.copy(burst.origin);
   return true;
 }

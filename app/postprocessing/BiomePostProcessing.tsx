@@ -22,12 +22,6 @@ function tod(timeOfDay: number): 'dawn' | 'noon' | 'dusk' | 'night' {
   return 'dusk';
 }
 
-/** Smooth-step clamp [0,1]. */
-function smoothstep(x: number): number {
-  const t = Math.max(0, Math.min(1, x));
-  return t * t * (3 - 2 * t);
-}
-
 interface PostParams {
   bloomIntensity: number;
   bloomThreshold: number;
@@ -72,8 +66,8 @@ function paramsForBiomeAndTime(biome: BiomeConfig, timeOfDay: number): PostParam
  * Biome-driven post-processing pipeline.
  *
  * Bloom, chromatic aberration, and vignette intensities vary by biome id and
- * time-of-day bucket. Parameters lerp frame-by-frame (0.05 factor) so biome
- * transitions don't cause visible pops.
+ * time-of-day bucket. Parameters use frame-rate-independent exponential smoothing
+ * (decay constant 4 s⁻¹) so transitions don't pop at any frame rate.
  *
  * GodRays are omitted here — they require a mesh sun reference that lives
  * inside DayNightCycle. Wire them from that component when needed.
@@ -81,7 +75,7 @@ function paramsForBiomeAndTime(biome: BiomeConfig, timeOfDay: number): PostParam
 export function BiomePostProcessing() {
   const { timeOfDay } = useEnvironment();
 
-  // Smoothed targets — updated each frame inside useFrame.
+  // Smoothed current values — updated imperatively in useFrame.
   const bloomIntRef = useRef(0.3);
   const bloomThreshRef = useRef(0.8);
   const vigOffRef = useRef(0.3);
@@ -89,23 +83,30 @@ export function BiomePostProcessing() {
   const chromaRef = useRef(0.0004);
   const noiseRef = useRef(0.04);
 
-  // Refs for the live effect props. @react-three/postprocessing reads these
-  // directly from the effect uniforms, so we drive them imperatively via
-  // useFrame rather than re-rendering the whole pipeline.
+  // Direct refs to postprocessing effect instances for imperative uniform updates.
   const bloomRef = useRef<{ intensity: number; luminanceThreshold: number } | null>(null);
   const vignetteRef = useRef<{ offset: number; darkness: number } | null>(null);
+  const chromaEffectRef = useRef<{ offset: { x: number; y: number } } | null>(null);
+  const noiseEffectRef = useRef<{ opacity: number } | null>(null);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     let biome: BiomeConfig;
     try {
       const roadDist = getPlayer().playerPosition?.x ?? 0;
       biome = BiomeService.getCurrentBiome(roadDist);
     } catch {
-      return;
+      // BiomeService not yet initialised (early lifecycle) — fall back to distance 0.
+      // This keeps the bloom/vignette refs driven from the first frame onward.
+      try {
+        biome = BiomeService.getCurrentBiome(0);
+      } catch {
+        return;
+      }
     }
 
     const target = paramsForBiomeAndTime(biome, timeOfDay);
-    const k = 0.05; // lerp factor — slow enough to avoid pops, fast enough for day transitions
+    // Frame-rate-independent exponential smoothing: decay constant 4 s⁻¹.
+    const k = 1 - Math.exp(-4 * delta);
 
     bloomIntRef.current += (target.bloomIntensity - bloomIntRef.current) * k;
     bloomThreshRef.current += (target.bloomThreshold - bloomThreshRef.current) * k;
@@ -122,6 +123,13 @@ export function BiomePostProcessing() {
       vignetteRef.current.offset = vigOffRef.current;
       vignetteRef.current.darkness = vigDarkRef.current;
     }
+    if (chromaEffectRef.current) {
+      chromaEffectRef.current.offset.x = chromaRef.current;
+      chromaEffectRef.current.offset.y = chromaRef.current;
+    }
+    if (noiseEffectRef.current) {
+      noiseEffectRef.current.opacity = noiseRef.current;
+    }
   });
 
   return (
@@ -135,10 +143,12 @@ export function BiomePostProcessing() {
         mipmapBlur
       />
       <ChromaticAberration
+        ref={chromaEffectRef}
         offset={[chromaRef.current, chromaRef.current]}
         blendFunction={BlendFunction.NORMAL}
       />
       <Noise
+        ref={noiseEffectRef}
         opacity={noiseRef.current}
         blendFunction={BlendFunction.SCREEN}
       />
@@ -151,5 +161,3 @@ export function BiomePostProcessing() {
     </EffectComposer>
   );
 }
-
-export { smoothstep };

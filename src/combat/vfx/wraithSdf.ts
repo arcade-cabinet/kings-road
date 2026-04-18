@@ -7,11 +7,9 @@ import * as THREE from 'three';
  */
 export const wraithSdfVert = /* glsl */ `
   varying vec3 vLocalPos;
-  varying vec3 vWorldPos;
 
   void main() {
     vLocalPos = position;
-    vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
@@ -19,14 +17,16 @@ export const wraithSdfVert = /* glsl */ `
 export const wraithSdfFrag = /* glsl */ `
   #define MAX_STEPS 48
   #define MIN_DIST 0.003
-  #define MAX_DIST 3.0
+  #define MAX_DIST 1.5
 
   uniform float u_time;
   uniform float u_dissipate; // 0 = solid, 1 = fully dissipated
   uniform vec3 u_color;
+  // Inverse model matrix computed on CPU each frame — avoids inverse() which
+  // is not available in GLSL ES 1.0 / WebGL 1.0.
+  uniform mat4 u_modelMatrixInverse;
 
   varying vec3 vLocalPos;
-  varying vec3 vWorldPos;
 
   // Smooth union of two SDFs
   float smin(float a, float b, float k) {
@@ -72,10 +72,14 @@ export const wraithSdfFrag = /* glsl */ `
   }
 
   void main() {
-    // Ray in local object space (bounded hull mesh)
-    vec3 ro = (inverse(modelMatrix) * vec4(cameraPosition, 1.0)).xyz;
+    // Camera in local object space via CPU-computed inverse (WebGL 1.0 safe).
+    // March from local camera position toward the hull surface fragment,
+    // so MAX_DIST is bounded by hull diameter (~1.2), not camera distance.
+    vec3 ro = (u_modelMatrixInverse * vec4(cameraPosition, 1.0)).xyz;
     vec3 rd = normalize(vLocalPos - ro);
 
+    // Start march at the hull surface (vLocalPos on BackSide), walking inward.
+    // t=0 is on the hull; marching inward keeps MAX_DIST relative to hull thickness.
     float t = 0.0;
     bool hit = false;
     for (int i = 0; i < MAX_STEPS; i++) {
@@ -112,6 +116,7 @@ export function createWraithSdfMaterial(
       u_time: { value: 0.0 },
       u_dissipate: { value: 0.0 },
       u_color: { value: new THREE.Color(color) },
+      u_modelMatrixInverse: { value: new THREE.Matrix4() },
     },
     transparent: true,
     depthWrite: false,
@@ -128,10 +133,9 @@ export function tickWraithSdf(
 ): boolean {
   mat.uniforms.u_time.value = elapsed;
   if (elapsed > dissipateStart) {
-    const d = Math.min(
-      1.0,
-      (elapsed - dissipateStart) / (dissipateEnd - dissipateStart),
-    );
+    const duration = dissipateEnd - dissipateStart;
+    const d =
+      duration > 0 ? Math.min(1.0, (elapsed - dissipateStart) / duration) : 1.0;
     mat.uniforms.u_dissipate.value = d;
     if (d >= 1.0) return false;
   }
