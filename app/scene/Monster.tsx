@@ -21,6 +21,12 @@ const WEREWOLF_PATH = assetUrl('/assets/monsters/werewolf-transformed.glb');
 const BLOODWRAITH_PATH = assetUrl('/assets/monsters/bloodwraith-transformed.glb');
 const PLAGUE_DOCTOR_PATH = assetUrl('/assets/monsters/plague_doctor-transformed.glb');
 const DEVIL_DEMON_PATH = assetUrl('/assets/monsters/devil_demon.glb');
+const ABOMINATION_PATH = assetUrl('/assets/monsters/abomination-2.glb');
+const GOLIATH_PATH = assetUrl('/assets/monsters/green-goliath.glb');
+const BUTCHER_PATH = assetUrl('/assets/monsters/black-butcher.glb');
+const BIGFOOT_PATH = assetUrl('/assets/monsters/bigfoot.glb');
+const ELK_DEMON_PATH = assetUrl('/assets/monsters/elk-demon.glb');
+const EYE_HEAD_PATH = assetUrl('/assets/monsters/eye-head.glb');
 
 const HOVER_ARCHETYPES = new Set([
   'butterfly_swarm',
@@ -77,6 +83,12 @@ export function Monster({ archetype, position }: MonsterProps) {
   const bloodwraith = useGLTF(BLOODWRAITH_PATH) as any;
   const plagueDoctor = useGLTF(PLAGUE_DOCTOR_PATH) as any;
   const devilDemon = useGLTF(DEVIL_DEMON_PATH) as any;
+  const abomination = useGLTF(ABOMINATION_PATH) as any;
+  const goliath = useGLTF(GOLIATH_PATH) as any;
+  const butcher = useGLTF(BUTCHER_PATH) as any;
+  const bigfoot = useGLTF(BIGFOOT_PATH) as any;
+  const elkDemon = useGLTF(ELK_DEMON_PATH) as any;
+  const eyeHead = useGLTF(EYE_HEAD_PATH) as any;
 
   const renderData = useMemo(
     () => buildMonsterRenderData(archetype),
@@ -180,7 +192,49 @@ export function Monster({ archetype, position }: MonsterProps) {
       }
     }
 
-    // 4. Fallback Primitives
+    // 4. Humanoid bandits / brigands — use butcher model
+    if (['bandit', 'bandit_leader'].includes(archetype.id)) {
+      if (butcher.scene) {
+        return <primitive object={butcher.scene.clone()} />;
+      }
+    }
+
+    // 5. Large beasts — trolls / goliaths / bigfoot kin
+    if (['troll', 'stone_golem'].includes(archetype.id)) {
+      if (goliath.scene) {
+        return <primitive object={goliath.scene.clone()} />;
+      }
+    }
+
+    // 6. Shaggy wild beasts — dire wolf, thornbeast use bigfoot as stand-in
+    if (['dire_wolf', 'thornbeast'].includes(archetype.id)) {
+      if (bigfoot.scene) {
+        return <primitive object={bigfoot.scene.clone()} />;
+      }
+    }
+
+    // 7. Deer — elk-demon variant (antlered quadruped silhouette)
+    if (archetype.id === 'deer') {
+      if (elkDemon.scene) {
+        return <primitive object={elkDemon.scene.clone()} />;
+      }
+    }
+
+    // 8. Slimes / eye-head — use eye_head model as a formless entity
+    if (['slime', 'giant_spider', 'giant_rat'].includes(archetype.id)) {
+      if (eyeHead.scene) {
+        return <primitive object={eyeHead.scene.clone()} />;
+      }
+    }
+
+    // 9. Small critters (rabbit / hedgehog) — reuse abomination-2 small-scale
+    if (['rabbit', 'hedgehog'].includes(archetype.id)) {
+      if (abomination.scene) {
+        return <primitive object={abomination.scene.clone()} />;
+      }
+    }
+
+    // 10. Fallback Primitives
     return bodyParts.map((part) => (
       <GeometryMesh
         key={`${part.type}-${part.position.join(',')}`}
@@ -196,6 +250,12 @@ export function Monster({ archetype, position }: MonsterProps) {
     bloodwraith.scene,
     plagueDoctor.scene,
     devilDemon.scene,
+    abomination.scene,
+    goliath.scene,
+    butcher.scene,
+    bigfoot.scene,
+    elkDemon.scene,
+    eyeHead.scene,
     bodyParts,
     primaryColor,
     secondaryColor,
@@ -220,3 +280,9 @@ useGLTF.preload(WEREWOLF_PATH);
 useGLTF.preload(BLOODWRAITH_PATH);
 useGLTF.preload(PLAGUE_DOCTOR_PATH);
 useGLTF.preload(DEVIL_DEMON_PATH);
+useGLTF.preload(ABOMINATION_PATH);
+useGLTF.preload(GOLIATH_PATH);
+useGLTF.preload(BUTCHER_PATH);
+useGLTF.preload(BIGFOOT_PATH);
+useGLTF.preload(ELK_DEMON_PATH);
+useGLTF.preload(EYE_HEAD_PATH);
