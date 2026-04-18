@@ -71,12 +71,14 @@ describe('quest-step-executor', () => {
 
     it('returns quest_complete when all steps are done', () => {
       activateQuest('side-wounded-soldier');
-      // Advance through all 3 steps
+      // Advance through the first two steps (0 → 1 → 2). The third advance
+      // call (from step 2) is the one that triggers completion; its return
+      // value is the quest_complete signal and also removes the quest from
+      // the active list.
       advanceQuestStep('side-wounded-soldier');
       advanceQuestStep('side-wounded-soldier');
-      advanceQuestStep('side-wounded-soldier');
+      const action = advanceQuestStep('side-wounded-soldier');
 
-      const action = getCurrentStepAction('side-wounded-soldier');
       expect(action.type).toBe('quest_complete');
       if (action.type === 'quest_complete') {
         expect(action.questId).toBe('side-wounded-soldier');
