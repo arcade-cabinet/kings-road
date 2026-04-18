@@ -22,10 +22,7 @@ import { inputManager } from '@/input/InputManager';
 import {
   die,
   endCombat,
-  getChunkState,
-  getFlags,
   getPlayer,
-  getSeedPhrase,
   setHealth,
   startCombat,
 } from '@/ecs/actions/game';
