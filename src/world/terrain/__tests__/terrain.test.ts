@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { buildDisplacedGeometry } from '../displacement';
 import type { HeightmapData } from '../heightmap';
 import { sampleHeightmap } from '../heightmap';
+import { buildProceduralHeightmap } from '../procedural';
 import { buildSplatMap } from '../splat';
 
 // ── Fixture heightmap (4×4, values 0–1) ──────────────────────────────────────
@@ -140,6 +141,65 @@ describe('buildDisplacedGeometry', () => {
     for (let i = 0; i <= segments; i++) {
       expect(yRight[i]).toBeCloseTo(yLeft[i], 3);
     }
+  });
+});
+
+// ── buildProceduralHeightmap ──────────────────────────────────────────────────
+
+describe('buildProceduralHeightmap', () => {
+  it('returns HeightmapData with correct dimensions', () => {
+    const hm = buildProceduralHeightmap('test', 0, 0, { resolution: 32 });
+    expect(hm.width).toBe(32);
+    expect(hm.height).toBe(32);
+    expect(hm.data.length).toBe(32 * 32);
+  });
+
+  it('all values are in [0, 1]', () => {
+    const hm = buildProceduralHeightmap('test', 0, 0, { resolution: 64 });
+    for (const v of hm.data) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('has non-trivial height variation (not flat)', () => {
+    const hm = buildProceduralHeightmap('test', 0, 0, {
+      resolution: 32,
+      octaves: 4,
+    });
+    const min = Math.min(...hm.data);
+    const max = Math.max(...hm.data);
+    expect(max - min).toBeGreaterThan(0.1);
+  });
+
+  it('is deterministic: same params → same output', () => {
+    const a = buildProceduralHeightmap('seed-x', 2, 3, { resolution: 16 });
+    const b = buildProceduralHeightmap('seed-x', 2, 3, { resolution: 16 });
+    expect(Array.from(a.data)).toEqual(Array.from(b.data));
+  });
+
+  it('varies by seed', () => {
+    const a = buildProceduralHeightmap('seed-aaa', 0, 0, { resolution: 16 });
+    const b = buildProceduralHeightmap('seed-zzz', 0, 0, { resolution: 16 });
+    expect(Array.from(a.data)).not.toEqual(Array.from(b.data));
+  });
+
+  it('varies by chunk coords', () => {
+    const a = buildProceduralHeightmap('seed', 0, 0, { resolution: 16 });
+    const b = buildProceduralHeightmap('seed', 1, 0, { resolution: 16 });
+    expect(Array.from(a.data)).not.toEqual(Array.from(b.data));
+  });
+
+  it('throws on invalid resolution', () => {
+    expect(() =>
+      buildProceduralHeightmap('seed', 0, 0, { resolution: 0 }),
+    ).toThrow('resolution must be a positive finite number');
+  });
+
+  it('throws on invalid octaves', () => {
+    expect(() =>
+      buildProceduralHeightmap('seed', 0, 0, { octaves: 0 }),
+    ).toThrow('octaves must be a positive integer');
   });
 });
 
