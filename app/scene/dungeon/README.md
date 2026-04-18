@@ -21,7 +21,7 @@ Consumes `DungeonKitPlacement[]` from `src/composition/dungeon-kit` and draws ea
   - `off` — skip `<AccumulativeShadows>` entirely. Mobile low-end path.
   - `static` — accumulate 40 frames then freeze via `<BakeShadows>`. Default for rooms a player has entered.
   - `temporal` — keep refining with 60-frame soft shadows. Desktop quality path for screenshots and bosses.
-- `<BakeShadows>` also snapshots the scene's shadow maps after one frame so static props stop re-rendering shadows per frame.
+- `<BakeShadows>` is mounted **only in `shadows='static'` mode** — it freezes shadow-map updates after the first frame, which is what a fully-baked static room wants but would prevent `temporal` from continuing to refine and would freeze any dynamic `castShadow` lights. `off` skips it since there's no shadow work to freeze.
 
 **Usage** — mount inside a `<Suspense>` boundary; GLBs suspend while loading:
 
@@ -44,5 +44,5 @@ const placements = composeDungeonRoom(room, seed);
 ## Performance notes
 
 - `<AccumulativeShadows>` costs roughly 1–2ms per accumulated frame on a modern phone — gate it behind visible-chunks / current-room only. Don't wrap the whole dungeon; wrap the room the player is in.
-- `<BakeShadows>` is a one-shot toggle: useful the frame after static geometry settles. Re-mount the renderer (new `key` on the group) to force a re-bake when the room changes.
+- `<BakeShadows>` is a one-shot toggle: useful the frame after static geometry settles. Active only in `shadows='static'` mode. Re-mount the renderer (new `key` on the group) to force a re-bake when the room changes.
 - Full PBR materials inherit from the kit GLBs as-authored. The renderer does not mutate materials — per the PBR Material Standard, the shared-immutable contract must be preserved.
