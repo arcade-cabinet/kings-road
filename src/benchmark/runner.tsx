@@ -30,7 +30,7 @@ function BenchmarkFrameSampler({
   const startRef = useRef<number | null>(null);
   const doneRef = useRef(false);
 
-  useFrame((_, delta) => {
+  useFrame((_, _delta) => {
     if (doneRef.current) return;
 
     const now = performance.now();

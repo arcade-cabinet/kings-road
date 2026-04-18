@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test';
 import type { BenchmarkSummary } from '../src/benchmark/capture';
+import { expect, test } from '@playwright/test';
+import baseline from '../docs/benchmarks/baseline.json';
 
 type SlimSummary = Omit<BenchmarkSummary, 'frames'>;
-import baseline from '../docs/benchmarks/baseline.json';
 
 const ROUTES = [
   'walk-village-perimeter',
@@ -57,7 +57,9 @@ test.describe('Benchmark harness', () => {
       const summary = summaries[0];
 
       // Regression check against committed baseline (skip if no baseline for route)
-      const base = (baseline as Record<string, { avgFps: number; p1Fps: number } | null>)[routeId];
+      const base = (
+        baseline as Record<string, { avgFps: number; p1Fps: number } | null>
+      )[routeId];
       if (base && base.avgFps > 0 && base.p1Fps > 0) {
         const avgDrop = (base.avgFps - summary.avgFps) / base.avgFps;
         const p1Drop = (base.p1Fps - summary.p1Fps) / base.p1Fps;

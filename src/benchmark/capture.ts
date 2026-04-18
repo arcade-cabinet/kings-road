@@ -106,11 +106,17 @@ export class BenchmarkCapture {
       peakFrameTimeMs: fts.length > 0 ? Math.max(...fts) : 0,
       avgFrameTimeMs: mean(fts),
       peakDrawCalls:
-        this.frames.length > 0 ? Math.max(...this.frames.map((f) => f.drawCalls)) : 0,
+        this.frames.length > 0
+          ? Math.max(...this.frames.map((f) => f.drawCalls))
+          : 0,
       peakTriangles:
-        this.frames.length > 0 ? Math.max(...this.frames.map((f) => f.triangles)) : 0,
+        this.frames.length > 0
+          ? Math.max(...this.frames.map((f) => f.triangles))
+          : 0,
       peakJsHeapMb:
-        this.frames.length > 0 ? Math.max(...this.frames.map((f) => f.jsHeapMb)) : 0,
+        this.frames.length > 0
+          ? Math.max(...this.frames.map((f) => f.jsHeapMb))
+          : 0,
       frames: this.frames,
     };
   }
