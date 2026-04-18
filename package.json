@@ -5,7 +5,8 @@
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "copywasm": "node -e \"const fs=require('fs'),p=require('path');for(const d of [p.join('public'),p.join('public','assets')]){fs.mkdirSync(d,{recursive:true});fs.copyFileSync(require.resolve('sql.js/dist/sql-wasm.wasm'),p.join(d,'sql-wasm.wasm'));}\"",
+    "copy:runtime-assets": "tsx scripts/copy-runtime-assets.ts",
+    "copywasm": "pnpm copy:runtime-assets",
     "compile:db": "tsx scripts/compile-content-db.ts",
     "predev": "pnpm copywasm && tsx scripts/compile-content-db.ts",
     "dev": "vite",

@@ -2,6 +2,7 @@ import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import type * as THREE from 'three';
+import { assetUrl } from '@/lib/assets';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
 import { hashString } from '@/factories/chibi-generator';
 import {
@@ -14,12 +15,12 @@ interface MonsterProps {
   position: [number, number, number];
 }
 
-const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
-const SKELETON_PATH = `${BASE_URL}/assets/monsters/Skeleton_warrior-transformed.glb`;
-const BAT_PATH = `${BASE_URL}/assets/monsters/Bat-transformed.glb`;
-const WEREWOLF_PATH = `${BASE_URL}/assets/monsters/werewolf-transformed.glb`;
-const BLOODWRAITH_PATH = `${BASE_URL}/assets/monsters/bloodwraith-transformed.glb`;
-const PLAGUE_DOCTOR_PATH = `${BASE_URL}/assets/monsters/plague_doctor-transformed.glb`;
+const SKELETON_PATH = assetUrl('/assets/monsters/Skeleton_warrior-transformed.glb');
+const BAT_PATH = assetUrl('/assets/monsters/Bat-transformed.glb');
+const WEREWOLF_PATH = assetUrl('/assets/monsters/werewolf-transformed.glb');
+const BLOODWRAITH_PATH = assetUrl('/assets/monsters/bloodwraith-transformed.glb');
+const PLAGUE_DOCTOR_PATH = assetUrl('/assets/monsters/plague_doctor-transformed.glb');
+const DEVIL_DEMON_PATH = assetUrl('/assets/monsters/devil_demon.glb');
 
 const HOVER_ARCHETYPES = new Set([
   'butterfly_swarm',
@@ -75,6 +76,7 @@ export function Monster({ archetype, position }: MonsterProps) {
   const werewolf = useGLTF(WEREWOLF_PATH) as any;
   const bloodwraith = useGLTF(BLOODWRAITH_PATH) as any;
   const plagueDoctor = useGLTF(PLAGUE_DOCTOR_PATH) as any;
+  const devilDemon = useGLTF(DEVIL_DEMON_PATH) as any;
 
   const renderData = useMemo(
     () => buildMonsterRenderData(archetype),
@@ -138,7 +140,7 @@ export function Monster({ archetype, position }: MonsterProps) {
     }
 
     // 2. Flying / Hovering entities
-    if (['butterfly_swarm', 'wraith', 'bat'].includes(archetype.id)) {
+    if (['butterfly_swarm', 'bat', 'songbird'].includes(archetype.id)) {
       if (bat.scene) {
         const cloned = bat.scene.clone();
         return <primitive object={cloned} />;
@@ -153,16 +155,27 @@ export function Monster({ archetype, position }: MonsterProps) {
       }
     }
 
-    if (archetype.id === 'bloodwraith' || archetype.id === 'ancient_horror') {
+    if (
+      ['wraith', 'grail_wraith', 'bloodwraith', 'ancient_horror'].includes(
+        archetype.id,
+      )
+    ) {
       if (bloodwraith.scene) {
         const cloned = bloodwraith.scene.clone();
         return <primitive object={cloned} />;
       }
     }
 
-    if (archetype.id === 'plague_doctor' || archetype.id === 'cultist') {
+    if (['necromancer', 'plague_doctor', 'cultist'].includes(archetype.id)) {
       if (plagueDoctor.scene) {
         const cloned = plagueDoctor.scene.clone();
+        return <primitive object={cloned} />;
+      }
+    }
+
+    if (['dragon', 'drake', 'wyvern', 'basilisk'].includes(archetype.id)) {
+      if (devilDemon.scene) {
+        const cloned = devilDemon.scene.clone();
         return <primitive object={cloned} />;
       }
     }
@@ -182,10 +195,11 @@ export function Monster({ archetype, position }: MonsterProps) {
     werewolf.scene,
     bloodwraith.scene,
     plagueDoctor.scene,
+    devilDemon.scene,
     bodyParts,
     primaryColor,
     secondaryColor,
-    position.join,
+    position,
   ]);
 
   return (
@@ -206,3 +220,4 @@ useGLTF.preload(BAT_PATH);
 useGLTF.preload(WEREWOLF_PATH);
 useGLTF.preload(BLOODWRAITH_PATH);
 useGLTF.preload(PLAGUE_DOCTOR_PATH);
+useGLTF.preload(DEVIL_DEMON_PATH);

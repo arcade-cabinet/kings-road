@@ -2,6 +2,7 @@ import { OrbitControls, Stage, useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useState } from 'react';
 import type { ItemStack } from '@/ecs/traits/inventory';
+import { assetUrl } from '@/lib/assets';
 import type { ItemDefinition } from '@/schemas/item.schema';
 import { useGameStore } from '@/stores/gameStore';
 import {
@@ -21,15 +22,16 @@ const SLOT_BG = 'rgba(245, 240, 232, 0.6)';
 const SLOT_BORDER = 'rgba(139, 111, 71, 0.3)';
 const SLOT_HOVER = 'rgba(196, 167, 71, 0.2)';
 
-const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 const ITEM_MODELS = {
-  sword: `${BASE_URL}/assets/items/Sword-transformed.glb`,
-  treasure: `${BASE_URL}/assets/items/Treasure-transformed.glb`,
-  stew: `${BASE_URL}/assets/items/stew-transformed.glb`,
-  cleaver: `${BASE_URL}/assets/items/cleaver-transformed.glb`,
-  machete: `${BASE_URL}/assets/items/machete-transformed.glb`,
-  traps: `${BASE_URL}/assets/items/traps-transformed.glb`,
-  bottles: `${BASE_URL}/assets/items/bottles-transformed.glb`,
+  sword: assetUrl('/assets/items/Sword-transformed.glb'),
+  treasure: assetUrl('/assets/items/Treasure-transformed.glb'),
+  stew: assetUrl('/assets/items/stew-transformed.glb'),
+  cleaver: assetUrl('/assets/items/cleaver-transformed.glb'),
+  machete: assetUrl('/assets/items/machete-transformed.glb'),
+  traps: assetUrl('/assets/items/traps-transformed.glb'),
+  bottles: assetUrl('/assets/items/bottles-transformed.glb'),
+  books: assetUrl('/assets/items/books.glb'),
+  misc: assetUrl('/assets/items/MISC_2025-transformed.glb'),
 };
 
 const ITEM_ICONS: Record<string, string> = {
@@ -76,37 +78,82 @@ const ITEM_TYPE_LABELS: Record<string, string> = {
 // ── 3D Item Preview ──────────────────────────────────────────────────────
 
 function ItemModelPreview({ itemId }: { itemId: string }) {
+  const def = getItemInfo(itemId);
+  const descriptor = `${itemId} ${def?.name ?? ''} ${def?.type ?? ''} ${def?.equipSlot ?? ''}`.toLowerCase();
+
   let modelPath = ITEM_MODELS.treasure;
   let nodeName = 'coin';
 
-  if (itemId.includes('iron_sword')) {
+  if (
+    descriptor.includes('sword') ||
+    descriptor.includes('staff') ||
+    descriptor.includes('branch')
+  ) {
     modelPath = ITEM_MODELS.sword;
     nodeName = 'Sword';
-  } else if (itemId.includes('cleaver')) {
+  } else if (descriptor.includes('hammer') || descriptor.includes('torch')) {
     modelPath = ITEM_MODELS.cleaver;
     nodeName = 'cleaver';
-  } else if (itemId.includes('machete')) {
+  } else if (descriptor.includes('cleaver')) {
+    modelPath = ITEM_MODELS.cleaver;
+    nodeName = 'cleaver';
+  } else if (descriptor.includes('machete')) {
     modelPath = ITEM_MODELS.machete;
     nodeName = 'machete';
-  } else if (itemId.includes('potion')) {
+  } else if (
+    descriptor.includes('potion') ||
+    descriptor.includes('salve') ||
+    descriptor.includes('draught') ||
+    descriptor.includes('antidote') ||
+    descriptor.includes('herb') ||
+    descriptor.includes('leaf') ||
+    descriptor.includes('moss') ||
+    descriptor.includes('thyme') ||
+    descriptor.includes('yarrow') ||
+    descriptor.includes('comfrey') ||
+    descriptor.includes('grailbloom') ||
+    descriptor.includes('windcrown')
+  ) {
     modelPath = ITEM_MODELS.bottles;
     nodeName = 'Bottle_Variant_1';
-  } else if (itemId.includes('stew')) {
+  } else if (descriptor.includes('stew') || descriptor.includes('ration')) {
     modelPath = ITEM_MODELS.stew;
     nodeName = 'bowl_01';
-  } else if (itemId.includes('trap')) {
+  } else if (descriptor.includes('trap')) {
     modelPath = ITEM_MODELS.traps;
     nodeName = 'Bear_Trap';
   } else if (
-    itemId.includes('map') ||
-    itemId.includes('book') ||
-    itemId.includes('key')
+    descriptor.includes('map') ||
+    descriptor.includes('ledger') ||
+    descriptor.includes('hymnal') ||
+    descriptor.includes('recipe') ||
+    descriptor.includes('manuscript') ||
+    descriptor.includes('treatise')
+  ) {
+    modelPath = ITEM_MODELS.books;
+    nodeName = 'Book';
+  } else if (
+    descriptor.includes('ring') ||
+    descriptor.includes('signet') ||
+    descriptor.includes('medallion') ||
+    descriptor.includes('seal') ||
+    descriptor.includes('token') ||
+    descriptor.includes('stamp') ||
+    descriptor.includes('grail') ||
+    descriptor.includes('key')
   ) {
     modelPath = ITEM_MODELS.treasure;
     nodeName = 'Grail_1';
-  } else if (itemId.includes('gem') || itemId.includes('diamond')) {
+  } else if (descriptor.includes('gem') || descriptor.includes('diamond')) {
     modelPath = ITEM_MODELS.treasure;
     nodeName = 'Diamond';
+  } else if (
+    descriptor.includes('shield') ||
+    descriptor.includes('armor') ||
+    descriptor.includes('cloak') ||
+    descriptor.includes('disguise')
+  ) {
+    modelPath = ITEM_MODELS.misc;
   }
 
   const { nodes } = useGLTF(modelPath) as any;
