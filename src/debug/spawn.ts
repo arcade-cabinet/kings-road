@@ -21,7 +21,7 @@ const STARTER_ITEMS: ItemStack[] = [
 ];
 
 /** Player spawns slightly off-road so they don't clip into the spine path. */
-function anchorToWorldPos(distanceFromStart: number): THREE.Vector3 {
+function anchorToWorldPos(distanceFromStart: number): Vector3 {
   return new Vector3(distanceFromStart, 0, 2);
 }
 
