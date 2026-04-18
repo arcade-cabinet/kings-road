@@ -1,11 +1,13 @@
-import { Cloud, Sky, Stars } from '@react-three/drei';
+import { CloudInstance, Clouds, Sky, Stars } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { assetUrl } from '@/lib/assets';
 import { useGameStore } from '@/stores/gameStore';
 import { updateWindowEmissive } from '@/utils/textures';
 
 const DAY_DURATION = 600.0; // 10 real minutes = 1 game day
+const CLOUD_TEXTURE = assetUrl('/assets/cloud.svg');
 
 // Pre-computed cloud configurations to avoid array index keys
 const cloudConfigs = Array.from({ length: 6 }, (_, i) => ({
@@ -297,9 +299,13 @@ export function SkyDome() {
       )}
 
       {/* Atmospheric clouds that follow player */}
-      <group ref={cloudGroupRef} position={[playerX, 0, playerZ]}>
+      <Clouds
+        ref={cloudGroupRef}
+        position={[playerX, 0, playerZ]}
+        texture={CLOUD_TEXTURE}
+      >
         {cloudConfigs.map((cfg) => (
-          <Cloud
+          <CloudInstance
             key={cfg.id}
             position={[cfg.x, cfg.y, cfg.z]}
             speed={cfg.speed}
@@ -309,7 +315,7 @@ export function SkyDome() {
             color={isDusk ? '#ffccaa' : isDawn ? '#ffddcc' : '#ffffff'}
           />
         ))}
-      </group>
+      </Clouds>
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { OrbitControls, Stage, useGLTF } from '@react-three/drei';
+import { OrbitControls, useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useState } from 'react';
 import type { ItemStack } from '@/ecs/traits/inventory';
@@ -185,9 +185,11 @@ function ItemPreviewPane({ itemId }: { itemId: string | null }) {
     <div className="w-full h-full relative bg-amber-900/5 rounded shadow-inner overflow-hidden">
       <Canvas shadows dpr={[1, 2]}>
         <Suspense fallback={null}>
-          <Stage intensity={0.5} environment="city" adjustCamera={1.2}>
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[4, 6, 8]} intensity={1.2} />
+          <group position={[0, -0.15, 0]}>
             <ItemModelPreview itemId={itemId} />
-          </Stage>
+          </group>
         </Suspense>
         <OrbitControls
           autoRotate

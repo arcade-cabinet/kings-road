@@ -1,4 +1,4 @@
-import { Stage, useGLTF } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useMemo } from 'react';
 import { assetUrl } from '@/lib/assets';
@@ -51,9 +51,9 @@ export function Portrait3D({ type }: Portrait3DProps) {
         <Suspense fallback={null}>
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={1} />
-          <Stage intensity={0.2} environment="apartment" adjustCamera={false}>
+          <group position={[0, -0.1, 0]}>
             <NPCModel type={type} />
-          </Stage>
+          </group>
         </Suspense>
       </Canvas>
       {/* Brass corner ornaments */}
