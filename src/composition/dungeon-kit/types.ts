@@ -17,7 +17,8 @@ export interface DungeonKitPlacement {
   role: DungeonPieceRole;
 }
 
-export interface PlacedRoom {
+/** Input descriptor for composeDungeonRoom. Distinct from src/world/dungeon-generator PlacedRoom. */
+export interface DungeonKitRoom {
   id: string;
   type: PlacedRoomType;
   center: Vec3;

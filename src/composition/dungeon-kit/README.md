@@ -7,7 +7,7 @@ domain: technical
 
 # src/composition/dungeon-kit
 
-Layer-3 compositor. Given a `PlacedRoom` descriptor, returns a `DungeonKitPlacement[]` array of pure-data placement objects for every floor tile, ceiling tile, wall section, doorway, and scatter prop needed to build that room.
+Layer-3 compositor. Given a `DungeonKitRoom` descriptor, returns a `DungeonKitPlacement[]` array of pure-data placement objects for every floor tile, ceiling tile, wall section, doorway, and scatter prop needed to build that room.
 
 No Three.js. No React. Same inputs → identical output.
 
@@ -42,7 +42,7 @@ GLBs live in `public/assets/dungeon/kit/`. Ingest via `scripts/ingest-dungeon-ki
 3. **4-wall perimeter** — wall pieces every 2 units; exit slot swapped to a doorway
 4. **Scatter** — 2 (corridor), 4 (chamber/entrance), 6 (boss); random position within bounds
 
-## PlacedRoom types
+## DungeonKitRoom types
 
 | Type | Scatter | Notes |
 |------|---------|-------|

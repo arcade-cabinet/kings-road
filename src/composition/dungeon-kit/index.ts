@@ -3,6 +3,6 @@ export { DUNGEON_KIT, getKitPiecesByRole } from './catalog';
 export { composeDungeonRoom } from './compose';
 export type {
   DungeonKitPlacement,
+  DungeonKitRoom,
   DungeonPieceRole,
-  PlacedRoom,
 } from './types';

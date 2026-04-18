@@ -1,7 +1,7 @@
 import { createRng } from '@/core';
 
 import { getKitPiecesByRole, weightedPickKit } from './catalog';
-import type { DungeonKitPlacement, PlacedRoom } from './types';
+import type { DungeonKitPlacement, DungeonKitRoom } from './types';
 
 const TILE = 2;
 const CEILING_HEIGHT = 4;
@@ -15,13 +15,13 @@ const SCATTER_COUNT: Record<string, number> = {
 
 function placeWallLine(
   placements: DungeonKitPlacement[],
-  room: PlacedRoom,
+  room: DungeonKitRoom,
   side: 'north' | 'south' | 'east' | 'west',
   rng: () => number,
 ): void {
   const isNS = side === 'north' || side === 'south';
   const length = isNS ? room.width : room.depth;
-  const slots = Math.round(length / TILE);
+  const slots = Math.max(1, Math.round(length / TILE));
   const midSlot = (slots - 1) / 2;
   const isExit = room.exits.includes(side);
 
@@ -73,7 +73,7 @@ function placeWallLine(
 }
 
 export function composeDungeonRoom(
-  room: PlacedRoom,
+  room: DungeonKitRoom,
   seed: string,
 ): DungeonKitPlacement[] {
   const rng = createRng(`dungeon-room:${room.id}:${seed}`);

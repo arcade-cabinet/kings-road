@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { DUNGEON_KIT } from '../catalog';
 import { composeDungeonRoom } from '../compose';
-import type { PlacedRoom } from '../types';
+import type { DungeonKitRoom } from '../types';
 
 const VALID_ASSET_IDS = new Set(Object.keys(DUNGEON_KIT));
 
-const TEST_ROOM: PlacedRoom = {
+const TEST_ROOM: DungeonKitRoom = {
   id: 'room-test-01',
   type: 'chamber',
   center: { x: 0, y: 0, z: 0 },
@@ -15,7 +15,7 @@ const TEST_ROOM: PlacedRoom = {
   exits: ['north', 'south'],
 };
 
-const CORRIDOR_ROOM: PlacedRoom = {
+const CORRIDOR_ROOM: DungeonKitRoom = {
   id: 'room-corridor-01',
   type: 'corridor',
   center: { x: 10, y: 0, z: 0 },
@@ -24,7 +24,7 @@ const CORRIDOR_ROOM: PlacedRoom = {
   exits: ['north'],
 };
 
-const BOSS_ROOM: PlacedRoom = {
+const BOSS_ROOM: DungeonKitRoom = {
   id: 'room-boss-01',
   type: 'boss',
   center: { x: 0, y: 0, z: 50 },
@@ -74,7 +74,7 @@ describe('composeDungeonRoom', () => {
   });
 
   it('produces different output for different room ids', () => {
-    const roomB: PlacedRoom = { ...TEST_ROOM, id: 'room-other' };
+    const roomB: DungeonKitRoom = { ...TEST_ROOM, id: 'room-other' };
     const a = composeDungeonRoom(TEST_ROOM, 'seed-x');
     const b = composeDungeonRoom(roomB, 'seed-x');
     const aScatter = a
