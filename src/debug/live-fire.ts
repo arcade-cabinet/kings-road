@@ -64,7 +64,8 @@ export function downloadLiveFireReport(session: LiveFireSession): void {
 
   const slug = `live-fire-${session.date}-${session.device
     .toLowerCase()
-    .replace(/\s+/g, '-')}`;
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')}`;
   const md = buildMarkdown(session);
 
   const blob = new Blob([md], { type: 'text/markdown' });
@@ -72,8 +73,10 @@ export function downloadLiveFireReport(session: LiveFireSession): void {
   const a = document.createElement('a');
   a.href = url;
   a.download = `${slug}.md`;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
 /**

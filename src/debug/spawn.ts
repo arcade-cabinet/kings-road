@@ -1,10 +1,5 @@
-import * as THREE from 'three';
-import {
-  setGameActive,
-  setPlayerPosition,
-  setSeedPhrase,
-  startGame,
-} from '@/ecs/actions/game';
+import { Vector3 } from 'three';
+import { startGame } from '@/ecs/actions/game';
 import { syncInventory } from '@/ecs/actions/inventory-ui';
 import type { ItemStack } from '@/ecs/traits/inventory';
 
@@ -27,7 +22,7 @@ const STARTER_ITEMS: ItemStack[] = [
 
 /** Player spawns slightly off-road so they don't clip into the spine path. */
 function anchorToWorldPos(distanceFromStart: number): THREE.Vector3 {
-  return new THREE.Vector3(distanceFromStart, 0, 2);
+  return new Vector3(distanceFromStart, 0, 2);
 }
 
 /**

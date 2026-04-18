@@ -7,7 +7,7 @@ domain: technical
 
 # src/debug/
 
-**Intent:** Dev-only tooling for Phase 0 benchmarking. Compile-time gated — zero production impact.
+**Intent:** Dev-only tooling for Phase 0 benchmarking. Runtime-gated via `import.meta.env.DEV` — all function bodies return immediately in production builds. The module is only tree-shaken from the production bundle if no production code imports it (app startup code must call `applyDebugSpawn()` inside a `if (import.meta.env.DEV)` guard).
 
 **Owner:** Team VFX (Phase 0)
 
@@ -42,12 +42,13 @@ Call `applyDebugSpawn()` once at app startup, before the React tree renders. If 
 
 **Valid biome ids:** `thornfield`, `ashford`, `millbrook`, `ravensgate`, `pilgrims_rest`, `grailsend`
 
-### Prod strip
+### Prod safety
 
-Every export body is guarded by `if (!import.meta.env.DEV) return`. Vite tree-shakes them in prod builds. Verify with:
+Every export body is guarded by `if (!import.meta.env.DEV) return false` (or `return`). In production builds these become `if (false) return` and Vite's minifier eliminates the branch. To guarantee the module itself is excluded from the prod bundle, wrap the call site in a `DEV` guard:
 
-```bash
-grep 'spawn=' dist/assets/*.js
+```ts
+if (import.meta.env.DEV) {
+  const { applyDebugSpawn } = await import('@/debug');
+  if (applyDebugSpawn()) skipMainMenu();
+}
 ```
-
-Expected: no output.
