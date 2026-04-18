@@ -1,23 +1,21 @@
 import type * as THREE from 'three';
 
 /**
- * Ensures a geometry has a uv2 attribute so aoMap renders correctly.
- * three.js aoMap reads from uv2; most GLBs only ship a single UV set (uv).
+ * Verifies a geometry has the `uv` attribute that PBR materials need.
  *
- * - If uv2 already exists: no-op.
- * - If uv exists: clone it into uv2.
- * - If neither exists: warn and skip.
+ * three.js r150+ reads `aoMap` from the texture's `channel` property (default
+ * 0, which resolves to the `uv` attribute). The older `uv2` convention is no
+ * longer used for `aoMap` unless a texture explicitly sets `channel = 2`.
+ *
+ * Since all PBR materials in this project use the default channel=0, the
+ * only thing `aoMap` needs is that the geometry has `uv` at all. This helper
+ * asserts that invariant at material-apply time and warns if it's missing
+ * (a GLB without UVs can't be textured regardless of channel).
  */
 export function prepareGeometryForPbr(geometry: THREE.BufferGeometry): void {
-  if (geometry.attributes.uv2) return;
-
-  const uv = geometry.attributes.uv;
-  if (!uv) {
+  if (!geometry.attributes.uv) {
     console.warn(
-      'prepareGeometryForPbr: geometry has no UV channel; aoMap will not render',
+      'prepareGeometryForPbr: geometry has no `uv` attribute; PBR textures will not render',
     );
-    return;
   }
-
-  geometry.setAttribute('uv2', uv.clone());
 }

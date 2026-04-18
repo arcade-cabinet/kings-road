@@ -1,9 +1,14 @@
 {
   "id": "thornfield",
   "name": "Thornfield",
-  "description": "Ancient ruins wrapped in dead forest and cold dawn fog. The worst-case biome.",
+  "description": "Ancient ruins wrapped in dead forest and cold dawn fog. The worst-case biome — the Phase 0 benchmark target.",
   "lighting": {
-    "hdri": "cold-dawn",
+    "hdri": {
+      "dawn": "misty-pines",
+      "noon": "misty-pines",
+      "dusk": "kloppenheim-04",
+      "night": "kloppenheim-04"
+    },
     "ambientColor": "#4a6070",
     "ambientIntensity": 0.4,
     "directionalColor": "#c8d8e8",
@@ -15,21 +20,25 @@
     "skyTint": "#6a8090"
   },
   "terrain": {
-    "heightmap": "Terrain003",
+    "heightmap": "procedural",
     "scale": 1.5,
     "materials": [
       "mossy-stone",
       "lichen-stone",
       "dead-grass",
-      "packed-mud"
+      "packed-mud",
+      "fallen-leaves",
+      "ivy-ground"
     ],
     "splatWeights": {
-      "mossy-stone": 0.35,
-      "lichen-stone": 0.25,
-      "dead-grass": 0.25,
-      "packed-mud": 0.15
+      "mossy-stone": 0.22,
+      "lichen-stone": 0.18,
+      "dead-grass": 0.2,
+      "packed-mud": 0.14,
+      "fallen-leaves": 0.16,
+      "ivy-ground": 0.1
     },
-    "displacementScale": 0.3
+    "displacementScale": 0.25
   },
   "foliage": {
     "density": 0.55,
@@ -37,10 +46,9 @@
       { "assetId": "gnarled-dead-oak", "density": 0.4, "scaleRange": [0.8, 1.4] },
       { "assetId": "hawthorn", "density": 0.25, "scaleRange": [0.6, 1.0], "clusterRadius": 3 },
       { "assetId": "thorn-bush", "density": 0.2, "scaleRange": [0.4, 0.8], "clusterRadius": 2 },
-      { "assetId": "ivy-ground", "density": 0.1, "scaleRange": [0.5, 1.0] },
-      { "assetId": "lone-fern", "density": 0.05, "scaleRange": [0.3, 0.6] }
+      { "assetId": "lone-fern", "density": 0.1, "scaleRange": [0.3, 0.6] }
     ],
-    "groundCover": ["fallen-leaves", "ivy-ground", "dead-grass"]
+    "groundCover": ["fallen-leaves", "ivy-ground", "dead-grass", "grave-moss"]
   },
   "weather": {
     "defaultState": "cold-fog",
@@ -95,7 +103,7 @@
   "audio": {
     "ambient": ["wind-cold", "dead-branches", "distant-raven"],
     "music": "thornfield-theme",
-    "footstepMaterial": "dead-leaves"
+    "footstepMaterial": "fallen-leaves"
   },
   "playerModifiers": {
     "staminaDrainMultiplier": 1.15,

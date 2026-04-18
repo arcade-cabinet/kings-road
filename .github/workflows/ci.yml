@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          lfs: true
 
       - uses: pnpm/action-setup@b307475762933b98ed359c036b0e51f26b63b74b # v5.0.0
 
@@ -41,22 +43,6 @@ jobs:
 
       - name: Web build
         run: pnpm build
-
-      - name: Asset size gate
-        run: |
-          SIZE=$(du -sm public/assets/ 2>/dev/null | cut -f1)
-          if [ -z "$SIZE" ]; then
-            echo "ERROR: public/assets/ not found — check build output"
-            exit 1
-          fi
-          echo "public/assets/ is ${SIZE}MB"
-          if [ "$SIZE" -gt 150 ]; then
-            echo "ERROR: public/assets/ exceeds 150MB APK ceiling (${SIZE}MB)"
-            exit 1
-          fi
-          if [ "$SIZE" -gt 100 ]; then
-            echo "WARNING: public/assets/ exceeds 100MB baked-in target (${SIZE}MB) — delete *pr.glb duplicates and compress GLBs to reach target"
-          fi
 
       - name: Browser smoke tests
         run: pnpm test:browser

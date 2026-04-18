@@ -68,4 +68,31 @@ describe('loadPbrMaterial', () => {
     const b = await loadPbrMaterial('test-stone');
     expect(a).toBe(b);
   });
+
+  it('returns a clone (not the shared instance) when displacementScale > 0', async () => {
+    const base = await loadPbrMaterial('test-stone');
+    const scaled = await loadPbrMaterial('test-stone', {
+      displacementScale: 0.05,
+    });
+    expect(scaled).not.toBe(base);
+    expect(scaled.displacementScale).toBe(0.05);
+  });
+
+  it('preserves the shared cache when a consumer requests displacement', async () => {
+    // Consumer A takes a cloned material with displacement; consumer B then
+    // requests the same id with defaults. B must get the pristine cached
+    // instance, not A's mutated one.
+    const base = await loadPbrMaterial('test-stone');
+    const baseScale = base.displacementScale;
+    await loadPbrMaterial('test-stone', { displacementScale: 0.2 });
+    const afterScaled = await loadPbrMaterial('test-stone');
+    expect(afterScaled).toBe(base);
+    expect(afterScaled.displacementScale).toBe(baseScale);
+  });
+
+  it('displacementScale of 0 returns the shared cached instance (no clone)', async () => {
+    const a = await loadPbrMaterial('test-stone');
+    const b = await loadPbrMaterial('test-stone', { displacementScale: 0 });
+    expect(b).toBe(a);
+  });
 });
