@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { getMostRecentSave } from '@/db/save-service';
+import type { SaveData } from '@/db/save-service';
 import { cn } from '@/lib/utils';
-import { useGameStore } from '@/stores/gameStore';
-import { generateSeedPhrase } from '@/stores/gameStore';
-import { hasAnySave } from '@/db/save-service';
-import { useState } from 'react';
+import { generateSeedPhrase, useGameStore } from '@/stores/gameStore';
 import { ShaderBackdrop } from './ShaderBackdrop';
 import { useMenuOrchestrator } from './useMenuOrchestrator';
 import { VellumOrnaments } from './VellumOrnaments';
@@ -39,18 +38,25 @@ export function MainMenu() {
     reseed,
   } = useMenuOrchestrator();
 
-  const [hasSaves, setHasSaves] = useState(false);
+  const [recentSave, setRecentSave] = useState<SaveData | undefined>(undefined);
 
   useEffect(() => {
-    if (!gameActive) {
-      hasAnySave()
-        .then(setHasSaves)
-        .catch((err) => {
-          console.warn('[MainMenu] hasAnySave failed; hiding Continue:', err);
-          setHasSaves(false);
-        });
-    }
+    if (gameActive) return;
+    let cancelled = false;
+    getMostRecentSave()
+      .then((save) => {
+        if (!cancelled) setRecentSave(save);
+      })
+      .catch((err) => {
+        console.warn('[MainMenu] getMostRecentSave failed:', err);
+        if (!cancelled) setRecentSave(undefined);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [gameActive]);
+
+  const hasSaves = Boolean(recentSave);
 
   useEffect(() => {
     if (!seedPhrase && !gameActive) {
@@ -158,22 +164,13 @@ export function MainMenu() {
             The road faltered: {bootError}
           </div>
         )}
-        {hasSaves && (
-          <button
-            type="button"
+        {hasSaves && recentSave && (
+          <ContinueCard
+            save={recentSave}
+            loading={loadingContinue}
+            disabled={fadeOut}
             onClick={continueFromSave}
-            disabled={loadingContinue || fadeOut}
-            className={cn(
-              'w-full py-3 mb-3 rounded-sm',
-              'font-crimson italic text-base text-[#4a3820]',
-              'border border-[#c4a747]/50 bg-[#fcf7eb]/70 backdrop-blur-sm',
-              'hover:bg-[#fcf7eb]/90 hover:border-[#c4a747]',
-              'active:scale-[0.99] transition-all duration-200',
-              'disabled:opacity-60 disabled:cursor-wait',
-            )}
-          >
-            {loadingContinue ? COPY.continueLoading : COPY.continue}
-          </button>
+          />
         )}
         <button
           type="button"
@@ -208,4 +205,149 @@ export function MainMenu() {
       </footer>
     </div>
   );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ContinueCard — rich resume-a-pilgrimage card
+//
+// 21st.dev-inspired: the Continue action is not a button, it's a glance-ready
+// card showing the pilgrim's seed phrase, how long ago they last stopped, and
+// how much time is already in that journey. Tapping anywhere on the card
+// resumes.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ContinueCard({
+  save,
+  loading,
+  disabled,
+  onClick,
+}: {
+  save: SaveData;
+  loading: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  const playTimeLabel = formatPlayTime(save.playTimeSeconds);
+  const savedAtLabel = formatRelativeTime(save.savedAt);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={loading || disabled}
+      className={cn(
+        'w-full mb-3 px-5 py-4 rounded-sm relative overflow-hidden text-left group',
+        'border border-[#c4a747]/50 backdrop-blur-sm',
+        'active:scale-[0.99] transition-all duration-200',
+        'disabled:opacity-70 disabled:cursor-wait',
+      )}
+      style={{
+        background:
+          'linear-gradient(180deg, rgba(252,247,235,0.82) 0%, rgba(242,233,210,0.78) 100%)',
+        boxShadow:
+          '0 1px 0 rgba(255,255,255,0.55) inset, 0 6px 22px rgba(74,56,32,0.18)',
+      }}
+    >
+      {/* Subtle hover sweep — same vocabulary as Set Forth */}
+      <span
+        aria-hidden
+        className={cn(
+          'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+          'bg-gradient-to-r from-transparent via-[rgba(196,167,71,0.15)] to-transparent',
+        )}
+      />
+      <div className="relative flex items-center gap-4">
+        <QuillSeal />
+        <div className="flex-1 min-w-0">
+          <div className="font-crimson italic text-[#8b6f47]/80 text-[0.6rem] tracking-[0.28em] uppercase">
+            {loading ? 'Returning…' : 'Continue'}
+          </div>
+          <div
+            className="font-lora font-semibold text-[#4a3820] text-lg md:text-xl leading-tight truncate mt-0.5"
+            title={save.seedPhrase}
+          >
+            {save.seedPhrase}
+          </div>
+          <div className="flex items-center gap-3 mt-1 text-[#8b6f47]/75 text-xs font-crimson italic">
+            <span>{savedAtLabel}</span>
+            <span className="w-px h-3 bg-[#c4a747]/40" aria-hidden="true" />
+            <span>{playTimeLabel}</span>
+          </div>
+        </div>
+        <ForwardGlyph />
+      </div>
+    </button>
+  );
+}
+
+function QuillSeal() {
+  return (
+    <div
+      className="relative w-10 h-10 flex items-center justify-center rounded-full shrink-0"
+      style={{
+        background:
+          'radial-gradient(circle at 30% 30%, rgba(196,167,71,0.35), rgba(139,111,71,0.18))',
+        boxShadow: '0 0 0 1px rgba(196,167,71,0.5) inset',
+      }}
+      aria-hidden="true"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="w-5 h-5 text-[#8b6f47]"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M3 21 L11 13" />
+        <path
+          d="M21 3 C13 5 9 9 7 15 L9 17 C15 15 19 11 21 3 Z"
+          fill="currentColor"
+          fillOpacity="0.3"
+        />
+      </svg>
+    </div>
+  );
+}
+
+function ForwardGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="w-5 h-5 text-[#8b6f47]/60 group-hover:text-[#8b6f47] shrink-0 transition-colors"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M8 5l8 7-8 7" />
+    </svg>
+  );
+}
+
+function formatPlayTime(seconds: number): string {
+  if (seconds < 60) return 'just begun';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m walked`;
+  return `${m}m walked`;
+}
+
+function formatRelativeTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(ms)) return 'some time ago';
+  const mins = Math.floor(ms / 60_000);
+  if (mins < 1) return 'moments ago';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days === 1) return 'yesterday';
+  if (days < 7) return `${days}d ago`;
+  const wks = Math.floor(days / 7);
+  if (wks < 5) return `${wks}w ago`;
+  const mons = Math.floor(days / 30);
+  return `${mons}mo ago`;
 }
