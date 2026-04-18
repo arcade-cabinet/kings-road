@@ -256,6 +256,11 @@ function findFreeCell(
     }
   }
 
-  // Fallback — should never happen with reasonable dungeon sizes
-  return [startX + 11, startZ];
+  // Spiral search exhausted 10-cell radius — dungeon is over-packed.
+  // Bubble the config bug up so the author sees it during layout rather
+  // than letting rooms stack invisibly at arbitrary coords.
+  throw new Error(
+    `findFreeCell: no free cell within radius 10 of (${startX}, ${startZ}). ` +
+      `The dungeon layout is over-packed — reduce roomCount or increase grid size.`,
+  );
 }
