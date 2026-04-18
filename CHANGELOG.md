@@ -12,6 +12,14 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.1.0...kings-road-v1.2.0) (2026-04-18)
+
+
+### Added
+
+* **ecs:** add getSessionEntity + unsafe_resetSessionEntity (Koota Phase 0) ([#37](https://github.com/arcade-cabinet/kings-road/issues/37)) ([62e07c1](https://github.com/arcade-cabinet/kings-road/commit/62e07c1b1b4a2d18f618403f4093e167b9ce7449))
+* **ecs:** Koota Phase 1 — InventoryUI Session trait behind inventoryStore facade ([#39](https://github.com/arcade-cabinet/kings-road/issues/39)) ([9e00662](https://github.com/arcade-cabinet/kings-road/commit/9e0066222fc5ca23edd2c94db2edb61a4b9dc4b5))
+
 ## [1.1.0](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.0.0...kings-road-v1.1.0) (2026-04-18)
 
 
