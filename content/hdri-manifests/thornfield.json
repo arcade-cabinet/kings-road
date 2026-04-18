@@ -1,4 +1,4 @@
 [
-  { "id": "misty-pines", "sourceDir": "/Volumes/home/assets/2DPhotorealistic/HDRIs/polyhaven/misty_pines" },
-  { "id": "kloppenheim-04", "sourceDir": "/Volumes/home/assets/2DPhotorealistic/HDRIs/polyhaven/kloppenheim_04" }
+  { "id": "misty-pines", "sourceDir": "2DPhotorealistic/HDRIs/polyhaven/misty_pines" },
+  { "id": "kloppenheim-04", "sourceDir": "2DPhotorealistic/HDRIs/polyhaven/kloppenheim_04" }
 ]

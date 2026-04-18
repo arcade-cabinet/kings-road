@@ -4,12 +4,16 @@
  *
  * Usage:
  *   npx tsx scripts/ingest-hdri.ts <manifest.json>
+ *   KINGS_ROAD_ASSETS=/path/to/mirror npx tsx scripts/ingest-hdri.ts <manifest.json>
  *
- * manifest.json format:
+ * manifest.json format (sourceDir is RELATIVE to $KINGS_ROAD_ASSETS):
  * [
- *   { "id": "cold-dawn", "sourceDir": "/Volumes/home/assets/HDRI/1K/cold_dawn_1k" },
+ *   { "id": "misty-pines", "sourceDir": "2DPhotorealistic/HDRIs/polyhaven/misty_pines" },
  *   ...
  * ]
+ *
+ * $KINGS_ROAD_ASSETS points at a local HDRI mirror. Default:
+ * `/Volumes/home/assets` (team NAS on macOS). Override per machine.
  *
  * For each entry the entire source directory is copied verbatim to
  * public/assets/hdri/<id>/ preserving all original filenames. The loader
@@ -26,9 +30,17 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
+const ASSETS_ROOT = process.env.KINGS_ROAD_ASSETS ?? '/Volumes/home/assets';
+
 interface ManifestEntry {
   id: string;
   sourceDir: string;
+}
+
+function resolveSourceDir(sourceDir: string): string {
+  return path.isAbsolute(sourceDir)
+    ? sourceDir
+    : path.join(ASSETS_ROOT, sourceDir);
 }
 
 const RESOLUTION_RANK: Record<string, number> = { _1k: 0, _2k: 1, _4k: 2 };
@@ -80,6 +92,7 @@ export function aliasHdr(outDir: string, id: string): void {
 
 function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
   const outDir = path.join(outputRoot, entry.id);
+  const absSource = resolveSourceDir(entry.sourceDir);
 
   try {
     fs.mkdirSync(outDir, { recursive: true });
@@ -90,18 +103,18 @@ function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
 
   let sourceFiles: string[];
   try {
-    sourceFiles = fs.readdirSync(entry.sourceDir);
+    sourceFiles = fs.readdirSync(absSource);
   } catch (err) {
+    console.error(`  ERROR: cannot read source dir "${absSource}": ${err}`);
     console.error(
-      `  ERROR: cannot read source dir "${entry.sourceDir}": ${err}`,
+      `  Check that KINGS_ROAD_ASSETS points at a local HDRI mirror (current: ${ASSETS_ROOT})`,
     );
-    console.error('  Is the NAS mounted? Check: mount | grep /Volumes/home');
     process.exit(1);
   }
 
   let copied = 0;
   for (const file of sourceFiles) {
-    const src = path.join(entry.sourceDir, file);
+    const src = path.join(absSource, file);
     let isFile: boolean;
     try {
       isFile = fs.statSync(src).isFile();
@@ -122,7 +135,7 @@ function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
   }
 
   if (copied === 0) {
-    console.warn(`  WARNING: no files found in ${entry.sourceDir}`);
+    console.warn(`  WARNING: no files found in ${absSource}`);
   }
 
   aliasHdr(outDir, entry.id);
@@ -148,7 +161,7 @@ function main() {
 
   console.log(`Ingesting ${manifest.length} HDRI(s) → ${outputRoot}\n`);
   for (const entry of manifest) {
-    console.log(`[${entry.id}]  ${entry.sourceDir}`);
+    console.log(`[${entry.id}]  ${resolveSourceDir(entry.sourceDir)}`);
     ingestEntry(entry, outputRoot);
   }
   console.log('\nDone.');

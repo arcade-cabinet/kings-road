@@ -46,8 +46,7 @@
       { "assetId": "gnarled-dead-oak", "density": 0.4, "scaleRange": [0.8, 1.4] },
       { "assetId": "hawthorn", "density": 0.25, "scaleRange": [0.6, 1.0], "clusterRadius": 3 },
       { "assetId": "thorn-bush", "density": 0.2, "scaleRange": [0.4, 0.8], "clusterRadius": 2 },
-      { "assetId": "lone-fern", "density": 0.1, "scaleRange": [0.3, 0.6] },
-      { "assetId": "mossy-log", "density": 0.05, "scaleRange": [0.5, 1.0] }
+      { "assetId": "lone-fern", "density": 0.1, "scaleRange": [0.3, 0.6] }
     ],
     "groundCover": ["fallen-leaves", "ivy-ground", "dead-grass", "grave-moss"]
   },
