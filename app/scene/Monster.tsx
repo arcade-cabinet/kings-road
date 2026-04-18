@@ -199,7 +199,6 @@ export function Monster({ archetype, position }: MonsterProps) {
     bodyParts,
     primaryColor,
     secondaryColor,
-    position,
   ]);
 
   return (

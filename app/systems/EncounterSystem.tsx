@@ -182,10 +182,10 @@ export function EncounterSystem() {
     const text = result.isCritical
       ? `${result.damage} CRIT!`
       : `${result.damage}`;
-    addDamagePopup(text, color, popupX, popupY, result.isCritical);
+    addDamagePopup(text, color, popupX, popupY, result.isCritical, true);
 
     if (result.isDead) {
-      addDamagePopup('Defeated!', '#66bb6a', popupX, popupY - 0.05, false);
+      addDamagePopup('Defeated!', '#66bb6a', popupX, popupY - 0.05, false, true);
     }
   }, [playerAttackDamage]);
 
@@ -269,6 +269,7 @@ export function EncounterSystem() {
                 '#ff4444',
                 popupX,
                 popupY,
+                false,
                 false,
               );
             }

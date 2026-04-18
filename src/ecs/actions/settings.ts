@@ -48,15 +48,31 @@ export async function loadSettings(): Promise<void> {
   session.set(SettingsConfig, { audio, display });
 }
 
-async function persist(
-  audio: AudioSettings,
-  display: DisplaySettings,
-): Promise<void> {
+let persistTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingAudio: AudioSettings | null = null;
+let pendingDisplay: DisplaySettings | null = null;
+
+async function flushPersist(): Promise<void> {
+  if (!pendingAudio || !pendingDisplay) return;
+  const audio = pendingAudio;
+  const display = pendingDisplay;
+  pendingAudio = null;
+  pendingDisplay = null;
   try {
     await setPreferenceJSON(STORAGE_KEY, { audio, display });
   } catch {
     // storage unavailable — in-memory state still wins this session
   }
+}
+
+function persist(audio: AudioSettings, display: DisplaySettings): void {
+  pendingAudio = audio;
+  pendingDisplay = display;
+  if (persistTimer !== null) clearTimeout(persistTimer);
+  persistTimer = setTimeout(() => {
+    persistTimer = null;
+    void flushPersist();
+  }, 200);
 }
 
 export function setAudioSetting<K extends keyof AudioSettings>(
@@ -67,7 +83,7 @@ export function setAudioSetting<K extends keyof AudioSettings>(
   const cur = session.get(SettingsConfig);
   const audio = { ...cur.audio, [key]: value };
   session.set(SettingsConfig, { audio, display: cur.display });
-  void persist(audio, cur.display);
+  persist(audio, cur.display);
 }
 
 export function setDisplaySetting<K extends keyof DisplaySettings>(
@@ -78,7 +94,7 @@ export function setDisplaySetting<K extends keyof DisplaySettings>(
   const cur = session.get(SettingsConfig);
   const display = { ...cur.display, [key]: value };
   session.set(SettingsConfig, { audio: cur.audio, display });
-  void persist(cur.audio, display);
+  persist(cur.audio, display);
 }
 
 export function resetSettingsDefaults(): void {
@@ -86,5 +102,5 @@ export function resetSettingsDefaults(): void {
   const audio = { ...DEFAULT_AUDIO };
   const display = { ...DEFAULT_DISPLAY };
   session.set(SettingsConfig, { audio, display });
-  void persist(audio, display);
+  persist(audio, display);
 }

@@ -80,8 +80,26 @@ const ITEM_TYPE_LABELS: Record<string, string> = {
 
 // ── 3D Item Preview ──────────────────────────────────────────────────────
 
+/** Renders a 3D preview using a structured viewmodel GLB from the item definition. */
+function ViewmodelPreview({ glb }: { glb: string }) {
+  const { nodes } = useGLTF(glb) as any;
+  const mesh = Object.values(nodes).find((n: any) => n?.isMesh || n?.geometry) as any;
+  if (!mesh) return null;
+  return (
+    <mesh geometry={mesh.geometry} castShadow receiveShadow>
+      <meshStandardMaterial color="#c4a747" roughness={0.4} metalness={0.8} />
+    </mesh>
+  );
+}
+
 function ItemModelPreview({ itemId }: { itemId: string }) {
   const def = getItemInfo(itemId);
+
+  // Prefer the structured viewmodel GLB if the item definition provides one
+  if (def?.viewmodel?.glb) {
+    return <ViewmodelPreview glb={def.viewmodel.glb} />;
+  }
+
   const descriptor = `${itemId} ${def?.name ?? ''} ${def?.type ?? ''} ${def?.equipSlot ?? ''}`.toLowerCase();
 
   let modelPath = ITEM_MODELS.treasure;

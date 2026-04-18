@@ -59,12 +59,12 @@ export function addDamagePopup(
   x: number,
   y: number,
   isCritical: boolean,
+  isPlayerHit: boolean,
 ): void {
   const s = session();
   const cur = s.get(CombatUI);
   const now = performance.now();
   const isHeal = text.startsWith('+');
-  const isDealt = color === '#ffffff' || color === '#ffcc00';
 
   s.set(CombatUI, {
     ...cur,
@@ -80,8 +80,8 @@ export function addDamagePopup(
         isCritical,
       },
     ],
-    lastHitTime: isDealt && !isHeal ? now : cur.lastHitTime,
-    lastDamageTime: !isDealt && !isHeal ? now : cur.lastDamageTime,
+    lastHitTime: isPlayerHit && !isHeal ? now : cur.lastHitTime,
+    lastDamageTime: !isPlayerHit && !isHeal ? now : cur.lastDamageTime,
   });
 }
 

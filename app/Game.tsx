@@ -14,6 +14,7 @@ import { useTrait } from 'koota/react';
 import { InventoryUI } from '@/ecs/traits/session-inventory';
 import { getSessionEntity } from '@/ecs/world';
 import { getFlags } from '@/ecs/actions/game';
+import { isInventoryOpen } from '@/ecs/actions/inventory-ui';
 import { useFlags } from '@/ecs/hooks/useGameSession';
 import { TouchOverlay } from '@/input/providers/TouchProvider';
 import { useInputManager } from '@/input/useInputManager';
@@ -36,11 +37,7 @@ export function Game() {
         return;
       }
       const flags = getFlags();
-      const inv = (getSessionEntity() as unknown as {
-        has: (t: typeof InventoryUI) => boolean;
-        get: (t: typeof InventoryUI) => { isOpen: boolean };
-      });
-      const invOpen = inv.has(InventoryUI) ? inv.get(InventoryUI).isOpen : false;
+      const invOpen = isInventoryOpen();
       if (
         flags.gameActive &&
         !flags.paused &&
