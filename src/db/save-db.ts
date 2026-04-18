@@ -1,35 +1,25 @@
 /**
- * Capacitor SQLite adapter for save data.
+ * SQLite adapter for save data.
  *
- * Single shared connection, lazy-initialized. Web uses the jeep-sqlite
- * web component bundled via @capacitor-community/sqlite; native uses the
- * platform SQLite store (UserDefaults-backed on iOS, file-backed on
- * Android). One row per slot: slotId (INTEGER PRIMARY KEY) + payload
- * (TEXT JSON).
+ * Web: sql.js with IndexedDB persistence. On open, restores a previously
+ * exported Uint8Array from IndexedDB (key: IDB_KEY). After each write,
+ * debounces a flush of db.export() back to IndexedDB (FLUSH_DEBOUNCE_MS).
+ * No DOM component required; eliminates the jeep-sqlite wasm ABI mismatch.
  *
- * Why SQLite over IndexedDB for saves:
- *   - Parity across web + native (same API, same schema, same file).
- *   - Makes future Drizzle-based cross-referencing with content tables
- *     straightforward (a single SQLite file holds both read-only content
- *     and mutable save rows if we ever want that unification).
- *   - Capacitor SQLite is the plugin Kings Road's CLAUDE.md already
- *     references for persistence.
+ * Native: @capacitor-community/sqlite — dynamically imported only on native
+ * so the web bundle never pulls in its transitive wasm deps.
+ *
+ * Public API: sqlRun / sqlQuery / closeDb — same contract as before.
  */
 
 import { Capacitor } from '@capacitor/core';
-import {
-  CapacitorSQLite,
-  SQLiteConnection,
-  type SQLiteDBConnection,
-} from '@capacitor-community/sqlite';
+import { assetUrl } from '@/lib/assets';
 
+const IS_WEB = Capacitor.getPlatform() === 'web';
 const DB_NAME = 'kings-road-saves';
 const DB_VERSION = 1;
-
-// A single, shared connection wrapper. CapacitorSQLite enforces one
-// connection per DB name per process — opening twice throws.
-let sqlite: SQLiteConnection | null = null;
-let dbPromise: Promise<SQLiteDBConnection> | null = null;
+const IDB_KEY = 'kings-road-saves-v1';
+const FLUSH_DEBOUNCE_MS = 200;
 
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS save_slots (
@@ -38,41 +28,128 @@ const SCHEMA = [
    );`,
 ];
 
-/** Initialize the jeep-sqlite web component on web platforms. */
-async function ensureWebStore(): Promise<void> {
-  if (Capacitor.getPlatform() !== 'web') return;
-  // jeep-sqlite needs a <jeep-sqlite> DOM node registered before opening
-  // the DB. Done once per document.
-  if (typeof document === 'undefined') return;
-  if (document.querySelector('jeep-sqlite')) return;
-  // Lazy-load the web component bundle — it registers the custom element.
-  await import('jeep-sqlite/loader').then((m) =>
-    m.defineCustomElements(window),
-  );
-  const el = document.createElement('jeep-sqlite');
-  document.body.appendChild(el);
-  // Initialize the web store (must be called after element mount).
-  await customElements.whenDefined('jeep-sqlite');
-  await CapacitorSQLite.initWebStore();
+// ---------------------------------------------------------------------------
+// Web path — sql.js + IndexedDB persistence
+// ---------------------------------------------------------------------------
+
+type SqlJsDatabase = import('sql.js').Database;
+
+let webDb: SqlJsDatabase | null = null;
+let webDbPromise: Promise<SqlJsDatabase> | null = null;
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+function idbGet(key: string): Promise<Uint8Array | null> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('kings-road-db', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('kv');
+    req.onsuccess = () => {
+      const tx = req.result.transaction('kv', 'readonly');
+      const get = tx.objectStore('kv').get(key);
+      get.onsuccess = () =>
+        resolve((get.result as Uint8Array | undefined) ?? null);
+      get.onerror = () => reject(get.error);
+    };
+    req.onerror = () => reject(req.error);
+  });
 }
 
-async function openDb(): Promise<SQLiteDBConnection> {
-  if (dbPromise) return dbPromise;
-  dbPromise = (async () => {
-    await ensureWebStore();
-    if (!sqlite) sqlite = new SQLiteConnection(CapacitorSQLite);
+function idbSet(key: string, value: Uint8Array): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('kings-road-db', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('kv');
+    req.onsuccess = () => {
+      const tx = req.result.transaction('kv', 'readwrite');
+      const put = tx.objectStore('kv').put(value, key);
+      put.onsuccess = () => resolve();
+      put.onerror = () => reject(put.error);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
 
-    // Check for an existing connection (hot-reload / re-init safety).
-    const isConn = (await sqlite.isConnection(DB_NAME, /* readonly */ false))
-      .result;
+function scheduleFlush(db: SqlJsDatabase): void {
+  if (flushTimer !== null) clearTimeout(flushTimer);
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    idbSet(IDB_KEY, db.export()).catch((err) =>
+      console.warn('[save-db] IndexedDB flush failed:', err),
+    );
+  }, FLUSH_DEBOUNCE_MS);
+}
+
+async function openWebDb(): Promise<SqlJsDatabase> {
+  if (webDbPromise) return webDbPromise;
+  webDbPromise = (async () => {
+    let initSqlJs: typeof import('sql.js')['default'];
+    try {
+      initSqlJs = (await import('sql.js')).default;
+    } catch (err) {
+      throw new Error(`[save-db] Failed to load sql.js: ${err}`);
+    }
+    const SQL = await initSqlJs({
+      locateFile: () => assetUrl('/sql-wasm.wasm'),
+    });
+    const stored = await idbGet(IDB_KEY);
+    const db = stored ? new SQL.Database(stored) : new SQL.Database();
+    for (const stmt of SCHEMA) {
+      db.run(stmt);
+    }
+    webDb = db;
+    return db;
+  })().catch((err) => {
+    // Evict so the next call retries rather than returning a rejected promise.
+    webDbPromise = null;
+    throw err;
+  });
+  return webDbPromise;
+}
+
+function webRun(db: SqlJsDatabase, query: string, values: unknown[]): void {
+  db.run(query, values as Parameters<SqlJsDatabase['run']>[1]);
+  scheduleFlush(db);
+}
+
+function webQuery<T>(db: SqlJsDatabase, query: string, values: unknown[]): T[] {
+  const stmt = db.prepare(query);
+  try {
+    stmt.bind(values as Parameters<SqlJsDatabase['run']>[1]);
+    const rows: T[] = [];
+    while (stmt.step()) {
+      rows.push(stmt.getAsObject() as T);
+    }
+    return rows;
+  } finally {
+    stmt.free();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Native path — @capacitor-community/sqlite (dynamic import, web-safe)
+// ---------------------------------------------------------------------------
+
+type SQLiteDBConnection =
+  import('@capacitor-community/sqlite').SQLiteDBConnection;
+type SQLiteConnection = import('@capacitor-community/sqlite').SQLiteConnection;
+
+let nativeSqlite: SQLiteConnection | null = null;
+let nativeDbPromise: Promise<SQLiteDBConnection> | null = null;
+
+async function openNativeDb(): Promise<SQLiteDBConnection> {
+  if (nativeDbPromise) return nativeDbPromise;
+  nativeDbPromise = (async () => {
+    const { CapacitorSQLite, SQLiteConnection } = await import(
+      '@capacitor-community/sqlite'
+    );
+    if (!nativeSqlite) nativeSqlite = new SQLiteConnection(CapacitorSQLite);
+    const isConn = (await nativeSqlite.isConnection(DB_NAME, false)).result;
     const db = isConn
-      ? await sqlite.retrieveConnection(DB_NAME, false)
-      : await sqlite.createConnection(
+      ? await nativeSqlite.retrieveConnection(DB_NAME, false)
+      : await nativeSqlite.createConnection(
           DB_NAME,
-          /* encrypted */ false,
+          false,
           'no-encryption',
           DB_VERSION,
-          /* readonly */ false,
+          false,
         );
     await db.open();
     for (const stmt of SCHEMA) {
@@ -80,33 +157,62 @@ async function openDb(): Promise<SQLiteDBConnection> {
     }
     return db;
   })();
-  return dbPromise;
+  return nativeDbPromise;
 }
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 export async function sqlRun(
   query: string,
   values: unknown[] = [],
 ): Promise<void> {
-  const db = await openDb();
-  await db.run(query, values);
+  if (IS_WEB) {
+    const db = await openWebDb();
+    webRun(db, query, values);
+  } else {
+    const db = await openNativeDb();
+    await db.run(query, values);
+  }
 }
 
 export async function sqlQuery<T = Record<string, unknown>>(
   query: string,
   values: unknown[] = [],
 ): Promise<T[]> {
-  const db = await openDb();
-  const res = await db.query(query, values);
-  return (res.values ?? []) as T[];
+  if (IS_WEB) {
+    const db = await openWebDb();
+    return webQuery<T>(db, query, values);
+  } else {
+    const db = await openNativeDb();
+    const res = await db.query(query, values);
+    return (res.values ?? []) as T[];
+  }
 }
 
 /** Close the shared connection. Only call at app shutdown. */
 export async function closeDb(): Promise<void> {
-  if (!sqlite) return;
-  try {
-    await sqlite.closeConnection(DB_NAME, false);
-  } finally {
-    sqlite = null;
-    dbPromise = null;
+  if (IS_WEB) {
+    if (flushTimer !== null) {
+      clearTimeout(flushTimer);
+      flushTimer = null;
+      if (webDb) {
+        await idbSet(IDB_KEY, webDb.export()).catch((err) =>
+          console.warn('[save-db] Final flush failed:', err),
+        );
+      }
+    }
+    webDb?.close();
+    webDb = null;
+    webDbPromise = null;
+  } else {
+    if (!nativeSqlite) return;
+    try {
+      await nativeSqlite.closeConnection(DB_NAME, false);
+    } finally {
+      nativeSqlite = null;
+      nativeDbPromise = null;
+    }
   }
 }
