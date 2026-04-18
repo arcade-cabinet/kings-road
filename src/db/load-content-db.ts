@@ -10,7 +10,7 @@
  * tries to read content.
  */
 
-import { initItemLoader } from '../game/world/item-loader';
+import { initItemLoader } from '@/world/item-loader';
 import { initContentStore } from './content-queries';
 
 /** Load game content from the JSON bundle and initialize the content store */

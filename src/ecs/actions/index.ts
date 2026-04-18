@@ -1,5 +1,5 @@
 import { createActions, type Entity } from 'koota';
-import type { EquipSlot } from '../../schemas/item.schema';
+import type { EquipSlot } from '@/schemas/item.schema';
 import { getItemDef } from '../item-registry';
 import type { ItemStack } from '../traits';
 import {

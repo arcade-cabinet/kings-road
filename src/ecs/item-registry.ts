@@ -1,4 +1,4 @@
-import type { ItemDefinition } from '../schemas/item.schema';
+import type { ItemDefinition } from '@/schemas/item.schema';
 
 /**
  * Runtime registry of item definitions.

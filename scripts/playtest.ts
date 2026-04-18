@@ -17,21 +17,21 @@
 import {
   calculateMonsterDamage,
   calculatePlayerDamage,
-} from '../src/game/systems/combat-resolver';
-import { createRng } from '../src/game/utils/random';
-import { getDangerTier, getEncounterChance } from '../src/game/world/danger';
-import {
-  generateKingdom,
-  getKingdomTile,
-  getRegionAt,
-  getSettlementAt,
-} from '../src/game/world/kingdom-gen';
-import { resolveQuestGraph } from '../src/game/world/quest-resolver';
+} from '../src/combat-resolver';
 import type { EncounterTable } from '../src/schemas/encounter-table.schema';
 import type { KingdomMap, Settlement } from '../src/schemas/kingdom.schema';
 import { KingdomConfigSchema } from '../src/schemas/kingdom.schema';
 import type { MonsterArchetype } from '../src/schemas/monster.schema';
 import type { QuestDefinition } from '../src/schemas/quest.schema';
+import { createRng } from '../src/utils/random';
+import { getDangerTier, getEncounterChance } from '../src/world/danger';
+import {
+  generateKingdom,
+  getKingdomTile,
+  getRegionAt,
+  getSettlementAt,
+} from '../src/world/kingdom-gen';
+import { resolveQuestGraph } from '../src/world/quest-resolver';
 
 // --- Static content imports ---
 

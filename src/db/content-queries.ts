@@ -6,25 +6,25 @@
  * is queried from the SQLite database compiled by scripts/compile-content-db.ts.
  *
  * Usage:
- *   import { getMonster, getItemsByType, getEncounterTable } from '../db/content-queries';
+ *   import { getMonster, getItemsByType, getEncounterTable } from '@/db/content-queries';
  *   const wolf = getMonster('wolf');
  *   const consumables = getItemsByType('consumable');
  *   const tier2 = getEncounterTable(2);
  */
 
-import type { BuildingArchetype } from '../schemas/building.schema';
-import type { DungeonLayout } from '../schemas/dungeon.schema';
-import type { EncounterDefinition } from '../schemas/encounter.schema';
+import type { BuildingArchetype } from '@/schemas/building.schema';
+import type { DungeonLayout } from '@/schemas/dungeon.schema';
+import type { EncounterDefinition } from '@/schemas/encounter.schema';
 import type {
   EncounterTable,
   LootTable,
-} from '../schemas/encounter-table.schema';
-import type { FeatureDefinition } from '../schemas/feature.schema';
-import type { ItemDefinition } from '../schemas/item.schema';
-import type { MonsterArchetype } from '../schemas/monster.schema';
-import type { NPCDefinition } from '../schemas/npc.schema';
-import type { NPCBlueprint } from '../schemas/npc-blueprint.schema';
-import type { TownConfig } from '../schemas/town.schema';
+} from '@/schemas/encounter-table.schema';
+import type { FeatureDefinition } from '@/schemas/feature.schema';
+import type { ItemDefinition } from '@/schemas/item.schema';
+import type { MonsterArchetype } from '@/schemas/monster.schema';
+import type { NPCDefinition } from '@/schemas/npc.schema';
+import type { NPCBlueprint } from '@/schemas/npc-blueprint.schema';
+import type { TownConfig } from '@/schemas/town.schema';
 
 // ── In-memory content store ────────────────────────────────────────────
 // Populated once at startup from game.db, then read-only.
