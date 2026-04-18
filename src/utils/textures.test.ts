@@ -107,6 +107,21 @@ describe('textures module', () => {
       expect(materials.door.side).toBe(THREE.DoubleSide);
     });
 
+    it('door material is a clone of cached wood — shares maps, not instance', () => {
+      const materials = getMaterials();
+      const cachedWood = loadPbrMaterial('wood');
+      expect(materials.door).not.toBe(cachedWood);
+      expect(materials.door.map).toBe(cachedWood.map);
+      expect(materials.door.normalMap).toBe(cachedWood.normalMap);
+    });
+
+    it('barrel material is a clone — mutations do not leak to wood', () => {
+      const materials = getMaterials();
+      const cachedWood = loadPbrMaterial('wood');
+      expect(materials.barrel).not.toBe(cachedWood);
+      expect(materials.barrel).not.toBe(materials.wood);
+    });
+
     it('gem material has emissive properties', () => {
       const materials = getMaterials();
       expect(materials.gem.emissive).toBeDefined();
