@@ -30,8 +30,8 @@ function pbrUrl(id: string, packPrefix: string, suffix: string): string {
 
 /**
  * Load a PBR material by tactile ID. Returns a configured MeshStandardMaterial
- * with Color + NormalGL + Roughness maps bound, and Displacement + AO when present.
- * Throws AssetError if the id is not in the palette.
+ * with Color + NormalGL + Roughness maps bound, and Displacement + AO + Metalness
+ * when present on disk. Throws AssetError if the id is not in the palette.
  * Caches by id — repeat calls return the same instance.
  */
 export async function loadPbrMaterial(
@@ -88,6 +88,19 @@ export async function loadPbrMaterial(
       })
       .catch(() => {
         /* AO is optional */
+      }),
+  );
+
+  optionalLoads.push(
+    loadTexture(pbrUrl(id, packPrefix, '_Metalness.jpg'))
+      .then((tex) => {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        mat.metalnessMap = tex;
+        mat.metalness = 1.0;
+      })
+      .catch(() => {
+        /* Metalness is optional — non-metals won't have this map */
       }),
   );
 
