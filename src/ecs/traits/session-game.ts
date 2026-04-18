@@ -94,6 +94,13 @@ export const EnvironmentState = trait(() => ({
   currentWeather: { ...DEFAULT_WEATHER } as WeatherState,
 }));
 
+// ── Play time tracker ─────────────────────────────────────────────────────
+// Ticks every frame when gameActive && !paused so save payloads can report
+// an accurate "2h 14m walked" figure on the load screen.
+export const PlayTime = trait(() => ({
+  playTimeSeconds: 0,
+}));
+
 // ── Combat session (encounter in flight) ──────────────────────────────────
 export const CombatSession = trait(() => ({
   activeEncounter: null as ActiveEncounter | null,

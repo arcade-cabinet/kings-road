@@ -25,6 +25,7 @@ import {
   setPlayerVelocityY,
   setStamina,
   setVelocity,
+  tickPlayTime,
   togglePause,
   getInteraction,
 } from '@/ecs/actions/game';
@@ -127,14 +128,22 @@ export function PlayerController() {
 
     // Don't process movement when game is paused/inactive/in menus/dead
     const { isDead } = getFlags();
-    if (
+    const inBlockingState =
       !gameActive ||
       paused ||
       inDialogue ||
       inCombat ||
       inventoryOpen ||
-      isDead
-    ) {
+      isDead;
+
+    // Play-time ticks while gameActive and not in a blocking state. Accumulates
+    // into the PlayTime trait so save payloads + the pause-menu "2h 14m walked"
+    // affordance reflect actual play time, not wall-clock time.
+    if (gameActive && !paused && !isDead) {
+      tickPlayTime(dt);
+    }
+
+    if (inBlockingState) {
       inputManager.postFrame();
       return;
     }
