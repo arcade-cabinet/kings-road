@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 export const CHUNK_TYPES = [
   'ocean',
   'coast',
@@ -18,4 +16,10 @@ export const CHUNK_TYPES = [
 
 export type ChunkType = (typeof CHUNK_TYPES)[number];
 
-export const ChunkTypeSchema = z.enum(CHUNK_TYPES);
+/** Zero-dep runtime guard — use ChunkTypeSchema (src/schemas) for Zod validation. */
+export function isChunkType(value: unknown): value is ChunkType {
+  return (
+    typeof value === 'string' &&
+    (CHUNK_TYPES as readonly string[]).includes(value)
+  );
+}

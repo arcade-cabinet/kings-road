@@ -5,6 +5,7 @@ export {
   RoofStyle,
   WallMaterial,
 } from './building.schema';
+export { ChunkTypeSchema } from './chunk-type.schema';
 export * from './crafting.schema';
 export * from './dialogue.schema';
 export * from './dungeon.schema';

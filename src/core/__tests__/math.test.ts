@@ -69,6 +69,12 @@ describe('interpolation', () => {
     expect(smoothstep(0, 1, 1)).toBe(1);
   });
 
+  it('smoothstep does not produce NaN when edge0 === edge1', () => {
+    expect(smoothstep(5, 5, 3)).toBe(0);
+    expect(smoothstep(5, 5, 5)).toBe(0);
+    expect(smoothstep(5, 5, 7)).toBe(1);
+  });
+
   it('inverseLerp inverts lerp', () => {
     expect(inverseLerp(0, 10, 5)).toBeCloseTo(0.5);
   });

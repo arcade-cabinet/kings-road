@@ -1,17 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { CHUNK_TYPES, ChunkTypeSchema } from '../types';
+import { CHUNK_TYPES, isChunkType } from '../types';
 
 describe('ChunkType', () => {
-  it('ChunkTypeSchema accepts all defined types', () => {
+  it('isChunkType accepts all defined types', () => {
     for (const t of CHUNK_TYPES) {
-      expect(() => ChunkTypeSchema.parse(t)).not.toThrow();
+      expect(isChunkType(t)).toBe(true);
     }
   });
 
-  it('ChunkTypeSchema rejects unknown string', () => {
-    expect(() => ChunkTypeSchema.parse('TOWN')).toThrow();
-    expect(() => ChunkTypeSchema.parse('WILD')).toThrow();
-    expect(() => ChunkTypeSchema.parse('')).toThrow();
+  it('isChunkType rejects unknown string', () => {
+    expect(isChunkType('TOWN')).toBe(false);
+    expect(isChunkType('WILD')).toBe(false);
+    expect(isChunkType('')).toBe(false);
+  });
+
+  it('isChunkType rejects non-string values', () => {
+    expect(isChunkType(42)).toBe(false);
+    expect(isChunkType(null)).toBe(false);
   });
 
   it('CHUNK_TYPES includes expected terrain types', () => {

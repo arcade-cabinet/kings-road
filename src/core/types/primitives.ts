@@ -24,3 +24,8 @@ export function asSeed(s: string): Seed {
 export function asBiomeId(id: string): BiomeId {
   return id as BiomeId;
 }
+
+/** Helper to cast a plain string to Archetype */
+export function asArchetype(id: string): Archetype {
+  return id as Archetype;
+}
