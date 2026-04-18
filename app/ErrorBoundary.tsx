@@ -1,5 +1,5 @@
 import { Component, type ReactNode } from 'react';
-import { ErrorOverlay } from './ui/ErrorOverlay';
+import { ErrorOverlay } from './views/ErrorOverlay';
 
 interface ErrorBoundaryProps {
   children: ReactNode;

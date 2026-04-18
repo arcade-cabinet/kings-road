@@ -4,6 +4,15 @@ import { defineConfig } from 'vite';
 
 const isCapacitor = process.env.CAPACITOR === 'true';
 
+// Project Pages deploy under /kings-road/ (github.io/<org>/<repo>/).
+// Root-relative URLs like /assets/... 404 there. We set base='/kings-road/' in
+// that environment, './' for Capacitor (bundles want relative), '/' for dev.
+const resolveBase = () => {
+  if (isCapacitor) return './';
+  if (process.env.GITHUB_PAGES === 'true') return '/kings-road/';
+  return '/';
+};
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -12,7 +21,7 @@ export default defineConfig({
       '@app': path.resolve(__dirname, './app'),
     },
   },
-  base: isCapacitor ? './' : '/',
+  base: resolveBase(),
   server: {
     port: 5173,
     host: true,

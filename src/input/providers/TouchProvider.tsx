@@ -10,11 +10,9 @@ const LOOK_SENSITIVITY = 0.004; // rad/px
 const BUTTON_SIZE = 72;
 const PAUSE_SIZE = 44;
 
-// Medieval palette
+// Medieval palette — used by the visible joystick ring that appears on first touch.
 const GOLD = '#c4a747';
 const WOOD = '#8b6f47';
-const PARCHMENT = 'rgba(245, 240, 232, 0.4)';
-const PARCHMENT_SOLID = 'rgba(245, 240, 232, 0.6)';
 const GOLD_BORDER = 'rgba(196, 167, 71, 0.7)';
 const WOOD_BORDER = 'rgba(139, 111, 71, 0.6)';
 
@@ -280,37 +278,31 @@ export const TouchOverlay: React.FC = () => {
 
   if (!gameActive) return null;
 
-  // Common button style
+  // Diegetic UI: buttons are invisible gesture zones (no border/label/icon).
+  // Mobile players tap the 3D world element they want to interact with; the
+  // right-side zones here exist only to catch taps in the expected hand-reach
+  // area for jump/attack/interact as secondary fallbacks.
   const buttonBase: React.CSSProperties = {
     width: BUTTON_SIZE,
     height: BUTTON_SIZE,
     borderRadius: '50%',
-    border: `2px solid ${GOLD_BORDER}`,
-    background: PARCHMENT_SOLID,
+    background: 'transparent',
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     touchAction: 'none',
     userSelect: 'none',
     WebkitUserSelect: 'none',
     cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
   };
 
+  // Labels and icons kept for DEV (inline-preview of zones) but hidden in prod.
   const buttonLabel: React.CSSProperties = {
-    fontFamily: 'Lora, serif',
-    fontSize: 10,
-    fontWeight: 700,
-    letterSpacing: '0.08em',
-    color: WOOD,
-    lineHeight: 1,
+    display: 'none',
   };
 
   const buttonIcon: React.CSSProperties = {
-    fontSize: 22,
-    lineHeight: 1,
-    marginBottom: 2,
+    display: 'none',
   };
 
   return (
@@ -323,7 +315,7 @@ export const TouchOverlay: React.FC = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Pause button — top-left */}
+      {/* Pause gesture zone — top-left, invisible (GameplayFrame owns the visible quill) */}
       <div
         onTouchStart={onPauseTap}
         style={{
@@ -332,30 +324,16 @@ export const TouchOverlay: React.FC = () => {
           left: 12,
           width: PAUSE_SIZE,
           height: PAUSE_SIZE,
-          borderRadius: 8,
-          border: `1.5px solid ${WOOD_BORDER}`,
-          background: PARCHMENT,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: 'transparent',
           pointerEvents: 'auto',
           touchAction: 'none',
           userSelect: 'none',
           WebkitUserSelect: 'none',
           cursor: 'pointer',
         }}
-      >
-        <span
-          style={{
-            fontFamily: 'Lora, serif',
-            fontSize: 18,
-            color: WOOD,
-            lineHeight: 1,
-          }}
-        >
-          ||
-        </span>
-      </div>
+      />
+      {/* Pause gesture doubles the GameplayFrame quill for classic thumb reach.
+          The visible pause affordance is in app/views/Gameplay/GameplayFrame.tsx. */}
 
       {/* Left half — joystick zone */}
       <div
@@ -419,22 +397,7 @@ export const TouchOverlay: React.FC = () => {
           />
         </div>
 
-        {/* Hint text */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 90,
-            left: 16,
-            fontFamily: 'Lora, serif',
-            fontSize: 11,
-            color: WOOD,
-            opacity: 0.5,
-            pointerEvents: 'none',
-            userSelect: 'none',
-          }}
-        >
-          Touch to move
-        </div>
+        {/* No hint text — touch is the default input, the world teaches itself. */}
       </div>
 
       {/* Right half — look zone */}

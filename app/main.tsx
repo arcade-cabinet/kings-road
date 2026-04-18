@@ -28,7 +28,7 @@ function showGlobalError(error: Error | string, source: string) {
   document.body.appendChild(container);
 
   // Lazy import to avoid circular deps — this is a crash handler
-  import('./ui/ErrorOverlay').then(({ ErrorOverlay }) => {
+  import('./views/ErrorOverlay').then(({ ErrorOverlay }) => {
     ReactDOM.createRoot(container).render(
       <ErrorOverlay error={errorObj} source={source} />,
     );

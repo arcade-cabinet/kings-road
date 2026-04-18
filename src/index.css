@@ -1,12 +1,87 @@
 /*
- * Fonts: loaded via Google Fonts CDN for Metro compatibility.
- * Metro's CSS does not support local url() resource imports from node_modules.
- * CSS spec: @import must precede all rules except @charset and @layer.
+ * Game CSS — Tailwind import must precede @font-face per CSS spec
+ * (@import only allowed before @font-face / other at-rules).
  */
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap');
-
-/* Game CSS */
 @import "tailwindcss";
+
+/*
+ * Fonts: self-hosted in public/assets/fonts/ so the game works offline and
+ * when packaged inside Capacitor native shells (where external CDN loads
+ * are unreliable and fail silently).
+ */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/lora-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/lora-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/lora-italic-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/lora-italic-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/crimsontext-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/assets/fonts/crimsontext-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/crimsontext-italic-400.woff2') format('woff2');
+}
+
+/* Set Forth button sheen — honey-gold light sweeping across the CTA on hover. */
+@keyframes kr-menu-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.kr-menu-sweep {
+  transform: translateX(-100%);
+}
+.group:hover .kr-menu-sweep,
+.group:focus-visible .kr-menu-sweep {
+  animation: kr-menu-sweep 1.2s ease-in-out;
+}
+
+/* Region-name fade-in when the pilgrim crosses into a named place. */
+@keyframes kr-region-fade {
+  0%   { opacity: 0; transform: translateY(-4px); }
+  20%  { opacity: 0.85; transform: translateY(0); }
+  80%  { opacity: 0.85; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+.animate-kr-region-fade {
+  animation: kr-region-fade 2.8s ease-in-out forwards;
+}
 
 /* Base styles - warm pastoral medieval theme */
 @layer base {

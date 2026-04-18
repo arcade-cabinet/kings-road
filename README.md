@@ -1,6 +1,6 @@
 ---
 title: King's Road
-updated: 2026-04-09
+updated: 2026-04-18
 status: current
 domain: product
 ---
@@ -31,30 +31,47 @@ The main quest follows a Holy Grail narrative across 6 anchor points. Side quest
 | Rendering | React Three Fiber, drei, postprocessing |
 | ECS | Koota (pmndrs) |
 | Schemas | Zod 4 |
-| Database | -community/sqlite + sql.js, Drizzle ORM |
-| State | Zustand (UI/HUD state) |
+| Database | sql.js (web) + @capacitor-community/sqlite (native), Drizzle ORM |
+| State | Zustand (UI/HUD state, migrating to Koota) |
 | UI | React 19, Tailwind CSS v4 |
-| Build | , Vite (local dev), TypeScript |
+| Build | Vite 7 (web + native dist), Capacitor 7 (native wrapper), TypeScript |
 | Testing | Vitest, Playwright (e2e + component) |
 | Formatting | Biome |
 | Audio | Tone.js |
 
 ## Project Structure
 
-```
-src/
+```text
+app/                      # All TSX: entry points + views + components + systems
+├── main.tsx              # Vite entry point
+├── App.tsx               # Root React tree (WorldProvider wrap)
+├── Game.tsx              # Menu vs active game
+├── ErrorBoundary.tsx
+├── scene/                # R3F 3D components (Chunk, Building, NPC, Feature, ...)
+├── systems/              # R3F useFrame-driven systems (PlayerController, ChunkManager, ...)
+├── views/                # Full-screen views grouped by route
+│   ├── MainMenu/         # Landing: MainMenu, ShaderBackdrop, VellumOrnaments
+│   ├── Gameplay/         # In-game: GameplayFrame, GameHUD, CombatHUD, DialogueBox,
+│   │                     #          InventoryScreen, PauseMenu, LoadingOverlay,
+│   │                     #          QuestLog, Minimap, MobileControls
+│   ├── DeathOverlay.tsx
+│   ├── ErrorOverlay.tsx
+│   └── SettingsPanel.tsx
+├── components/           # Shared UI primitives (Portrait3D, …)
+└── __tests__/            # Vitest browser smoke tests
+
+src/                      # Logical subpackages
 ├── schemas/              # Zod schemas for all content types
 ├── ecs/                  # Koota ECS layer (world, traits, actions)
 ├── db/                   # Drizzle ORM schema, content DB loader, save service
-├── game/
-│   ├── components/       # R3F 3D components
-│   │   └── ui/           # 2D overlay components (HUD, menus, dialogue)
-│   ├── systems/          # Game logic: Player, Chunks, Quests, Combat, etc.
-│   ├── world/            # Road spine, pacing engine, dungeon/town/kingdom gen
-│   ├── factories/        # Building, NPC, monster, chibi-generator
-│   ├── audio/            # Ambient mixer, Tone.js layer factory
-│   ├── hooks/            # Input handling
-│   └── stores/           # Zustand stores (game, world, quest, combat, settings)
+├── stores/               # Zustand stores (game, world, quest, combat, settings)
+├── types/                # Shared TypeScript types
+├── world/                # Road spine, pacing engine, dungeon/town/kingdom gen
+├── factories/            # Building, NPC, monster, chibi-generator
+├── audio/                # Ambient mixer, Tone.js layer factory
+├── hooks/                # useInput and other React hooks
+└── utils/                # RNG, textures, utilities
+
 content/                  # JSON content trove
 ├── world/road-spine.json # 6 anchors along the 30km road
 ├── main-quest/           # Main story chapters
@@ -67,34 +84,32 @@ content/                  # JSON content trove
 ├── dungeons/             # Dungeon layouts
 ├── encounters/           # Narrative encounter definitions
 └── CONTRIBUTING.md       # Tone guide, schema examples, authoring rules
+
 scripts/
 ├── validate-content.ts   # Content validation pipeline
 ├── compile-content-db.ts # Compile JSON content to SQLite
 └── assemble-game-config.ts
+
 e2e/
 └── game.spec.ts          # Playwright end-to-end test
 ```
 
 ## Controls
 
-### Desktop
+This is a mobile-first game. The web build exists for development and testing.
 
-| Key | Action |
-|-----|--------|
-| W/S | Move forward/backward |
-| A/D | Turn left/right |
-| Q/E | Strafe/turn |
-| SHIFT | Walk (slower) |
-| SPACE | Jump |
-| E | Interact |
-| Mouse Drag | Look around |
-| ESC | Pause menu |
+### Touch (primary)
 
-### Mobile
+- **Left half**: touch anywhere to spawn a floating joystick for movement. Push to the edge to sprint.
+- **Right half**: swipe to look around; tap on highlighted world elements to interact (NPCs glow, signposts shimmer, interactables draw a subtle halo).
+- **Jump**: two-finger tap anywhere.
+- **Pause**: tap the quill icon (top-left corner, part of the in-world parchment frame).
 
-- Left half: touch area spawns a virtual joystick for movement
-- Right side: Jump and Interact buttons
-- Push joystick to edge: Sprint
+The HUD is **diegetic** — health shown via vignette + heartbeat, not numbers; inventory items appear on the character's belt/back; dialogue surfaces as illuminated-manuscript speech bubbles anchored to the speaker. If a panel-style overlay is needed, it's styled as vellum, not a game menu.
+
+### Keyboard (debug only)
+
+Desktop keyboard shortcuts exist for development workflow (WASD movement, F to interact, ESC pause) but are not the intended UX and may drift from mobile parity.
 
 ## Content Pipeline
 
@@ -108,14 +123,24 @@ Game content lives in `content/` as JSON. To add quests, NPCs, buildings, or fea
 ## Commands
 
 ```bash
-pnpm dev                   # Start Vite dev server
-pnpm build                 # Production build (vite build)
-pnpm test                  # Run unit tests
+# Development
+pnpm dev                   # Vite dev server at localhost:5173
+pnpm build                 # Production web build
+
+# Native (Capacitor)
+pnpm build:native          # Build dist/ for Capacitor
+pnpm cap:sync              # Sync dist/ into android/ios
+pnpm native:android:debug  # Full Android debug APK pipeline
+
+# Tests (see docs/TESTING.md for full reference)
+pnpm test                  # Vitest unit tests
 pnpm test:watch            # Watch mode
 pnpm test:coverage         # Coverage report (80% thresholds)
-pnpm test:ct               # Playwright component tests
+pnpm test:browser          # Vitest browser mode (component + WebGL smoke)
 pnpm test:e2e              # Playwright end-to-end tests
 pnpm test:all              # All test suites
+
+# Other
 pnpm tsc --noEmit          # Type check
 npx tsx scripts/validate-content.ts    # Validate content trove
 npx tsx scripts/compile-content-db.ts  # Recompile content DB
