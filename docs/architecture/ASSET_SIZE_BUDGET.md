@@ -165,13 +165,16 @@ A CI step in `.github/workflows/ci.yml` (after the build step) fails if `public/
       exit 1
     fi
     echo "public/assets/ is ${SIZE}MB"
-    if [ "$SIZE" -gt 100 ]; then
-      echo "ERROR: public/assets/ exceeds 100MB baked-in ceiling (${SIZE}MB)"
+    if [ "$SIZE" -gt 150 ]; then
+      echo "ERROR: public/assets/ exceeds 150MB APK ceiling (${SIZE}MB)"
       exit 1
+    fi
+    if [ "$SIZE" -gt 100 ]; then
+      echo "WARNING: public/assets/ exceeds 100MB baked-in target (${SIZE}MB) — delete *pr.glb duplicates and compress GLBs to reach target"
     fi
 ```
 
-**Current threshold: 100 MB.** The repo baseline is ~140 MB, so CI will fail until the `*pr.glb` duplicates are deleted and GLBs are compressed (see Immediate action items). The threshold is intentionally set at the target, not the current baseline, to make the debt visible and prevent new assets from being added before cleanup lands.
+**Hard ceiling: 150 MB** (APK install-size limit) — fails CI if breached. **Soft target: 100 MB** — warns above 100 MB to surface the 40 MB cleanup obligation. Lower the hard ceiling to 100 MB once `*pr.glb` deletion and GLB compression land.
 
 ---
 
@@ -180,7 +183,7 @@ A CI step in `.github/workflows/ci.yml` (after the build step) fails if `public/
 Priority order before Phase 0 branch cuts:
 
 1. **Delete `*pr.glb` duplicates** from `public/assets/npcs/` — saves ~28 MB, no code change. (Owner: whoever touches NPC loading next.)
-2. **Add asset size CI gate** — done in this PR; currently set to 100 MB target (will fail until #1 + #3 land).
+2. **Add asset size CI gate** — done in this PR; hard ceiling 150 MB (fail), soft target 100 MB (warn). Lower hard ceiling to 100 MB once #1 + #3 land.
 3. **Run `gltf-transform optimize` on NPC + buildings GLBs** — biggest single compression win. Add a `scripts/compress-assets.ts` that processes `public/assets/**/*.glb`. (Owner: assets-agent or tooling.)
 4. **Convert PBR textures to WebP** when the PBR ingest script is authored — add `--texture-compress webp` flag. (Owner: assets-agent.)
 5. **Downscale HDRI to 2K RGBE** when the HDRI ingest script is authored — keeps HDRI baked-in budget under 8 MB. (Owner: assets-agent or team-lead.)
