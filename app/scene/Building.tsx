@@ -1,7 +1,7 @@
 import { useGLTF } from '@react-three/drei';
 import { useMemo } from 'react';
 import type { BuildingArchetype } from '@/schemas/building.schema';
-import { hashString } from '@/factories/chibi-generator';
+import { hashString } from '@/utils/random';
 
 interface BuildingProps {
   archetype: BuildingArchetype;

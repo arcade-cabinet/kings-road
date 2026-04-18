@@ -48,3 +48,17 @@ export function cyrb128(str: string): number {
 export function createRng(seed: string): () => number {
   return mulberry32(cyrb128(seed));
 }
+
+/**
+ * FNV-1a hash — fast string → u32 used as a deterministic integer seed
+ * for per-entity visual variation (which building skin to use, which
+ * monster variant to spawn, etc.). Not cryptographic.
+ */
+export function hashString(str: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
