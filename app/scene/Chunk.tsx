@@ -6,20 +6,12 @@ import {
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
-import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
 import type { ChunkData } from '@/types/game';
 import { cyrb128, mulberry32 } from '@/utils/random';
 import { getBiomeGroundMaterial, getMaterials } from '@/utils/textures';
 import type { HeightSampler } from '@/utils/vegetation';
 import { placeVegetation } from '@/utils/vegetation';
+import { GlbInstancer } from './GlbInstancer';
 import {
   BLOCK_SIZE,
   CHUNK_SIZE,
@@ -66,10 +58,8 @@ interface MeshData {
   windowGlow: MeshInstance[];
   crate: MeshInstance[];
   barrel: MeshInstance[];
-  pineTrunk: MeshInstance[];
-  pineLeaves: MeshInstance[];
-  oakTrunk: MeshInstance[];
-  oakLeaves: MeshInstance[];
+  pine: MeshInstance[];
+  oak: MeshInstance[];
   bush: MeshInstance[];
   grassTuft: MeshInstance[];
   deadTree: MeshInstance[];
@@ -235,10 +225,8 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
       windowGlow: [],
       crate: [],
       barrel: [],
-      pineTrunk: [],
-      pineLeaves: [],
-      oakTrunk: [],
-      oakLeaves: [],
+      pine: [],
+      oak: [],
       bush: [],
       grassTuft: [],
       deadTree: [],
@@ -382,10 +370,8 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         localRng,
         heightSampler,
       );
-      data.pineTrunk.push(...veg.pineTrunk);
-      data.pineLeaves.push(...veg.pineLeaves);
-      data.oakTrunk.push(...veg.oakTrunk);
-      data.oakLeaves.push(...veg.oakLeaves);
+      data.pine.push(...veg.pine);
+      data.oak.push(...veg.oak);
       data.bush.push(...veg.bush);
       data.grassTuft.push(...veg.grassTuft);
       data.deadTree.push(...veg.deadTree);
@@ -618,67 +604,33 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         />
       )}
 
-      {/* Pine trunks */}
-      <InstancedMeshes
-        items={meshData.pineTrunk}
-        geometry="pineTrunk"
-        material={materials.pineTrunk}
-      />
+      {/* Pines — authored GLB, single InstancedMesh per chunk */}
+      <GlbInstancer glb="nature/tree15.glb" items={meshData.pine} />
 
-      {/* Pine leaves */}
-      <InstancedMeshes
-        items={meshData.pineLeaves}
-        geometry="pineLeaves"
-        material={materials.pineLeaves}
-      />
+      {/* Oaks — authored GLB */}
+      <GlbInstancer glb="nature/tree01.glb" items={meshData.oak} />
 
-      {/* Oak trunks */}
-      <InstancedMeshes
-        items={meshData.oakTrunk}
-        geometry="oakTrunk"
-        material={materials.oakTrunk}
-      />
+      {/* Bushes — authored GLB */}
+      <GlbInstancer glb="nature/bush05.glb" items={meshData.bush} />
 
-      {/* Oak leaves */}
-      <InstancedMeshes
-        items={meshData.oakLeaves}
-        geometry="oakLeaves"
-        material={materials.oakLeaves}
-      />
+      {/* Dead trees — reuse tree07 with dark tint via material override */}
+      <GlbInstancer glb="nature/tree07.glb" items={meshData.deadTree} />
 
-      {/* Bushes */}
-      <InstancedMeshes
-        items={meshData.bush}
-        geometry="bush"
-        material={materials.bush}
-      />
+      {/* Boulders — authored GLB */}
+      <GlbInstancer glb="nature/rocks.glb" items={meshData.boulder} />
 
-      {/* Grass tufts */}
-      <InstancedMeshes
+      {/* Grass tufts — small bush stand-in at reduced scale (no dedicated grass GLB) */}
+      <GlbInstancer
+        glb="nature/bush01.glb"
         items={meshData.grassTuft}
-        geometry="grassTuft"
-        material={materials.grassTuft}
+        baseScale={0.35}
       />
 
-      {/* Dead trees */}
-      <InstancedMeshes
-        items={meshData.deadTree}
-        geometry="deadTree"
-        material={materials.deadTree}
-      />
-
-      {/* Heather */}
-      <InstancedMeshes
+      {/* Heather — bush at reduced scale */}
+      <GlbInstancer
+        glb="nature/bush01.glb"
         items={meshData.heather}
-        geometry="heather"
-        material={materials.heather}
-      />
-
-      {/* Boulders */}
-      <InstancedMeshes
-        items={meshData.boulder}
-        geometry="boulder"
-        material={materials.boulder}
+        baseScale={0.45}
       />
 
       {/* Config-driven buildings */}
