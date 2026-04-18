@@ -39,15 +39,18 @@ kings-road/
 pending-integration/
 
 # Asset pack companion files — kept locally for tooling, not shipped
+# Six runtime JPGs (_Color, _NormalGL, _Roughness, _Displacement, _AmbientOcclusion, _Metalness) commit
+# NormalDX gitignored — WebGL uses NormalGL; shipping both is duplicate data
 public/assets/pbr/**/*.blend
 public/assets/pbr/**/*.blend1
 public/assets/pbr/**/*.mtlx
 public/assets/pbr/**/*.tres
 public/assets/pbr/**/*.usdc
+public/assets/pbr/**/_NormalDX.jpg
 public/assets/pbr/**/*.png
+# HDRI: commit .hdr and .exr (future EXR loader); ignore author companions + preview PNG
 public/assets/hdri/**/*.blend
 public/assets/hdri/**/*.blend1
-public/assets/hdri/**/*.exr
 public/assets/hdri/**/*.png
 public/assets/terrain/**/*.blend
 public/assets/terrain/**/*.blend1

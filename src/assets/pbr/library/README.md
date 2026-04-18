@@ -18,11 +18,11 @@ original filenames. A typical pack contains:
 public/assets/pbr/<tactile-id>/
   <PackPrefix>_Color.jpg           # Albedo/diffuse (sRGB) — loader binds this
   <PackPrefix>_NormalGL.jpg        # Normal, OpenGL convention — loader binds this
-  <PackPrefix>_NormalDX.jpg        # Normal, DirectX convention — kept for platform swaps
+  <PackPrefix>_NormalDX.jpg        # Normal, DirectX convention — gitignored (WebGL uses GL)
   <PackPrefix>_Roughness.jpg       # Roughness (linear) — loader binds this
   <PackPrefix>_Displacement.jpg    # Height/parallax (linear) — loader binds when present
   <PackPrefix>_AmbientOcclusion.jpg # AO (linear) — loader binds when present
-  <PackPrefix>_Metalness.jpg       # Metalness (metals only)
+  <PackPrefix>_Metalness.jpg       # Metalness (metals only) — loader binds when present
   <PackPrefix>.blend               # Blender companion — gitignored
   <PackPrefix>.mtlx / .tres / .usdc # USD/Godot companions — gitignored
   <PackPrefix>.png                 # Preview — gitignored
@@ -31,9 +31,8 @@ public/assets/pbr/<tactile-id>/
 `<PackPrefix>` is registered in `palette.ts` as the `packPrefix` field for
 each tactile ID. The loader constructs filenames as `<packPrefix><suffix>`.
 
-Author-side companions (`.blend`, `.mtlx`, `.tres`, `.usdc`, `.png`) are
-gitignored via `public/assets/pbr/**/*.blend` etc. — kept locally for
-tooling but not shipped in the repo.
+Gitignored: `_NormalDX.jpg` (duplicate, WebGL uses GL convention), `.blend`,
+`.mtlx`, `.tres`, `.usdc`, `.png`. All six runtime JPGs commit.
 
 ## Sourcing
 

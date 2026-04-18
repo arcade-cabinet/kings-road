@@ -17,7 +17,11 @@ vi.mock('three', async (importOriginal) => {
       _onProgress: unknown,
       onError: (e: unknown) => void,
     ) {
-      if (url.includes('_AmbientOcclusion') || url.includes('_Displacement')) {
+      if (
+        url.includes('_AmbientOcclusion') ||
+        url.includes('_Displacement') ||
+        url.includes('_Metalness')
+      ) {
         onError(new Error('optional map missing'));
       } else {
         onLoad(new actual.Texture());
