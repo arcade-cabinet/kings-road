@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { ErrorBoundary as GameErrorBoundary } from '@app/ErrorBoundary';
 import { GameScene } from '@app/scene/GameScene';
-import { CombatHUD } from '@app/views/Gameplay/CombatHUD';
 import { DeathOverlay } from '@app/views/DeathOverlay';
 import { DialogueBox } from '@app/views/Gameplay/DialogueBox';
 import { GameplayFrame } from '@app/views/Gameplay/GameplayFrame';
@@ -97,8 +96,6 @@ export function Game() {
         render inside the frame so they share safe-area padding.
       */}
       <GameplayFrame>
-        {/* Combat only renders when in combat; keeps wound decals diegetic */}
-        <CombatHUD />
         {/* Dialogue — HTML fallback until the in-Canvas billboard lands */}
         <DialogueBox />
         {/* Inventory panel — triggered by belt tap */}

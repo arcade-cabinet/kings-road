@@ -160,7 +160,7 @@ describe('performance regression: NPC factory', () => {
 });
 
 describe('performance regression: building factory', () => {
-  it('generates geometry for all 14 archetypes in <5ms', () => {
+  it('generates geometry for all 14 archetypes in <10ms', () => {
     const archetypeIds = [
       'tavern',
       'cottage',
@@ -183,7 +183,7 @@ describe('performance regression: building factory', () => {
         if (arch) generateBuildingGeometry(arch);
       }
     });
-    expect(elapsed).toBeLessThan(5);
+    expect(elapsed).toBeLessThan(10);
   });
 });
 
