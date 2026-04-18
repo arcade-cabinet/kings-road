@@ -17,13 +17,13 @@ Procedural generation is for LAYOUT (where things go, quest branching, pacing), 
 
 ### Files Generating Appearance Procedurally
 
-| File | LOC | Generates | Consumers |
-|------|-----|-----------|-----------|
-| `src/factories/chibi-generator.ts` | 344 | Config struct (race, colors, proportions) used to drive geometry/texture downstream | `src/factories/npc-factory.ts` (imports `ChibiConfig` type, `generateTownNPC`) |
-| `src/factories/face-texture.ts` | 584 | Canvas-drawn face textures (`THREE.CanvasTexture`) — skin gradient, hair, eyes, mouth, facial hair via 2D canvas API | `src/factories/npc-factory.ts` (`generateFaceTexture`, `createChibiFaceTexture`) |
-| `src/utils/textures.ts` | 495 | Canvas-drawn tileable textures (plaster, stone\_block, thatch, wood, door, crate, window, road, grass, cobblestone) + material cache (`getMaterials`) + biome ground materials | No live game component imports found — only self-referential and benchmark usage |
-| `src/utils/vegetation.ts` | 339 | **Placement only** — scatter X/Y/Z positions for pine/oak/bush/grass/boulder/deadTree/heather per biome profile. No mesh or texture creation. | No live game component imports found (placement coordinates only) |
-| `src/factories/building-factory.ts` | 397 | **Geometry descriptors only** — wall/floor/stair/door/window bounding-box segments as plain data structs; no `THREE.Geometry`, no textures. Also exports `TILE_SIZE` constant reused by `world/town-layout.ts` and `utils/worldCoords.ts`. | `src/world/town-layout.ts` (TILE\_SIZE only); `src/utils/worldCoords.ts` (TILE\_SIZE only) |
+| File | LOC (at audit) | Generates | Consumers |
+|------|----------------|-----------|-----------|
+| `src/factories/chibi-generator.ts` | ~344 | Config struct (race, colors, proportions) used to drive geometry/texture downstream | `src/factories/npc-factory.ts` (imports `ChibiConfig` type, `generateTownNPC`) |
+| `src/factories/face-texture.ts` | ~584 | Canvas-drawn face textures (`THREE.CanvasTexture`) — skin gradient, hair, eyes, mouth, facial hair via 2D canvas API | `src/factories/npc-factory.ts` (`generateFaceTexture`, `createChibiFaceTexture`) |
+| `src/utils/textures.ts` | ~495 | Canvas-drawn tileable textures (plaster, stone\_block, thatch, wood, door, crate, window, road, grass, cobblestone) + material cache (`getMaterials`) + biome ground materials | No live game component imports found — only self-referential and benchmark usage |
+| `src/utils/vegetation.ts` | ~339 | **Placement only** — scatter X/Y/Z positions for pine/oak/bush/grass/boulder/deadTree/heather per biome profile. No mesh or texture creation. | No live game component imports found (placement coordinates only) |
+| `src/factories/building-factory.ts` | ~397 | **Geometry descriptors only** — wall/floor/stair/door/window bounding-box segments as plain data structs; no `THREE.Geometry`, no textures. Also exports `TILE_SIZE` constant reused by `world/town-layout.ts` and `utils/worldCoords.ts`. | `src/world/town-layout.ts` (TILE\_SIZE only); `src/utils/worldCoords.ts` (TILE\_SIZE only) |
 
 ### Verdict by File
 
@@ -110,8 +110,12 @@ vegetation geometry from the placement output.
 **Work:**
 1. Audit chunk renderer(s) that consume `PlacedVegetation` and currently use procedural box/sphere
    primitives for tree/bush/boulder meshes.
-2. Replace each procedural mesh with `<primitive object={gltf.scene.clone()} />` referencing
-   the authored GLBs already in `public/assets/nature/`.
+2. Load each authored GLB once via `useGLTF` and extract the `BufferGeometry` and `Material`
+   from the relevant mesh node (e.g. `gltf.nodes['Tree_Pine'].geometry`). Do not use
+   `scene.clone()` for instanced types — cloning an entire GLTF hierarchy per instance defeats
+   the purpose of instancing and will fail the 2 ms frame budget at 65+ instances per chunk.
+   (`<primitive object={gltf.scene.clone()} />` is acceptable only for one-off non-instanced
+   objects such as interactive prop dressing.)
 3. Map placement types to GLBs: `pineTrunk+pineLeaves` → `tree15.glb` (conical);
    `oakTrunk+oakLeaves` → `tree01.glb` or `tree07.glb`; `bush` → `bush01.glb` / `bush05.glb`;
    `boulder` → `rocks.glb`; `deadTree` → `tree07.glb` (dead variant or greyscale material
@@ -119,7 +123,9 @@ vegetation geometry from the placement output.
    is sourced from PSX MEGA Nature Pack.
 4. Upgrade `placeVegetation` output to include a `meshKey` field so the renderer can select
    the right GLB without re-implementing the biome logic.
-5. Use `THREE.InstancedMesh` with the authored geometry for each vegetation type.
+5. Build one `THREE.InstancedMesh` per vegetation type using the extracted `BufferGeometry`
+   and `Material`. Set instance matrices from `PlacedVegetation` positions/rotations/scales.
+   A single `InstancedMesh` per type reduces draw calls to O(types) instead of O(instances).
 
 **Acceptance criteria:**
 - World chunks render authored tree/bush/rock GLBs at procedurally-placed positions.
@@ -128,9 +134,10 @@ vegetation geometry from the placement output.
 - Frame budget for a full chunk (worst-case deep\_forest: 65 instances) stays under 2 ms
   measured via Chrome DevTools performance trace.
 
-**Risk:** Medium. Chunk renderer refactor is a hot-path change; InstancedMesh setup with GLB
-geometry requires care with buffer attributes and material extraction. Must test on mobile
-(iOS Safari / Android Chrome) for GPU budget.
+**Risk:** Medium. Chunk renderer refactor is a hot-path change; InstancedMesh setup requires
+extracting `BufferGeometry` and `Material` from the GLB node before building the instanced
+mesh — the GLTF scene hierarchy cannot be passed directly to `InstancedMesh`. Must test on
+mobile (iOS Safari / Android Chrome) for GPU budget.
 
 ---
 
