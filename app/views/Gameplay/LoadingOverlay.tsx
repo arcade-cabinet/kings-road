@@ -1,8 +1,17 @@
 import { useProgress } from '@react-three/drei';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
+import { useFlags, useSeed, useChunkState } from '@/ecs/hooks/useGameSession';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 
 /** Fallback stage messages shown while chunks are loading (after generation) */
 const CHUNK_LOADING_STAGES = [
@@ -15,13 +24,13 @@ const CHUNK_LOADING_STAGES = [
 const MIN_DISPLAY_MS = 2000;
 
 export function LoadingOverlay() {
-  const gameActive = useGameStore((state) => state.gameActive);
-  const seedPhrase = useGameStore((state) => state.seedPhrase);
-  const activeChunks = useGameStore((state) => state.activeChunks);
+  const { gameActive } = useFlags();
+  const { seedPhrase } = useSeed();
+  const { activeChunks } = useChunkState();
 
-  const isGenerating = useWorldStore((state) => state.isGenerating);
-  const generationProgress = useWorldStore((state) => state.generationProgress);
-  const generationPhase = useWorldStore((state) => state.generationPhase);
+  const isGenerating = useWorldSession().isGenerating;
+  const generationProgress = useWorldSession().generationProgress;
+  const generationPhase = useWorldSession().generationPhase;
 
   // Real-time asset loading progress from Three.js
   const { progress: assetProgress, active: assetsLoading } = useProgress();

@@ -1,7 +1,15 @@
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { inputManager } from '@/input/InputManager';
-import { useGameStore } from '@/stores/gameStore';
+import {
+  getFlags,
+  getPlayer,
+  getCamera,
+  getChunkState,
+  openDialogue,
+  setCurrentInteractable,
+} from '@/ecs/actions/game';
+import { useChunkState } from '@/ecs/hooks/useGameSession';
 import type { Interactable } from '@/types/game';
 
 // Reusable vectors — hoisted to avoid per-frame GC pressure
@@ -10,18 +18,12 @@ const _upAxis = new THREE.Vector3(0, 1, 0);
 const _dirToObj = new THREE.Vector3();
 
 export function InteractionSystem() {
-  const globalInteractables = useGameStore(
-    (state) => state.globalInteractables,
-  );
+  const { globalInteractables } = useChunkState();
 
   useFrame(() => {
-    const state = useGameStore.getState();
-    const playerPosition = state.playerPosition;
-    const cameraYaw = state.cameraYaw;
-    const gameActive = state.gameActive;
-    const inDialogue = state.inDialogue;
-    const setCurrentInteractable = state.setCurrentInteractable;
-    const openDialogue = state.openDialogue;
+    const { playerPosition } = getPlayer();
+    const { cameraYaw } = getCamera();
+    const { gameActive, inDialogue } = getFlags();
 
     if (!gameActive || inDialogue) {
       setCurrentInteractable(null);

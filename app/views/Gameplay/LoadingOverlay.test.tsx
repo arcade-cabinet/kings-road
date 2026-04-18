@@ -1,19 +1,50 @@
-import { act, render, screen } from '@testing-library/react';
+import {
+  act,
+  render as rtlRender,
+  type RenderOptions,
+  screen,
+} from '@testing-library/react';
+import { WorldProvider } from 'koota/react';
+import type { ReactElement, ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
+import { setWorldState } from '@/ecs/actions/world';
+import {
+  addChunk,
+  resetGame,
+  setGameActive,
+  setSeedPhrase,
+} from '@/ecs/actions/game';
+import { gameWorld } from '@/ecs/world';
+import { unsafe_resetSessionEntity } from '@/ecs/world';
 import { LoadingOverlay } from './LoadingOverlay';
+
+/** Minimal valid chunk for triggering "chunks loaded" state */
+const STUB_CHUNK = {
+  cx: 0,
+  cz: 0,
+  key: '0,0',
+  type: 'WILD' as const,
+  name: 'Stub',
+  collidables: [],
+  interactables: [],
+  collectedGems: new Set<number>(),
+};
+
+function KootaWrapper({ children }: { children: ReactNode }) {
+  return <WorldProvider world={gameWorld}>{children}</WorldProvider>;
+}
+
+function render(ui: ReactElement, options?: RenderOptions) {
+  return rtlRender(ui, { wrapper: KootaWrapper, ...options });
+}
 
 describe('LoadingOverlay', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    // Reset stores to default state
-    useGameStore.setState({
-      gameActive: true,
-      seedPhrase: 'Golden Verdant Meadow',
-      activeChunks: new Map(),
-    });
-    useWorldStore.setState({
+    unsafe_resetSessionEntity();
+    setGameActive(true);
+    setSeedPhrase('Golden Verdant Meadow');
+    setWorldState({
       isGenerating: false,
       generationProgress: 0,
       generationPhase: '',
@@ -29,7 +60,7 @@ describe('LoadingOverlay', () => {
     expect(screen.queryByText('Preparing the Realm')).toBeNull();
 
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',
@@ -43,7 +74,7 @@ describe('LoadingOverlay', () => {
     render(<LoadingOverlay />);
 
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',
@@ -57,7 +88,7 @@ describe('LoadingOverlay', () => {
     render(<LoadingOverlay />);
 
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.3,
         generationPhase: 'Shaping the terrain...',
@@ -72,7 +103,7 @@ describe('LoadingOverlay', () => {
 
     // Start generation
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',
@@ -82,12 +113,12 @@ describe('LoadingOverlay', () => {
 
     // Complete generation and start game
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: false,
         generationProgress: 1,
         generationPhase: '',
       });
-      useGameStore.setState({ gameActive: true });
+      setGameActive(true);
     });
 
     // Simulate chunks loading after MIN_DISPLAY_MS
@@ -95,9 +126,7 @@ describe('LoadingOverlay', () => {
       vi.advanceTimersByTime(2100);
     });
     act(() => {
-      useGameStore.setState({
-        activeChunks: new Map([['0,0', {} as never]]),
-      });
+      addChunk(STUB_CHUNK);
     });
 
     // Trigger fade-out timeout
@@ -118,7 +147,7 @@ describe('LoadingOverlay', () => {
 
     // Start generation
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',
@@ -128,12 +157,12 @@ describe('LoadingOverlay', () => {
 
     // Complete generation
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: false,
         generationProgress: 1,
         generationPhase: '',
       });
-      useGameStore.setState({ gameActive: true });
+      setGameActive(true);
     });
 
     // Load chunks and wait for MIN_DISPLAY_MS
@@ -141,9 +170,7 @@ describe('LoadingOverlay', () => {
       vi.advanceTimersByTime(2100);
     });
     act(() => {
-      useGameStore.setState({
-        activeChunks: new Map([['0,0', {} as never]]),
-      });
+      addChunk(STUB_CHUNK);
     });
 
     // Trigger fade-out + animation complete
@@ -168,7 +195,7 @@ describe('LoadingOverlay', () => {
 
     // First game session
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.5,
         generationPhase: 'Building roads...',
@@ -178,20 +205,18 @@ describe('LoadingOverlay', () => {
 
     // Complete generation and load
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: false,
         generationProgress: 1,
         generationPhase: '',
       });
-      useGameStore.setState({ gameActive: true });
+      setGameActive(true);
     });
     act(() => {
       vi.advanceTimersByTime(2100);
     });
     act(() => {
-      useGameStore.setState({
-        activeChunks: new Map([['0,0', {} as never]]),
-      });
+      addChunk(STUB_CHUNK);
     });
     act(() => {
       vi.advanceTimersByTime(1000);
@@ -200,8 +225,9 @@ describe('LoadingOverlay', () => {
 
     // Reset game (back to menu)
     act(() => {
-      useGameStore.setState({ gameActive: false, activeChunks: new Map() });
-      useWorldStore.setState({
+      resetGame();
+      setGameActive(false);
+      setWorldState({
         isGenerating: false,
         generationProgress: 0,
         generationPhase: '',
@@ -210,8 +236,8 @@ describe('LoadingOverlay', () => {
 
     // Start second game session -- overlay should appear again
     act(() => {
-      useGameStore.setState({ gameActive: true });
-      useWorldStore.setState({
+      setGameActive(true);
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',

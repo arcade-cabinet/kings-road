@@ -1,0 +1,19 @@
+{
+  "id": "knife_dagger",
+  "name": "Bandit Dagger",
+  "description": "A broad, double-edged dagger bearing the crude notch marks of a road brigand's tally. Well-balanced for close quarters and heavy enough to punch through padded armour.",
+  "type": "equipment",
+  "stackable": false,
+  "equipSlot": "weapon",
+  "rarity": "uncommon",
+  "weight": 0.8,
+  "value": 25,
+  "statModifiers": [
+    { "stat": "damage", "value": 7 },
+    { "stat": "defense", "value": 1 }
+  ],
+  "viewmodel": {
+    "glb": "/assets/weapons/knife-4.glb",
+    "handPose": "grip"
+  }
+}

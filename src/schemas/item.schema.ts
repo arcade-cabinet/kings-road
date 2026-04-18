@@ -22,6 +22,33 @@ export const ItemRarity = z.enum([
 ]);
 export type ItemRarity = z.infer<typeof ItemRarity>;
 
+/** Hand pose used when equipping this item as an FPS viewmodel weapon */
+export const HandPose = z.enum([
+  'grip', // standard pistol/one-handed weapon grip
+  'hold', // two-handed hold (polearms, staves)
+  'pinch', // small items held between fingers (throwing knife, dagger)
+  'palm', // flat-palm hold (torch, shield off-hand)
+]);
+export type HandPose = z.infer<typeof HandPose>;
+
+/** FPS viewmodel config — links weapon to a GLB and hand pose */
+export const ViewmodelSchema = z.object({
+  /** Path relative to public/ root, e.g. '/assets/weapons/knife-1.glb' */
+  glb: z
+    .string()
+    .regex(
+      /^\/assets\/weapons\/.+\.glb$/,
+      'glb must be a /assets/weapons/*.glb path',
+    ),
+  /** How the hand rig is posed when holding this weapon */
+  handPose: HandPose,
+  /** Scale factor for the weapon mesh in viewmodel space (default 1) */
+  scale: z.number().min(0.01).max(10).optional(),
+  /** Hand GLB override — defaults to '/assets/hands/hand.glb' */
+  handGlb: z.string().optional(),
+});
+export type Viewmodel = z.infer<typeof ViewmodelSchema>;
+
 /** Stat modifier applied when equipped or consumed */
 export const StatModifierSchema = z.object({
   stat: z.enum([
@@ -77,5 +104,7 @@ export const ItemDefinitionSchema = z.object({
   iconKey: z.string().optional(),
   /** Level requirement to use/equip */
   levelRequirement: z.number().int().min(1).optional(),
+  /** FPS viewmodel config — required for held weapons displayed in first-person */
+  viewmodel: ViewmodelSchema.optional(),
 });
 export type ItemDefinition = z.infer<typeof ItemDefinitionSchema>;

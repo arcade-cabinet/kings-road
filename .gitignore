@@ -45,3 +45,4 @@ pending-integration/
 # Claude Code task-batch state and compaction hook
 .claude/state/
 .claude/hooks/task-batch-flush.sh
+.claude/worktrees/

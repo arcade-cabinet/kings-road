@@ -1,6 +1,6 @@
 import { useGLTF } from '@react-three/drei';
 import { useMemo } from 'react';
-import { hashString } from '@/factories/chibi-generator';
+import { hashString } from '@/utils/random';
 
 const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 const MINE_PROPS_PATH = `${BASE_URL}/assets/dungeon/MineProps-transformed.glb`;

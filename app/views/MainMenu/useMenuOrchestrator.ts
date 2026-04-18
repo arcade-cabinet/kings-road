@@ -5,14 +5,29 @@ import {
   getMostRecentSave,
   restoreGameState,
 } from '@/db/save-service';
+import { type ActiveDungeon } from '@/ecs/traits/session-game';
+import { generateSeedPhrase } from '@/utils/seedPhrase';
 import {
-  type ActiveDungeon,
-  generateSeedPhrase,
-  useGameStore,
-} from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
-import { useQuestStore } from '@/stores/questStore';
-import { useWorldStore } from '@/stores/worldStore';
+  enterDungeon,
+  mergeGameState,
+  setSeedPhrase,
+  startGame,
+} from '@/ecs/actions/game';
+import { syncInventory } from '@/ecs/actions/inventory-ui';
+import {
+  resolveNarrative,
+  restoreQuests,
+} from '@/ecs/actions/quest';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import { CHUNK_SIZE, PLAYER_HEIGHT } from '@/utils/worldCoords';
 import { generateDungeonLayout } from '@/world/dungeon-generator';
 import { getDungeonById } from '@/world/dungeon-registry';
@@ -38,9 +53,6 @@ export interface MenuOrchestratorActions {
 
 export function useMenuOrchestrator(): MenuOrchestratorState &
   MenuOrchestratorActions {
-  const setSeedPhrase = useGameStore((s) => s.setSeedPhrase);
-  const startGame = useGameStore((s) => s.startGame);
-
   const [fadeOut, setFadeOut] = useState(false);
   const [loadingContinue, setLoadingContinue] = useState(false);
   const [bootError, setBootError] = useState<string | null>(null);
@@ -50,7 +62,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
     const s = generateSeedPhrase();
     setSeedPhrase(s);
     return s;
-  }, [setSeedPhrase]);
+  }, []);
 
   const continueFromSave = useCallback(async () => {
     if (inFlightRef.current) return;
@@ -68,25 +80,25 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
       setFadeOut(true);
       await wait(FADE_OUT_MS);
 
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0,
         generationPhase: 'Loading the scrolls of knowledge...',
       });
       await loadContentDb();
-      await useWorldStore.getState().generateWorld(data.seedPhrase);
-      useQuestStore.getState().resolveNarrative(data.seedPhrase);
+      await generateWorld(data.seedPhrase);
+      resolveNarrative(data.seedPhrase);
 
       restoreGameState(data, {
         startGame: (seed, pos, yaw) => {
           startGame(seed, new THREE.Vector3(pos.x, pos.y, pos.z), yaw);
         },
-        mergeGameState: (partial) => useGameStore.setState(partial),
+        mergeGameState: (partial) => mergeGameState(partial),
         restoreInventory: (items, gold, equipment) => {
-          useInventoryStore.getState().sync(items, 20, gold, equipment);
+          syncInventory(items, 20, gold, equipment);
         },
         restoreQuests: (a, c, t) => {
-          useQuestStore.getState().restoreQuests(a, c, t);
+          restoreQuests(a, c, t);
         },
         restoreDungeon: (dungeon) => {
           const layout = getDungeonById(dungeon.id);
@@ -104,7 +116,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
             ),
             overworldYaw: dungeon.overworldYaw,
           };
-          useGameStore.getState().enterDungeon(active);
+          enterDungeon(active);
         },
       });
     } catch (err) {
@@ -112,11 +124,11 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
       setBootError(errorMessage(err));
       setFadeOut(false);
       setLoadingContinue(false);
-      useWorldStore.setState({ isGenerating: false });
+      setWorldState({ isGenerating: false });
     } finally {
       inFlightRef.current = false;
     }
-  }, [startGame]);
+  }, []);
 
   const beginNewPilgrimage = useCallback(
     async (seed: string | null) => {
@@ -132,16 +144,15 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
         setFadeOut(true);
         await wait(FADE_OUT_MS);
 
-        useWorldStore.setState({
+        setWorldState({
           isGenerating: true,
           generationProgress: 0,
           generationPhase: 'Loading the scrolls of knowledge...',
         });
         await loadContentDb();
 
-        const generateWorld = useWorldStore.getState().generateWorld;
         const kingdomMap = await generateWorld(currentSeed);
-        useQuestStore.getState().resolveNarrative(currentSeed);
+        resolveNarrative(currentSeed);
 
         const ashford = kingdomMap.settlements.find((s) => s.id === 'ashford');
         const spawnGridX =
@@ -160,12 +171,12 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
         console.error('[MainMenu] beginNewPilgrimage failed:', err);
         setBootError(errorMessage(err));
         setFadeOut(false);
-        useWorldStore.setState({ isGenerating: false });
+        setWorldState({ isGenerating: false });
       } finally {
         inFlightRef.current = false;
       }
     },
-    [setSeedPhrase, startGame],
+    [],
   );
 
   return {

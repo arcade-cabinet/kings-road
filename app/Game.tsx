@@ -1,29 +1,30 @@
 import { useEffect } from 'react';
 import { ErrorBoundary as GameErrorBoundary } from '@app/ErrorBoundary';
 import { GameScene } from '@app/scene/GameScene';
-import { CombatHUD } from '@app/views/Gameplay/CombatHUD';
 import { DeathOverlay } from '@app/views/DeathOverlay';
 import { DialogueBox } from '@app/views/Gameplay/DialogueBox';
+import { DiegeticLayer } from '@app/views/Gameplay/DiegeticLayer';
 import { GameplayFrame } from '@app/views/Gameplay/GameplayFrame';
 import { InventoryScreen } from '@app/views/Gameplay/InventoryScreen';
 import { LoadingOverlay } from '@app/views/Gameplay/LoadingOverlay';
 import { MainMenu } from '@app/views/MainMenu/MainMenu';
 import { PauseMenu } from '@app/views/Gameplay/PauseMenu';
 import { QuestLog } from '@app/views/Gameplay/QuestLog';
+import { useTrait } from 'koota/react';
+import { InventoryUI } from '@/ecs/traits/session-inventory';
+import { getSessionEntity } from '@/ecs/world';
+import { getFlags } from '@/ecs/actions/game';
+import { isInventoryOpen } from '@/ecs/actions/inventory-ui';
+import { useFlags } from '@/ecs/hooks/useGameSession';
 import { TouchOverlay } from '@/input/providers/TouchProvider';
 import { useInputManager } from '@/input/useInputManager';
-import { useGameStore } from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
 
 export function Game() {
   // Register all input providers (keyboard/mouse, gamepad, touch)
   useInputManager();
 
-  const gameActive = useGameStore((s) => s.gameActive);
-  const paused = useGameStore((s) => s.paused);
-  const inDialogue = useGameStore((s) => s.inDialogue);
-  const inCombat = useGameStore((s) => s.inCombat);
-  const inventoryOpen = useInventoryStore((s) => s.isOpen);
+  const { gameActive, paused, inDialogue, inCombat } = useFlags();
+  const inventoryOpen = useTrait(getSessionEntity(), InventoryUI)?.isOpen ?? false;
 
   // Request pointer lock on click when game is active
   useEffect(() => {
@@ -35,14 +36,14 @@ export function Game() {
       ) {
         return;
       }
-      const state = useGameStore.getState();
-      const inv = useInventoryStore.getState();
+      const flags = getFlags();
+      const invOpen = isInventoryOpen();
       if (
-        state.gameActive &&
-        !state.paused &&
-        !state.inDialogue &&
-        !state.inCombat &&
-        !inv.isOpen
+        flags.gameActive &&
+        !flags.paused &&
+        !flags.inDialogue &&
+        !flags.inCombat &&
+        !invOpen
       ) {
         document.body.requestPointerLock().catch(() => {
           // Pointer lock can fail if document isn't focused or valid — safe to ignore
@@ -97,8 +98,9 @@ export function Game() {
         render inside the frame so they share safe-area padding.
       */}
       <GameplayFrame>
-        {/* Combat only renders when in combat; keeps wound decals diegetic */}
-        <CombatHUD />
+        {/* Diegetic body-sense layer: wound vignette, breath fog, combat
+            impact flashes, heartbeat, and low-opacity belt/journal pips. */}
+        <DiegeticLayer />
         {/* Dialogue — HTML fallback until the in-Canvas billboard lands */}
         <DialogueBox />
         {/* Inventory panel — triggered by belt tap */}

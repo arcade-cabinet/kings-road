@@ -5,7 +5,16 @@ import {
 } from '@react-three/rapier';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import type { ChunkData } from '@/types/game';
 import { cyrb128, mulberry32 } from '@/utils/random';
 import { getBiomeGroundMaterial, getMaterials } from '@/utils/textures';
@@ -213,7 +222,7 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   const oZ = cz * CHUNK_SIZE;
 
   // Kingdom map from world store for heightmap sampling (needed early for vegetation)
-  const kingdomMap = useWorldStore((state) => state.kingdomMap);
+  const kingdomMap = useWorldSession().kingdomMap;
 
   // Generate all mesh data for this chunk
   const meshData = useMemo(() => {
@@ -499,10 +508,19 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     return { geometry: geo, heights };
   }, [kingdomMap, chunkData.kingdomTile, isOcean, oX, oZ]);
 
-  // Safety check - if materials aren't ready, don't render
-  if (!groundMaterial || !materials.townWall) {
-    console.warn('[Chunk] Materials not ready');
-    return null;
+  // Materials must be ready before the first chunk renders — the
+  // material cache is seeded synchronously at module load in
+  // `@/utils/textures`. If either is missing, it's a bug, not a runtime
+  // condition. Fail hard so ErrorBoundary / ErrorOverlay catch it.
+  if (!groundMaterial) {
+    throw new Error(
+      `[Chunk ${chunkData.key}] groundMaterial missing — check getBiomeGroundMaterial wiring`,
+    );
+  }
+  if (!materials.townWall) {
+    throw new Error(
+      `[Chunk ${chunkData.key}] materials.townWall missing — getMaterials() cache not seeded`,
+    );
   }
 
   // Ocean chunks: render nothing (water rendering is a separate task)

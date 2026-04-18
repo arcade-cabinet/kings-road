@@ -24,6 +24,21 @@ export function chunkToWorldOrigin(
 }
 
 /**
+ * Convert world coordinates to kingdom map grid coordinates (tuple).
+ * One grid tile equals one chunk.
+ */
+export function worldToGrid(worldX: number, worldZ: number): [number, number] {
+  return [Math.floor(worldX / CHUNK_SIZE), Math.floor(worldZ / CHUNK_SIZE)];
+}
+
+/**
+ * Convert kingdom map grid coordinates to world origin (tuple).
+ */
+export function gridToWorldOrigin(gx: number, gy: number): [number, number] {
+  return [gx * CHUNK_SIZE, gy * CHUNK_SIZE];
+}
+
+/**
  * Convert tile coordinates (relative to a chunk's center tile) to world position.
  */
 export function tileToWorld(

@@ -5,13 +5,28 @@ import type {
   QuestReward,
   QuestStep,
 } from '@/schemas/quest.schema';
-import { useGameStore } from '@/stores/gameStore';
 import {
-  type ActiveQuest,
+  activateQuest,
+  addQuestXp,
+  advanceQuestStep,
+  completeQuest,
+  consumeQuestEvents,
   getAllQuests,
   getQuestDefinition,
-  useQuestStore,
-} from '@/stores/questStore';
+  getQuestState,
+  getResolvedQuest,
+  markQuestTriggered,
+  recordCombatVictory,
+  recordDialogue,
+} from '@/ecs/actions/quest';
+import type { ActiveQuest, QuestEvents } from '@/ecs/traits/session-quest';
+import {
+  getCombatSession,
+  getChunkState,
+  getFlags,
+  getInteraction,
+  getPlayer,
+} from '@/ecs/actions/game';
 import { CHUNK_SIZE } from '@/utils/worldGen';
 import { getAnchorById } from '@/world/road-spine';
 
@@ -57,48 +72,47 @@ export function QuestSystem() {
   const prevInCombatRef = useRef(false);
 
   useFrame((_, delta) => {
-    const gameState = useGameStore.getState();
-    const { gameActive, playerPosition } = gameState;
+    const { gameActive } = getFlags();
     if (!gameActive) return;
 
     const dt = Math.min(delta, 0.1);
 
-    // ── Detect dialogue close events ──────────────────────────────────
-    // When inDialogue transitions from true to false, record the NPC
-    // interaction so step conditions can match against it.
-    const wasInDialogue = prevInDialogueRef.current;
-    prevInDialogueRef.current = gameState.inDialogue;
+    const { inDialogue, inCombat, isDead } = getFlags();
+    const { playerPosition } = getPlayer();
+    const { currentChunkType } = getChunkState();
 
-    if (wasInDialogue && !gameState.inDialogue) {
+    // ── Detect dialogue close events ──────────────────────────────────
+    const wasInDialogue = prevInDialogueRef.current;
+    prevInDialogueRef.current = inDialogue;
+
+    if (wasInDialogue && !inDialogue) {
       // currentInteractable may still be set on the close frame
-      const interactable = gameState.currentInteractable;
+      const { currentInteractable: interactable } = getInteraction();
       if (interactable) {
-        useQuestStore
-          .getState()
-          .recordDialogue(interactable.type, interactable.name);
+        recordDialogue(interactable.type, interactable.name);
       }
     }
 
     // ── Detect combat end events ──────────────────────────────────────
     const wasInCombat = prevInCombatRef.current;
-    prevInCombatRef.current = gameState.inCombat;
+    prevInCombatRef.current = inCombat;
 
-    if (wasInCombat && !gameState.inCombat && !gameState.isDead) {
+    if (wasInCombat && !inCombat && !isDead) {
       // Combat ended with player alive = victory
       // The encounter system already resolved loot; we just track the event.
-      const encounter = gameState.activeEncounter;
-      const monstersKilled = encounter?.monsters.length ?? 0;
-      useQuestStore.getState().recordCombatVictory(null, monstersKilled);
+      const { activeEncounter } = getCombatSession();
+      const monstersKilled = activeEncounter?.monsters.length ?? 0;
+      recordCombatVictory(null, monstersKilled);
     }
 
     // Don't evaluate triggers or steps while in dialogue or combat
-    if (gameState.inDialogue || gameState.inCombat) return;
+    if (inDialogue || inCombat) return;
 
     // ── Trigger evaluation (throttled) ────────────────────────────────
     triggerTimerRef.current += dt;
     if (triggerTimerRef.current >= TRIGGER_CHECK_INTERVAL) {
       triggerTimerRef.current = 0;
-      evaluateTriggers(playerPosition, gameState.currentChunkType);
+      evaluateTriggers(playerPosition, currentChunkType);
     }
 
     // ── Step condition evaluation (throttled) ─────────────────────────
@@ -120,13 +134,7 @@ function evaluateTriggers(
   playerPosition: { x: number; y: number; z: number },
   currentChunkType: string,
 ): void {
-  const {
-    activeQuests,
-    completedQuests,
-    triggeredQuests,
-    activateQuest,
-    getResolvedQuest,
-  } = useQuestStore.getState();
+  const { activeQuests, completedQuests, triggeredQuests } = getQuestState();
 
   // Player road distance: chunk Z maps to 1D road distance
   const cz = Math.floor(playerPosition.z / CHUNK_SIZE);
@@ -201,7 +209,7 @@ function evaluateActiveQuests(playerPosition: {
   y: number;
   z: number;
 }): void {
-  const questState = useQuestStore.getState();
+  const questState = getQuestState();
   const { activeQuests, events } = questState;
   if (activeQuests.length === 0) return;
 
@@ -231,14 +239,14 @@ function evaluateActiveQuests(playerPosition: {
         completeQuestWithRewards(quest, activeQuest);
       } else {
         // Advance to next step
-        useQuestStore.getState().advanceStep(activeQuest.questId);
+        advanceQuestStep(activeQuest.questId);
       }
     }
   }
 
   // Consume transient events after evaluating all quests
   if (events.lastDialogueArchetype !== null || events.combatVictory) {
-    useQuestStore.getState().consumeEvents();
+    consumeQuestEvents();
   }
 }
 
@@ -273,7 +281,7 @@ function resolveSteps(
  */
 function isStepConditionMet(
   step: QuestStep,
-  events: ReturnType<typeof useQuestStore.getState>['events'],
+  events: QuestEvents,
   playerRoadDistance: number,
 ): boolean {
   switch (step.type) {
@@ -345,8 +353,6 @@ function completeQuestWithRewards(
   quest: QuestDefinition,
   activeQuest: ActiveQuest,
 ): void {
-  const { completeQuest, addQuestXp } = useQuestStore.getState();
-
   // Collect all rewards
   const rewards = collectRewards(quest, activeQuest);
 

@@ -2,16 +2,14 @@ import { Billboard, Float, Text, useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { assetUrl, npcLabelFontUrl } from '@/lib/assets';
 import type { NPCBlueprint } from '@/schemas/npc-blueprint.schema';
-import { useGameStore } from '@/stores/gameStore';
+import { getPlayer, getInteraction } from '@/ecs/actions/game';
+import { useInteraction } from '@/ecs/hooks/useGameSession';
 import type { Interactable } from '@/types/game';
 
 // Reusable vector — avoids per-NPC per-frame allocation
 const _toPlayer = new THREE.Vector3();
-
-// Troika-three-text needs a direct URL to a woff2 font file
-const FONT_URL =
-  'https://fonts.gstatic.com/s/lora/v36/0QIvMX1D_JOuMwf7I-NP.woff2';
 
 interface NPCProps {
   interactable: Interactable;
@@ -28,12 +26,22 @@ const MODEL_MAPPING: Record<string, string> = {
   healer: 'student',
   scholar: 'student',
   priest: 'student',
+  hermit: 'villagers',
+  farmer: 'villagers',
+  noble: 'merchant',
+  pilgrim: 'villagers',
   wanderer: 'villagers',
   villager: 'villagers',
   blacksmith: 'villagers',
   bandit: 'ninja',
   ninja: 'ninja',
   archer: 'archer',
+  herbalist: 'student',
+  lord: 'merchant',
+  miller: 'villagers',
+  jailer: 'knight',
+  stablehand: 'villagers',
+  watchman: 'knight',
 };
 
 // Sub-node mapping for the villagers mega-pack
@@ -42,6 +50,11 @@ const VILLAGER_NODES: Record<string, string> = {
   wanderer: 'Male_2',
   blacksmith: 'Male_1', // Armored male
   peasant: 'Male_3',
+  hermit: 'Male_3',
+  farmer: 'Male_3',
+  pilgrim: 'Male_2',
+  miller: 'Male_1',
+  stablehand: 'Male_2',
 };
 
 // Display titles for all archetypes
@@ -81,32 +94,29 @@ const TYPE_ACCENTS: Record<string, string> = {
   priest: '#cccc88',
 };
 
-export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
+export function NPC({ interactable, blueprint }: NPCProps) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
 
-  const currentInteractable = useGameStore(
-    (state) => state.currentInteractable,
-  );
+  const { currentInteractable } = useInteraction();
 
   const [highlightIntensity, setHighlightIntensity] = useState(0);
 
   const npcId = interactable?.id ?? '';
-  const npcType = interactable?.type ?? 'wanderer';
+  const npcType = blueprint?.archetype ?? interactable?.type ?? 'wanderer';
   const npcPosition = interactable?.position;
-  const npcName = interactable?.name ?? 'Stranger';
+  const npcName = blueprint?.name ?? interactable?.name ?? 'Stranger';
 
   const isHighlighted = currentInteractable?.id === npcId && npcId !== '';
   const accentColor = TYPE_ACCENTS[npcType] ?? '#88aacc';
-
-  const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   // Determine model path based on archetype
   const modelName = MODEL_MAPPING[npcType] || 'basemesh';
   const isMegaPack = modelName === 'villagers';
 
+  // useGLTF return type is dynamic based on GLB node names — no static shape available
   const { scene, nodes } = useGLTF(
-    `${BASE_URL}/assets/npcs/${modelName}.glb`,
+    assetUrl(`/assets/npcs/${modelName}.glb`),
   ) as any;
 
   // Clone scene or extract specific node from mega-pack
@@ -133,7 +143,7 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
 
   // Animation
   useFrame((_state, delta) => {
-    const playerPosition = useGameStore.getState().playerPosition;
+    const playerPosition = getPlayer().playerPosition;
     if (!groupRef.current || !npcPosition || !playerPosition) return;
     elapsedRef.current += delta;
 
@@ -217,7 +227,7 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
               color="#c4a747"
               anchorX="center"
               anchorY="middle"
-              font={FONT_URL}
+               font={npcLabelFontUrl}
               outlineWidth={0.015}
               outlineColor="#000"
             >
@@ -229,7 +239,7 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
               color={accentColor}
               anchorX="center"
               anchorY="middle"
-              font={FONT_URL}
+               font={npcLabelFontUrl}
             >
               {DISPLAY_TITLES[npcType] ?? npcType}
             </Text>
@@ -262,10 +272,9 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
 }
 
 // Preload common models
-const PRELOAD_BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 const MODELS_TO_PRELOAD = new Set(Object.values(MODEL_MAPPING));
 MODELS_TO_PRELOAD.add('basemesh');
 
 for (const model of MODELS_TO_PRELOAD) {
-  useGLTF.preload(`${PRELOAD_BASE_URL}/assets/npcs/${model}.glb`);
+  useGLTF.preload(assetUrl(`/assets/npcs/${model}.glb`));
 }

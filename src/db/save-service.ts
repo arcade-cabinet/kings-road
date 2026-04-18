@@ -12,7 +12,7 @@
 
 import type * as THREE from 'three';
 import type { EquippedItems, ItemStack } from '@/ecs/traits/inventory';
-import type { ActiveQuest } from '@/stores/questStore';
+import type { ActiveQuest } from '@/ecs/traits/session-quest';
 
 // ── Serializable types ────────────────────────────────────────────────
 
@@ -159,136 +159,95 @@ export function snapshotGameState(
   };
 }
 
-// ── IndexedDB persistence ─────────────────────────────────────────────
+// ── Capacitor SQLite persistence ──────────────────────────────────────
+//
+// Single table `save_slots(slotId INTEGER PRIMARY KEY, payload TEXT)`.
+// One row per slot, payload is the JSON-serialized SaveData. The
+// connection + schema are managed by `./save-db`.
 
-const DB_NAME = 'kings-road-saves';
-const DB_VERSION = 1;
-const STORE_NAME = 'save_slots';
+import { sqlQuery, sqlRun } from './save-db';
 
-function openDb(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: 'slotId' });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-/** Stored record shape in IndexedDB */
-interface SaveSlotRecord {
+interface SlotRow {
   slotId: number;
-  data: SaveData;
+  payload: string;
 }
 
-/** Save game state to a numbered slot (1-3). */
+/** Save game state to a numbered slot (0=auto, 1-3=manual). */
 export async function saveToSlot(
   slotId: number,
   data: SaveData,
 ): Promise<void> {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-    store.put({ slotId, data } satisfies SaveSlotRecord);
-    tx.oncomplete = () => {
-      db.close();
-      resolve();
-    };
-    tx.onerror = () => {
-      db.close();
-      reject(tx.error);
-    };
-  });
+  const payload = JSON.stringify(data);
+  await sqlRun(
+    `INSERT INTO save_slots (slotId, payload) VALUES (?, ?)
+     ON CONFLICT(slotId) DO UPDATE SET payload = excluded.payload;`,
+    [slotId, payload],
+  );
 }
 
 /** Load save data from a slot. Returns undefined if the slot is empty. */
 export async function loadFromSlot(
   slotId: number,
 ): Promise<SaveData | undefined> {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.get(slotId);
-    request.onsuccess = () => {
-      db.close();
-      const record = request.result as SaveSlotRecord | undefined;
-      resolve(record?.data);
-    };
-    request.onerror = () => {
-      db.close();
-      reject(request.error);
-    };
-  });
+  const rows = await sqlQuery<SlotRow>(
+    `SELECT slotId, payload FROM save_slots WHERE slotId = ? LIMIT 1;`,
+    [slotId],
+  );
+  const row = rows[0];
+  if (!row) return undefined;
+  try {
+    return JSON.parse(row.payload) as SaveData;
+  } catch (err) {
+    // Corrupt payload is a data-integrity bug — surface it so the user
+    // / developer sees it rather than silently returning "no save".
+    throw new Error(
+      `Save slot ${slotId} payload is corrupt and could not be parsed: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
+  }
 }
 
 /** Delete a save slot. */
 export async function deleteSlot(slotId: number): Promise<void> {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-    store.delete(slotId);
-    tx.oncomplete = () => {
-      db.close();
-      resolve();
-    };
-    tx.onerror = () => {
-      db.close();
-      reject(tx.error);
-    };
-  });
+  await sqlRun(`DELETE FROM save_slots WHERE slotId = ?;`, [slotId]);
 }
 
 /** List all save slot summaries for the load menu. */
 export async function listSaveSlots(): Promise<SaveSlotSummary[]> {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.getAll();
-    request.onsuccess = () => {
-      db.close();
-      const records = request.result as SaveSlotRecord[];
-      const summaries: SaveSlotSummary[] = records.map((r) => ({
-        slotId: r.slotId,
-        displayName: r.data.displayName,
-        seedPhrase: r.data.seedPhrase,
-        savedAt: r.data.savedAt,
-        playTimeSeconds: r.data.playTimeSeconds,
-        level: r.data.player.level,
-      }));
-      summaries.sort((a, b) => a.slotId - b.slotId);
-      resolve(summaries);
-    };
-    request.onerror = () => {
-      db.close();
-      reject(request.error);
-    };
-  });
+  const rows = await sqlQuery<SlotRow>(
+    `SELECT slotId, payload FROM save_slots ORDER BY slotId ASC;`,
+  );
+  const summaries: SaveSlotSummary[] = [];
+  for (const row of rows) {
+    let data: SaveData;
+    try {
+      data = JSON.parse(row.payload) as SaveData;
+    } catch (err) {
+      throw new Error(
+        `Save slot ${row.slotId} payload is corrupt: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      );
+    }
+    summaries.push({
+      slotId: row.slotId,
+      displayName: data.displayName,
+      seedPhrase: data.seedPhrase,
+      savedAt: data.savedAt,
+      playTimeSeconds: data.playTimeSeconds,
+      level: data.player.level,
+    });
+  }
+  return summaries;
 }
 
-/** Check if any save slot has data (for "Continue" button on main menu). */
+/** Check if any save slot has data (for "Continue" affordance on main menu). */
 export async function hasAnySave(): Promise<boolean> {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.count();
-    request.onsuccess = () => {
-      db.close();
-      resolve(request.result > 0);
-    };
-    request.onerror = () => {
-      db.close();
-      reject(request.error);
-    };
-  });
+  const rows = await sqlQuery<{ n: number }>(
+    `SELECT COUNT(*) AS n FROM save_slots;`,
+  );
+  return (rows[0]?.n ?? 0) > 0;
 }
 
 /** Get the most recent save across all slots (for quick "Continue"). */

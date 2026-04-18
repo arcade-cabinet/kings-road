@@ -1,10 +1,16 @@
 import { render } from 'vitest-browser-react';
-import { expect, test } from 'vitest';
+import { beforeEach, expect, test } from 'vitest';
 import { MainMenu } from '@app/views/MainMenu/MainMenu';
-import { useGameStore } from '@/stores/gameStore';
+import { getSeedPhrase, setGameActive, setSeedPhrase } from '@/ecs/actions/game';
+import { unsafe_resetSessionEntity } from '@/ecs/world';
+
+beforeEach(() => {
+  unsafe_resetSessionEntity();
+  setGameActive(false);
+  setSeedPhrase('');
+});
 
 test('MainMenu renders title and primary CTA', async () => {
-  useGameStore.setState({ gameActive: false, seedPhrase: '' });
   const screen = await render(<MainMenu />);
   await expect.element(screen.getByText(/King's Road/)).toBeInTheDocument();
   await expect
@@ -16,11 +22,10 @@ test('MainMenu renders title and primary CTA', async () => {
 });
 
 test('MainMenu auto-generates a seed phrase on mount when none is set', async () => {
-  useGameStore.setState({ gameActive: false, seedPhrase: '' });
   await render(<MainMenu />);
   // Effect runs after paint — wait briefly then inspect store.
   await new Promise((r) => setTimeout(r, 30));
-  const seed = useGameStore.getState().seedPhrase;
+  const seed = getSeedPhrase();
   expect(seed).toBeTruthy();
   expect(seed.length).toBeGreaterThan(3);
 });

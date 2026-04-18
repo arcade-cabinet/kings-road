@@ -7,7 +7,7 @@
 import { useGLTF } from '@react-three/drei';
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { hashString } from '@/factories/chibi-generator';
+import { hashString } from '@/utils/random';
 import type { PlacedFeatureData } from '@/types/game';
 import { DungeonProp } from './DungeonProp';
 

@@ -1,8 +1,7 @@
-import { Stage, useGLTF } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useMemo } from 'react';
-
-const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
+import { assetUrl } from '@/lib/assets';
 
 const MODEL_MAPPING: Record<string, string> = {
   guard: 'knight',
@@ -13,9 +12,20 @@ const MODEL_MAPPING: Record<string, string> = {
   healer: 'student',
   scholar: 'student',
   priest: 'student',
-  wanderer: 'basemesh',
-  villager: 'basemesh',
+  hermit: 'villagers',
+  farmer: 'villagers',
+  noble: 'merchant',
+  pilgrim: 'villagers',
+  wanderer: 'villagers',
+  villager: 'villagers',
+  blacksmith: 'villagers',
   bandit: 'ninja',
+  herbalist: 'student',
+  lord: 'merchant',
+  miller: 'villagers',
+  jailer: 'knight',
+  stablehand: 'villagers',
+  watchman: 'knight',
   ninja: 'ninja',
   archer: 'archer',
 };
@@ -26,7 +36,7 @@ interface Portrait3DProps {
 
 function NPCModel({ type }: { type: string }) {
   const modelName = MODEL_MAPPING[type] || 'basemesh';
-  const { scene } = useGLTF(`${BASE_URL}/assets/npcs/${modelName}.glb`);
+  const { scene } = useGLTF(assetUrl(`/assets/npcs/${modelName}.glb`));
   const cloned = useMemo(() => scene.clone(), [scene]);
 
   return (
@@ -41,9 +51,9 @@ export function Portrait3D({ type }: Portrait3DProps) {
         <Suspense fallback={null}>
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={1} />
-          <Stage intensity={0.2} environment="apartment" adjustCamera={false}>
+          <group position={[0, -0.1, 0]}>
             <NPCModel type={type} />
-          </Stage>
+          </group>
         </Suspense>
       </Canvas>
       {/* Brass corner ornaments */}
@@ -58,5 +68,5 @@ export function Portrait3D({ type }: Portrait3DProps) {
 // Preload common portraits (deduplicated)
 const uniqueModels = Array.from(new Set(Object.values(MODEL_MAPPING)));
 for (const model of uniqueModels) {
-  useGLTF.preload(`${BASE_URL}/assets/npcs/${model}.glb`);
+  useGLTF.preload(assetUrl(`/assets/npcs/${model}.glb`));
 }

@@ -1,11 +1,22 @@
-import { Cloud, Sky, Stars } from '@react-three/drei';
+import { CloudInstance, Clouds, Sky, Stars } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useGameStore } from '@/stores/gameStore';
+import { assetUrl } from '@/lib/assets';
+import {
+  getEnvironment,
+  getFlags,
+  getPlayer,
+  setTimeOfDay,
+} from '@/ecs/actions/game';
+import {
+  useEnvironment,
+  useFlags,
+} from '@/ecs/hooks/useGameSession';
 import { updateWindowEmissive } from '@/utils/textures';
 
 const DAY_DURATION = 600.0; // 10 real minutes = 1 game day
+const CLOUD_TEXTURE = assetUrl('/assets/cloud.svg');
 
 // Pre-computed cloud configurations to avoid array index keys
 const cloudConfigs = Array.from({ length: 6 }, (_, i) => ({
@@ -61,11 +72,10 @@ export function DayNightCycle() {
   const sunLightRef = useRef<THREE.DirectionalLight>(null);
   const playerLanternRef = useRef<THREE.PointLight>(null);
 
-  const setTimeOfDay = useGameStore((state) => state.setTimeOfDay);
-  const gameActive = useGameStore((state) => state.gameActive);
-  const timeOfDay = useGameStore((state) => state.timeOfDay);
+  const { gameActive } = useFlags();
+  const { timeOfDay } = useEnvironment();
 
-  // Local time ref — updated every frame, synced to store periodically
+  // Local time ref — updated every frame, synced to Koota periodically
   const localTimeRef = useRef(timeOfDay);
   const syncTimerRef = useRef(0);
 
@@ -84,7 +94,7 @@ export function DayNightCycle() {
     localTimeRef.current = (localTimeRef.current + dt / DAY_DURATION) % 1;
     const newTime = localTimeRef.current;
 
-    // Sync to Zustand periodically for HUD / other UI consumers
+    // Sync to Koota periodically for HUD / other UI consumers
     syncTimerRef.current += dt;
     if (syncTimerRef.current >= TIME_SYNC_INTERVAL) {
       syncTimerRef.current = 0;
@@ -190,9 +200,9 @@ function getSkyMode(t: number): 'day' | 'dawn' | 'dusk' | 'night' {
 
 export function SkyDome() {
   // Subscribe to a coarse sky mode — only re-renders on actual visual transitions
-  // Subscribe to coarse sky mode — only re-renders at visual transitions, NOT every frame
-  const skyMode = useGameStore((state) => getSkyMode(state.timeOfDay));
-  const gameActive = useGameStore((state) => state.gameActive);
+  const { timeOfDay } = useEnvironment();
+  const skyMode = getSkyMode(timeOfDay);
+  const { gameActive } = useFlags();
 
   // biome-ignore lint/suspicious/noExplicitAny: drei Sky ref type is complex
   // biome-ignore lint/correctness/noUnusedVariables: reserved for future sky effects
@@ -205,13 +215,13 @@ export function SkyDome() {
   const isDawn = skyMode === 'dawn';
 
   // Read initial player position once (clouds/moon follow player imperatively in useFrame)
-  const initPlayerPos = useRef(useGameStore.getState().playerPosition);
+  const initPlayerPos = useRef(getPlayer().playerPosition);
   const playerX = initPlayerPos.current?.x ?? 60;
   const playerZ = initPlayerPos.current?.z ?? 60;
 
   // Update sky sun position and moon imperatively (no React re-render)
   useFrame(() => {
-    const t = useGameStore.getState().timeOfDay;
+    const t = getEnvironment().timeOfDay;
     const theta = (t - 0.25) * Math.PI * 2;
     const sunY = Math.sin(theta);
     const sunX = Math.cos(theta);
@@ -227,7 +237,7 @@ export function SkyDome() {
 
     // Update moon position
     if (moonRef.current) {
-      const pp = useGameStore.getState().playerPosition;
+      const { playerPosition: pp } = getPlayer();
       moonRef.current.position.set(
         (pp?.x ?? 60) + Math.cos((t + 0.5) * Math.PI * 2) * 200,
         100 + Math.sin((t + 0.5) * Math.PI * 2) * 50,
@@ -237,15 +247,14 @@ export function SkyDome() {
 
     // Update cloud group to follow player
     if (cloudGroupRef.current) {
-      const pp = useGameStore.getState().playerPosition;
+      const { playerPosition: pp } = getPlayer();
       cloudGroupRef.current.position.set(pp?.x ?? 60, 0, pp?.z ?? 60);
     }
   });
 
   if (!gameActive) return null;
 
-  // Initial sun position for Sky mount
-  const timeOfDay = useGameStore.getState().timeOfDay;
+  // Initial sun position for Sky mount (reuse timeOfDay from reactive hook above)
   const initTheta = (timeOfDay - 0.25) * Math.PI * 2;
   const initSunPos: [number, number, number] = [
     Math.cos(initTheta) * 100,
@@ -297,9 +306,13 @@ export function SkyDome() {
       )}
 
       {/* Atmospheric clouds that follow player */}
-      <group ref={cloudGroupRef} position={[playerX, 0, playerZ]}>
+      <Clouds
+        ref={cloudGroupRef}
+        position={[playerX, 0, playerZ]}
+        texture={CLOUD_TEXTURE}
+      >
         {cloudConfigs.map((cfg) => (
-          <Cloud
+          <CloudInstance
             key={cfg.id}
             position={[cfg.x, cfg.y, cfg.z]}
             speed={cfg.speed}
@@ -309,7 +322,7 @@ export function SkyDome() {
             color={isDusk ? '#ffccaa' : isDawn ? '#ffddcc' : '#ffffff'}
           />
         ))}
-      </group>
+      </Clouds>
     </>
   );
 }
@@ -365,7 +378,7 @@ export function AmbientParticles() {
     if (!meshRef.current) return;
     elapsedRef.current += delta;
     const t = elapsedRef.current;
-    const pp = useGameStore.getState().playerPosition;
+    const { playerPosition: pp } = getPlayer();
     const px = pp?.x ?? 0;
     const pz = pp?.z ?? 0;
 

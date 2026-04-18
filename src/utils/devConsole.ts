@@ -8,13 +8,24 @@
  */
 
 import * as THREE from 'three';
-import { useGameStore } from '@/stores/gameStore';
-import { useQuestStore } from '@/stores/questStore';
 import {
-  gridToWorldOrigin,
-  useWorldStore,
-  worldToGrid,
-} from '@/stores/worldStore';
+  getCamera,
+  getChunkState,
+  getEnvironment,
+  getPlayer,
+  setHealth,
+  setPlayerPosition,
+  setPlayerVelocityY,
+  setStamina,
+  setTimeOfDay,
+} from '@/ecs/actions/game';
+import {
+  activateQuest as activateQuestAction,
+  completeQuest as completeQuestAction,
+  getQuestState,
+} from '@/ecs/actions/quest';
+import { getTileAtGrid, getWorldState } from '@/ecs/actions/world';
+import { gridToWorldOrigin, worldToGrid } from '@/utils/worldCoords';
 import { getRegionAt } from '@/world/kingdom-gen';
 import { CHUNK_SIZE, PLAYER_HEIGHT } from './worldGen';
 
@@ -38,7 +49,7 @@ const devConsole = {
   // ── Movement & teleportation ─────────────────────────────────────────
 
   moveToSettlement(settlementId: string) {
-    const map = useWorldStore.getState().kingdomMap;
+    const map = getWorldState().kingdomMap;
     if (!map) {
       console.warn('[DEV] No kingdom map — start a game first.');
       return;
@@ -58,7 +69,7 @@ const devConsole = {
       PLAYER_HEIGHT,
       wz + CHUNK_SIZE / 2,
     );
-    useGameStore.getState().setPlayerPosition(pos);
+    setPlayerPosition(pos);
     fmt(`Teleported to ${settlement.name}`, {
       gx,
       gy,
@@ -74,7 +85,7 @@ const devConsole = {
       PLAYER_HEIGHT,
       wz + CHUNK_SIZE / 2,
     );
-    useGameStore.getState().setPlayerPosition(pos);
+    setPlayerPosition(pos);
     fmt(`Teleported to grid (${gx}, ${gy})`, {
       worldX: pos.x,
       worldZ: pos.z,
@@ -82,25 +93,29 @@ const devConsole = {
   },
 
   moveForward(distance: number) {
-    const state = useGameStore.getState();
-    const yaw = state.cameraYaw;
-    const pos = state.playerPosition.clone();
+    const player = getPlayer();
+    const camera = getCamera();
+    const yaw = camera.cameraYaw;
+    const pos = player.playerPosition.clone();
     // Camera yaw 0 = looking along -Z, consistent with Three.js convention
     pos.x -= Math.sin(yaw) * distance;
     pos.z -= Math.cos(yaw) * distance;
-    state.setPlayerPosition(pos);
+    setPlayerPosition(pos);
     fmt(`Moved forward ${distance} units`, { x: pos.x, z: pos.z });
   },
 
   // ── Observation ──────────────────────────────────────────────────────
 
   getPlayerInfo() {
-    const gs = useGameStore.getState();
-    const ws = useWorldStore.getState();
-    const pos = gs.playerPosition;
+    const player = getPlayer();
+    const camera = getCamera();
+    const chunks = getChunkState();
+    const env = getEnvironment();
+    const ws = getWorldState();
+    const pos = player.playerPosition;
     const [gx, gy] = worldToGrid(pos.x, pos.z);
     const map = ws.kingdomMap;
-    const tile = ws.getTileAtGrid(gx, gy);
+    const tile = getTileAtGrid(gx, gy);
     const region = map ? getRegionAt(map, gx, gy) : undefined;
     const info = {
       position: {
@@ -109,22 +124,22 @@ const devConsole = {
         z: pos.z.toFixed(1),
       },
       grid: { gx, gy },
-      chunk: gs.currentChunkKey,
-      chunkName: gs.currentChunkName,
-      chunkType: gs.currentChunkType,
+      chunk: chunks.currentChunkKey,
+      chunkName: chunks.currentChunkName,
+      chunkType: chunks.currentChunkType,
       biome: tile?.biome ?? 'unknown',
       region: region?.name ?? 'none',
-      health: gs.health,
-      stamina: gs.stamina,
-      facing: `${((gs.cameraYaw * 180) / Math.PI).toFixed(1)} deg`,
-      timeOfDay: `${(gs.timeOfDay * 24).toFixed(1)}h`,
+      health: player.health,
+      stamina: player.stamina,
+      facing: `${((camera.cameraYaw * 180) / Math.PI).toFixed(1)} deg`,
+      timeOfDay: `${(env.timeOfDay * 24).toFixed(1)}h`,
     };
     fmt('Player Info', info);
     return info;
   },
 
   getKingdomInfo() {
-    const map = useWorldStore.getState().kingdomMap;
+    const map = getWorldState().kingdomMap;
     if (!map) {
       console.warn('[DEV] No kingdom map — start a game first.');
       return null;
@@ -142,7 +157,7 @@ const devConsole = {
   },
 
   listSettlements() {
-    const map = useWorldStore.getState().kingdomMap;
+    const map = getWorldState().kingdomMap;
     if (!map) {
       console.warn('[DEV] No kingdom map — start a game first.');
       return [];
@@ -158,9 +173,10 @@ const devConsole = {
   },
 
   listNearbyNPCs(radius = 30) {
-    const gs = useGameStore.getState();
-    const pos = gs.playerPosition;
-    const nearby = gs.globalInteractables
+    const player = getPlayer();
+    const chunks = getChunkState();
+    const pos = player.playerPosition;
+    const nearby = chunks.globalInteractables
       .filter((i) => {
         const dx = i.position.x - pos.x;
         const dz = i.position.z - pos.z;
@@ -183,8 +199,8 @@ const devConsole = {
   },
 
   getCurrentChunkData() {
-    const gs = useGameStore.getState();
-    const chunk = gs.activeChunks.get(gs.currentChunkKey);
+    const chunks = getChunkState();
+    const chunk = chunks.activeChunks.get(chunks.currentChunkKey);
     if (!chunk) {
       console.warn('[DEV] No active chunk at current position.');
       return null;
@@ -210,24 +226,24 @@ const devConsole = {
 
   setTimeOfDay(hour: number) {
     const normalized = (hour % 24) / 24;
-    useGameStore.getState().setTimeOfDay(normalized);
+    setTimeOfDay(normalized);
     fmt(`Time set to ${hour % 24}:00`, { normalized });
   },
 
   setHealth(value: number) {
-    useGameStore.getState().setHealth(value);
+    setHealth(value);
     fmt('Health set', value);
   },
 
   setStamina(value: number) {
-    useGameStore.getState().setStamina(value);
+    setStamina(value);
     fmt('Stamina set', value);
   },
 
   toggleFlyMode() {
     _flyMode = !_flyMode;
     if (_flyMode) {
-      useGameStore.getState().setPlayerVelocityY(0);
+      setPlayerVelocityY(0);
     }
     fmt('Fly mode', _flyMode ? 'ON' : 'OFF');
     return _flyMode;
@@ -242,7 +258,7 @@ const devConsole = {
   // ── World inspection ─────────────────────────────────────────────────
 
   inspectTile(gx: number, gy: number) {
-    const tile = useWorldStore.getState().getTileAtGrid(gx, gy);
+    const tile = getTileAtGrid(gx, gy);
     if (!tile) {
       console.warn(`[DEV] No tile at grid (${gx}, ${gy}).`);
       return null;
@@ -252,7 +268,7 @@ const devConsole = {
   },
 
   inspectRegion(gx: number, gy: number) {
-    const map = useWorldStore.getState().kingdomMap;
+    const map = getWorldState().kingdomMap;
     if (!map) {
       console.warn('[DEV] No kingdom map — start a game first.');
       return null;
@@ -269,7 +285,7 @@ const devConsole = {
   // ── Quest helpers ────────────────────────────────────────────────────
 
   listQuests() {
-    const qs = useQuestStore.getState();
+    const qs = getQuestState();
     const info = {
       active: qs.activeQuests,
       completed: qs.completedQuests,
@@ -280,12 +296,12 @@ const devConsole = {
   },
 
   activateQuest(questId: string, branch?: 'A' | 'B') {
-    useQuestStore.getState().activateQuest(questId, branch);
+    activateQuestAction(questId, branch);
     fmt('Quest activated', { questId, branch });
   },
 
   completeQuest(questId: string) {
-    useQuestStore.getState().completeQuest(questId);
+    completeQuestAction(questId);
     fmt('Quest completed', questId);
   },
 };

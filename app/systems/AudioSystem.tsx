@@ -6,9 +6,19 @@ import type { AudioZone } from '@/audio/ambient-mixer';
 import { computeAmbientMix } from '@/audio/ambient-mixer';
 import type { AudioLayer } from '@/audio/layer-factory';
 import { createAllLayers } from '@/audio/layer-factory';
-import { useCombatStore } from '@/stores/combatStore';
-import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore, worldToGrid } from '@/stores/worldStore';
+import { getCombatUI } from '@/ecs/actions/combat-ui';
+import { getPlayer, getEnvironment } from '@/ecs/actions/game';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
+import { gridToWorldOrigin, worldToGrid } from '@/utils/worldCoords';
 import { CHUNK_SIZE } from '@/utils/worldCoords';
 
 // ── One-shot Synths ──────────────────────────────────────────────
@@ -53,7 +63,7 @@ const ZONE_SAMPLE_RADIUS = 3;
  * water-adjacent and vegetation-rich biomes.
  */
 function deriveAudioZones(playerX: number, playerZ: number): AudioZone[] {
-  const worldStore = useWorldStore.getState();
+  const worldStore = getWorldState();
   const map = worldStore.kingdomMap;
   if (!map) return [];
 
@@ -64,7 +74,7 @@ function deriveAudioZones(playerX: number, playerZ: number): AudioZone[] {
     for (let dx = -ZONE_SAMPLE_RADIUS; dx <= ZONE_SAMPLE_RADIUS; dx++) {
       const gx = cx + dx;
       const gy = cy + dy;
-      const tile = worldStore.getTileAtGrid(gx, gy);
+      const tile = getTileAtGrid(gx, gy);
       if (!tile) continue;
 
       const worldCenterX = gx * CHUNK_SIZE + CHUNK_SIZE / 2;
@@ -147,8 +157,9 @@ export function AudioSystem() {
   useFrame((_, delta) => {
     if (!initialized || layersRef.current.length === 0) return;
 
-    const { playerPosition, timeOfDay } = useGameStore.getState();
-    const { lastHitTime, lastDamageTime } = useCombatStore.getState();
+    const { playerPosition } = getPlayer();
+    const { timeOfDay } = getEnvironment();
+    const { lastHitTime, lastDamageTime } = getCombatUI();
 
     // ── Combat SFX ──────────────────────────────────────────────────
 

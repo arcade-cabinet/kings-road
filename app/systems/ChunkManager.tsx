@@ -3,8 +3,25 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { KingdomMap, Settlement } from '@/schemas/kingdom.schema';
 import { Chunk } from '@app/scene/Chunk';
-import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
+import {
+  addGlobalAABBs,
+  addGlobalInteractables,
+  addChunk,
+  getFlags,
+  getPlayer,
+  getSeedPhrase,
+  removeChunk,
+  removeGlobalAABBs,
+  removeGlobalInteractables,
+  setCurrentChunk,
+  getChunkState,
+} from '@/ecs/actions/game';
+import {
+  useChunkState,
+  useFlags,
+  useSeed,
+} from '@/ecs/hooks/useGameSession';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import type {
   AABB,
   ChunkData,
@@ -429,24 +446,11 @@ function generateChunkData(
 }
 
 export function ChunkManager() {
-  const seedPhrase = useGameStore((state) => state.seedPhrase);
-  const activeChunks = useGameStore((state) => state.activeChunks);
-  const chunkDeltas = useGameStore((state) => state.chunkDeltas);
-  const gameActive = useGameStore((state) => state.gameActive);
-  const kingdomMap = useWorldStore((state) => state.kingdomMap);
-  const featureIndex = useWorldStore((state) => state.featureIndex);
-
-  const addChunk = useGameStore((state) => state.addChunk);
-  const removeChunk = useGameStore((state) => state.removeChunk);
-  const addGlobalAABBs = useGameStore((state) => state.addGlobalAABBs);
-  const removeGlobalAABBs = useGameStore((state) => state.removeGlobalAABBs);
-  const addGlobalInteractables = useGameStore(
-    (state) => state.addGlobalInteractables,
-  );
-  const removeGlobalInteractables = useGameStore(
-    (state) => state.removeGlobalInteractables,
-  );
-  const setCurrentChunk = useGameStore((state) => state.setCurrentChunk);
+  const { seedPhrase } = useSeed();
+  const { activeChunks, chunkDeltas } = useChunkState();
+  const { gameActive } = useFlags();
+  const kingdomMap = useWorldSession().kingdomMap;
+  const featureIndex = useWorldSession().featureIndex;
 
   const lastChunkKey = useRef('');
   const bannerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -455,7 +459,7 @@ export function ChunkManager() {
   useFrame(() => {
     if (!gameActive || !seedPhrase || !kingdomMap) return;
 
-    const playerPosition = useGameStore.getState().playerPosition;
+    const { playerPosition } = getPlayer();
     const { cx: currentCx, cz: currentCz } = worldToChunk(
       playerPosition.x,
       playerPosition.z,

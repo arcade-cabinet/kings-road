@@ -29,6 +29,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Validate content
+        run: pnpm exec tsx scripts/validate-content.ts
+
       - name: Build
         env:
           GITHUB_PAGES: 'true'

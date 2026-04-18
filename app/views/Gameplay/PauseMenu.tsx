@@ -9,10 +9,37 @@ import {
   snapshotGameState,
 } from '@/db/save-service';
 import { cn } from '@/lib/utils';
-import { type ActiveDungeon, useGameStore } from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
-import { useQuestStore } from '@/stores/questStore';
-import { useWorldStore } from '@/stores/worldStore';
+import { type ActiveDungeon } from '@/ecs/traits/session-game';
+import {
+  enterDungeon,
+  getGameSnapshot,
+  mergeGameState,
+  resetGame,
+  setGameActive,
+  setPaused,
+  startGame,
+} from '@/ecs/actions/game';
+import { useFlags, useSeed } from '@/ecs/hooks/useGameSession';
+import {
+  getInventorySnapshot,
+  syncInventory,
+} from '@/ecs/actions/inventory-ui';
+import {
+  getQuestState,
+  resetQuests,
+  resolveNarrative,
+  restoreQuests,
+} from '@/ecs/actions/quest';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import { generateDungeonLayout } from '@/world/dungeon-generator';
 import { getDungeonById } from '@/world/dungeon-registry';
 import { SettingsPanel } from '@app/views/SettingsPanel';
@@ -101,9 +128,9 @@ function formatDate(iso: string): string {
 
 /** Build a snapshot of current game state for saving. */
 function captureSnapshot() {
-  const gs = useGameStore.getState();
-  const qs = useQuestStore.getState();
-  const inv = useInventoryStore.getState();
+  const gs = getGameSnapshot();
+  const qs = getQuestState();
+  const inv = getInventorySnapshot();
   return snapshotGameState(
     gs,
     qs,
@@ -250,7 +277,7 @@ function SaveGamePage({
   }
 
   return (
-    <div className="relative bg-gradient-to-b from-yellow-50/95 to-yellow-100/90 border border-yellow-700/30 px-10 py-8 shadow-2xl w-[380px]">
+    <div className="relative bg-gradient-to-b from-yellow-50/95 to-yellow-100/90 border border-yellow-700/30 px-5 py-6 sm:px-10 sm:py-8 shadow-2xl w-[min(380px,calc(100dvw-2rem))] max-h-[min(85dvh,calc(100dvh-2rem))] overflow-y-auto">
       <div className="absolute -top-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
       <div className="absolute -bottom-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
 
@@ -322,32 +349,30 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
     }
 
     // Reset current game state
-    useGameStore.getState().resetGame();
-    useWorldStore.getState().clearWorld();
-    useQuestStore.getState().resetQuests();
+    resetGame();
+    clearWorld();
+    resetQuests();
 
     // Regenerate kingdom from saved seed
-    await useWorldStore.getState().generateWorld(data.seedPhrase);
+    await generateWorld(data.seedPhrase);
 
     // Resolve quest narrative
-    useQuestStore.getState().resolveNarrative(data.seedPhrase);
+    resolveNarrative(data.seedPhrase);
 
     // Restore all saved state via centralized restoreGameState
     restoreGameState(data, {
       startGame: (seed, pos, yaw) => {
         const position = new THREE.Vector3(pos.x, pos.y, pos.z);
-        useGameStore.getState().startGame(seed, position, yaw);
+        startGame(seed, position, yaw);
       },
       mergeGameState: (partial) => {
-        useGameStore.setState(partial);
+        mergeGameState(partial);
       },
       restoreInventory: (items, gold, equipment) => {
-        useInventoryStore.getState().sync(items, 20, gold, equipment);
+        syncInventory(items, 20, gold, equipment);
       },
       restoreQuests: (activeQuests, completedQuests, triggeredQuests) => {
-        useQuestStore
-          .getState()
-          .restoreQuests(activeQuests, completedQuests, triggeredQuests);
+        restoreQuests(activeQuests, completedQuests, triggeredQuests);
       },
       restoreDungeon: (dungeon) => {
         const layout = getDungeonById(dungeon.id);
@@ -365,7 +390,7 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
           ),
           overworldYaw: dungeon.overworldYaw,
         };
-        useGameStore.getState().enterDungeon(active);
+        enterDungeon(active);
       },
     });
   }, []);
@@ -389,7 +414,7 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="relative bg-gradient-to-b from-yellow-50/95 to-yellow-100/90 border border-yellow-700/30 px-10 py-8 shadow-2xl w-[380px]">
+    <div className="relative bg-gradient-to-b from-yellow-50/95 to-yellow-100/90 border border-yellow-700/30 px-5 py-6 sm:px-10 sm:py-8 shadow-2xl w-[min(380px,calc(100dvw-2rem))] max-h-[min(85dvh,calc(100dvh-2rem))] overflow-y-auto">
       <div className="absolute -top-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
       <div className="absolute -bottom-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
 
@@ -455,10 +480,8 @@ function useAutoSaveOnPause(paused: boolean, gameActive: boolean) {
 // ---------------------------------------------------------------------------
 
 export function PauseMenu() {
-  const gameActive = useGameStore((state) => state.gameActive);
-  const paused = useGameStore((state) => state.paused);
-  const setPaused = useGameStore((state) => state.setPaused);
-  const seedPhrase = useGameStore((state) => state.seedPhrase);
+  const { gameActive, paused } = useFlags();
+  const { seedPhrase } = useSeed();
   const [page, setPage] = useState<'main' | 'settings' | 'save' | 'load'>(
     'main',
   );
@@ -477,9 +500,9 @@ export function PauseMenu() {
 
   const handleQuit = () => {
     setPaused(false);
-    useGameStore.getState().resetGame();
-    useGameStore.getState().setGameActive(false);
-    useWorldStore.getState().clearWorld();
+    resetGame();
+    setGameActive(false);
+    clearWorld();
   };
 
   return (

@@ -285,7 +285,7 @@ describe('validateQuestGraph', () => {
 describe('resolveQuestGraph with real content', () => {
   // Integration test using the actual quest registry
   it('resolves all bundled quests without errors', async () => {
-    const { getAllQuests } = await import('../stores/questStore');
+    const { getAllQuests } = await import('@/ecs/actions/quest');
     const quests = getAllQuests();
     const graph = resolveQuestGraph(quests, 'integration-test-seed');
     const errors = validateQuestGraph(graph);

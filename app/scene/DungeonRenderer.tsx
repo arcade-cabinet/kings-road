@@ -9,7 +9,19 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { CuboidCollider, RigidBody } from '@react-three/rapier';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useGameStore } from '@/stores/gameStore';
+import {
+  exitDungeon,
+  getFlags,
+  getDungeonSession,
+  getPlayer,
+  moveToRoom,
+  setCameraYaw,
+  setPlayerPosition,
+} from '@/ecs/actions/game';
+import {
+  useDungeonSession,
+  useFlags,
+} from '@/ecs/hooks/useGameSession';
 import type { PlacedRoom } from '@/world/dungeon-generator';
 import {
   DUNGEON_DEPTH,
@@ -303,10 +315,11 @@ function DungeonNavigator() {
   const lastTransitionRef = useRef(0);
 
   useFrame(() => {
-    const state = useGameStore.getState();
-    if (!state.inDungeon || !state.activeDungeon) return;
+    const { inDungeon } = getFlags();
+    const { activeDungeon } = getDungeonSession();
+    if (!inDungeon || !activeDungeon) return;
 
-    const dungeon = state.activeDungeon;
+    const dungeon = activeDungeon;
     const currentRoom = dungeon.spatial.rooms[dungeon.currentRoomIndex];
     if (!currentRoom) return;
 
@@ -314,7 +327,8 @@ function DungeonNavigator() {
     const now = performance.now();
     if (now - lastTransitionRef.current < 500) return;
 
-    _playerPos.copy(state.playerPosition);
+    const { playerPosition } = getPlayer();
+    _playerPos.copy(playerPosition);
 
     // Check if the player is near any exit doorway of the current room
     const roomWorldX = currentRoom.worldX;
@@ -382,9 +396,9 @@ function DungeonNavigator() {
         else if (oppositeDir === 'east') targetYaw = -Math.PI / 2;
         else if (oppositeDir === 'west') targetYaw = Math.PI / 2;
 
-        state.setPlayerPosition(newPos);
-        state.setCameraYaw(targetYaw);
-        state.moveToRoom(targetIndex);
+        setPlayerPosition(newPos);
+        setCameraYaw(targetYaw);
+        moveToRoom(targetIndex);
         lastTransitionRef.current = now;
         return;
       }
@@ -404,7 +418,7 @@ function DungeonNavigator() {
         dzFromCenter < exitThreshold &&
         dxFromCenter < DOORWAY_WIDTH
       ) {
-        state.exitDungeon();
+        exitDungeon();
         lastTransitionRef.current = now;
         return;
       }
@@ -421,7 +435,7 @@ function DungeonNavigator() {
  * so the physics-based PlayerController works inside the dungeon.
  */
 function DungeonColliders() {
-  const activeDungeon = useGameStore((s) => s.activeDungeon);
+  const { activeDungeon } = useDungeonSession();
   if (!activeDungeon) return null;
 
   const currentRoom =
@@ -583,8 +597,8 @@ function EastWestDoorwayColliders({
 // ── Main DungeonRenderer ─────────────────────────────────────────────
 
 export function DungeonRenderer() {
-  const inDungeon = useGameStore((s) => s.inDungeon);
-  const activeDungeon = useGameStore((s) => s.activeDungeon);
+  const { inDungeon } = useFlags();
+  const { activeDungeon } = useDungeonSession();
   const { scene } = useThree();
 
   // Change scene background when entering/exiting dungeon

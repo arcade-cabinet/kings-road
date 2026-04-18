@@ -14,7 +14,7 @@ import { CombatParticles } from './CombatParticles';
 import { DungeonRenderer } from './DungeonRenderer';
 import { OceanPlane } from './OceanPlane';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { useGameStore } from '@/stores/gameStore';
+import { useFlags, useSeed } from '@/ecs/hooks/useGameSession';
 import { AudioSystem } from '@app/systems/AudioSystem';
 import { ChunkManager } from '@app/systems/ChunkManager';
 import { CombatFeedback } from '@app/systems/CombatFeedback';
@@ -65,9 +65,8 @@ function PostProcessing() {
 }
 
 function SceneContent() {
-  const gameActive = useGameStore((state) => state.gameActive);
-  const seedPhrase = useGameStore((state) => state.seedPhrase);
-  const inDungeon = useGameStore((state) => state.inDungeon);
+  const { gameActive, inDungeon } = useFlags();
+  const { seedPhrase } = useSeed();
 
   // Always render minimal scene structure to avoid R3F unmount issues
   // Just conditionally render the game content inside

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 128">
+  <defs>
+    <radialGradient id="cloud" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="white" stop-opacity="0.95" />
+      <stop offset="55%" stop-color="white" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="white" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <ellipse cx="72" cy="78" rx="58" ry="34" fill="url(#cloud)" />
+  <ellipse cx="126" cy="56" rx="62" ry="40" fill="url(#cloud)" />
+  <ellipse cx="186" cy="78" rx="56" ry="32" fill="url(#cloud)" />
+</svg>

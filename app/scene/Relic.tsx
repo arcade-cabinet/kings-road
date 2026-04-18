@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { useGameStore } from '@/stores/gameStore';
+import { collectGem, getPlayer } from '@/ecs/actions/game';
 import { PLAYER_RADIUS } from '@/utils/worldGen';
 
 // Reusable vector for collection animation
@@ -31,7 +31,6 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
   const [attractAnimation, setAttractAnimation] = useState(0);
   const _particlesRef = useRef<CollectParticle[]>([]);
 
-  const collectGem = useGameStore((state) => state.collectGem);
   const elapsedRef = useRef(0);
 
   // Safe position values
@@ -48,7 +47,7 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
     if (!meshRef.current) return;
     elapsedRef.current += delta;
 
-    const playerPosition = useGameStore.getState().playerPosition;
+    const playerPosition = getPlayer().playerPosition;
     const playerX = playerPosition?.x ?? 0;
     const playerZ = playerPosition?.z ?? 0;
 
