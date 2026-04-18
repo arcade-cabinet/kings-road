@@ -18,8 +18,8 @@
  * declaring a viewmodel GLB.
  */
 import { useGLTF } from '@react-three/drei';
-import { useThree } from '@react-three/fiber';
-import { useMemo } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { SkeletonUtils } from 'three-stdlib';
 import { useTrait } from 'koota/react';
@@ -28,6 +28,7 @@ import { useFlags } from '@/ecs/hooks/useGameSession';
 import { getSessionEntity } from '@/ecs/world';
 import { assetUrl } from '@/lib/assets';
 import { isContentStoreReady, getItem } from '@/db/content-queries';
+import { getPlayer } from '@/ecs/actions/game';
 import type { HandPose } from '@/schemas/item.schema';
 
 const DEFAULT_HAND_GLB = '/assets/hands/hand.glb';
@@ -123,18 +124,49 @@ export function FPSViewmodel() {
 
   if (!gameActive || !viewmodelConfig) return null;
 
-  // Parent the weapon + hand group to the camera so it stays pinned to
-  // the viewport in first-person. The camera itself is already in the
-  // R3F tree; attaching this `primitive` makes both ride along.
   return (
     <primitive object={camera}>
-      <WeaponMesh
-        glb={viewmodelConfig.glb}
-        pose={viewmodelConfig.handPose}
-      />
-      <HandMesh pose={viewmodelConfig.handPose} />
+      <BobbedViewmodel pose={viewmodelConfig.handPose}>
+        <WeaponMesh
+          glb={viewmodelConfig.glb}
+          pose={viewmodelConfig.handPose}
+        />
+        <HandMesh pose={viewmodelConfig.handPose} />
+      </BobbedViewmodel>
     </primitive>
   );
+}
+
+/**
+ * Applies a sine-wave weapon bob driven by the player's forward
+ * velocity. Zero velocity -> no bob (weapon sits at rest). The bob
+ * amplitude is tied to `velocity` so a sprinting player sees more sway
+ * than someone walking slowly. Wraps its children in a stable group ref
+ * so `useFrame` can mutate transform matrices without re-rendering.
+ */
+function BobbedViewmodel({
+  pose,
+  children,
+}: {
+  pose: HandPose;
+  children: React.ReactNode;
+}) {
+  void pose;
+  const bobRef = useRef<THREE.Group>(null);
+  const elapsed = useRef(0);
+
+  useFrame((_state, delta) => {
+    if (!bobRef.current) return;
+    const velocity = Math.abs(getPlayer().velocity ?? 0);
+    elapsed.current += delta;
+    const moving = Math.min(velocity / 4, 1); // clamp to [0,1]
+    const t = elapsed.current;
+    const bobY = Math.sin(t * 8) * 0.015 * moving;
+    const bobX = Math.cos(t * 4) * 0.01 * moving;
+    bobRef.current.position.set(bobX, bobY, 0);
+  });
+
+  return <group ref={bobRef}>{children}</group>;
 }
 
 useGLTF.preload(assetUrl(DEFAULT_HAND_GLB));
