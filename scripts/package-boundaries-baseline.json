@@ -1,0 +1,10 @@
+[
+  "LATERAL|src/ecs/actions/quest.ts|@/world/quest-resolver",
+  "LATERAL|src/ecs/actions/world.ts|@/world/feature-placement",
+  "LATERAL|src/ecs/actions/world.ts|@/world/kingdom-gen",
+  "LATERAL|src/ecs/traits/session-game.ts|@/world/dungeon-generator",
+  "LATERAL|src/ecs/traits/session-quest.ts|@/world/quest-resolver",
+  "LATERAL|src/ecs/traits/session-world.ts|@/world/feature-placement",
+  "LATERAL|src/world/item-loader.ts|@/ecs/item-registry",
+  "LATERAL|src/world/quest-resolver.test.ts|@/ecs/actions/quest"
+]
