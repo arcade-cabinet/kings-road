@@ -205,13 +205,13 @@ function transitionIntoDungeon(entrance: DungeonEntrance) {
   // Generate spatial layout from the dungeon definition
   const spatial = generateDungeonLayout(entrance.layout);
 
-  // Find the entrance room
+  // Find the entrance room — the authored dungeon must declare a valid
+  // entranceRoomId; missing one is a content bug, not a runtime state.
   const entranceRoom = spatial.roomById.get(entrance.layout.entranceRoomId);
   if (!entranceRoom) {
-    console.warn(
+    throw new Error(
       `[DungeonEntrySystem] Entrance room '${entrance.layout.entranceRoomId}' not found in dungeon '${entrance.layout.id}'`,
     );
-    return;
   }
 
   const entranceIndex = spatial.rooms.indexOf(entranceRoom);

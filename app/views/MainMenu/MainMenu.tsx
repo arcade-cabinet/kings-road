@@ -40,6 +40,8 @@ export function MainMenu() {
 
   const [recentSave, setRecentSave] = useState<SaveData | undefined>(undefined);
 
+  const [saveLoadError, setSaveLoadError] = useState<Error | null>(null);
+
   useEffect(() => {
     if (gameActive) return;
     let cancelled = false;
@@ -47,14 +49,20 @@ export function MainMenu() {
       .then((save) => {
         if (!cancelled) setRecentSave(save);
       })
-      .catch((err) => {
-        console.warn('[MainMenu] getMostRecentSave failed:', err);
-        if (!cancelled) setRecentSave(undefined);
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        // Propagate to render — the ErrorBoundary at the App root will
+        // catch it and surface the overlay. No silent fallback.
+        setSaveLoadError(
+          err instanceof Error ? err : new Error(String(err)),
+        );
       });
     return () => {
       cancelled = true;
     };
   }, [gameActive]);
+
+  if (saveLoadError) throw saveLoadError;
 
   const hasSaves = Boolean(recentSave);
 

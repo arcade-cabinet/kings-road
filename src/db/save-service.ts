@@ -198,11 +198,13 @@ export async function loadFromSlot(
   try {
     return JSON.parse(row.payload) as SaveData;
   } catch (err) {
-    console.error(
-      `[save-service] Failed to parse payload for slot ${slotId}:`,
-      err,
+    // Corrupt payload is a data-integrity bug — surface it so the user
+    // / developer sees it rather than silently returning "no save".
+    throw new Error(
+      `Save slot ${slotId} payload is corrupt and could not be parsed: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
     );
-    return undefined;
   }
 }
 
@@ -218,19 +220,24 @@ export async function listSaveSlots(): Promise<SaveSlotSummary[]> {
   );
   const summaries: SaveSlotSummary[] = [];
   for (const row of rows) {
+    let data: SaveData;
     try {
-      const data = JSON.parse(row.payload) as SaveData;
-      summaries.push({
-        slotId: row.slotId,
-        displayName: data.displayName,
-        seedPhrase: data.seedPhrase,
-        savedAt: data.savedAt,
-        playTimeSeconds: data.playTimeSeconds,
-        level: data.player.level,
-      });
-    } catch {
-      // Skip corrupt rows — they'll be overwritten on next save.
+      data = JSON.parse(row.payload) as SaveData;
+    } catch (err) {
+      throw new Error(
+        `Save slot ${row.slotId} payload is corrupt: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      );
     }
+    summaries.push({
+      slotId: row.slotId,
+      displayName: data.displayName,
+      seedPhrase: data.seedPhrase,
+      savedAt: data.savedAt,
+      playTimeSeconds: data.playTimeSeconds,
+      level: data.player.level,
+    });
   }
   return summaries;
 }
