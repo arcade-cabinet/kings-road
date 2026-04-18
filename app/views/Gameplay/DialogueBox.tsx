@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useGameStore } from '@/stores/gameStore';
-import { Portrait3D } from './Portrait3D';
+import { Portrait3D } from '@app/components/Portrait3D';
 
 // ---------------------------------------------------------------------------
 // Typewriter hook

@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-react';
 import { expect, test } from 'vitest';
-import { GameHUD } from '../GameHUD';
+import { GameHUD } from '@app/views/Gameplay/GameHUD';
 import { useGameStore } from '@/stores/gameStore';
 
 test('GameHUD renders with active game state', async () => {

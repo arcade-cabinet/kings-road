@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-react';
 import { expect, test } from 'vitest';
-import { InventoryScreen } from '../InventoryScreen';
+import { InventoryScreen } from '@app/views/Gameplay/InventoryScreen';
 import { useInventoryStore } from '@/stores/inventoryStore';
 
 test('InventoryScreen mounts when open', async () => {

@@ -1,9 +1,57 @@
 /*
- * Fonts: loaded via Google Fonts CDN for Metro compatibility.
- * Metro's CSS does not support local url() resource imports from node_modules.
- * CSS spec: @import must precede all rules except @charset and @layer.
+ * Fonts: self-hosted in public/assets/fonts/ so the game works offline and
+ * when packaged inside Capacitor native shells (where external CDN loads
+ * are unreliable and fail silently).
  */
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/lora-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/lora-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/lora-italic-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/lora-italic-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/crimsontext-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/assets/fonts/crimsontext-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/crimsontext-italic-400.woff2') format('woff2');
+}
 
 /* Game CSS */
 @import "tailwindcss";

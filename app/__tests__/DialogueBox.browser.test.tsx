@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-react';
 import { expect, test } from 'vitest';
-import { DialogueBox } from '../DialogueBox';
+import { DialogueBox } from '@app/views/Gameplay/DialogueBox';
 
 test('DialogueBox mounts', async () => {
   const screen = await render(<DialogueBox />);

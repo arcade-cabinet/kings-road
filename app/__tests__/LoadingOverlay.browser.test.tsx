@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-react';
 import { expect, test } from 'vitest';
-import { LoadingOverlay } from '../LoadingOverlay';
+import { LoadingOverlay } from '@app/views/Gameplay/LoadingOverlay';
 import { useGameStore } from '@/stores/gameStore';
 import { useWorldStore } from '@/stores/worldStore';
 

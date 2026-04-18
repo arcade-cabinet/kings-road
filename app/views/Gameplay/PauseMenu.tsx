@@ -15,7 +15,7 @@ import { useQuestStore } from '@/stores/questStore';
 import { useWorldStore } from '@/stores/worldStore';
 import { generateDungeonLayout } from '@/world/dungeon-generator';
 import { getDungeonById } from '@/world/dungeon-registry';
-import { SettingsPanel } from './SettingsPanel';
+import { SettingsPanel } from '@app/views/SettingsPanel';
 
 // ---------------------------------------------------------------------------
 // Constants
