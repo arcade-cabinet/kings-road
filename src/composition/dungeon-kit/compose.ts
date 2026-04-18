@@ -63,7 +63,7 @@ function placeWallLine(
     const piece = weightedPickKit(pieces, rng);
 
     placements.push({
-      assetId: piece.id,
+      assetId: piece.path.replace(/^\/assets\//, ''),
       position: { x: px, y: 0, z: pz },
       rotation: { x: 0, y: rotY, z: 0 },
       scale: 1,
@@ -89,7 +89,7 @@ export function composeDungeonRoom(
       const floorPieces = getKitPiecesByRole('floor', room.type);
       const piece = weightedPickKit(floorPieces, rng);
       placements.push({
-        assetId: piece.id,
+        assetId: piece.path.replace(/^\/assets\//, ''),
         position: { x, y: 0, z },
         rotation: { x: 0, y: 0, z: 0 },
         scale: 1,
@@ -105,7 +105,7 @@ export function composeDungeonRoom(
       const ceilPieces = getKitPiecesByRole('ceiling');
       const piece = weightedPickKit(ceilPieces, rng);
       placements.push({
-        assetId: piece.id,
+        assetId: piece.path.replace(/^\/assets\//, ''),
         position: { x, y: CEILING_HEIGHT, z },
         rotation: { x: Math.PI, y: 0, z: 0 },
         scale: 1,
@@ -125,7 +125,7 @@ export function composeDungeonRoom(
     const x = room.center.x + (rng() - 0.5) * (room.width - TILE);
     const z = room.center.z + (rng() - 0.5) * (room.depth - TILE);
     placements.push({
-      assetId: piece.id,
+      assetId: piece.path.replace(/^\/assets\//, ''),
       position: { x, y: 0, z },
       rotation: { x: 0, y: rng() * Math.PI * 2, z: 0 },
       scale: 0.8 + rng() * 0.4,

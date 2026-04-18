@@ -9,4 +9,4 @@ export interface VegetationPlacement {
 
 export type HeightSampler = (worldX: number, worldZ: number) => number;
 
-export const CHUNK_SIZE = 64;
+export { CHUNK_SIZE } from '@/utils/worldGen';

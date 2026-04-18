@@ -3,6 +3,12 @@ import type { StoryPropArchetype } from './types';
 export interface StoryPropDef {
   archetype: StoryPropArchetype;
   assetId: string;
+  /**
+   * GLB path relative to public/assets/ (e.g. "story-props/cairn.glb").
+   * Null until the prop is ingested — entries without a path are silently
+   * skipped by composeStoryProps so the catalog can be authored ahead of ingest.
+   */
+  glbPath: string | null;
   /** Narrative text snippets (one picked at random) */
   texts: string[];
   /**
@@ -18,6 +24,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
   {
     archetype: 'cairn-with-name',
     assetId: 'story-cairn',
+    glbPath: null,
     texts: [
       "A cairn of grey stones. One is scratched: 'Eliza, 1247.'",
       "Stones stacked carefully. A name is etched into the base: 'Thomas Wren.'",
@@ -30,6 +37,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
   {
     archetype: 'rusted-sword-in-stump',
     assetId: 'story-rusted-sword',
+    glbPath: null,
     texts: [
       'A rusted short sword driven to the hilt into a weathered tree stump.',
       'An iron blade, blade-down in rotting wood. The grip has crumbled away.',
@@ -41,6 +49,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
   {
     archetype: 'carved-initials-fence',
     assetId: 'story-carved-post',
+    glbPath: null,
     texts: [
       "A fence post with initials carved deep: 'A.M. + R.W.'",
       "Two sets of initials and a date: '1231'. The wood has grown around the cuts.",
@@ -52,6 +61,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
   {
     archetype: 'bouquet-by-grave',
     assetId: 'story-dried-bouquet',
+    glbPath: null,
     texts: [
       'A bundle of dried wildflowers, brittle now, laid against a stone.',
       'Dead flowers tied with a strip of cloth. Left recently, or years ago.',
@@ -63,6 +73,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
   {
     archetype: 'child-toy-on-doorstep',
     assetId: 'story-wooden-toy',
+    glbPath: null,
     texts: [
       'A small carved horse, crudely made, left on the threshold.',
       "A child's wooden doll, face worn smooth. Left in a hurry, perhaps.",
@@ -74,6 +85,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
   {
     archetype: 'tally-marks-on-wall',
     assetId: 'story-tally-wall',
+    glbPath: null,
     texts: [
       'Tally marks scratched into stone. Forty-seven. Then they stopped.',
       'Scratch marks in groups of five, then a long gap, then three more alone.',
@@ -85,6 +97,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
   {
     archetype: 'broken-plough',
     assetId: 'story-broken-plough',
+    glbPath: null,
     texts: [
       'A plough, iron share snapped clean, left where it fell in the field.',
       'Half a plough. The other half is somewhere in the tall grass.',
@@ -96,6 +109,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
   {
     archetype: 'discarded-bundle',
     assetId: 'story-bundle',
+    glbPath: null,
     texts: [
       'A cloth bundle, knotted shut, dropped beside the road. Untouched.',
       'Someone left their pack here. The strap is cut, not unbuckled.',

@@ -1,6 +1,5 @@
 import {
   CuboidCollider,
-  HeightfieldCollider,
   RigidBody,
 } from '@react-three/rapier';
 import { useMemo } from 'react';
@@ -14,7 +13,8 @@ import type { TownConfig } from '@/composition/ruins';
 import type { HeightSampler } from '@/composition/vegetation';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import type { ChunkData } from '@/types/game';
-import { getTerrainHeight, CHUNK_SIZE, BLOCK_SIZE } from '@/utils/worldGen';
+import { getTerrainHeight, CHUNK_SIZE, BLOCK_SIZE, MAX_TERRAIN_HEIGHT } from '@/utils/worldGen';
+import { cyrb128, mulberry32 } from '@/core';
 import { Building } from './Building';
 import { CompositionLayer } from './CompositionLayer';
 import { Feature } from './Feature';
@@ -22,6 +22,8 @@ import { NPC } from './NPC';
 import { Relic } from './Relic';
 import { RoadSurface } from './RoadSurface';
 import { TerrainChunk } from './terrain/TerrainChunk';
+
+const GEM_COUNT_PER_DUNGEON_CHUNK = 3;
 
 interface ChunkProps {
   chunkData: ChunkData;
@@ -40,34 +42,37 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
 
   const { kingdomMap } = useWorldSession();
 
-  // Resolve full BiomeConfig when biome id is present — needed by compositors.
   const biomeConfig = useMemo(() => {
     if (!chunkData.biome) return null;
     try {
       return BiomeService.getBiomeById(chunkData.biome);
-    } catch {
+    } catch (err) {
+      console.warn(`[Chunk ${key}] BiomeService.getBiomeById(${chunkData.biome}) failed:`, err);
       return null;
     }
-  }, [chunkData.biome]);
+  }, [chunkData.biome, key]);
 
-  // Height sampler for vegetation — threads terrain elevation into placement Y.
-  const heightSampler = useMemo<HeightSampler | undefined>(() => {
-    if (!kingdomMap) return undefined;
-    return (wx: number, wz: number) => getTerrainHeight(kingdomMap, wx, wz);
-  }, [kingdomMap]);
+  const heightSampler = useMemo<HeightSampler>(() => {
+    if (kingdomMap) return (wx: number, wz: number) => getTerrainHeight(kingdomMap, wx, wz);
+    // Fallback: approximate ground Y from tile elevation so vegetation doesn't float.
+    const fallbackY = chunkData.kingdomTile
+      ? chunkData.kingdomTile.elevation * MAX_TERRAIN_HEIGHT
+      : 0;
+    return () => fallbackY;
+  }, [kingdomMap, chunkData.kingdomTile]);
 
-  // Composition output — pure data, no Three.js.
   const placements = useMemo(() => {
     if (type === 'WILD' || type === 'ROAD') {
       const vegPlacements = biomeConfig
-        ? composeVegetation(biomeConfig, cx, cz, heightSampler ?? (() => 0), seedPhrase)
+        ? composeVegetation(biomeConfig, cx, cz, heightSampler, seedPhrase)
         : [];
 
-      // Story props along the road spine (road distance ≈ world Z).
-      const storyPlacements =
-        biomeConfig && (type === 'WILD' || type === 'ROAD')
-          ? composeStoryProps(biomeConfig.id, [oZ, oZ + CHUNK_SIZE], seedPhrase)
-          : [];
+      const storyPlacements = biomeConfig
+        ? composeStoryProps(biomeConfig.id, [oZ, oZ + CHUNK_SIZE], seedPhrase).map((p) => ({
+            ...p,
+            position: { ...p.position, x: p.position.x + oX },
+          }))
+        : [];
 
       return [...vegPlacements, ...storyPlacements];
     }
@@ -78,13 +83,10 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         center: { x: oX + CHUNK_SIZE / 2, y: 0, z: oZ + CHUNK_SIZE / 2 },
         radius: CHUNK_SIZE / 2,
       };
-      return biomeConfig
-        ? composeRuins(biomeConfig, townConfig, seedPhrase)
-        : [];
+      return biomeConfig ? composeRuins(biomeConfig, townConfig, seedPhrase) : [];
     }
 
     if (type === 'DUNGEON') {
-      // Synthesise a DungeonKitRoom spanning the full chunk interior.
       const room: DungeonKitRoom = {
         id: key,
         type: 'chamber',
@@ -97,30 +99,22 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     }
 
     return [];
-  }, [
-    type,
-    biomeConfig,
-    cx,
-    cz,
-    key,
-    oX,
-    oZ,
-    seedPhrase,
-    hasConfigTown,
-    heightSampler,
-  ]);
+  }, [type, biomeConfig, cx, cz, key, oX, oZ, seedPhrase, hasConfigTown, heightSampler]);
 
-  // Gem collectibles from chunk collidables — kept from original.
+  // Seeded deterministic gem positions — collectedGems is the collected set, not spawn list.
   const gems = useMemo(() => {
     if (type !== 'DUNGEON') return [];
-    return chunkData.collectedGems
-      ? Array.from(chunkData.collectedGems).map((id) => ({ id, x: oX + CHUNK_SIZE / 2, y: 1, z: oZ + CHUNK_SIZE / 2 }))
-      : [];
-  }, [type, chunkData.collectedGems, oX, oZ]);
+    const rng = mulberry32(cyrb128(`gems:${key}`));
+    return Array.from({ length: GEM_COUNT_PER_DUNGEON_CHUNK }, (_, i) => ({
+      id: `${key}-gem-${i}`,
+      index: i,
+      x: oX + CHUNK_SIZE * 0.2 + rng() * CHUNK_SIZE * 0.6,
+      y: 1,
+      z: oZ + CHUNK_SIZE * 0.2 + rng() * CHUNK_SIZE * 0.6,
+    }));
+  }, [type, key, oX, oZ]);
 
-  const isOcean =
-    chunkData.kingdomTile != null && !chunkData.kingdomTile.isLand;
-
+  const isOcean = chunkData.kingdomTile != null && !chunkData.kingdomTile.isLand;
   if (isOcean) return null;
 
   if (type === 'TOWN' && !hasConfigTown) {
@@ -132,19 +126,14 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   }
 
   const groundY = chunkData.kingdomTile
-    ? chunkData.kingdomTile.elevation * 20
+    ? chunkData.kingdomTile.elevation * MAX_TERRAIN_HEIGHT
     : 0;
 
   return (
     <group>
-      {/* Ground — TerrainChunk when biome config is available, flat plane otherwise */}
+      {/* Ground — TerrainChunk when biome config is available, flat collider otherwise */}
       {biomeConfig ? (
-        <TerrainChunk
-          biomeConfig={biomeConfig}
-          seed={seedPhrase}
-          cx={cx}
-          cz={cz}
-        />
+        <TerrainChunk biomeConfig={biomeConfig} seed={seedPhrase} cx={cx} cz={cz} />
       ) : (
         <RigidBody type="fixed" colliders={false}>
           <CuboidCollider
@@ -197,34 +186,36 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         <Feature key={feature.id} feature={feature} />
       ))}
 
-      {/* Collectible gems */}
+      {/* Collectible gems — seeded positions, collected flag from save state */}
       {gems.map((gem) => (
         <Relic
-          key={`${key}-gem-${gem.id}`}
+          key={gem.id}
           chunkKey={key}
-          gemId={gem.id}
+          gemId={gem.index}
           position={[gem.x, gem.y, gem.z]}
-          collected={chunkData.collectedGems?.has(gem.id) ?? false}
+          collected={chunkData.collectedGems?.has(gem.index) ?? false}
         />
       ))}
 
-      {/* Static obstacle colliders */}
-      <RigidBody type="fixed" colliders={false}>
-        {chunkData.collidables.map((aabb) => {
-          const w = (aabb.maxX - aabb.minX) / 2;
-          const d = (aabb.maxZ - aabb.minZ) / 2;
-          const h = BLOCK_SIZE;
-          const ccx = (aabb.minX + aabb.maxX) / 2;
-          const ccz = (aabb.minZ + aabb.maxZ) / 2;
-          return (
-            <CuboidCollider
-              key={`${ccx.toFixed(1)},${ccz.toFixed(1)}`}
-              args={[w, h, d]}
-              position={[ccx, h, ccz]}
-            />
-          );
-        })}
-      </RigidBody>
+      {/* Static obstacle colliders — skip for DUNGEON (kit compositor owns geometry) */}
+      {type !== 'DUNGEON' && (
+        <RigidBody type="fixed" colliders={false}>
+          {chunkData.collidables.map((aabb) => {
+            const w = (aabb.maxX - aabb.minX) / 2;
+            const d = (aabb.maxZ - aabb.minZ) / 2;
+            const h = BLOCK_SIZE;
+            const ccx = (aabb.minX + aabb.maxX) / 2;
+            const ccz = (aabb.minZ + aabb.maxZ) / 2;
+            return (
+              <CuboidCollider
+                key={`${ccx.toFixed(1)},${ccz.toFixed(1)}`}
+                args={[w, h, d]}
+                position={[ccx, h, ccz]}
+              />
+            );
+          })}
+        </RigidBody>
+      )}
     </group>
   );
 }

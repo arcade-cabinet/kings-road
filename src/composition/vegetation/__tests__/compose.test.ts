@@ -12,7 +12,7 @@ const HILLY_SAMPLER: HeightSampler = (x, z) =>
 
 const VALID_ASSET_IDS = new Set(
   Object.values(FOLIAGE_CATALOG).flatMap((variants) =>
-    variants.map((v) => v.id),
+    variants.map((v) => v.path.replace(/^\/assets\//, '')),
   ),
 );
 

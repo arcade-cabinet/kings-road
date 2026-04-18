@@ -47,16 +47,16 @@ function toBuckets(placements: AnyPlacement[]): Bucket[] {
     }
 
     const rotY =
-      typeof p.rotation === 'number' ? p.rotation : (p.rotation as { y: number }).y;
+      typeof p.rotation === 'number' ? p.rotation : ((p.rotation as { y?: number })?.y ?? 0);
 
     bucket.items.push({
       x: p.position.x,
       y: p.position.y,
       z: p.position.z,
       rotY,
-      sx: p.scale,
-      sy: p.scale,
-      sz: p.scale,
+      sx: p.scale ?? 1,
+      sy: p.scale ?? 1,
+      sz: p.scale ?? 1,
     });
   }
 
