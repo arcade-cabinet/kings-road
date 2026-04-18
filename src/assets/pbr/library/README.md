@@ -11,20 +11,34 @@ name must match the value registered in `palette.ts` for that tactile ID.
 
 ## On-disk layout
 
+The entire AmbientCG-style source pack is copied verbatim preserving all
+original filenames. A typical pack contains:
+
 ```
-<material-dir>/
-  color.jpg          # Albedo/diffuse (sRGB)
-  normal.jpg         # Normal map (linear, OpenGL convention)
-  roughness.jpg      # Roughness (linear, greyscale)
-  displacement.jpg   # Height/displacement (linear, greyscale) — optional
-  ao.jpg             # Ambient occlusion (linear, greyscale) — optional
+public/assets/pbr/<tactile-id>/
+  <PackPrefix>_Color.jpg           # Albedo/diffuse (sRGB) — loader binds this
+  <PackPrefix>_NormalGL.jpg        # Normal, OpenGL convention — loader binds this
+  <PackPrefix>_NormalDX.jpg        # Normal, DirectX convention — gitignored (WebGL uses GL)
+  <PackPrefix>_Roughness.jpg       # Roughness (linear) — loader binds this
+  <PackPrefix>_Displacement.jpg    # Height/parallax (linear) — loader binds when present
+  <PackPrefix>_AmbientOcclusion.jpg # AO (linear) — loader binds when present
+  <PackPrefix>_Metalness.jpg       # Metalness (metals only) — loader binds when present
+  <PackPrefix>.blend               # Blender companion — gitignored
+  <PackPrefix>.mtlx / .tres / .usdc # USD/Godot companions — gitignored
+  <PackPrefix>.png                 # Preview — gitignored
 ```
+
+`<PackPrefix>` is registered in `palette.ts` as the `packPrefix` field for
+each tactile ID. The loader constructs filenames as `<packPrefix><suffix>`.
+
+Gitignored: `_NormalDX.jpg` (duplicate, WebGL uses GL convention), `.blend`,
+`.mtlx`, `.tres`, `.usdc`, `.png`. All six runtime JPGs commit.
 
 ## Sourcing
 
-Materials are ingested by `scripts/ingest-pbr.ts` which copies from
-`/Volumes/home/assets/2DPhotorealistic/MATERIAL/1K-JPG/<PackName>/` to
-`public/assets/pbr/<material-dir>/` with canonical filenames above.
+Materials are ingested by `scripts/ingest-pbr.ts` which copies entire pack
+directories from `/Volumes/home/assets/2DPhotorealistic/MATERIAL/1K-JPG/<PackName>/`
+to `public/assets/pbr/<tactile-id>/`.
 
-The ingestion script is invoked by the content curator (team-lead) with a
-curated list of (tactile-id, source-pack-path) pairs.
+The content curator (team-lead) provides the manifest (`id` + `sourceDir` pairs)
+and invokes the script. See `docs/benchmarks/phase-0-curation/thornfield-pbr-picks.md`.

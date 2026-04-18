@@ -17,7 +17,11 @@ vi.mock('three', async (importOriginal) => {
       _onProgress: unknown,
       onError: (e: unknown) => void,
     ) {
-      if (url.includes('ao.jpg') || url.includes('displacement.jpg')) {
+      if (
+        url.includes('_AmbientOcclusion') ||
+        url.includes('_Displacement') ||
+        url.includes('_Metalness')
+      ) {
         onError(new Error('optional map missing'));
       } else {
         onLoad(new actual.Texture());
@@ -28,8 +32,8 @@ vi.mock('three', async (importOriginal) => {
   return { ...actual, TextureLoader: MockTextureLoader };
 });
 
-// Register fixture materials before importing loader (palette is a plain object)
-PBR_PALETTE['test-stone'] = 'test-stone';
+// Register fixture material with AmbientCG packPrefix convention
+PBR_PALETTE['test-stone'] = { packPrefix: 'TestStone001' };
 
 // Import loader after mocks and palette mutations are in place
 const { loadPbrMaterial } = await import('./loader');

@@ -24,14 +24,14 @@ function loadTexture(
   });
 }
 
-function pbrUrl(dir: string, filename: string): string {
-  return assetUrl(`/assets/pbr/${dir}/${filename}`);
+function pbrUrl(id: string, packPrefix: string, suffix: string): string {
+  return assetUrl(`/assets/pbr/${id}/${packPrefix}${suffix}`);
 }
 
 /**
  * Load a PBR material by tactile ID. Returns a configured MeshStandardMaterial
- * with Color + Normal + Roughness maps bound, and Displacement + AO when present.
- * Throws AssetError if the id is not in the palette.
+ * with Color + NormalGL + Roughness maps bound, and Displacement + AO + Metalness
+ * when present on disk. Throws AssetError if the id is not in the palette.
  * Caches by id — repeat calls return the same instance.
  */
 export async function loadPbrMaterial(
@@ -40,15 +40,17 @@ export async function loadPbrMaterial(
   const cached = cache.get(id);
   if (cached) return cached;
 
-  const dir = PBR_PALETTE[id];
-  if (!dir) {
+  const entry = PBR_PALETTE[id];
+  if (!entry) {
     throw new AssetError(`PBR material "${id}" not found in palette`);
   }
 
+  const { packPrefix } = entry;
+
   const [colorMap, normalMap, roughnessMap] = await Promise.all([
-    loadTexture(pbrUrl(dir, 'color.jpg'), THREE.SRGBColorSpace),
-    loadTexture(pbrUrl(dir, 'normal.jpg')),
-    loadTexture(pbrUrl(dir, 'roughness.jpg')),
+    loadTexture(pbrUrl(id, packPrefix, '_Color.jpg'), THREE.SRGBColorSpace),
+    loadTexture(pbrUrl(id, packPrefix, '_NormalGL.jpg')),
+    loadTexture(pbrUrl(id, packPrefix, '_Roughness.jpg')),
   ]);
 
   for (const map of [colorMap, normalMap, roughnessMap]) {
@@ -62,16 +64,15 @@ export async function loadPbrMaterial(
     roughnessMap,
   });
 
-  // Optional maps — load and attach if they exist
   const optionalLoads: Promise<void>[] = [];
 
   optionalLoads.push(
-    loadTexture(pbrUrl(dir, 'displacement.jpg'))
+    loadTexture(pbrUrl(id, packPrefix, '_Displacement.jpg'))
       .then((tex) => {
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
         mat.displacementMap = tex;
-        mat.displacementScale = 0.05;
+        mat.displacementScale = 0.0;
       })
       .catch(() => {
         /* displacement is optional */
@@ -79,7 +80,7 @@ export async function loadPbrMaterial(
   );
 
   optionalLoads.push(
-    loadTexture(pbrUrl(dir, 'ao.jpg'))
+    loadTexture(pbrUrl(id, packPrefix, '_AmbientOcclusion.jpg'))
       .then((tex) => {
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
@@ -87,6 +88,19 @@ export async function loadPbrMaterial(
       })
       .catch(() => {
         /* AO is optional */
+      }),
+  );
+
+  optionalLoads.push(
+    loadTexture(pbrUrl(id, packPrefix, '_Metalness.jpg'))
+      .then((tex) => {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        mat.metalnessMap = tex;
+        mat.metalness = 1.0;
+      })
+      .catch(() => {
+        /* Metalness is optional — non-metals won't have this map */
       }),
   );
 
