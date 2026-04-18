@@ -4,7 +4,7 @@ import { GameScene } from './scene/GameScene';
 import { CombatHUD } from './views/Gameplay/CombatHUD';
 import { DeathOverlay } from './views/DeathOverlay';
 import { DialogueBox } from './views/Gameplay/DialogueBox';
-import { GameHUD } from './views/Gameplay/GameHUD';
+import { GameplayFrame } from './views/Gameplay/GameplayFrame';
 import { InventoryScreen } from './views/Gameplay/InventoryScreen';
 import { LoadingOverlay } from './views/Gameplay/LoadingOverlay';
 import { MainMenu } from './views/MainMenu/MainMenu';
@@ -86,16 +86,32 @@ export function Game() {
         <GameScene />
       </GameErrorBoundary>
 
-      {/* UI Layers */}
+      {/* UI Layers — ordered by z-stack (front-most last) */}
       <MainMenu />
       <LoadingOverlay />
-      <GameHUD />
-      <CombatHUD />
-      <DeathOverlay />
+
+      {/*
+        Diegetic gameplay HUD: minimal top band (region fade-in + pause quill),
+        no persistent health/stamina bars, no minimap, no keyboard prompts.
+        Surface-specific overlays (combat, dialogue, quest log, inventory)
+        render inside the frame so they share safe-area padding.
+      */}
+      <GameplayFrame>
+        {/* Combat only renders when in combat; keeps wound decals diegetic */}
+        <CombatHUD />
+        {/* Dialogue — HTML fallback until the in-Canvas billboard lands */}
+        <DialogueBox />
+        {/* Inventory panel — triggered by belt tap */}
+        <InventoryScreen />
+        {/* Quest journal — triggered by journal tap */}
+        <QuestLog />
+      </GameplayFrame>
+
+      {/* Top-level overlays outside GameplayFrame (take full screen) */}
       <PauseMenu />
-      <DialogueBox />
-      <QuestLog />
-      <InventoryScreen />
+      <DeathOverlay />
+
+      {/* Invisible gesture zone — mobile touch input */}
       <TouchOverlay />
     </div>
   );
