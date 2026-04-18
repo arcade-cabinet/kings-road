@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RUIN_ASSETS, getAssetsByCategory, weightedPick } from '../assets';
+import { getAssetsByCategory, RUIN_ASSETS, weightedPick } from '../assets';
 import { composeRuins } from '../compose';
 import type { TownConfig } from '../types';
 
@@ -96,14 +96,24 @@ describe('weightedPick', () => {
   it('returns a valid asset id from a non-empty array', () => {
     const ids = getAssetsByCategory('graves');
     expect(ids.length).toBeGreaterThan(0);
-    const rng = (() => { let i = 0; const vals = [0.1, 0.5, 0.9]; return () => vals[i++ % vals.length]; })();
+    const rng = (() => {
+      let i = 0;
+      const vals = [0.1, 0.5, 0.9];
+      return () => vals[i++ % vals.length];
+    })();
     const result = weightedPick(ids, rng);
     expect(typeof result).toBe('string');
     expect(RUIN_ASSETS).toHaveProperty(result);
   });
 
   it('all five categories have at least one asset', () => {
-    for (const cat of ['walls', 'graves', 'scatter', 'structure', 'flora'] as const) {
+    for (const cat of [
+      'walls',
+      'graves',
+      'scatter',
+      'structure',
+      'flora',
+    ] as const) {
       expect(getAssetsByCategory(cat).length).toBeGreaterThan(0);
     }
   });
