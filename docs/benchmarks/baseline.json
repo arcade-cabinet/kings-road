@@ -1,0 +1,17 @@
+{
+  "_note": "Populate this after first clean benchmark run. Copy the downloaded benchmark-*.json summary here, keyed by route id.",
+  "_example": {
+    "walk-village-perimeter": {
+      "avgFps": 60,
+      "p1Fps": 45,
+      "p5Fps": 52,
+      "p50Fps": 60,
+      "peakFrameTime": 22,
+      "avgFrameTime": 16.7,
+      "totalFrames": 3600,
+      "avgDrawCalls": 120,
+      "avgTriangles": 85000,
+      "peakHeapMb": 210
+    }
+  }
+}
