@@ -9,8 +9,8 @@ export const gameWorld = createWorld();
  * Phase 0 of the Zustand → Koota migration (see
  * `docs/plans/2026-04-18-koota-migration.md`). Phases 1-5 attach traits
  * to this entity. Module-scope spawning would allocate an entity at import
- * time even in tests that never touch it; a lazy accessor keeps world.ts
- * side-effect-free.
+ * import time even in tests that never touch it; a lazy accessor avoids
+ * spawning that entity until it is first needed.
  */
 let sessionEntity: Entity | null = null;
 
