@@ -72,20 +72,15 @@ export function applyDebugSpawn(): boolean {
 
   startGame(devSeed, pos, 0);
 
-  syncInventory(
-    STARTER_ITEMS,
-    20,
-    0,
-    {
-      head: null,
-      chest: null,
-      legs: null,
-      feet: null,
-      weapon: 'iron_sword',
-      shield: null,
-      accessory: null,
-    },
-  );
+  syncInventory(STARTER_ITEMS, 20, 0, {
+    head: null,
+    chest: null,
+    legs: null,
+    feet: null,
+    weapon: 'iron_sword',
+    shield: null,
+    accessory: null,
+  });
 
   return true;
 }
