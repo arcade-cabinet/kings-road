@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useCombatStore } from '@/stores/combatStore';
+import { getCombatUI } from '@/ecs/actions/combat-ui';
 import { useGameStore } from '@/stores/gameStore';
 
 const PARTICLE_COUNT = 32;
@@ -39,8 +39,7 @@ export function CombatParticles() {
   const dirVec = useMemo(() => new THREE.Vector3(), []);
 
   useFrame((_state, _delta) => {
-    const { lastDamageTime, lastHitTime, damagePopups } =
-      useCombatStore.getState();
+    const { lastDamageTime, lastHitTime, damagePopups } = getCombatUI();
     const playerPos = useGameStore.getState().playerPosition;
     const now = performance.now();
 

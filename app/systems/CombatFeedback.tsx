@@ -1,7 +1,7 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
 import * as THREE from 'three';
-import { useCombatStore } from '@/stores/combatStore';
+import { getCombatUI } from '@/ecs/actions/combat-ui';
 
 /**
  * CombatFeedback System — handles screen shake and visceral effects.
@@ -19,7 +19,7 @@ export function CombatFeedback() {
   // and we are just adding a transient offset.
 
   useFrame((_state, delta) => {
-    const { lastDamageTime, lastHitTime } = useCombatStore.getState();
+    const { lastDamageTime, lastHitTime } = getCombatUI();
     const _now = performance.now();
 
     // ── Screen Shake Logic ───────────────────────────────────────────

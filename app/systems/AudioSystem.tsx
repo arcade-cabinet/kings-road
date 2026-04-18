@@ -6,7 +6,7 @@ import type { AudioZone } from '@/audio/ambient-mixer';
 import { computeAmbientMix } from '@/audio/ambient-mixer';
 import type { AudioLayer } from '@/audio/layer-factory';
 import { createAllLayers } from '@/audio/layer-factory';
-import { useCombatStore } from '@/stores/combatStore';
+import { getCombatUI } from '@/ecs/actions/combat-ui';
 import { useGameStore } from '@/stores/gameStore';
 import { useWorldStore, worldToGrid } from '@/stores/worldStore';
 import { CHUNK_SIZE } from '@/utils/worldCoords';
@@ -148,7 +148,7 @@ export function AudioSystem() {
     if (!initialized || layersRef.current.length === 0) return;
 
     const { playerPosition, timeOfDay } = useGameStore.getState();
-    const { lastHitTime, lastDamageTime } = useCombatStore.getState();
+    const { lastHitTime, lastDamageTime } = getCombatUI();
 
     // ── Combat SFX ──────────────────────────────────────────────────
 

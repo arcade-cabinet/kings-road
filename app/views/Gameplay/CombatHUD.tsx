@@ -6,14 +6,32 @@
  * Reads from combatStore for all transient combat UI state.
  */
 
+import { useTrait } from 'koota/react';
 import { useEffect, useState } from 'react';
+import { getCombatMonsters } from '@/combat-resolver';
+import { setRecentDamageTaken } from '@/ecs/actions/combat-ui';
 import {
+  CombatUI,
   type DamagePopup,
   POPUP_LIFETIME_MS,
-  useCombatStore,
-} from '@/stores/combatStore';
+} from '@/ecs/traits/session-combat';
+import { getSessionEntity } from '@/ecs/world';
 import { useGameStore } from '@/stores/gameStore';
-import { getCombatMonsters } from '@/combat-resolver';
+
+function useCombatUI() {
+  return (
+    useTrait(getSessionEntity(), CombatUI) ?? {
+      phase: 'idle' as const,
+      damagePopups: [] as DamagePopup[],
+      recentDamageTaken: 0,
+      lastDamageTime: 0,
+      lastHitTime: 0,
+      summary: null,
+      attackCooldown: 0,
+      playerAttackDamage: 8,
+    }
+  );
+}
 
 // ── Design tokens (matching GameHUD pastoral theme) ─────────────────
 
@@ -118,7 +136,7 @@ function MonsterHPBars() {
 // ── Combat action prompt ────────────────────────────────────────────
 
 function CombatPrompt() {
-  const attackCooldown = useCombatStore((s) => s.attackCooldown);
+  const attackCooldown = useCombatUI().attackCooldown;
   const ready = attackCooldown <= 0;
 
   return (
@@ -155,7 +173,7 @@ function CombatPrompt() {
 // ── Camera shake via CSS transform ──────────────────────────────────
 
 function useScreenShake() {
-  const recentDamage = useCombatStore((s) => s.recentDamageTaken);
+  const recentDamage = useCombatUI().recentDamageTaken;
   const [shake, setShake] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -168,7 +186,7 @@ function useScreenShake() {
     const animate = () => {
       if (frame >= maxFrames) {
         setShake({ x: 0, y: 0 });
-        useCombatStore.getState().setRecentDamageTaken(0);
+        setRecentDamageTaken(0);
         return;
       }
       const decay = 1 - frame / maxFrames;
@@ -189,7 +207,7 @@ function useScreenShake() {
 // ── Loot summary ────────────────────────────────────────────────────
 
 function LootSummary() {
-  const summary = useCombatStore((s) => s.summary);
+  const summary = useCombatUI().summary;
   if (!summary) return null;
 
   return (
@@ -245,9 +263,10 @@ function LootSummary() {
 
 export function CombatHUD() {
   const inCombat = useGameStore((s) => s.inCombat);
-  const phase = useCombatStore((s) => s.phase);
-  const popups = useCombatStore((s) => s.damagePopups);
-  const lastDamageTime = useCombatStore((s) => s.lastDamageTime);
+  const combat = useCombatUI();
+  const phase = combat.phase;
+  const popups = combat.damagePopups;
+  const lastDamageTime = combat.lastDamageTime;
   const shake = useScreenShake();
 
   const [damageFlash, setDamageFlash] = useState(0);

@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useCombatStore } from '@/stores/combatStore';
+import { resetCombatUI } from '@/ecs/actions/combat-ui';
 import { useGameStore } from '@/stores/gameStore';
 
 export function DeathOverlay() {
   const isDead = useGameStore((s) => s.isDead);
   const respawn = useGameStore((s) => s.respawn);
-  const resetCombatUI = useCombatStore((s) => s.resetCombatUI);
   const [fadeIn, setFadeIn] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
 
@@ -23,7 +22,7 @@ export function DeathOverlay() {
   const handleRespawn = useCallback(() => {
     resetCombatUI();
     respawn();
-  }, [respawn, resetCombatUI]);
+  }, [respawn]);
 
   // Also allow pressing E or Enter to respawn
   useEffect(() => {
