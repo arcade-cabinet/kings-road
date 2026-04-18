@@ -1,6 +1,6 @@
-import type { BenchmarkSummary } from '../src/benchmark/capture';
 import { expect, test } from '@playwright/test';
 import baseline from '../docs/benchmarks/baseline.json';
+import type { BenchmarkSummary } from '../src/benchmark/capture';
 
 type SlimSummary = Omit<BenchmarkSummary, 'frames'>;
 

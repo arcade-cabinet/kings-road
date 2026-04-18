@@ -6,7 +6,8 @@ function fmt(n: number, decimals = 1): string {
 
 function verdictBand(avgFps: number, p1Fps: number): string {
   if (avgFps >= 60 && p1Fps >= 45) return 'Stay R3F — full speed ahead';
-  if (avgFps >= 45 && p1Fps >= 30) return 'Stay R3F — budget carefully per-biome';
+  if (avgFps >= 45 && p1Fps >= 30)
+    return 'Stay R3F — budget carefully per-biome';
   if (avgFps >= 30) return 'Marginal — port to Godot likely';
   return 'Port to Godot — bet the farm';
 }

@@ -4,7 +4,7 @@ import { setJoystick, setKey } from '@/ecs/actions/game';
 import { BenchmarkCapture } from './capture';
 import { exportBenchmarkJson } from './export';
 import { buildMarkdownReport } from './report';
-import { getRoute, getFrameAtTime, type BenchmarkRoute } from './routes';
+import { type BenchmarkRoute, getFrameAtTime, getRoute } from './routes';
 
 /** Parse ?bench=<route-id> from the current URL. Returns null when absent. */
 export function parseBenchParam(): string | null {
