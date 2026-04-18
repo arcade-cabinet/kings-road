@@ -19,9 +19,30 @@ config/game-content.json
 public/game.db
 public/game-content.json
 
-# Expo / React Native
+# Capacitor: track project shell but ignore build artifacts
+android/app/build/
+android/.gradle/
+android/local.properties
+android/app/release/
+android/app/.cxx/
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+ios/App/App/public/
+android/app/src/main/assets/public/
+
+# legacy Expo artifacts (for cleanup on stale checkouts)
 .expo/
-ios/
-android/
 expo-env.d.ts
 kings-road/
+
+pending-integration/*.zip
+pending-integration/*.ZIP
+
+# .remember/ is Claude's persistent memory — intentionally tracked
+.remember/logs/
+.remember/tmp/
+
+# Claude Code task-batch state and compaction hook
+.claude/state/
+.claude/hooks/task-batch-flush.sh

@@ -1,0 +1,40 @@
+name: Automerge
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch metadata
+        id: meta
+        uses: dependabot/fetch-metadata@ffa630c65fa7e0ecfa0625b5ceda64399aea1b36 # v3.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Approve and enable auto-merge
+        if: steps.meta.outputs.update-type == 'version-update:semver-patch' || steps.meta.outputs.update-type == 'version-update:semver-minor'
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr review "$PR_URL" --approve
+          gh pr merge "$PR_URL" --auto --squash
+
+  release-please:
+    if: github.actor == 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve and enable auto-merge on release-please PR
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr review "$PR_URL" --approve
+          gh pr merge "$PR_URL" --auto --squash

@@ -11,6 +11,17 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/task-batch-flush.sh"
+          }
+        ]
+      }
     ]
   }
 }

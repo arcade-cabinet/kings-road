@@ -1,7 +1,13 @@
+---
+title: Hybrid Procedural CC0 Rendering
+updated: 2026-04-09
+status: current
+domain: technical
+---
+
 # Hybrid Procedural CC0 Rendering (React Three Fiber)
 
-**Date:** March 10, 2026  
-**Context:** This technique was developed during the `kings-road` project to bridge the gap between infinite procedural generation and high-fidelity handcrafted CC0 assets (like the 3DPSX mega packs).
+**Context:** This technique bridges the gap between infinite procedural generation and high-fidelity handcrafted CC0 assets (like the 3DPSX mega packs).
 
 ## The Problem
 Procedural generation often relies on primitive shapes (boxes, spheres) because they are mathematically easy to generate and position. However, this results in a "Lego-block" aesthetic. Conversely, handcrafted models are beautiful but static.

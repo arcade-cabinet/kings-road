@@ -1,44 +1,47 @@
+import path from 'node:path';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
-  define: {
-    __DEV__: true,
-  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@app': path.resolve(__dirname, './app'),
     },
   },
   test: {
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./src/__tests__/setup.ts'],
-    include: ['src/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules', 'e2e'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}', 'app/**/*.{test,spec}.{ts,tsx}'],
+    exclude: [
+      'node_modules',
+      'e2e',
+      '**/*.ct.{ts,tsx}',
+      '**/*.story.{ts,tsx}',
+      '**/*.browser.test.{ts,tsx}',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary', 'json', 'html'],
       reportsDirectory: './coverage',
       include: [
-        'src/game/stores/**/*.{ts,tsx}',
-        'src/game/utils/**/*.{ts,tsx}',
-        'src/game/hooks/**/*.{ts,tsx}',
-        'src/game/types.ts',
+        'src/stores/**/*.{ts,tsx}',
+        'src/utils/**/*.{ts,tsx}',
+        'src/hooks/**/*.{ts,tsx}',
+        'src/types/**/*.ts',
         'src/lib/**/*.{ts,tsx}',
+        'src/world/**/*.ts',
+        'src/factories/**/*.ts',
       ],
       exclude: [
         'src/**/*.test.{ts,tsx}',
         'src/**/*.spec.{ts,tsx}',
         'src/__tests__/**',
-        'src/types/**',
+        'src/types/global.d.ts',
         'src/vite-env.d.ts',
-        // Exclude React Three Fiber components (complex WebGL testing)
-        'src/game/components/**',
-        'src/game/systems/**',
-        'src/game/Game.tsx',
+        'app/**',
       ],
       thresholds: {
         global: {

@@ -1,3 +1,10 @@
+---
+title: Design
+updated: 2026-04-09
+status: current
+domain: product
+---
+
 # Design
 
 This document covers the visual design, UX decisions, and aesthetic direction of King's Road.

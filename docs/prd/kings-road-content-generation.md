@@ -1,8 +1,14 @@
+---
+title: Content Generation PRD
+updated: 2026-04-09
+status: current
+domain: product
+---
+
 # King's Road Content Generation PRD
 
 > **Target:** Ralph-TUI overnight content generation
 > **Version:** 1.0.0
-> **Date:** 2026-03-09
 
 ## Overview
 

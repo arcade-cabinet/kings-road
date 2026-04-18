@@ -11,8 +11,8 @@
  */
 
 import type * as THREE from 'three';
-import type { EquippedItems, ItemStack } from '../ecs/traits/inventory';
-import type { ActiveQuest } from '../game/stores/questStore';
+import type { EquippedItems, ItemStack } from '@/ecs/traits/inventory';
+import type { ActiveQuest } from '@/stores/questStore';
 
 // ── Serializable types ────────────────────────────────────────────────
 

@@ -8,7 +8,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { initContentStore } from '../db/content-queries';
+import { initContentStore } from '@/db/content-queries';
 
 const ROOT = path.resolve(__dirname, '../..');
 const CONTENT = path.join(ROOT, 'content');
