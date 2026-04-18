@@ -20,6 +20,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 interface ManifestEntry {
   id: string;
@@ -30,47 +31,13 @@ function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
   const outDir = path.join(outputRoot, entry.id);
 
   try {
-    fs.mkdirSync(outDir, { recursive: true });
-  } catch (err) {
-    console.error(`  ERROR: could not create output dir ${outDir}: ${err}`);
-    process.exit(1);
-  }
-
-  let sourceFiles: string[];
-  try {
-    sourceFiles = fs.readdirSync(entry.sourceDir);
+    fs.cpSync(entry.sourceDir, outDir, { recursive: true });
   } catch (err) {
     console.error(
-      `  ERROR: cannot read source dir "${entry.sourceDir}": ${err}`,
+      `  ERROR: cannot copy "${entry.sourceDir}" → ${outDir}: ${err}`,
     );
     console.error('  Is the NAS mounted? Check: mount | grep /Volumes/home');
     process.exit(1);
-  }
-
-  let copied = 0;
-  for (const file of sourceFiles) {
-    const src = path.join(entry.sourceDir, file);
-    let isFile: boolean;
-    try {
-      isFile = fs.statSync(src).isFile();
-    } catch (err) {
-      console.warn(`  WARNING: could not stat ${src}, skipping: ${err}`);
-      continue;
-    }
-    if (!isFile) continue;
-
-    try {
-      fs.copyFileSync(src, path.join(outDir, file));
-      console.log(`  ${entry.id}/${file}`);
-      copied++;
-    } catch (err) {
-      console.error(`  ERROR: failed to copy ${src}: ${err}`);
-      process.exit(1);
-    }
-  }
-
-  if (copied === 0) {
-    console.warn(`  WARNING: no files found in ${entry.sourceDir}`);
   }
 }
 
@@ -101,6 +68,6 @@ function main() {
 }
 
 // Only run when executed directly (not imported by tests)
-if (process.argv[1] === new URL(import.meta.url).pathname) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main();
 }
