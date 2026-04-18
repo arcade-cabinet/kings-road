@@ -2,15 +2,31 @@
  * SettingsPanel — tabbed settings UI with Audio, Display, and Controls.
  *
  * Styled as a medieval parchment panel consistent with the PauseMenu.
- * All changes are persisted to localStorage via settingsStore.
+ * State is read from the Koota SettingsConfig trait; writes go through
+ * the action functions in `@/ecs/actions/settings`, which persist to
+ * Capacitor Preferences (localStorage on web, native stores on mobile).
  */
 
+import { useTrait } from 'koota/react';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
 import {
+  resetSettingsDefaults,
+  setAudioSetting,
+  setDisplaySetting,
+} from '@/ecs/actions/settings';
+import {
+  DEFAULT_AUDIO,
+  DEFAULT_DISPLAY,
   type RenderQuality,
-  useSettingsStore,
-} from '@/stores/settingsStore';
+  SettingsConfig,
+} from '@/ecs/traits/session-settings';
+import { getSessionEntity } from '@/ecs/world';
+import { cn } from '@/lib/utils';
+
+function useSettings() {
+  const settings = useTrait(getSessionEntity(), SettingsConfig);
+  return settings ?? { audio: DEFAULT_AUDIO, display: DEFAULT_DISPLAY };
+}
 
 // ── Shared UI primitives ─────────────────────────────────────────────────
 
@@ -65,8 +81,6 @@ function PanelButton({
   );
 }
 
-// ── Slider control ───────────────────────────────────────────────────────
-
 function Slider({
   label,
   value,
@@ -116,8 +130,6 @@ function Slider({
   );
 }
 
-// ── Toggle control ───────────────────────────────────────────────────────
-
 function Toggle({
   label,
   value,
@@ -150,8 +162,6 @@ function Toggle({
     </div>
   );
 }
-
-// ── Select control ───────────────────────────────────────────────────────
 
 function Select<T extends string>({
   label,
@@ -190,8 +200,6 @@ function Select<T extends string>({
   );
 }
 
-// ── Section divider ──────────────────────────────────────────────────────
-
 function SectionHeader({ title }: { title: string }) {
   return (
     <div className="mt-3 first:mt-0 mb-1.5">
@@ -210,8 +218,6 @@ function SectionHeader({ title }: { title: string }) {
     </div>
   );
 }
-
-// ── Tab bar ──────────────────────────────────────────────────────────────
 
 type SettingsTab = 'audio' | 'display' | 'controls';
 
@@ -249,44 +255,40 @@ function TabBar({
   );
 }
 
-// ── Tab content ──────────────────────────────────────────────────────────
-
 function AudioTab() {
-  const audio = useSettingsStore((s) => s.audio);
-  const set = useSettingsStore((s) => s.setAudioSetting);
+  const { audio } = useSettings();
 
   return (
     <div className="flex flex-col gap-0.5">
       <Slider
         label="Master Volume"
         value={audio.masterVolume}
-        onChange={(v) => set('masterVolume', v)}
+        onChange={(v) => setAudioSetting('masterVolume', v)}
       />
       <Slider
         label="Music"
         value={audio.musicVolume}
-        onChange={(v) => set('musicVolume', v)}
+        onChange={(v) => setAudioSetting('musicVolume', v)}
       />
       <Slider
         label="Sound Effects"
         value={audio.sfxVolume}
-        onChange={(v) => set('sfxVolume', v)}
+        onChange={(v) => setAudioSetting('sfxVolume', v)}
       />
       <Slider
         label="Ambient"
         value={audio.ambientVolume}
-        onChange={(v) => set('ambientVolume', v)}
+        onChange={(v) => setAudioSetting('ambientVolume', v)}
       />
     </div>
   );
 }
 
 function DisplayTab() {
-  const display = useSettingsStore((s) => s.display);
-  const set = useSettingsStore((s) => s.setDisplaySetting);
+  const { display } = useSettings();
 
   const handleFullscreen = (v: boolean) => {
-    set('fullscreen', v);
+    setDisplaySetting('fullscreen', v);
     if (v) {
       document.documentElement.requestFullscreen?.();
     } else {
@@ -304,12 +306,12 @@ function DisplayTab() {
           { value: 'medium', label: 'Med' },
           { value: 'high', label: 'High' },
         ]}
-        onChange={(v) => set('renderQuality', v)}
+        onChange={(v) => setDisplaySetting('renderQuality', v)}
       />
       <Toggle
         label="Shadows"
         value={display.shadows}
-        onChange={(v) => set('shadows', v)}
+        onChange={(v) => setDisplaySetting('shadows', v)}
       />
       <Select<'1' | '2' | '3'>
         label="View Distance"
@@ -319,7 +321,7 @@ function DisplayTab() {
           { value: '2', label: 'Normal' },
           { value: '3', label: 'Far' },
         ]}
-        onChange={(v) => set('viewDistance', Number(v))}
+        onChange={(v) => setDisplaySetting('viewDistance', Number(v))}
       />
       <Toggle
         label="Fullscreen"
@@ -330,7 +332,6 @@ function DisplayTab() {
   );
 }
 
-// Keybindings data (same as PauseMenu's ControlsPanel)
 const KEYBINDINGS: Array<{ key: string; action: string; group: string }> = [
   { key: 'W A S D', action: 'Move', group: 'Movement' },
   { key: 'Mouse', action: 'Look around (pointer lock)', group: 'Movement' },
@@ -379,11 +380,8 @@ function ControlsTab() {
   );
 }
 
-// ── Main SettingsPanel ───────────────────────────────────────────────────
-
 export function SettingsPanel({ onBack }: { onBack: () => void }) {
   const [tab, setTab] = useState<SettingsTab>('audio');
-  const resetDefaults = useSettingsStore((s) => s.resetDefaults);
 
   return (
     <div
@@ -392,11 +390,9 @@ export function SettingsPanel({ onBack }: { onBack: () => void }) {
         PARCHMENT_BG,
       )}
     >
-      {/* Corner accents */}
       <div className="absolute -top-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
       <div className="absolute -bottom-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
 
-      {/* Title */}
       <h2
         className="font-lora text-2xl font-bold tracking-[0.08em] text-center mb-4"
         style={{
@@ -407,21 +403,18 @@ export function SettingsPanel({ onBack }: { onBack: () => void }) {
         Settings
       </h2>
 
-      {/* Tabs */}
       <TabBar active={tab} onChange={setTab} />
 
-      {/* Content — scrollable if needed */}
       <div className="flex-1 overflow-y-auto min-h-0 mb-4">
         {tab === 'audio' && <AudioTab />}
         {tab === 'display' && <DisplayTab />}
         {tab === 'controls' && <ControlsTab />}
       </div>
 
-      {/* Bottom buttons */}
       <div className="flex flex-col gap-2">
         <PanelButton
           label="Reset Defaults"
-          onClick={resetDefaults}
+          onClick={resetSettingsDefaults}
           variant="danger"
         />
         <PanelButton label="Back" onClick={onBack} />
