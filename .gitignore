@@ -19,10 +19,20 @@ config/game-content.json
 public/game.db
 public/game-content.json
 
-# Expo / React Native
+# Capacitor: track project shell but ignore build artifacts
+android/app/build/
+android/.gradle/
+android/local.properties
+android/app/release/
+android/app/.cxx/
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+ios/App/App/public/
+android/app/src/main/assets/public/
+
+# legacy Expo artifacts (for cleanup on stale checkouts)
 .expo/
-ios/
-android/
 expo-env.d.ts
 kings-road/
 

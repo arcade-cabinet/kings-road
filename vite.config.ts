@@ -1,3 +1,4 @@
+import path from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -5,6 +6,12 @@ const isCapacitor = process.env.CAPACITOR === 'true';
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@app': path.resolve(__dirname, './app'),
+    },
+  },
   base: isCapacitor ? './' : '/',
   server: {
     port: 5173,
