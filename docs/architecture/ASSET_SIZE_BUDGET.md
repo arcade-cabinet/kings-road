@@ -183,35 +183,26 @@ Priority order before Phase 0 branch cuts:
 
 ---
 
-## Branch protection note
+## Required status checks — enterprise ruleset 11889443
 
-As of 2026-04-18, `main` has **no branch protection rules** (`gh api repos/arcade-cabinet/kings-road/branches/main/protection` returns 404). The `Package Boundaries` CI step (PR #65) and this `Asset size gate` will both run in CI but currently cannot be marked as **required checks** until branch protection is configured.
+`main` is protected via the **enterprise-level ruleset** (ID 11889443), not via repo-level branch protection. The repo-level endpoint (`gh api repos/arcade-cabinet/kings-road/branches/main/protection`) returns 404, but the enterprise ruleset is active and enforces:
 
-Recommended branch protection settings for `main`:
+- `non_fast_forward` — no force pushes
+- `required_linear_history` — squash merges only
+- `pull_request` — `allowed_merge_methods: ["squash"]`, `dismiss_stale_reviews_on_push: true`
 
-```
-Required status checks:
-  - Test & Lint / Biome lint
-  - Test & Lint / TypeScript check
-  - Test & Lint / Unit tests
-  - Test & Lint / Package boundaries
-  - Test & Lint / Asset size gate   ← add after CI step lands
-Require branches to be up to date before merging: true
-Require a pull request before merging: true
-  Required approvals: 1
-Restrict who can push to matching branches: true (team-lead only)
-```
+**What still needs an org-admin action:** the enterprise ruleset does not yet list `required_status_checks`. The following CI jobs should be added to the ruleset's required checks by whoever holds org-admin access:
 
-Configure via:
+| Check context string | Provided by | When to require |
+|---|---|---|
+| `Test & Lint / Biome lint` | `.github/workflows/ci.yml` | Now |
+| `Test & Lint / TypeScript check` | `.github/workflows/ci.yml` | Now |
+| `Test & Lint / Unit tests` | `.github/workflows/ci.yml` | Now |
+| `Test & Lint / Package boundaries` | `.github/workflows/ci.yml` (PR #65) | After #65 merges |
+| `Test & Lint / Asset size gate` | `.github/workflows/ci.yml` (this PR) | After this PR merges |
+| `CodeQL / Analyze (javascript-typescript)` | `.github/workflows/codeql.yml` | Now |
 
-```bash
-gh api repos/arcade-cabinet/kings-road/branches/main/protection \
-  --method PUT \
-  --field required_status_checks='{"strict":true,"contexts":["Test & Lint / Biome lint","Test & Lint / TypeScript check","Test & Lint / Unit tests","Test & Lint / Package boundaries"]}' \
-  --field enforce_admins=false \
-  --field required_pull_request_reviews='{"required_approving_review_count":1}' \
-  --field restrictions=null
-```
+These cannot be configured via `gh api` at the repo level — they must be set in the enterprise ruleset UI or via the enterprise GraphQL API (`updateRepositoryRuleset` mutation). This is an org-admin action outside agent scope.
 
 ---
 
