@@ -11,6 +11,9 @@ function weightedPickDef(
   defs: StoryPropDef[],
   rng: () => number,
 ): StoryPropDef {
+  if (defs.length === 0) {
+    throw new Error('Cannot pick from empty defs array');
+  }
   const total = defs.reduce((sum, d) => sum + d.weight, 0);
   let r = rng() * total;
   for (const def of defs) {
@@ -21,6 +24,7 @@ function weightedPickDef(
 }
 
 function pickText(texts: string[], rng: () => number): string {
+  if (texts.length === 0) return '';
   return texts[Math.floor(rng() * texts.length)];
 }
 
@@ -37,11 +41,20 @@ export function composeStoryProps(
   seed: string,
 ): StoryPropPlacement[] {
   const [start, end] = roadDistanceRange;
-  const segmentLength = end - start;
-
-  const rng = createRng(`story-props:${biomeId}:${start}:${end}:${seed}`);
+  if (start > end) {
+    throw new Error(
+      `Invalid road distance range: start (${start}) must be <= end (${end})`,
+    );
+  }
 
   const defs = getPropDefsForBiome(biomeId);
+  if (defs.length === 0) {
+    return [];
+  }
+
+  const segmentLength = end - start;
+  const rng = createRng(`story-props:${biomeId}:${start}:${end}:${seed}`);
+
   const placements: StoryPropPlacement[] = [];
 
   // Place props at seeded intervals within the segment.
@@ -53,7 +66,12 @@ export function composeStoryProps(
 
   const usedPositions: number[] = [];
 
-  for (let i = 0; i < targetCount * 5 && placements.length < targetCount; i++) {
+  // Cap iterations: targetCount * 5 is enough attempts for reasonable density,
+  // but when MIN_SPACING_M constraints prevent reaching targetCount we stop early
+  // rather than spinning. Result may be fewer placements than targetCount.
+  const maxAttempts = Math.max(targetCount * 5, targetCount + 20);
+
+  for (let i = 0; i < maxAttempts && placements.length < targetCount; i++) {
     const roadOffset = start + rng() * segmentLength;
 
     // Minimum spacing along road axis

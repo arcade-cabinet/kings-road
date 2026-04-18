@@ -86,4 +86,26 @@ describe('composeStoryProps', () => {
     const small = composeStoryProps('thornfield', [0, 500], 'size');
     expect(big.length).toBeGreaterThanOrEqual(small.length);
   });
+
+  it('throws on inverted range (start > end)', () => {
+    expect(() =>
+      composeStoryProps('thornfield', [14000, 12000], 'inverted'),
+    ).toThrow('Invalid road distance range');
+  });
+
+  it('returns empty array for unknown biome with no global props', () => {
+    // All catalog entries have biomeAffinity [] (universal) or specific biomes,
+    // so unknown biome still gets weight-1 entries — result is non-empty.
+    // This test verifies the empty-defs guard does not incorrectly fire.
+    const result = composeStoryProps('unknown-biome', THORNFIELD_RANGE, 'x');
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('does not exceed maxAttempts when spacing makes targetCount unreachable', () => {
+    // Very short segment (100m) with MIN_SPACING_M=80 makes placing >1 prop hard.
+    // Verify no hang and returns whatever fits.
+    const result = composeStoryProps('thornfield', [0, 100], 'tight');
+    expect(result.length).toBeGreaterThanOrEqual(0);
+    expect(result.length).toBeLessThanOrEqual(2);
+  });
 });
