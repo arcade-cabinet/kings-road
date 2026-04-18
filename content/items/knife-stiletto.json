@@ -1,0 +1,19 @@
+{
+  "id": "knife_stiletto",
+  "name": "Bandit's Stiletto",
+  "description": "A thin, needle-pointed blade favoured by highwaymen along the King's Road. Light enough to conceal beneath a cloak, deadly enough to find the gaps in mail.",
+  "type": "equipment",
+  "stackable": false,
+  "equipSlot": "weapon",
+  "rarity": "common",
+  "weight": 0.4,
+  "value": 12,
+  "statModifiers": [
+    { "stat": "damage", "value": 4 },
+    { "stat": "speed", "value": 2 }
+  ],
+  "viewmodel": {
+    "glb": "/assets/weapons/knife-1.glb",
+    "handPose": "pinch"
+  }
+}

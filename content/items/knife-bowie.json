@@ -1,0 +1,18 @@
+{
+  "id": "knife_bowie",
+  "name": "Bowie Knife",
+  "description": "A heavy-spined hunting blade with a clipped point and full-length edge. Settlers and scouts prize it equally for skinning game and fending off wolves in the woodland stretches of the Road.",
+  "type": "equipment",
+  "stackable": false,
+  "equipSlot": "weapon",
+  "rarity": "common",
+  "weight": 0.7,
+  "value": 18,
+  "statModifiers": [
+    { "stat": "damage", "value": 6 }
+  ],
+  "viewmodel": {
+    "glb": "/assets/weapons/knife-2.glb",
+    "handPose": "grip"
+  }
+}
