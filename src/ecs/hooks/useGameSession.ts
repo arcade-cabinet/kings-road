@@ -10,6 +10,7 @@
 import { useTrait } from 'koota/react';
 import * as THREE from 'three';
 import {
+  type ActiveDungeon,
   CameraState,
   ChunkState,
   CombatSession,
@@ -23,6 +24,14 @@ import {
   SeedState,
 } from '@/ecs/traits/session-game';
 import { getSessionEntity } from '@/ecs/world';
+import type {
+  AABB,
+  ActiveEncounter,
+  ChunkData,
+  ChunkDelta,
+  ChunkType,
+  Interactable,
+} from '@/types/game';
 import { PLAYER_HEIGHT } from '@/utils/worldGen';
 
 const DEFAULT_FLAGS = {
@@ -52,10 +61,18 @@ const DEFAULT_CAMERA = {
 
 const DEFAULT_SEED = { seedPhrase: '' };
 
-const DEFAULT_CHUNKS = {
+const DEFAULT_CHUNKS: {
+  currentChunkKey: string;
+  currentChunkName: string;
+  currentChunkType: ChunkType;
+  activeChunks: Map<string, ChunkData>;
+  globalAABBs: AABB[];
+  globalInteractables: Interactable[];
+  chunkDeltas: Record<string, ChunkDelta>;
+} = {
   currentChunkKey: '',
   currentChunkName: 'The Realm',
-  currentChunkType: 'WILD' as const,
+  currentChunkType: 'WILD',
   activeChunks: new Map(),
   globalAABBs: [],
   globalInteractables: [],
@@ -68,8 +85,12 @@ const DEFAULT_ENV = {
   currentWeather: DEFAULT_WEATHER,
 };
 
-const DEFAULT_COMBAT = { activeEncounter: null };
-const DEFAULT_DUNGEON = { activeDungeon: null };
+const DEFAULT_COMBAT: { activeEncounter: ActiveEncounter | null } = {
+  activeEncounter: null,
+};
+const DEFAULT_DUNGEON: { activeDungeon: ActiveDungeon | null } = {
+  activeDungeon: null,
+};
 
 const DEFAULT_INTERACTION = {
   currentInteractable: null,
