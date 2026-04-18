@@ -91,7 +91,7 @@ When adding a new material to the palette or using one in a scene:
 - [ ] AO map included if pack supplies one — check `ls public/assets/pbr/<id>/ | grep AO`.
 - [ ] Metalness map included if the material is a metal — same check for `Metalness`.
 - [ ] Consumer geometry calls `prepareGeometryForPbr(geometry)` before material apply.
-- [ ] If displacement matters (parallax close-up), consumer sets `displacementScale` at point of use.
+- [ ] If displacement matters (parallax close-up), consumer requests a clone via `loadPbrMaterial(id, { displacementScale: N })`. **Do not mutate the material returned with defaults** — it's a shared cached instance; mutating it leaks state into every other consumer of the same id.
 
 ## Why this matters for RPG resource systems
 
