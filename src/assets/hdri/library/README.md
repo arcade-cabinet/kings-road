@@ -11,15 +11,26 @@ The filename without extension is the `id` passed to the loader.
 
 ## On-disk layout
 
+The entire source pack directory is copied verbatim. A typical HDRI pack contains:
+
 ```
-public/assets/hdri/<id>.hdr
+public/assets/hdri/<id>/
+  <id>.hdr           # Equirectangular HDRI — loader loads this
+  <id>.exr           # High-precision variant — kept for future EXR loader
+  <id>.png           # Preview thumbnail — gitignored
+  <id>.blend         # Blender companion — gitignored
+  <id>.tres / .usdc  # Godot / USD companions — gitignored
 ```
+
+The HDRI loader loads `public/assets/hdri/<id>/<id>.hdr`.
+
+Author-side companions are gitignored — kept locally for tooling.
 
 ## Sourcing
 
-HDRIs are ingested by `scripts/ingest-hdri.ts` which copies from
-`/Volumes/home/assets/HDRI/1K/` to `public/assets/hdri/` with the
-canonical id as the filename.
+HDRIs are ingested by `scripts/ingest-hdri.ts` which copies entire pack
+directories from `/Volumes/home/assets/HDRI/1K/<pack>/` to `public/assets/hdri/<id>/`.
 
-Thornfield HDRIs (cold-dawn, overcast-noon, fog-dusk) are added by the
-content curator (team-lead) in task #6.
+The content curator (team-lead) provides the manifest using `sourceDir` (whole
+directory) rather than a single file path. Thornfield HDRIs (cold-dawn,
+overcast-noon, fog-dusk) are added in task #6.

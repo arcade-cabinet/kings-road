@@ -38,6 +38,21 @@ kings-road/
 
 pending-integration/
 
+# Asset pack companion files — kept locally for tooling, not shipped
+public/assets/pbr/**/*.blend
+public/assets/pbr/**/*.blend1
+public/assets/pbr/**/*.mtlx
+public/assets/pbr/**/*.tres
+public/assets/pbr/**/*.usdc
+public/assets/pbr/**/*.png
+public/assets/hdri/**/*.blend
+public/assets/hdri/**/*.blend1
+public/assets/hdri/**/*.exr
+public/assets/hdri/**/*.png
+public/assets/terrain/**/*.blend
+public/assets/terrain/**/*.blend1
+public/assets/terrain/**/*.png
+
 # .remember/ is Claude's persistent memory — intentionally tracked
 .remember/logs/
 .remember/tmp/

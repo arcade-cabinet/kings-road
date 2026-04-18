@@ -17,7 +17,7 @@ export async function loadHdri(id: string): Promise<THREE.Texture> {
   const cached = cache.get(id);
   if (cached) return cached;
 
-  const url = assetUrl(`/assets/hdri/${id}.hdr`);
+  const url = assetUrl(`/assets/hdri/${id}/${id}.hdr`);
 
   const texture = await new Promise<THREE.Texture>((resolve, reject) => {
     rgbeLoader.load(url, resolve, undefined, () => {
