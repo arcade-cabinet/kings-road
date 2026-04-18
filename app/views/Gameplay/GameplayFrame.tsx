@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useGameStore } from '@/stores/gameStore';
+import { togglePause } from '@/ecs/actions/game';
+import { useFlags, useChunkState } from '@/ecs/hooks/useGameSession';
 
 /**
  * Gameplay HUD frame — organized by mobile thumb zones, not arbitrary corner panels.
@@ -23,9 +24,8 @@ import { useGameStore } from '@/stores/gameStore';
  * Subtle top strip fades in for region transitions then fades out.
  */
 export function GameplayFrame({ children }: { children?: React.ReactNode }) {
-  const gameActive = useGameStore((s) => s.gameActive);
-  const currentChunkName = useGameStore((s) => s.currentChunkName);
-  const currentChunkType = useGameStore((s) => s.currentChunkType);
+  const { gameActive } = useFlags();
+  const { currentChunkName, currentChunkType } = useChunkState();
 
   // Fade in region name for ~2.8s when the player crosses into a new named area.
   const [visibleRegion, setVisibleRegion] = useState<string | null>(null);
@@ -102,7 +102,7 @@ function TopBand({ regionName }: { regionName: string | null }) {
           'opacity-40 hover:opacity-90 active:opacity-100',
           'active:scale-95 transition-all duration-200',
         )}
-        onClick={() => useGameStore.getState().togglePause()}
+        onClick={() => togglePause()}
       >
         <QuillIcon />
       </button>

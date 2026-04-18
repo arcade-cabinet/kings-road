@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { getMostRecentSave } from '@/db/save-service';
 import type { SaveData } from '@/db/save-service';
 import { cn } from '@/lib/utils';
-import { generateSeedPhrase, useGameStore } from '@/stores/gameStore';
+import { generateSeedPhrase } from '@/utils/seedPhrase';
+import { setSeedPhrase } from '@/ecs/actions/game';
+import { useFlags, useSeed } from '@/ecs/hooks/useGameSession';
 import { ShaderBackdrop } from './ShaderBackdrop';
 import { useMenuOrchestrator } from './useMenuOrchestrator';
 import { VellumOrnaments } from './VellumOrnaments';
@@ -25,9 +27,8 @@ const COPY = {
 } as const;
 
 export function MainMenu() {
-  const gameActive = useGameStore((s) => s.gameActive);
-  const seedPhrase = useGameStore((s) => s.seedPhrase);
-  const setSeedPhrase = useGameStore((s) => s.setSeedPhrase);
+  const { gameActive } = useFlags();
+  const { seedPhrase } = useSeed();
 
   const {
     fadeOut,
@@ -70,7 +71,7 @@ export function MainMenu() {
     if (!seedPhrase && !gameActive) {
       setSeedPhrase(generateSeedPhrase());
     }
-  }, [seedPhrase, gameActive, setSeedPhrase]);
+  }, [seedPhrase, gameActive]);
 
   if (gameActive) return null;
 

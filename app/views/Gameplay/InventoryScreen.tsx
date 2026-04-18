@@ -13,7 +13,7 @@ import { InventoryUI } from '@/ecs/traits/session-inventory';
 import { getSessionEntity } from '@/ecs/world';
 import { assetUrl } from '@/lib/assets';
 import type { ItemDefinition } from '@/schemas/item.schema';
-import { useGameStore } from '@/stores/gameStore';
+import { useFlags } from '@/ecs/hooks/useGameSession';
 
 // ── Constants ────────────────────────────────────────────────────────────
 
@@ -503,7 +503,7 @@ export function InventoryScreen() {
   const maxSlots = ui?.maxSlots ?? 20;
   const gold = ui?.gold ?? 0;
   const close = closeInventory;
-  const gameActive = useGameStore((s) => s.gameActive);
+  const { gameActive } = useFlags();
 
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
 

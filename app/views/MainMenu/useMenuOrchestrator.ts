@@ -5,11 +5,14 @@ import {
   getMostRecentSave,
   restoreGameState,
 } from '@/db/save-service';
+import { type ActiveDungeon } from '@/ecs/traits/session-game';
+import { generateSeedPhrase } from '@/utils/seedPhrase';
 import {
-  type ActiveDungeon,
-  generateSeedPhrase,
-  useGameStore,
-} from '@/stores/gameStore';
+  enterDungeon,
+  mergeGameState,
+  setSeedPhrase,
+  startGame,
+} from '@/ecs/actions/game';
 import { syncInventory } from '@/ecs/actions/inventory-ui';
 import {
   resolveNarrative,
@@ -50,9 +53,6 @@ export interface MenuOrchestratorActions {
 
 export function useMenuOrchestrator(): MenuOrchestratorState &
   MenuOrchestratorActions {
-  const setSeedPhrase = useGameStore((s) => s.setSeedPhrase);
-  const startGame = useGameStore((s) => s.startGame);
-
   const [fadeOut, setFadeOut] = useState(false);
   const [loadingContinue, setLoadingContinue] = useState(false);
   const [bootError, setBootError] = useState<string | null>(null);
@@ -62,7 +62,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
     const s = generateSeedPhrase();
     setSeedPhrase(s);
     return s;
-  }, [setSeedPhrase]);
+  }, []);
 
   const continueFromSave = useCallback(async () => {
     if (inFlightRef.current) return;
@@ -93,7 +93,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
         startGame: (seed, pos, yaw) => {
           startGame(seed, new THREE.Vector3(pos.x, pos.y, pos.z), yaw);
         },
-        mergeGameState: (partial) => useGameStore.setState(partial),
+        mergeGameState: (partial) => mergeGameState(partial),
         restoreInventory: (items, gold, equipment) => {
           syncInventory(items, 20, gold, equipment);
         },
@@ -116,7 +116,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
             ),
             overworldYaw: dungeon.overworldYaw,
           };
-          useGameStore.getState().enterDungeon(active);
+          enterDungeon(active);
         },
       });
     } catch (err) {
@@ -128,7 +128,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
     } finally {
       inFlightRef.current = false;
     }
-  }, [startGame]);
+  }, []);
 
   const beginNewPilgrimage = useCallback(
     async (seed: string | null) => {
@@ -176,7 +176,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
         inFlightRef.current = false;
       }
     },
-    [setSeedPhrase, startGame],
+    [],
   );
 
   return {

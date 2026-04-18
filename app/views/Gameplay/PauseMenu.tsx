@@ -9,7 +9,17 @@ import {
   snapshotGameState,
 } from '@/db/save-service';
 import { cn } from '@/lib/utils';
-import { type ActiveDungeon, useGameStore } from '@/stores/gameStore';
+import { type ActiveDungeon } from '@/ecs/traits/session-game';
+import {
+  enterDungeon,
+  getGameSnapshot,
+  mergeGameState,
+  resetGame,
+  setGameActive,
+  setPaused,
+  startGame,
+} from '@/ecs/actions/game';
+import { useFlags, useSeed } from '@/ecs/hooks/useGameSession';
 import {
   getInventorySnapshot,
   syncInventory,
@@ -118,7 +128,7 @@ function formatDate(iso: string): string {
 
 /** Build a snapshot of current game state for saving. */
 function captureSnapshot() {
-  const gs = useGameStore.getState();
+  const gs = getGameSnapshot();
   const qs = getQuestState();
   const inv = getInventorySnapshot();
   return snapshotGameState(
@@ -339,7 +349,7 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
     }
 
     // Reset current game state
-    useGameStore.getState().resetGame();
+    resetGame();
     clearWorld();
     resetQuests();
 
@@ -353,10 +363,10 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
     restoreGameState(data, {
       startGame: (seed, pos, yaw) => {
         const position = new THREE.Vector3(pos.x, pos.y, pos.z);
-        useGameStore.getState().startGame(seed, position, yaw);
+        startGame(seed, position, yaw);
       },
       mergeGameState: (partial) => {
-        useGameStore.setState(partial);
+        mergeGameState(partial);
       },
       restoreInventory: (items, gold, equipment) => {
         syncInventory(items, 20, gold, equipment);
@@ -380,7 +390,7 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
           ),
           overworldYaw: dungeon.overworldYaw,
         };
-        useGameStore.getState().enterDungeon(active);
+        enterDungeon(active);
       },
     });
   }, []);
@@ -470,10 +480,8 @@ function useAutoSaveOnPause(paused: boolean, gameActive: boolean) {
 // ---------------------------------------------------------------------------
 
 export function PauseMenu() {
-  const gameActive = useGameStore((state) => state.gameActive);
-  const paused = useGameStore((state) => state.paused);
-  const setPaused = useGameStore((state) => state.setPaused);
-  const seedPhrase = useGameStore((state) => state.seedPhrase);
+  const { gameActive, paused } = useFlags();
+  const { seedPhrase } = useSeed();
   const [page, setPage] = useState<'main' | 'settings' | 'save' | 'load'>(
     'main',
   );
@@ -492,8 +500,8 @@ export function PauseMenu() {
 
   const handleQuit = () => {
     setPaused(false);
-    useGameStore.getState().resetGame();
-    useGameStore.getState().setGameActive(false);
+    resetGame();
+    setGameActive(false);
     clearWorld();
   };
 

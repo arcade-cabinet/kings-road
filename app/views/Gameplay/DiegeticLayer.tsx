@@ -23,7 +23,7 @@ import { InventoryUI } from '@/ecs/traits/session-inventory';
 import { QuestLog } from '@/ecs/traits/session-quest';
 import { openInventory } from '@/ecs/actions/inventory-ui';
 import { getSessionEntity } from '@/ecs/world';
-import { useGameStore } from '@/stores/gameStore';
+import { useFlags, usePlayer } from '@/ecs/hooks/useGameSession';
 import { cn } from '@/lib/utils';
 
 const LOW_HEALTH_THRESHOLD = 0.4;
@@ -35,15 +35,8 @@ export function DiegeticLayer({
 }: {
   onOpenQuests?: () => void;
 }) {
-  const gameActive = useGameStore((s) => s.gameActive);
-  const inCombat = useGameStore((s) => s.inCombat);
-  const inDialogue = useGameStore((s) => s.inDialogue);
-  const paused = useGameStore((s) => s.paused);
-  const isDead = useGameStore((s) => s.isDead);
-  const health = useGameStore((s) => s.health);
-  const stamina = useGameStore((s) => s.stamina);
-  // Health / stamina are stored as 0-100 scalars today; dividing by 100 keeps
-  // the pct math identical to when these become bounded Koota traits.
+  const { gameActive, inCombat, inDialogue, paused, isDead } = useFlags();
+  const { health, stamina } = usePlayer();
   const maxHealth = 100;
   const maxStamina = 100;
 

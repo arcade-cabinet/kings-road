@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useGameStore } from '@/stores/gameStore';
+import { closeDialogue } from '@/ecs/actions/game';
+import { useFlags, useInteraction } from '@/ecs/hooks/useGameSession';
 import { Portrait3D } from '@app/components/Portrait3D';
 
 // ---------------------------------------------------------------------------
@@ -302,14 +303,8 @@ function ChoiceButton({
 // ---------------------------------------------------------------------------
 
 export function DialogueBox() {
-  const inDialogue = useGameStore((state) => state.inDialogue);
-  const dialogueName = useGameStore((state) => state.dialogueName);
-  const dialogueText = useGameStore((state) => state.dialogueText);
-  const dialogueType = useGameStore((state) => state.dialogueType);
-  const currentInteractable = useGameStore(
-    (state) => state.currentInteractable,
-  );
-  const closeDialogue = useGameStore((state) => state.closeDialogue);
+  const { inDialogue } = useFlags();
+  const { dialogueName, dialogueText, dialogueType, currentInteractable } = useInteraction();
 
   const [isClosing, setIsClosing] = useState(false);
   const [animPhase, setAnimPhase] = useState<'entering' | 'open' | 'closing'>(
@@ -336,7 +331,7 @@ export function DialogueBox() {
       closeDialogue();
       setIsClosing(false);
     }, 250);
-  }, [isClosing, closeDialogue]);
+  }, [isClosing]);
 
   const handleClick = () => {
     if (!isComplete) {

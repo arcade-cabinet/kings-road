@@ -1,7 +1,7 @@
 import { useProgress } from '@react-three/drei';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useGameStore } from '@/stores/gameStore';
+import { useFlags, useSeed, useChunkState } from '@/ecs/hooks/useGameSession';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import {
   clearWorld,
@@ -24,9 +24,9 @@ const CHUNK_LOADING_STAGES = [
 const MIN_DISPLAY_MS = 2000;
 
 export function LoadingOverlay() {
-  const gameActive = useGameStore((state) => state.gameActive);
-  const seedPhrase = useGameStore((state) => state.seedPhrase);
-  const activeChunks = useGameStore((state) => state.activeChunks);
+  const { gameActive } = useFlags();
+  const { seedPhrase } = useSeed();
+  const { activeChunks } = useChunkState();
 
   const isGenerating = useWorldSession().isGenerating;
   const generationProgress = useWorldSession().generationProgress;
