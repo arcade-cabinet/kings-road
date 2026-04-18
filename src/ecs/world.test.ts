@@ -23,9 +23,14 @@ describe('world', () => {
     unsafe_resetSessionEntity();
     // Koota recycles entity IDs via a free list — consume the recycled slot so
     // the next getSessionEntity() gets a genuinely fresh ID.
-    gameWorld.spawn();
-    const second = getSessionEntity();
-    expect(second).not.toBe(first);
+    const recycledSlotConsumer = gameWorld.spawn();
+    try {
+      const second = getSessionEntity();
+      expect(second).not.toBe(first);
+    } finally {
+      (recycledSlotConsumer as unknown as { destroy(): void }).destroy();
+      unsafe_resetSessionEntity();
+    }
   });
 
   it('getSessionEntity is lazy — does not spawn at module import time', () => {
@@ -33,10 +38,13 @@ describe('world', () => {
     // no spawn happens before the first getSessionEntity() call.
     unsafe_resetSessionEntity();
     const spawnSpy = vi.spyOn(gameWorld, 'spawn');
-    expect(spawnSpy).not.toHaveBeenCalled();
-    const entity = getSessionEntity();
-    expect(spawnSpy).toHaveBeenCalledOnce();
-    expect(typeof entity).toBe('number');
-    spawnSpy.mockRestore();
+    try {
+      expect(spawnSpy).not.toHaveBeenCalled();
+      const entity = getSessionEntity();
+      expect(spawnSpy).toHaveBeenCalledOnce();
+      expect(typeof entity).toBe('number');
+    } finally {
+      spawnSpy.mockRestore();
+    }
   });
 });
