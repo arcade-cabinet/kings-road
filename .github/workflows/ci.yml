@@ -42,6 +42,15 @@ jobs:
       - name: Web build
         run: pnpm build
 
+      - name: Asset size gate
+        run: |
+          SIZE=$(du -sm public/assets/ | cut -f1)
+          echo "public/assets/ is ${SIZE}MB"
+          if [ "$SIZE" -gt 100 ]; then
+            echo "ERROR: public/assets/ exceeds 100MB baked-in ceiling (${SIZE}MB)"
+            exit 1
+          fi
+
       - name: Browser smoke tests
         run: pnpm test:browser
         continue-on-error: true
