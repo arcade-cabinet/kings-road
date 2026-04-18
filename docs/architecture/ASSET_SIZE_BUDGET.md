@@ -55,7 +55,7 @@ Biome-shared assets (PBR textures, NPC bundle, HDRI) are loaded on biome entry a
 | NPC bundle | Load on biome entry | Biome exit |
 | Monster GLBs | Load on chunk enter if monsters present | Chunk eviction |
 
-Biome exit is defined as the player's road-spine position moving more than `CHUNK_SIZE × 4` units past the last chunk of the current biome.
+Biome exit is determined by `BiomeService.getCurrentRegionBounds(distanceFromStart)` returning a different region — i.e., when the player's road-spine distance crosses the `endDistance` boundary of the current region as defined in `road-spine.json`. The eviction caller is responsible for comparing the previous and current region ids each frame.
 
 ---
 
@@ -122,7 +122,7 @@ This rewrites history. All collaborators must re-clone or run `git lfs fetch --a
 
 ### GLBs
 
-Apply Draco mesh compression + Basis Universal texture compression at ingest time:
+Apply Draco mesh compression + WebP texture compression at ingest time (Phase 0 target — no runtime code change needed; three.js loads WebP natively). Basis Universal / KTX2 is a Phase 1+ upgrade requiring `KTX2Loader` + `BasisTextureLoader`.
 
 ```bash
 npx gltf-transform optimize input.glb output.glb \
