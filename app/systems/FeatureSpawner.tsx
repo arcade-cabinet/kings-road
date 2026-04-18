@@ -95,7 +95,7 @@ function FeatureMesh({ feature }: { feature: SpawnedFeature }) {
 function AuthoredFeatureMesh({ feature }: { feature: SpawnedFeature }) {
   const { glb, glbScale, glbYawRange, tier } = feature.definition;
   // glb is non-null here per FeatureMesh guard.
-  const gltf = useGLTF(assetUrl(`assets/${glb}`));
+  const gltf = useGLTF(assetUrl(`/assets/${glb}`));
   const tierScale = tier === 'major' ? 1.5 : tier === 'minor' ? 1.0 : 0.6;
   const scale = tierScale * glbScale;
 

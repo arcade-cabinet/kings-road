@@ -11,7 +11,7 @@ domain: technical
 
 ## The question this answers
 
-> "Can the current stack (Vite + React 19 + R3F + Koota + Capacitor) hit a 30fps floor on a mid-range phone while rendering the full visual-polish target — full PBR, HDRI IBL, heightmapped terrain, composed villages, volumetric fog, SDF combat VFX — OR do we need to port to Godot?"
+> "Can the current stack (Vite + React 19 + R3F + Koota + Capacitor) hit a 30 fps floor on a mid-range phone while rendering the full visual-polish target — full PBR, HDRI IBL, heightmapped terrain, composed villages, volumetric fog, SDF combat VFX — OR do we need to port to Godot?"
 
 We answer it with **numbers**, not conjecture. Two measurement instruments, both mandatory.
 
@@ -26,7 +26,7 @@ We answer it with **numbers**, not conjecture. Two measurement instruments, both
 ## Design principles (locked from brainstorm)
 
 0. **Biome is the root config.** All downstream visual/audio/gameplay behavior derives from biome JSON.
-1. **Plays well on the target device, always.** 30fps floor on a mid-range phone is non-negotiable. SDF/raymarched effects bounded to hull meshes; never full-screen. `<AdaptiveDpr>` + `<PerformanceMonitor>` auto-degrade under load.
+1. **Plays well on the target device, always.** 30 fps floor on a mid-range phone is non-negotiable. SDF/raymarched effects bounded to hull meshes; never full-screen. `<AdaptiveDpr>` + `<PerformanceMonitor>` auto-degrade under load.
 2. **Use drei's scene-composition ecosystem first.** `<Environment>`, `<ContactShadows>`, `<AccumulativeShadows>`, `<SoftShadows>`, `<Sparkles>`, `<PerformanceMonitor>`, `<AdaptiveDpr>`, `<CameraShake>` before writing custom.
 3. **No flat colors on player-visible solid geometry.** Every surface uses a full PBR material (Color + Normal + Roughness + Displacement-where-meaningful + AO-where-present). Chosen by *tactile identity* — hard/cold, hard/warm, soft, metallic, furry, wet, brittle.
 4. **Structural primitives are fine; bare ones are not.** Primitive armature (stairs, foundations, wall segments) is acceptable if every player-facing surface carries authored detail.
@@ -48,7 +48,7 @@ Thornfield Ruins is the **worst-case biome**: it exercises every system at once.
 | Cold lighting + post-processing | Distinct LUT, god-rays, chromatic aberration |
 | Story density | Cairns, graves, rusted swords, carved initials, offerings — the "inhabited by the dead" compositor target |
 
-If Thornfield hits 30fps floor on the phone, everywhere else will too. If Thornfield struggles, the answer is honest.
+If Thornfield hits the 30 fps floor on the phone, everywhere else will too. If Thornfield struggles, the answer is honest.
 
 ## In scope
 

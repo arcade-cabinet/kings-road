@@ -165,9 +165,25 @@ export function NPC({ interactable, blueprint }: NPCProps) {
       const nodeName = VILLAGER_NODES[npcType] || VILLAGER_NODES.wanderer;
       const targetNode = nodes[nodeName];
       if (targetNode) {
+        // The villagers mega-pack nests body meshes under container
+        // groups (e.g. the `Woman_2` node is a Group holding `Woman_2_Body`
+        // + `Woman_2_Hair` as children). Name-equality alone would hide
+        // the children of the target group. Walk ancestry and keep the
+        // mesh visible when ANY ancestor (or itself) matches the target.
+        const isInTargetSubtree = (node: THREE.Object3D): boolean => {
+          let current: THREE.Object3D | null = node;
+          while (current) {
+            if (current.name === nodeName) return true;
+            current = current.parent;
+          }
+          return false;
+        };
         sceneClone.traverse((child) => {
-          if ((child as THREE.Mesh).isMesh || (child as THREE.SkinnedMesh).isSkinnedMesh) {
-            child.visible = child.name === nodeName;
+          if (
+            (child as THREE.Mesh).isMesh ||
+            (child as THREE.SkinnedMesh).isSkinnedMesh
+          ) {
+            child.visible = isInTargetSubtree(child);
           }
         });
       }
@@ -233,7 +249,13 @@ export function NPC({ interactable, blueprint }: NPCProps) {
 
   return (
     <group ref={groupRef} position={[npcPosition.x, 0, npcPosition.z]}>
-      <Float speed={1.5} rotationIntensity={0} floatIntensity={0.1}>
+      {/* `<Float>` previously added a procedural bob; now that the
+          rigged idle clip drives breathing/sway itself, zero out the
+          procedural intensity so we don't fight the animation. Keep
+          `<Float>` in the tree as a structural wrapper (we may
+          reintroduce a subtle idle sway that doesn't conflict with the
+          clip later). */}
+      <Float speed={1.5} rotationIntensity={0} floatIntensity={0}>
         <group ref={modelRef} scale={[1, 1, 1]}>
           {/* Shadow */}
           <mesh

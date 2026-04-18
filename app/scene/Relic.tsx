@@ -209,6 +209,12 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
         `Crystal relic GLB ${CRYSTAL_GLB} has no mesh node — cannot render relic geometry.`,
       );
     }
+    if (!mesh.geometry) {
+      throw new Error(
+        `Crystal relic GLB ${CRYSTAL_GLB} mesh "${mesh.name || '(unnamed)'}" ` +
+          `has no geometry — GLB structure changed unexpectedly.`,
+      );
+    }
     return mesh.geometry;
   }, [crystalGlb.nodes]);
 
