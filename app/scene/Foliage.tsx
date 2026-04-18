@@ -1,6 +1,6 @@
 import { useGLTF } from '@react-three/drei';
 import { useMemo } from 'react';
-import { hashString } from '@/utils/random';
+import { hashString } from '@/core';
 
 const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, '');
 

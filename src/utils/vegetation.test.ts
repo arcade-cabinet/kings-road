@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cyrb128, mulberry32 } from './random';
+import { cyrb128, mulberry32 } from '@/core';
 import {
   BIOME_VEGETATION,
   DEFAULT_VEGETATION,

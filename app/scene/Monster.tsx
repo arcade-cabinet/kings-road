@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { SkeletonUtils } from 'three-stdlib';
 import { assetUrl } from '@/lib/assets';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
-import { hashString } from '@/utils/random';
+import { hashString } from '@/core';
 
 interface MonsterProps {
   archetype: MonsterArchetype;

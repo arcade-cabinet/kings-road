@@ -6,13 +6,13 @@
  * produces the same story.
  */
 
+import { createRng } from '@/core';
 import type {
   QuestBranch,
   QuestDefinition,
   QuestReward,
   QuestStep,
 } from '@/schemas/quest.schema';
-import { createRng } from '@/utils/random';
 
 /** A quest with its branch resolved and steps flattened. */
 export interface ResolvedQuest {

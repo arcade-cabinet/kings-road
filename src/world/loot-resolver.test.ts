@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { cyrb128, mulberry32 } from '@/core';
 import type { LootTable } from '@/schemas/encounter-table.schema';
-import { cyrb128, mulberry32 } from '@/utils/random';
 import { rollLootFromTable } from './loot-resolver';
 
 function makeRng(seed = 'test-loot') {

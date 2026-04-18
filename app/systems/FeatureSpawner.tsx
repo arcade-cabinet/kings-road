@@ -29,7 +29,7 @@ import {
 } from '@/ecs/hooks/useGameSession';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import type { Interactable } from '@/types/game';
-import { cyrb128, mulberry32 } from '@/utils/random';
+import { cyrb128, mulberry32 } from '@/core';
 
 // --- Lazy-initialized registries (populated on first access from content store) ---
 

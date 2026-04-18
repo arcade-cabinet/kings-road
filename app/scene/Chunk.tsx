@@ -16,7 +16,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import type { ChunkData } from '@/types/game';
-import { cyrb128, mulberry32 } from '@/utils/random';
+import { cyrb128, mulberry32 } from '@/core';
 import { getBiomeGroundMaterial, getMaterials } from '@/utils/textures';
 import type { HeightSampler } from '@/utils/vegetation';
 import { placeVegetation } from '@/utils/vegetation';

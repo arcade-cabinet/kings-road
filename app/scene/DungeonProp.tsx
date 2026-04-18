@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { hashString } from '@/utils/random';
+import { hashString } from '@/core';
 import { Model as Barrel1 } from './generated/crates/barrel-1';
 import { Model as Barrel1Open } from './generated/crates/barrel-1-open';
 import { Model as Barrel2Keg } from './generated/crates/barrel-2-keg';

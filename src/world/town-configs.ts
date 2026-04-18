@@ -15,6 +15,7 @@
  * Content is sourced from the content store (game.db) at runtime.
  */
 
+import { cyrb128, mulberry32 } from '@/core';
 import {
   getAllBuildings,
   getAllNamedNpcs,
@@ -30,7 +31,6 @@ import type { Settlement, SettlementType } from '@/schemas/kingdom.schema';
 import type { NPCDefinition } from '@/schemas/npc.schema';
 import type { NPCBlueprint } from '@/schemas/npc-blueprint.schema';
 import type { TownConfig, TownNPCPlacement } from '@/schemas/town.schema';
-import { cyrb128, mulberry32 } from '@/utils/random';
 
 // ── Lazy-initialized caches (populated on first access from content store) ──
 

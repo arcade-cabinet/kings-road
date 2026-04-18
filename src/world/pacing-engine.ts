@@ -1,5 +1,5 @@
+import { cyrb128, mulberry32 } from '@/core';
 import { type PacingConfig, PacingConfigSchema } from '@/schemas/pacing.schema';
-import { cyrb128, mulberry32 } from '@/utils/random';
 
 /** A feature placement along the road spine. */
 export interface FeaturePlacement {

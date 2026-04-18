@@ -11,8 +11,8 @@
  * All functions are pure and deterministic from seed.
  */
 
+import { cyrb128 } from '@/core';
 import type { KingdomBiome, KingdomConfig } from '@/schemas/kingdom.schema';
-import { cyrb128 } from '@/utils/random';
 import { createSimplex2D, fbm, ridgeNoise } from './simplex';
 
 // ── Output types ───────────────────────────────────────────────────────
