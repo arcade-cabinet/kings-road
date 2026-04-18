@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
-import type { IInputProvider, InputFrame } from '@/input/types';
 import { useFlags } from '@/ecs/hooks/useGameSession';
+import type { IInputProvider, InputFrame } from '@/input/types';
 
 // --- Constants ---
 

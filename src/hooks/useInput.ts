@@ -2,21 +2,21 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import {
+  closeDialogue,
+  getCamera,
+  getFlags,
+  setCameraPitch,
+  setCameraYaw,
+  setJoystick as setJoystickAction,
+  setKey as setKeyAction,
+  setMouseDown as setMouseDownAction,
+  togglePause,
+} from '@/ecs/actions/game';
+import {
   closeInventory,
   isInventoryOpen,
   toggleInventory,
 } from '@/ecs/actions/inventory-ui';
-import {
-  closeDialogue,
-  getCamera,
-  getFlags,
-  setKey as setKeyAction,
-  setJoystick as setJoystickAction,
-  setMouseDown as setMouseDownAction,
-  setCameraYaw,
-  setCameraPitch,
-  togglePause,
-} from '@/ecs/actions/game';
 import { useFlags } from '@/ecs/hooks/useGameSession';
 
 export function useKeyboardInput() {
@@ -41,8 +41,7 @@ export function useKeyboardInput() {
         return;
       }
 
-      if (inDialogue || getFlags().paused || isInventoryOpen())
-        return;
+      if (inDialogue || getFlags().paused || isInventoryOpen()) return;
 
       // I toggles inventory
       if (k === 'KeyI') {
@@ -156,12 +155,7 @@ export function useMouseInput() {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (
-        !isDown.current ||
-        !gameActive ||
-        inDialogue ||
-        getFlags().paused
-      )
+      if (!isDown.current || !gameActive || inDialogue || getFlags().paused)
         return;
 
       const { cameraYaw, cameraPitch } = getCamera();
@@ -194,57 +188,48 @@ export function useTouchInput() {
   const touchId = useRef<number | null>(null);
   const joystickBase = useRef({ x: 0, y: 0 });
 
-  const handleTouchStart = useCallback(
-    (e: TouchEvent) => {
-      if (touchId.current === null && e.changedTouches.length > 0) {
-        const touch = e.changedTouches[0];
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    if (touchId.current === null && e.changedTouches.length > 0) {
+      const touch = e.changedTouches[0];
 
-        // Check if touch is on action buttons (handled separately)
-        const target = e.target as HTMLElement;
-        if (target.closest('.action-btn')) return;
+      // Check if touch is on action buttons (handled separately)
+      const target = e.target as HTMLElement;
+      if (target.closest('.action-btn')) return;
 
-        touchId.current = touch.identifier;
-        joystickBase.current = { x: touch.clientX, y: touch.clientY };
+      touchId.current = touch.identifier;
+      joystickBase.current = { x: touch.clientX, y: touch.clientY };
+      setJoystickAction({ x: 0, y: 0 }, 0);
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const touch = e.changedTouches[i];
+      if (touch.identifier === touchId.current) {
+        let dx = touch.clientX - joystickBase.current.x;
+        let dy = touch.clientY - joystickBase.current.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+
+        const maxDist = 70;
+        if (dist > maxDist) {
+          dx = (dx / dist) * maxDist;
+          dy = (dy / dist) * maxDist;
+          dist = maxDist;
+        }
+
+        setJoystickAction({ x: dx / maxDist, y: dy / maxDist }, dist);
+      }
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback((e: TouchEvent) => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === touchId.current) {
+        touchId.current = null;
         setJoystickAction({ x: 0, y: 0 }, 0);
       }
-    },
-    [],
-  );
-
-  const handleTouchMove = useCallback(
-    (e: TouchEvent) => {
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (touch.identifier === touchId.current) {
-          let dx = touch.clientX - joystickBase.current.x;
-          let dy = touch.clientY - joystickBase.current.y;
-          let dist = Math.sqrt(dx * dx + dy * dy);
-
-          const maxDist = 70;
-          if (dist > maxDist) {
-            dx = (dx / dist) * maxDist;
-            dy = (dy / dist) * maxDist;
-            dist = maxDist;
-          }
-
-          setJoystickAction({ x: dx / maxDist, y: dy / maxDist }, dist);
-        }
-      }
-    },
-    [],
-  );
-
-  const handleTouchEnd = useCallback(
-    (e: TouchEvent) => {
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        if (e.changedTouches[i].identifier === touchId.current) {
-          touchId.current = null;
-          setJoystickAction({ x: 0, y: 0 }, 0);
-        }
-      }
-    },
-    [],
-  );
+    }
+  }, []);
 
   useEffect(() => {
     document.addEventListener('touchstart', handleTouchStart, {

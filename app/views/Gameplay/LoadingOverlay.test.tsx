@@ -8,9 +8,27 @@ import { WorldProvider } from 'koota/react';
 import type { ReactElement, ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { setWorldState } from '@/ecs/actions/world';
+import {
+  addChunk,
+  resetGame,
+  setGameActive,
+  setSeedPhrase,
+} from '@/ecs/actions/game';
 import { gameWorld } from '@/ecs/world';
-import { useGameStore } from '@/stores/gameStore';
+import { unsafe_resetSessionEntity } from '@/ecs/world';
 import { LoadingOverlay } from './LoadingOverlay';
+
+/** Minimal valid chunk for triggering "chunks loaded" state */
+const STUB_CHUNK = {
+  cx: 0,
+  cz: 0,
+  key: '0,0',
+  type: 'WILD' as const,
+  name: 'Stub',
+  collidables: [],
+  interactables: [],
+  collectedGems: new Set<number>(),
+};
 
 function KootaWrapper({ children }: { children: ReactNode }) {
   return <WorldProvider world={gameWorld}>{children}</WorldProvider>;
@@ -23,12 +41,9 @@ function render(ui: ReactElement, options?: RenderOptions) {
 describe('LoadingOverlay', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    // Reset stores to default state
-    useGameStore.setState({
-      gameActive: true,
-      seedPhrase: 'Golden Verdant Meadow',
-      activeChunks: new Map(),
-    });
+    unsafe_resetSessionEntity();
+    setGameActive(true);
+    setSeedPhrase('Golden Verdant Meadow');
     setWorldState({
       isGenerating: false,
       generationProgress: 0,
@@ -103,7 +118,7 @@ describe('LoadingOverlay', () => {
         generationProgress: 1,
         generationPhase: '',
       });
-      useGameStore.setState({ gameActive: true });
+      setGameActive(true);
     });
 
     // Simulate chunks loading after MIN_DISPLAY_MS
@@ -111,9 +126,7 @@ describe('LoadingOverlay', () => {
       vi.advanceTimersByTime(2100);
     });
     act(() => {
-      useGameStore.setState({
-        activeChunks: new Map([['0,0', {} as never]]),
-      });
+      addChunk(STUB_CHUNK);
     });
 
     // Trigger fade-out timeout
@@ -149,7 +162,7 @@ describe('LoadingOverlay', () => {
         generationProgress: 1,
         generationPhase: '',
       });
-      useGameStore.setState({ gameActive: true });
+      setGameActive(true);
     });
 
     // Load chunks and wait for MIN_DISPLAY_MS
@@ -157,9 +170,7 @@ describe('LoadingOverlay', () => {
       vi.advanceTimersByTime(2100);
     });
     act(() => {
-      useGameStore.setState({
-        activeChunks: new Map([['0,0', {} as never]]),
-      });
+      addChunk(STUB_CHUNK);
     });
 
     // Trigger fade-out + animation complete
@@ -199,15 +210,13 @@ describe('LoadingOverlay', () => {
         generationProgress: 1,
         generationPhase: '',
       });
-      useGameStore.setState({ gameActive: true });
+      setGameActive(true);
     });
     act(() => {
       vi.advanceTimersByTime(2100);
     });
     act(() => {
-      useGameStore.setState({
-        activeChunks: new Map([['0,0', {} as never]]),
-      });
+      addChunk(STUB_CHUNK);
     });
     act(() => {
       vi.advanceTimersByTime(1000);
@@ -216,7 +225,8 @@ describe('LoadingOverlay', () => {
 
     // Reset game (back to menu)
     act(() => {
-      useGameStore.setState({ gameActive: false, activeChunks: new Map() });
+      resetGame();
+      setGameActive(false);
       setWorldState({
         isGenerating: false,
         generationProgress: 0,
@@ -226,7 +236,7 @@ describe('LoadingOverlay', () => {
 
     // Start second game session -- overlay should appear again
     act(() => {
-      useGameStore.setState({ gameActive: true });
+      setGameActive(true);
       setWorldState({
         isGenerating: true,
         generationProgress: 0.1,

@@ -5,12 +5,12 @@ import {
   closeInventory,
   openInventory,
 } from '@/ecs/actions/inventory-ui';
+import { setGameActive } from '@/ecs/actions/game';
 import { unsafe_resetSessionEntity } from '@/ecs/world';
-import { useGameStore } from '@/stores/gameStore';
 
 beforeEach(() => {
   unsafe_resetSessionEntity();
-  useGameStore.setState({ gameActive: true });
+  setGameActive(true);
 });
 
 test('InventoryScreen renders children when open', async () => {

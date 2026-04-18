@@ -2,15 +2,15 @@ import { beforeEach, expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { QuestLog } from '@app/views/Gameplay/QuestLog';
 import { restoreQuests } from '@/ecs/actions/quest';
+import { setGameActive } from '@/ecs/actions/game';
 import { unsafe_resetSessionEntity } from '@/ecs/world';
-import { useGameStore } from '@/stores/gameStore';
 
 beforeEach(() => {
   unsafe_resetSessionEntity();
 });
 
 test('QuestLog shows an entry for each active quest', async () => {
-  useGameStore.setState({ gameActive: true });
+  setGameActive(true);
   restoreQuests(
     [
       { questId: 'main-chapter-00', currentStep: 1 },
@@ -24,7 +24,7 @@ test('QuestLog shows an entry for each active quest', async () => {
 });
 
 test('QuestLog renders nothing when gameActive is false', async () => {
-  useGameStore.setState({ gameActive: false });
+  setGameActive(false);
   restoreQuests([], [], []);
   const screen = await render(<QuestLog />);
   await expect
