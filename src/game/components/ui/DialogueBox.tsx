@@ -367,7 +367,7 @@ export function DialogueBox() {
   if (!inDialogue && !isClosing) return null;
 
   const npcType = currentInteractable?.type;
-  const portrait = NPC_PORTRAITS[npcType ?? ''] ?? DEFAULT_PORTRAIT;
+  const _portrait = NPC_PORTRAITS[npcType ?? ''] ?? DEFAULT_PORTRAIT;
 
   return (
     <div

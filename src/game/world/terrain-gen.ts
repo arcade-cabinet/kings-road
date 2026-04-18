@@ -389,13 +389,13 @@ export function generateTerrain(
   };
 
   // Create noise functions from seed
-  const baseSeed = cyrb128(seed + ':terrain');
+  const baseSeed = cyrb128(`${seed}:terrain`);
   const baseNoise = createSimplex2D(baseSeed);
-  const ridgeNoiseSeed = cyrb128(seed + ':ridges');
+  const ridgeNoiseSeed = cyrb128(`${seed}:ridges`);
   const ridgeNoiseFunc = createSimplex2D(ridgeNoiseSeed);
-  const coastNoiseSeed = cyrb128(seed + ':coast');
+  const coastNoiseSeed = cyrb128(`${seed}:coast`);
   const coastNoise = createSimplex2D(coastNoiseSeed);
-  const moistureSeed = cyrb128(seed + ':moisture');
+  const moistureSeed = cyrb128(`${seed}:moisture`);
   const moistureNoise = createSimplex2D(moistureSeed);
 
   // Phase 1: Generate land mask and raw elevation
@@ -438,7 +438,7 @@ export function generateTerrain(
   const coastDist = computeCoastDistance(width, height, isLandGrid);
 
   // Phase 3: Generate rivers
-  const riverSeed = cyrb128(seed + ':rivers');
+  const riverSeed = cyrb128(`${seed}:rivers`);
   const rivers = generateRivers(
     width,
     height,

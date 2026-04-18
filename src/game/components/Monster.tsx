@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import type * as THREE from 'three';
 import type { MonsterArchetype } from '../../schemas/monster.schema';
+import { hashString } from '../factories/chibi-generator';
 import {
   buildMonsterRenderData,
   type MonsterGeometry,

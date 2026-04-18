@@ -25,3 +25,8 @@ ios/
 android/
 expo-env.d.ts
 kings-road/
+
+pending-integration/*.zip
+pending-integration/*.ZIP
+
+.remember/

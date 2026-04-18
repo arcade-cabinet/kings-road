@@ -270,7 +270,7 @@ export function CombatHUD() {
       }}
     >
       {/* Damage Flash Overlay */}
-      <div 
+      <div
         className="absolute inset-0 bg-red-900 transition-opacity duration-150"
         style={{ opacity: damageFlash * 0.25 }}
       />

@@ -1,5 +1,5 @@
 import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import * as THREE from 'three';
 import { useCombatStore } from '../stores/combatStore';
 
@@ -17,13 +17,13 @@ export function CombatFeedback() {
   // Initial camera position for relative offsets
   // NOTE: This assumes the camera is controlled by PlayerController or similar
   // and we are just adding a transient offset.
-  
+
   useFrame((_state, delta) => {
     const { lastDamageTime, lastHitTime } = useCombatStore.getState();
-    const now = performance.now();
+    const _now = performance.now();
 
     // ── Screen Shake Logic ───────────────────────────────────────────
-    
+
     let shakeIntensity = 0;
 
     // Shake for damage taken (Stronger)
@@ -31,7 +31,7 @@ export function CombatFeedback() {
       lastDamageRef.current = lastDamageTime;
       shakeIntensity = 0.5;
     }
-    
+
     // Shake for hits dealt (Subtle)
     if (lastHitTime > lastHitRef.current) {
       lastHitRef.current = lastHitTime;
@@ -43,7 +43,7 @@ export function CombatFeedback() {
       shakeRef.current.set(
         (Math.random() - 0.5) * shakeIntensity,
         (Math.random() - 0.5) * shakeIntensity,
-        (Math.random() - 0.5) * shakeIntensity
+        (Math.random() - 0.5) * shakeIntensity,
       );
     } else {
       shakeRef.current.lerp(new THREE.Vector3(0, 0, 0), delta * 15);

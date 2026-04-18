@@ -298,27 +298,33 @@ export function generateFeaturePlacements(
   // PASS 2: Roadside features (to prevent dead zones)
   const allFeatures = getFeaturePool();
   const roadPool = allFeatures.filter((f) => ROADSIDE_FEATURES.includes(f.id));
-  
+
   if (roadPool.length > 0) {
     const roadTiles: [number, number, string][] = [];
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
         const idx = y * map.width + x;
         const tile = map.tiles[idx];
-        if (tile && tile.isLand && tile.hasRoad && !settlementTiles.has(idx)) {
-           // Find which region this belongs to
-           const region = map.regions.find(r => x >= r.bounds[0] && x <= r.bounds[2] && y >= r.bounds[1] && y <= r.bounds[3]);
-           roadTiles.push([x, y, region?.id ?? 'unknown']);
+        if (tile?.isLand && tile.hasRoad && !settlementTiles.has(idx)) {
+          // Find which region this belongs to
+          const region = map.regions.find(
+            (r) =>
+              x >= r.bounds[0] &&
+              x <= r.bounds[2] &&
+              y >= r.bounds[1] &&
+              y <= r.bounds[3],
+          );
+          roadTiles.push([x, y, region?.id ?? 'unknown']);
         }
       }
     }
-    
+
     // Sort road tiles south to north
     roadTiles.sort((a, b) => a[1] - b[1]);
-    
+
     let tilesSinceInteraction = 0;
     const roadRng = mulberry32(cyrb128(`${seed}:roadside`));
-    
+
     for (const [x, y, regionId] of roadTiles) {
       tilesSinceInteraction++;
       // If we've gone 10-14 tiles without a feature, force a spawn
@@ -390,7 +396,13 @@ function getRegionDensity(region: KingdomRegion): string {
  * Generate features with explicit per-region density overrides.
  * This is the preferred entry point when the kingdom config is available.
  */
-const ROADSIDE_FEATURES = ['milestone_marker', 'wayside_shrine', 'crossroads_sign', 'abandoned_camp', 'old_well'];
+const ROADSIDE_FEATURES = [
+  'milestone_marker',
+  'wayside_shrine',
+  'crossroads_sign',
+  'abandoned_camp',
+  'old_well',
+];
 
 export function generateFeaturePlacementsWithDensity(
   map: KingdomMap,
@@ -468,27 +480,33 @@ export function generateFeaturePlacementsWithDensity(
   // PASS 2: Roadside features (to prevent dead zones)
   const allFeatures = getFeaturePool();
   const roadPool = allFeatures.filter((f) => ROADSIDE_FEATURES.includes(f.id));
-  
+
   if (roadPool.length > 0) {
     const roadTiles: [number, number, string][] = [];
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
         const idx = y * map.width + x;
         const tile = map.tiles[idx];
-        if (tile && tile.isLand && tile.hasRoad && !settlementTiles.has(idx)) {
-           // Find which region this belongs to
-           const region = map.regions.find(r => x >= r.bounds[0] && x <= r.bounds[2] && y >= r.bounds[1] && y <= r.bounds[3]);
-           roadTiles.push([x, y, region?.id ?? 'unknown']);
+        if (tile?.isLand && tile.hasRoad && !settlementTiles.has(idx)) {
+          // Find which region this belongs to
+          const region = map.regions.find(
+            (r) =>
+              x >= r.bounds[0] &&
+              x <= r.bounds[2] &&
+              y >= r.bounds[1] &&
+              y <= r.bounds[3],
+          );
+          roadTiles.push([x, y, region?.id ?? 'unknown']);
         }
       }
     }
-    
+
     // Sort road tiles south to north
     roadTiles.sort((a, b) => a[1] - b[1]);
-    
+
     let tilesSinceInteraction = 0;
     const roadRng = mulberry32(cyrb128(`${seed}:roadside`));
-    
+
     for (const [x, y, regionId] of roadTiles) {
       tilesSinceInteraction++;
       // If we've gone 10-14 tiles without a feature, force a spawn

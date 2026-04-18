@@ -95,7 +95,7 @@ export const useCombatStore = create<CombatUIState>((set) => ({
       const now = performance.now();
       const isHeal = text.startsWith('+');
       const isDealt = color === '#ffffff' || color === '#ffcc00'; // Critical or white = player hit
-      
+
       return {
         damagePopups: [
           ...state.damagePopups,

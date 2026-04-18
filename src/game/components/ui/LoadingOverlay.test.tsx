@@ -9,7 +9,7 @@ describe('LoadingOverlay', () => {
     vi.useFakeTimers();
     // Reset stores to default state
     useGameStore.setState({
-      gameActive: false,
+      gameActive: true,
       seedPhrase: 'Golden Verdant Meadow',
       activeChunks: new Map(),
     });
@@ -210,6 +210,7 @@ describe('LoadingOverlay', () => {
 
     // Start second game session -- overlay should appear again
     act(() => {
+      useGameStore.setState({ gameActive: true });
       useWorldStore.setState({
         isGenerating: true,
         generationProgress: 0.1,
