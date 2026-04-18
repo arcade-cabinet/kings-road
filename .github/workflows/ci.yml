@@ -34,7 +34,7 @@ jobs:
         run: pnpm test
 
       - name: Validate content trove
-        run: npx tsx scripts/validate-trove.ts
+        run: pnpm exec tsx scripts/validate-trove.ts
 
       - name: Web build
         run: pnpm build
