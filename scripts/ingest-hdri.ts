@@ -29,6 +29,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const ASSETS_ROOT = process.env.KINGS_ROAD_ASSETS ?? '/Volumes/home/assets';
 
@@ -102,47 +103,13 @@ function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
   const absSource = resolveSourceDir(entry.sourceDir);
 
   try {
-    fs.mkdirSync(outDir, { recursive: true });
+    fs.cpSync(absSource, outDir, { recursive: true });
   } catch (err) {
-    console.error(`  ERROR: could not create output dir ${outDir}: ${err}`);
-    process.exit(1);
-  }
-
-  let sourceFiles: string[];
-  try {
-    sourceFiles = fs.readdirSync(absSource);
-  } catch (err) {
-    console.error(`  ERROR: cannot read source dir "${absSource}": ${err}`);
+    console.error(`  ERROR: cannot copy "${absSource}" → ${outDir}: ${err}`);
     console.error(
       `  Check that KINGS_ROAD_ASSETS points at a local HDRI mirror (current: ${ASSETS_ROOT})`,
     );
     process.exit(1);
-  }
-
-  let copied = 0;
-  for (const file of sourceFiles) {
-    const src = path.join(absSource, file);
-    let isFile: boolean;
-    try {
-      isFile = fs.statSync(src).isFile();
-    } catch (err) {
-      console.warn(`  WARNING: could not stat ${src}, skipping: ${err}`);
-      continue;
-    }
-    if (!isFile) continue;
-
-    try {
-      fs.copyFileSync(src, path.join(outDir, file));
-      console.log(`  ${entry.id}/${file}`);
-      copied++;
-    } catch (err) {
-      console.error(`  ERROR: failed to copy ${src}: ${err}`);
-      process.exit(1);
-    }
-  }
-
-  if (copied === 0) {
-    console.warn(`  WARNING: no files found in ${absSource}`);
   }
 
   aliasHdr(outDir, entry.id);
@@ -175,6 +142,6 @@ function main() {
 }
 
 // Only run when executed directly (not imported by tests)
-if (process.argv[1] === new URL(import.meta.url).pathname) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main();
 }
