@@ -1,6 +1,7 @@
 import { WorldProvider } from 'koota/react';
 import { useEffect } from 'react';
 import { BiomeConfigSchema, BiomeService, biomeConfigs } from '@/biome';
+import { applyDebugSpawn } from '@/debug';
 import { loadSettings } from '@/ecs/actions/settings';
 import { gameWorld } from '@/ecs/world';
 import { loadRoadSpine } from '@/world/road-spine';
@@ -17,6 +18,8 @@ BiomeService.init(
 function App() {
   useEffect(() => {
     void loadSettings();
+    // Skip main menu when ?spawn=<biome> is in the URL. DEV-only, no-op in prod.
+    applyDebugSpawn();
   }, []);
 
   return (

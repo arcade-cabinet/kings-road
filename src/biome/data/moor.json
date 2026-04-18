@@ -3,7 +3,7 @@
   "name": "Ravensgate Moors",
   "description": "Boggy moorland with standing stones and persistent mist.",
   "lighting": {
-    "hdri": "overcast-grey",
+    "hdri": "kloppenheim-04",
     "ambientColor": "#506070",
     "ambientIntensity": 0.3,
     "directionalColor": "#a0b0c0",
@@ -14,7 +14,7 @@
     "fogDensity": 0.012
   },
   "terrain": {
-    "heightmap": "moor-flat",
+    "heightmap": "procedural",
     "scale": 1.0,
     "materials": ["boggy-peat", "heather", "wet-mud"],
     "displacementScale": 0.05
