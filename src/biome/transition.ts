@@ -27,9 +27,15 @@ export function computeBiomeTransition(
   const current = BiomeService.getBiomeById(region.biomeId);
   const [prevId, nextId] = BiomeService.getNeighbors(distanceFromStart);
 
-  // Leading-edge: within the blend window preceding the boundary to next biome
+  // Leading-edge: within the blend window preceding the boundary to next biome.
+  // Skip when the next region shares a biome id — cross-fading a biome with
+  // itself is identity, so return null and let the caller render one biome.
   const leadingEdge = region.endDistance;
-  if (nextId && distanceFromStart >= leadingEdge - transitionMeters) {
+  if (
+    nextId &&
+    nextId !== region.biomeId &&
+    distanceFromStart >= leadingEdge - transitionMeters
+  ) {
     const to = BiomeService.getBiomeById(nextId);
     const t = clamp01(
       (distanceFromStart - (leadingEdge - transitionMeters)) /
@@ -38,9 +44,14 @@ export function computeBiomeTransition(
     return { from: current, to, t };
   }
 
-  // Trailing-edge: within the blend window following the boundary from prev biome
+  // Trailing-edge: within the blend window following the boundary from prev biome.
+  // Same same-biome short-circuit as above.
   const trailingEdge = region.startDistance;
-  if (prevId && distanceFromStart <= trailingEdge + transitionMeters) {
+  if (
+    prevId &&
+    prevId !== region.biomeId &&
+    distanceFromStart <= trailingEdge + transitionMeters
+  ) {
     const from = BiomeService.getBiomeById(prevId);
     const t = clamp01(
       (distanceFromStart - (trailingEdge - transitionMeters)) /

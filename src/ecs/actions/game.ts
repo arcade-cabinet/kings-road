@@ -29,9 +29,9 @@ import type {
   AABB,
   ActiveEncounter,
   ChunkData,
+  ChunkRoleTag,
   InputState,
   Interactable,
-  LegacyChunkType,
 } from '@/types/game';
 import { generateSeedPhrase } from '@/utils/seedPhrase';
 
@@ -160,7 +160,7 @@ export function getChunkState() {
 export function setCurrentChunk(
   key: string,
   name: string,
-  type: LegacyChunkType,
+  type: ChunkRoleTag,
 ): void {
   const e = ensure(ChunkState);
   e.set(ChunkState, {
@@ -281,7 +281,7 @@ export function enterDungeon(dungeon: ActiveDungeon): void {
   cs.set(ChunkState, {
     ...cs.get(ChunkState)!,
     currentChunkName: `${dungeon.name}: ${roomName}`,
-    currentChunkType: 'DUNGEON' as LegacyChunkType,
+    currentChunkType: 'DUNGEON' as ChunkRoleTag,
   });
 }
 export function exitDungeon(): void {
@@ -306,7 +306,7 @@ export function exitDungeon(): void {
   cs.set(ChunkState, {
     ...cs.get(ChunkState)!,
     currentChunkName: 'The Realm',
-    currentChunkType: 'WILD' as LegacyChunkType,
+    currentChunkType: 'WILD' as ChunkRoleTag,
   });
   f.set(GameFlags, { ...f.get(GameFlags)!, inDungeon: false });
   d.set(DungeonSession, { activeDungeon: null });
@@ -416,7 +416,7 @@ export function resetGame(): void {
   cs.set(ChunkState, {
     currentChunkKey: '',
     currentChunkName: 'The Realm',
-    currentChunkType: 'WILD' as LegacyChunkType,
+    currentChunkType: 'WILD' as ChunkRoleTag,
     activeChunks: new Map(),
     globalAABBs: [],
     globalInteractables: [],

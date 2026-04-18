@@ -53,11 +53,22 @@ const WeatherStateSchema = z.object({
   precipitationDensity: z.number().default(0),
 });
 
-const WeatherSchema = z.object({
-  defaultState: z.string(),
-  states: z.array(WeatherStateSchema),
-  transitionDuration: z.number().default(10),
-});
+const WeatherSchema = z
+  .object({
+    defaultState: z.string(),
+    states: z.array(WeatherStateSchema),
+    transitionDuration: z.number().default(10),
+  })
+  .superRefine((val, ctx) => {
+    const ids = new Set(val.states.map((s) => s.id));
+    if (!ids.has(val.defaultState)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['defaultState'],
+        message: `defaultState "${val.defaultState}" is not in states[]: [${[...ids].join(', ')}]`,
+      });
+    }
+  });
 
 const SparklesConfigSchema = z.object({
   count: z.number().int().min(0),

@@ -4,9 +4,9 @@ import type {
   AABB,
   ChunkData,
   ChunkDelta,
+  ChunkRoleTag,
   InputState,
   Interactable,
-  LegacyChunkType,
   NPCType,
 } from '@/types/game';
 
@@ -66,9 +66,9 @@ describe('type definitions', () => {
     });
   });
 
-  describe('LegacyChunkType', () => {
+  describe('ChunkRoleTag', () => {
     it('allows all valid chunk types', () => {
-      const types: LegacyChunkType[] = ['WILD', 'TOWN', 'DUNGEON', 'ROAD'];
+      const types: ChunkRoleTag[] = ['WILD', 'TOWN', 'DUNGEON', 'ROAD'];
       expect(types).toHaveLength(4);
     });
   });
