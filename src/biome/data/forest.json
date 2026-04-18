@@ -1,0 +1,48 @@
+{
+  "id": "forest",
+  "name": "Millbrook Forests",
+  "description": "Dense canopy forest with mossy roots and forest clearings.",
+  "lighting": {
+    "hdri": "forest-dappled",
+    "ambientColor": "#406040",
+    "ambientIntensity": 0.35,
+    "directionalColor": "#c0e0a0",
+    "directionalIntensity": 0.5,
+    "fogColor": "#607050",
+    "fogNear": 30,
+    "fogFar": 180
+  },
+  "terrain": {
+    "heightmap": "forest-floor",
+    "scale": 1.0,
+    "materials": ["forest-soil", "moss-ground", "leaf-litter"],
+    "displacementScale": 0.15
+  },
+  "foliage": {
+    "density": 0.85,
+    "species": [
+      { "assetId": "oak-tree", "density": 0.5, "scaleRange": [0.9, 1.5] },
+      { "assetId": "pine-tree", "density": 0.3, "scaleRange": [0.8, 1.6] },
+      { "assetId": "undergrowth-bush", "density": 0.2, "clusterRadius": 2 }
+    ],
+    "groundCover": ["leaf-litter", "moss-patch", "fern"]
+  },
+  "weather": {
+    "defaultState": "overcast",
+    "states": [
+      { "id": "overcast", "probability": 0.5, "fogMultiplier": 1.2, "windStrength": 0.1, "precipitationType": "none", "precipitationDensity": 0 },
+      { "id": "rain", "probability": 0.3, "fogMultiplier": 1.5, "windStrength": 0.3, "precipitationType": "rain", "precipitationDensity": 0.4 },
+      { "id": "sunny-patches", "probability": 0.2, "fogMultiplier": 0.6, "windStrength": 0.05, "precipitationType": "none", "precipitationDensity": 0 }
+    ],
+    "transitionDuration": 12
+  },
+  "audio": {
+    "ambient": ["forest-ambience", "bird-calls", "wind-through-leaves"],
+    "footstepMaterial": "leaf-litter"
+  },
+  "monsterPool": ["wolf", "forest-spider", "bandit"],
+  "playerModifiers": {
+    "staminaDrainMultiplier": 1.05,
+    "speedMultiplier": 0.92
+  }
+}

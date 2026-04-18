@@ -1,0 +1,46 @@
+{
+  "id": "meadow",
+  "name": "Ashford Meadows",
+  "description": "Rolling green meadows with wildflowers and gentle hills.",
+  "lighting": {
+    "hdri": "golden-noon",
+    "ambientColor": "#f0e8c0",
+    "ambientIntensity": 0.6,
+    "directionalColor": "#ffe8a0",
+    "directionalIntensity": 1.0,
+    "fogColor": "#e8f0d8",
+    "fogNear": 60,
+    "fogFar": 300
+  },
+  "terrain": {
+    "heightmap": "flat-gentle",
+    "scale": 1.0,
+    "materials": ["green-grass", "wildflower-field", "packed-dirt"],
+    "displacementScale": 0.1
+  },
+  "foliage": {
+    "density": 0.35,
+    "species": [
+      { "assetId": "oak-tree", "density": 0.4 },
+      { "assetId": "wildflower-patch", "density": 0.6, "clusterRadius": 4 }
+    ],
+    "groundCover": ["short-grass", "daisy"]
+  },
+  "weather": {
+    "defaultState": "sunny",
+    "states": [
+      { "id": "sunny", "probability": 0.7, "fogMultiplier": 0.5, "windStrength": 0.1, "precipitationType": "none", "precipitationDensity": 0 },
+      { "id": "cloudy", "probability": 0.3, "fogMultiplier": 0.8, "windStrength": 0.2, "precipitationType": "none", "precipitationDensity": 0 }
+    ],
+    "transitionDuration": 20
+  },
+  "audio": {
+    "ambient": ["birds", "wind-gentle", "distant-stream"],
+    "footstepMaterial": "grass"
+  },
+  "monsterPool": ["wolf", "bandit"],
+  "playerModifiers": {
+    "staminaDrainMultiplier": 1.0,
+    "speedMultiplier": 1.0
+  }
+}
