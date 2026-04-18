@@ -107,7 +107,7 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
 
   const { scene, nodes } = useGLTF(
     `${BASE_URL}/assets/npcs/${modelName}.glb`,
-  ) as any;
+  ) as any; // useGLTF return type is dynamic based on GLB node names — no static shape available
 
   // Clone scene or extract specific node from mega-pack
   const clonedScene = useMemo(() => {
