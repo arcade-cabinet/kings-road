@@ -77,24 +77,20 @@ e2e/
 
 ## Controls
 
-### Desktop
+This is a mobile-first game. The web build exists for development and testing.
 
-| Key | Action |
-|-----|--------|
-| W/S | Move forward/backward |
-| A/D | Strafe left/right |
-| Q | Turn left |
-| SHIFT | Walk (slower) |
-| SPACE | Jump |
-| F | Interact |
-| Mouse Drag | Look around |
-| ESC | Pause menu |
+### Touch (primary)
 
-### Mobile
+- **Left half**: touch anywhere to spawn a floating joystick for movement. Push to the edge to sprint.
+- **Right half**: swipe to look around; tap on highlighted world elements to interact (NPCs glow, signposts shimmer, interactables draw a subtle halo).
+- **Jump**: two-finger tap anywhere.
+- **Pause**: tap the quill icon (top-left corner, part of the in-world parchment frame).
 
-- Left half: touch area spawns a virtual joystick for movement
-- Right side: Jump and Interact buttons
-- Push joystick to edge: Sprint
+The HUD is **diegetic** — health shown via vignette + heartbeat, not numbers; inventory items appear on the character's belt/back; dialogue surfaces as illuminated-manuscript speech bubbles anchored to the speaker. If a panel-style overlay is needed, it's styled as vellum, not a game menu.
+
+### Keyboard (debug only)
+
+Desktop keyboard shortcuts exist for development workflow (WASD movement, F to interact, ESC pause) but are not the intended UX and may drift from mobile parity.
 
 ## Content Pipeline
 
