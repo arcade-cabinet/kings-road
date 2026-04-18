@@ -3,7 +3,8 @@ import type { BiomeConfig } from './schema';
 
 type RoadSpineRegion = {
   biome: string;
-  anchorRange: [string, string];
+  // Zod v4 infers z.tuple output as [T?, T?, ...unknown[]]; accept that shape.
+  anchorRange: [string?, string?, ...unknown[]];
 };
 
 type RoadSpineAnchor = {
@@ -59,7 +60,13 @@ function precomputeRegions(spine: RoadSpineData): ResolvedRegion[] {
     spine.anchors.map((a) => [a.id, a.distanceFromStart]),
   );
   return spine.regions.map((region) => {
-    const [startAnchor, endAnchor] = region.anchorRange;
+    const startAnchor = region.anchorRange[0];
+    const endAnchor = region.anchorRange[1];
+    if (!startAnchor || !endAnchor) {
+      throw new BiomeError(
+        `road-spine region has invalid anchorRange: expected [string, string]`,
+      );
+    }
     const startDistance = anchorDistance.get(startAnchor);
     const endDistance = anchorDistance.get(endAnchor);
     if (startDistance === undefined) {
