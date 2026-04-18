@@ -32,6 +32,7 @@
 import { constants } from 'node:fs';
 import { access, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 type Layer = 0 | 1 | 2 | 3 | 4;
 type SubLayer = '2a' | '2b' | '2c' | null;
@@ -66,10 +67,27 @@ const SUBLAYER_ORDER: Record<string, number> = { '2a': 0, '2b': 1, '2c': 2 };
 const args = process.argv.slice(2);
 const updateBaseline = args.includes('--update-baseline');
 const rootArgIdx = args.indexOf('--root');
-const SCRIPT_DIR = new URL('.', import.meta.url).pathname;
-const ROOT =
-  rootArgIdx >= 0 ? resolve(args[rootArgIdx + 1]) : resolve(SCRIPT_DIR, '..');
-const BASELINE_PATH = join(SCRIPT_DIR, 'package-boundaries-baseline.json');
+const SCRIPT_DIR = fileURLToPath(new URL('.', import.meta.url));
+
+function resolveRootArg(
+  argv: string[],
+  rootIndex: number,
+  scriptDir: string,
+): string {
+  if (rootIndex < 0) return resolve(scriptDir, '..');
+  const rootValue = argv[rootIndex + 1];
+  if (!rootValue || rootValue.startsWith('--')) {
+    console.error(
+      'Usage error: --root requires a path.\n' +
+        'Example: npx tsx scripts/check-package-boundaries.ts --root /some/dir',
+    );
+    process.exit(2);
+  }
+  return resolve(rootValue);
+}
+
+const ROOT = resolveRootArg(args, rootArgIdx, SCRIPT_DIR);
+const BASELINE_PATH = join(ROOT, 'scripts', 'package-boundaries-baseline.json');
 
 const PACKAGES_WITH_BARREL = new Set<string>();
 
@@ -170,7 +188,8 @@ function resolveTargetPkg(
   }
   if (specifier.startsWith('@app/')) {
     const rest = specifier.slice(5);
-    const appPkg = PKG_BY_NAME.get('app')!;
+    const appPkg = PKG_BY_NAME.get('app');
+    if (!appPkg) return null;
     const isBarrel = rest === '' || rest === 'index' || rest === 'index.ts';
     return { pkg: appPkg, isBarrel };
   }

@@ -19,7 +19,7 @@ Types (`src/core/types/`):
 - `Vec3` — 3D vector interface
 - `EntityId`, `Seed`, `BiomeId`, `Archetype` — opaque branded string types
 - `asEntityId`, `asSeed`, `asBiomeId` — safe cast helpers
-- `ChunkType`, `CHUNK_TYPES`, `ChunkTypeSchema` — exhaustive chunk type union + Zod schema
+- `ChunkType`, `CHUNK_TYPES`, `isChunkType`, `parseChunkType` — exhaustive chunk type union + dependency-free type guard and parser
 
 Math (`src/core/math/`):
 - `hashString`, `mulberry32`, `cyrb128`, `createRng` — deterministic PRNG / hashing

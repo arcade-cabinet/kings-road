@@ -22,5 +22,6 @@ export {
   asEntityId,
   asSeed,
   CHUNK_TYPES,
-  ChunkTypeSchema,
+  isChunkType,
+  parseChunkType,
 } from './types';
