@@ -36,14 +36,22 @@ export async function loadHeightmap(id: string): Promise<HeightmapData> {
 
   const { width, height } = tex.image as { width: number; height: number };
   const rawData = tex.image.data as Float32Array;
-  const channelCount = rawData.length / (width * height);
+  const pixelCount = width * height;
+  const channelCount = rawData.length / pixelCount;
+
+  if (!Number.isInteger(channelCount) || channelCount < 1) {
+    tex.dispose();
+    throw new AssetError(
+      `Heightmap "${id}" has unexpected channel layout: ${rawData.length} values for ${pixelCount} pixels`,
+    );
+  }
 
   // Extract first channel (R) and normalise to [0, 1]
-  const data = new Float32Array(width * height);
+  const data = new Float32Array(pixelCount);
   let minVal = Infinity;
   let maxVal = -Infinity;
-  for (let i = 0; i < width * height; i++) {
-    const v = (rawData as Float32Array)[i * channelCount];
+  for (let i = 0; i < pixelCount; i++) {
+    const v = rawData[i * channelCount];
     data[i] = v;
     if (v < minVal) minVal = v;
     if (v > maxVal) maxVal = v;
@@ -54,15 +62,15 @@ export async function loadHeightmap(id: string): Promise<HeightmapData> {
     for (let i = 0; i < data.length; i++) {
       data[i] = (data[i] - minVal) / range;
     }
+  } else {
+    // Uniform heightmap — clamp constant value to [0,1] so contract holds.
+    const normalized = Math.max(0, Math.min(1, minVal));
+    data.fill(normalized);
   }
 
   tex.dispose();
 
-  const result: HeightmapData = {
-    data,
-    width: width as number,
-    height: height as number,
-  };
+  const result: HeightmapData = { data, width, height };
   cache.set(id, result);
   return result;
 }

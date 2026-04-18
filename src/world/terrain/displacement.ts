@@ -20,10 +20,11 @@ export interface DisplacedGeometryOptions {
 /**
  * Build a displaced BufferGeometry for one terrain chunk.
  *
- * Seam rule: the UV range for this chunk extends 1 texel into each
- * neighbour so that shared edges sample identical height values regardless
- * of floating-point rounding order. The caller is responsible for ensuring
- * adjacent chunks use the same heightmap and heightScale.
+ * Seam strategy: adjacent chunks use exact boundary UVs — chunk (N) ends at
+ * uMax = (N+1)/totalChunks and chunk (N+1) starts at uMin = (N+1)/totalChunks.
+ * They evaluate sampleHeightmap at the same UV value, producing identical Y on
+ * shared edges regardless of floating-point rounding order. The caller must use
+ * the same heightmap and heightScale for both chunks.
  */
 export function buildDisplacedGeometry(
   heightmap: HeightmapData,
@@ -38,19 +39,19 @@ export function buildDisplacedGeometry(
     heightScale = 20,
   } = options;
 
+  if (segments <= 0 || !Number.isFinite(segments)) {
+    throw new Error('segments must be a positive finite number');
+  }
+  if (totalChunks <= 0 || !Number.isFinite(totalChunks)) {
+    throw new Error('totalChunks must be a positive finite number');
+  }
+
   const vertCount = (segments + 1) * (segments + 1);
   const positions = new Float32Array(vertCount * 3);
   const normals = new Float32Array(vertCount * 3);
   const uvs = new Float32Array(vertCount * 2);
 
-  // UV extent of one chunk in the global heightmap.
-  // Shared edges use the exact boundary UV so adjacent chunks sample the same
-  // heightmap value — no inset here. The 1-pixel-into-neighbour rule applies
-  // only to interior samples that want to avoid texture seams from linear
-  // filtering; the *boundary* of a chunk must land on the exact same UV as
-  // the *boundary* of its neighbour.
   const chunkUvSize = 1 / totalChunks;
-
   const uMin = chunkCx * chunkUvSize;
   const uMax = (chunkCx + 1) * chunkUvSize;
   const vMin = chunkCz * chunkUvSize;
@@ -100,7 +101,7 @@ export function buildDisplacedGeometry(
     }
   }
 
-  computeNormals(positions, indices, normals, segments);
+  computeNormals(positions, indices, normals);
 
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -116,11 +117,7 @@ function computeNormals(
   positions: Float32Array,
   indices: Uint32Array,
   out: Float32Array,
-  segments: number,
 ): void {
-  const stride = segments + 1;
-
-  // Compute per-triangle normals and accumulate onto vertices
   const tmp = new Float32Array(out.length);
 
   for (let i = 0; i < indices.length; i += 3) {
@@ -140,14 +137,18 @@ function computeNormals(
     const ny = az * bx - ax * bz;
     const nz = ax * by - ay * bx;
 
-    for (const vi of [ia, ib, ic]) {
-      tmp[vi] += nx;
-      tmp[vi + 1] += ny;
-      tmp[vi + 2] += nz;
-    }
+    // Accumulate directly — no per-triangle array allocation
+    tmp[ia] += nx;
+    tmp[ia + 1] += ny;
+    tmp[ia + 2] += nz;
+    tmp[ib] += nx;
+    tmp[ib + 1] += ny;
+    tmp[ib + 2] += nz;
+    tmp[ic] += nx;
+    tmp[ic + 1] += ny;
+    tmp[ic + 2] += nz;
   }
 
-  // Normalise
   for (let i = 0; i < tmp.length; i += 3) {
     const len = Math.sqrt(tmp[i] ** 2 + tmp[i + 1] ** 2 + tmp[i + 2] ** 2);
     if (len > 0) {
@@ -155,10 +156,7 @@ function computeNormals(
       out[i + 1] = tmp[i + 1] / len;
       out[i + 2] = tmp[i + 2] / len;
     } else {
-      out[i + 1] = 1; // flat normal fallback
+      out[i + 1] = 1;
     }
   }
-
-  // Suppress unused-var warning — stride is computed for readability
-  void stride;
 }

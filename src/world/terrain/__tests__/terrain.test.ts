@@ -143,6 +143,34 @@ describe('buildDisplacedGeometry', () => {
   });
 });
 
+// ── buildDisplacedGeometry — validation ──────────────────────────────────────
+
+describe('buildDisplacedGeometry — validation', () => {
+  it('throws on segments = 0', () => {
+    expect(() =>
+      buildDisplacedGeometry(FIXTURE_4X4, {
+        chunkSize: 100,
+        chunkCx: 0,
+        chunkCz: 0,
+        totalChunks: 4,
+        segments: 0,
+      }),
+    ).toThrow('segments must be a positive finite number');
+  });
+
+  it('throws on totalChunks = 0', () => {
+    expect(() =>
+      buildDisplacedGeometry(FIXTURE_4X4, {
+        chunkSize: 100,
+        chunkCx: 0,
+        chunkCz: 0,
+        totalChunks: 0,
+        segments: 4,
+      }),
+    ).toThrow('totalChunks must be a positive finite number');
+  });
+});
+
 // ── buildSplatMap ─────────────────────────────────────────────────────────────
 
 const MOCK_BIOME_CONFIG = {
@@ -190,6 +218,16 @@ const MOCK_BIOME_CONFIG = {
 };
 
 describe('buildSplatMap', () => {
+  it('throws when materials array is empty', () => {
+    const emptyMaterials = {
+      ...MOCK_BIOME_CONFIG,
+      terrain: { ...MOCK_BIOME_CONFIG.terrain, materials: [] },
+    };
+    expect(() => buildSplatMap(emptyMaterials as any, 'test-seed')).toThrow(
+      'biomeConfig.terrain.materials must contain at least one material',
+    );
+  });
+
   it('returns a DataTexture of the requested resolution', () => {
     const tex = buildSplatMap(MOCK_BIOME_CONFIG as any, 'test-seed', {
       resolution: 64,

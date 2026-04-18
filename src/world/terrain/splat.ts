@@ -22,9 +22,10 @@ export interface SplatMapOptions {
  * Missing entries default to equal distribution. Weights are normalised so
  * they always sum to 1 per pixel.
  *
- * A small amount of noise is added per-pixel so the seams between flat weight
- * zones show natural variation. The noise is seeded from (seed + chunkCx + chunkCz)
- * so adjacent chunks match at their shared edges (same seed row).
+ * A small amount of per-pixel noise is added to break up flat weight zones.
+ * Note: the noise is generated from a per-chunk sequential RNG, so splat maps
+ * do NOT guarantee continuity at chunk edges — splat seams are acceptable
+ * because the underlying PBR surface normals and heightmap seams are exact.
  */
 export function buildSplatMap(
   biomeConfig: BiomeConfig,
@@ -35,6 +36,12 @@ export function buildSplatMap(
 
   const materials = biomeConfig.terrain.materials.slice(0, 4);
   const matCount = materials.length;
+
+  if (matCount === 0) {
+    throw new Error(
+      'biomeConfig.terrain.materials must contain at least one material',
+    );
+  }
 
   // Resolve base weights from config
   const baseWeights = materials.map((id) => {
@@ -48,32 +55,26 @@ export function buildSplatMap(
   const pixelCount = resolution * resolution;
   const data = new Uint8Array(pixelCount * 4);
 
-  // Per-chunk RNG for noise variation
   const rng = createRng(`${seed}:splat:${chunkCx}:${chunkCz}`);
 
   for (let i = 0; i < pixelCount; i++) {
-    // Add slight per-pixel noise to break up flat zones
-    const noise = [
-      rng() * 0.08 - 0.04,
-      rng() * 0.08 - 0.04,
-      rng() * 0.08 - 0.04,
-      rng() * 0.08 - 0.04,
-    ];
+    const n0 = rng() * 0.08 - 0.04;
+    const n1 = rng() * 0.08 - 0.04;
+    const n2 = rng() * 0.08 - 0.04;
+    const n3 = rng() * 0.08 - 0.04;
 
-    const raw = [
-      Math.max(0, baseWeights[0] + noise[0]),
-      Math.max(0, baseWeights[1] + noise[1]),
-      Math.max(0, baseWeights[2] + noise[2]),
-      Math.max(0, baseWeights[3] + noise[3]),
-    ];
+    const r0 = Math.max(0, baseWeights[0] + n0);
+    const r1 = Math.max(0, baseWeights[1] + n1);
+    const r2 = Math.max(0, baseWeights[2] + n2);
+    const r3 = Math.max(0, baseWeights[3] + n3);
 
-    const sum = raw[0] + raw[1] + raw[2] + raw[3];
+    const sum = r0 + r1 + r2 + r3;
     const inv = sum > 0 ? 1 / sum : 0;
 
-    data[i * 4 + 0] = Math.round(raw[0] * inv * 255);
-    data[i * 4 + 1] = Math.round(raw[1] * inv * 255);
-    data[i * 4 + 2] = Math.round(raw[2] * inv * 255);
-    data[i * 4 + 3] = Math.round(raw[3] * inv * 255);
+    data[i * 4 + 0] = Math.round(r0 * inv * 255);
+    data[i * 4 + 1] = Math.round(r1 * inv * 255);
+    data[i * 4 + 2] = Math.round(r2 * inv * 255);
+    data[i * 4 + 3] = Math.round(r3 * inv * 255);
   }
 
   const tex = new THREE.DataTexture(
