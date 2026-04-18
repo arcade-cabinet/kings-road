@@ -4,5 +4,8 @@
   "name": "Standing Stone",
   "description": "A weathered monolith rises from the grass, its surface traced with spirals so old they seem carved by the wind itself.",
   "visualType": "standing_stone",
-  "interactable": false
+  "interactable": false,
+  "glb": "nature/rocks.glb",
+  "glbScale": 1.5,
+  "glbYawRange": 360
 }

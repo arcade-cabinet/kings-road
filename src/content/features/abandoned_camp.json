@@ -5,5 +5,8 @@
   "description": "A circle of blackened stones marks a cold campfire, surrounded by trampled grass and a torn canvas lean-to.",
   "visualType": "abandoned_camp",
   "interactable": true,
-  "dialogueOnInteract": "The ashes are days old but still faintly warm. A scratched message on a flat stone reads: 'Beware the road past nightfall. They walk without lanterns.'"
+  "dialogueOnInteract": "The ashes are days old but still faintly warm. A scratched message on a flat stone reads: 'Beware the road past nightfall. They walk without lanterns.'",
+  "glb": "dungeon/Crates_and_barrels.glb",
+  "glbScale": 1.0,
+  "glbYawRange": 360
 }

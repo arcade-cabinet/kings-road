@@ -1,3 +1,4 @@
+import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -6,12 +7,11 @@ import {
   getPacingConfig,
   isContentStoreReady,
 } from '@/db/content-queries';
+import { assetUrl } from '@/lib/assets';
 import type { FeatureDefinition } from '@/schemas/feature.schema';
 import {
   addGlobalInteractables,
-  getFlags,
   getPlayer,
-  getSeedPhrase,
   removeGlobalInteractables,
 } from '@/ecs/actions/game';
 import {
@@ -289,15 +289,18 @@ function getFeatureGeometry(type: string): THREE.BufferGeometry {
 // --- Feature mesh component ---
 
 function FeatureMesh({ feature }: { feature: SpawnedFeature }) {
-  const visual = useMemo(
-    () =>
-      getFeatureVisual(feature.definition.visualType, feature.definition.tier),
-    [feature.definition.visualType, feature.definition.tier],
+  // Authored GLB path wins when feature.definition.glb is set. Fallback below
+  // is the legacy colored-primitive renderer, kept for ambient features that
+  // don't yet have authored models.
+  if (feature.definition.glb) {
+    return <AuthoredFeatureMesh feature={feature} />;
+  }
+
+  const visual = getFeatureVisual(
+    feature.definition.visualType,
+    feature.definition.tier,
   );
-  const geometry = useMemo(
-    () => getFeatureGeometry(visual.geometry),
-    [visual.geometry],
-  );
+  const geometry = getFeatureGeometry(visual.geometry);
   const material = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
@@ -321,6 +324,35 @@ function FeatureMesh({ feature }: { feature: SpawnedFeature }) {
       scale={visual.scale}
       castShadow
       receiveShadow
+    />
+  );
+}
+
+function AuthoredFeatureMesh({ feature }: { feature: SpawnedFeature }) {
+  const { glb, glbScale, glbYawRange, tier } = feature.definition;
+  // glb is non-null here per FeatureMesh guard.
+  const gltf = useGLTF(assetUrl(`assets/${glb}`));
+  const tierScale = tier === 'major' ? 1.5 : tier === 'minor' ? 1.0 : 0.6;
+  const scale = tierScale * glbScale;
+
+  // Deterministic per-instance yaw from the feature's id hash.
+  const yawOffset = useMemo(() => {
+    const h = feature.id
+      .split('')
+      .reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) >>> 0, 0);
+    return ((h % 360) / 360) * glbYawRange * (Math.PI / 180);
+  }, [feature.id, glbYawRange]);
+
+  // Clone the scene so multiple instances of the same GLB don't share
+  // transform state. Drei's useGLTF hands out a shared scene by default.
+  const sceneInstance = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+
+  return (
+    <primitive
+      object={sceneInstance}
+      position={feature.position}
+      rotation={[0, feature.rotation + yawOffset, 0]}
+      scale={scale}
     />
   );
 }
