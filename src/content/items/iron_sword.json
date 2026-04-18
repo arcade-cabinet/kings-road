@@ -16,7 +16,7 @@
   },
   "stackable": false,
   "viewmodel": {
-    "glb": "/assets/weapons/knight-sword.glb",
+    "glb": "/assets/weapons/pack/broadsword.glb",
     "handPose": "grip"
   }
 }

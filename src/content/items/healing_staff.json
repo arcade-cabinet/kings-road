@@ -16,7 +16,7 @@
   },
   "stackable": false,
   "viewmodel": {
-    "glb": "/assets/items/Sword-transformed.glb",
+    "glb": "/assets/weapons/pack/bo-001.glb",
     "handPose": "hold"
   }
 }

@@ -10,7 +10,7 @@
   },
   "stackable": true,
   "viewmodel": {
-    "glb": "/assets/weapons/cleaver.glb",
-    "handPose": "grip"
+    "glb": "/assets/dungeon/mine/torch-post.glb",
+    "handPose": "palm"
   }
 }
