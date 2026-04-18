@@ -68,26 +68,33 @@ function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
   const outDir = path.join(outputRoot, entry.id);
   fs.mkdirSync(outDir, { recursive: true });
 
-  const sourceFiles = fs
-    .readdirSync(entry.sourcePack)
-    .filter((f) => f.endsWith('.jpg'));
-  let copied = 0;
+  try {
+    const sourceFiles = fs
+      .readdirSync(entry.sourcePack)
+      .filter((f) => f.endsWith('.jpg'));
+    let copied = 0;
 
-  for (const file of sourceFiles) {
-    const canonical = resolveCanonicalName(file);
-    if (!canonical) continue;
-    fs.copyFileSync(
-      path.join(entry.sourcePack, file),
-      path.join(outDir, canonical),
-    );
-    console.log(`  ${entry.id}/${canonical}  ←  ${file}`);
-    copied++;
-  }
+    for (const file of sourceFiles) {
+      const canonical = resolveCanonicalName(file);
+      if (!canonical) continue;
+      fs.copyFileSync(
+        path.join(entry.sourcePack, file),
+        path.join(outDir, canonical),
+      );
+      console.log(`  ${entry.id}/${canonical}  ←  ${file}`);
+      copied++;
+    }
 
-  if (copied === 0) {
-    console.warn(
-      `  WARNING: no recognizable maps found in ${entry.sourcePack}`,
+    if (copied === 0) {
+      console.warn(
+        `  WARNING: no recognizable maps found in ${entry.sourcePack}`,
+      );
+    }
+  } catch (error) {
+    console.error(
+      `  ERROR processing ${entry.id}: ${error instanceof Error ? error.message : String(error)}`,
     );
+    throw error;
   }
 }
 
@@ -98,18 +105,27 @@ function main() {
     process.exit(1);
   }
 
-  const manifest: ManifestEntry[] = JSON.parse(
-    fs.readFileSync(manifestPath, 'utf-8'),
-  );
-  const outputRoot = path.join(process.cwd(), 'public', 'assets', 'pbr');
-  fs.mkdirSync(outputRoot, { recursive: true });
+  try {
+    const manifest: ManifestEntry[] = JSON.parse(
+      fs.readFileSync(manifestPath, 'utf-8'),
+    );
+    const outputRoot = path.join(process.cwd(), 'public', 'assets', 'pbr');
+    fs.mkdirSync(outputRoot, { recursive: true });
 
-  console.log(`Ingesting ${manifest.length} PBR material(s) → ${outputRoot}\n`);
-  for (const entry of manifest) {
-    console.log(`[${entry.id}]  ${entry.sourcePack}`);
-    ingestEntry(entry, outputRoot);
+    console.log(
+      `Ingesting ${manifest.length} PBR material(s) → ${outputRoot}\n`,
+    );
+    for (const entry of manifest) {
+      console.log(`[${entry.id}]  ${entry.sourcePack}`);
+      ingestEntry(entry, outputRoot);
+    }
+    console.log('\nDone.');
+  } catch (error) {
+    console.error(
+      `Error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
   }
-  console.log('\nDone.');
 }
 
 main();

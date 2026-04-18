@@ -45,11 +45,21 @@ export async function loadPbrMaterial(
     throw new AssetError(`PBR material "${id}" not found in palette`);
   }
 
-  const [colorMap, normalMap, roughnessMap] = await Promise.all([
-    loadTexture(pbrUrl(dir, 'color.jpg'), THREE.SRGBColorSpace),
-    loadTexture(pbrUrl(dir, 'normal.jpg')),
-    loadTexture(pbrUrl(dir, 'roughness.jpg')),
-  ]);
+  let colorMap: THREE.Texture;
+  let normalMap: THREE.Texture;
+  let roughnessMap: THREE.Texture;
+
+  try {
+    [colorMap, normalMap, roughnessMap] = await Promise.all([
+      loadTexture(pbrUrl(dir, 'color.jpg'), THREE.SRGBColorSpace),
+      loadTexture(pbrUrl(dir, 'normal.jpg')),
+      loadTexture(pbrUrl(dir, 'roughness.jpg')),
+    ]);
+  } catch (error) {
+    throw new AssetError(
+      `PBR material "${id}" failed to load required textures: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
 
   for (const map of [colorMap, normalMap, roughnessMap]) {
     map.wrapS = THREE.RepeatWrapping;
@@ -84,6 +94,7 @@ export async function loadPbrMaterial(
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
         mat.aoMap = tex;
+        mat.aoMapIntensity = 1.0;
       })
       .catch(() => {
         /* AO is optional */

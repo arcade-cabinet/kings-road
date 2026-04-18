@@ -30,22 +30,29 @@ function main() {
     process.exit(1);
   }
 
-  const manifest: ManifestEntry[] = JSON.parse(
-    fs.readFileSync(manifestPath, 'utf-8'),
-  );
-  const outputRoot = path.join(process.cwd(), 'public', 'assets', 'terrain');
-  fs.mkdirSync(outputRoot, { recursive: true });
+  try {
+    const manifest: ManifestEntry[] = JSON.parse(
+      fs.readFileSync(manifestPath, 'utf-8'),
+    );
+    const outputRoot = path.join(process.cwd(), 'public', 'assets', 'terrain');
+    fs.mkdirSync(outputRoot, { recursive: true });
 
-  console.log(
-    `Ingesting ${manifest.length} terrain heightmap(s) → ${outputRoot}\n`,
-  );
-  for (const entry of manifest) {
-    const ext = path.extname(entry.sourcePath);
-    const dest = path.join(outputRoot, `${entry.id}${ext}`);
-    fs.copyFileSync(entry.sourcePath, dest);
-    console.log(`  ${entry.id}${ext}  ←  ${entry.sourcePath}`);
+    console.log(
+      `Ingesting ${manifest.length} terrain heightmap(s) → ${outputRoot}\n`,
+    );
+    for (const entry of manifest) {
+      const ext = path.extname(entry.sourcePath);
+      const dest = path.join(outputRoot, `${entry.id}${ext}`);
+      fs.copyFileSync(entry.sourcePath, dest);
+      console.log(`  ${entry.id}${ext}  ←  ${entry.sourcePath}`);
+    }
+    console.log('\nDone.');
+  } catch (error) {
+    console.error(
+      `Error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
   }
-  console.log('\nDone.');
 }
 
 main();
