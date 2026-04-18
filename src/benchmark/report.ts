@@ -11,14 +11,12 @@ function verdictBand(avgFps: number, p1Fps: number): string {
   return 'Port to Godot — bet the farm';
 }
 
-/**
- * Build a markdown report from a BenchmarkSummary.
- * Includes summary table + mermaid gantt for frame-time distribution.
- */
+/** Build a markdown report from a BenchmarkSummary. */
 export function buildMarkdownReport(summary: BenchmarkSummary): string {
   const verdict = verdictBand(summary.avgFps, summary.p1Fps);
 
-  const buckets = Array.from({ length: 10 }, (_, i) => {
+  // 20 buckets × 6ms covers 0–120ms, capturing hitches well above the 60fps budget
+  const buckets = Array.from({ length: 20 }, (_, i) => {
     const lo = i * 6;
     const hi = lo + 6;
     const count = summary.frames.filter(

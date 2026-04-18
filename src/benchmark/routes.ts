@@ -17,7 +17,7 @@ export interface BenchmarkRoute {
   script: ScriptedEvent[];
 }
 
-/** Simple Poisson-deterministic sequence: sine-based walk direction changes. */
+/** Fixed-interval direction changes: turns every 8s using evenly-spaced heading angles. */
 function walkScript(durationSeconds: number): ScriptedEvent[] {
   const events: ScriptedEvent[] = [];
   const changeInterval = 8;
@@ -58,7 +58,8 @@ export const BENCHMARK_ROUTES: BenchmarkRoute[] = [
       { t: 20, frame: { moveZ: 1, sprint: true } },
       // Stop and interact with dungeon entrance
       { t: 35, frame: { moveZ: 0, sprint: false, interact: true } },
-      // Move into first room
+      // Release interact, move into first room
+      { t: 36, frame: { interact: false } },
       { t: 37, frame: { moveZ: 1 } },
       // Stop and attack skeleton
       { t: 50, frame: { moveZ: 0, attack: true } },

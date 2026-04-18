@@ -31,8 +31,8 @@ export interface BenchmarkSummary {
 
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
-  const idx = Math.floor((p / 100) * sorted.length);
-  return sorted[Math.max(0, idx - 1)];
+  const idx = Math.max(0, Math.ceil((p / 100) * sorted.length) - 1);
+  return sorted[idx];
 }
 
 function mean(arr: number[]): number {
@@ -103,11 +103,14 @@ export class BenchmarkCapture {
       avgFps: mean(fps),
       p1Fps: percentile(sortedFps, 1),
       p5Fps: percentile(sortedFps, 5),
-      peakFrameTimeMs: Math.max(0, ...fts),
+      peakFrameTimeMs: fts.length > 0 ? Math.max(...fts) : 0,
       avgFrameTimeMs: mean(fts),
-      peakDrawCalls: Math.max(0, ...this.frames.map((f) => f.drawCalls)),
-      peakTriangles: Math.max(0, ...this.frames.map((f) => f.triangles)),
-      peakJsHeapMb: Math.max(0, ...this.frames.map((f) => f.jsHeapMb)),
+      peakDrawCalls:
+        this.frames.length > 0 ? Math.max(...this.frames.map((f) => f.drawCalls)) : 0,
+      peakTriangles:
+        this.frames.length > 0 ? Math.max(...this.frames.map((f) => f.triangles)) : 0,
+      peakJsHeapMb:
+        this.frames.length > 0 ? Math.max(...this.frames.map((f) => f.jsHeapMb)) : 0,
       frames: this.frames,
     };
   }

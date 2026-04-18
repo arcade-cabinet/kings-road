@@ -13,13 +13,6 @@ export function parseBenchParam(): string | null {
 
 type Phase = 'idle' | 'running' | 'done';
 
-interface BenchmarkState {
-  phase: Phase;
-  routeId: string;
-  elapsed: number;
-  currentFps: number;
-}
-
 /**
  * Inner R3F component — must be mounted inside a Canvas.
  * Drives scripted input and samples renderer stats each frame.
@@ -62,6 +55,8 @@ function BenchmarkFrameSampler({
       doneRef.current = true;
       // Clear all input
       setJoystick({ x: 0, y: 0 }, 0);
+      setKey('action', false);
+      setKey('shift', false);
       onDone();
     }
   });
@@ -70,22 +65,17 @@ function BenchmarkFrameSampler({
 }
 
 /**
- * BenchmarkRunner — mount anywhere in the React tree (outside Canvas is fine;
- * BenchmarkFrameSampler is the in-Canvas child).
+ * BenchmarkRunner — must be mounted INSIDE the R3F <Canvas> because it renders
+ * BenchmarkFrameSampler which calls useThree()/useFrame().
  *
- * Usage: add to the app entry when `?bench=<route-id>` is detected.
+ * Usage: add to the Canvas children when `?bench=<route-id>` is detected.
  * The component handles the full lifecycle: load → run → export → report.
  */
 export function BenchmarkRunner() {
   const routeId = parseBenchParam();
   const route = routeId ? getRoute(routeId) : undefined;
 
-  const [state, setState] = useState<BenchmarkState>({
-    phase: 'idle',
-    routeId: routeId ?? '',
-    elapsed: 0,
-    currentFps: 0,
-  });
+  const [phase, setPhase] = useState<Phase>('idle');
 
   const captureRef = useRef<BenchmarkCapture | null>(null);
   const reportRef = useRef<string>('');
@@ -95,7 +85,7 @@ export function BenchmarkRunner() {
     // Start after a short delay so the scene has time to fully load
     const t = setTimeout(() => {
       captureRef.current = new BenchmarkCapture(route.id);
-      setState((s) => ({ ...s, phase: 'running' }));
+      setPhase('running');
     }, 2000);
     return () => clearTimeout(t);
   }, [route]);
@@ -123,18 +113,19 @@ export function BenchmarkRunner() {
   }
 
   function handleDone() {
-    const summary = captureRef.current!.finish();
-    const md = buildMarkdownReport(summary);
-    reportRef.current = md;
+    if (!captureRef.current) return;
+    const summary = captureRef.current.finish();
+    reportRef.current = buildMarkdownReport(summary);
     exportBenchmarkJson(summary);
-    setState((s) => ({ ...s, phase: 'done' }));
-    // Also log summary to console for Playwright to capture
-    console.log('[benchmark:summary]', JSON.stringify(summary));
+    setPhase('done');
+    // Log summary to console for Playwright to capture — omit per-frame data to keep log size sane
+    const { frames: _frames, ...slim } = summary;
+    console.log('[benchmark:summary]', JSON.stringify(slim));
   }
 
   return (
     <>
-      {state.phase === 'running' && captureRef.current && (
+      {phase === 'running' && captureRef.current && (
         <BenchmarkFrameSampler
           route={route}
           capture={captureRef.current}
@@ -159,9 +150,9 @@ export function BenchmarkRunner() {
           pointerEvents: 'none',
         }}
       >
-        {state.phase === 'idle' && `BENCH: ${route.label} — loading…`}
-        {state.phase === 'running' && `BENCH: ${route.label} — recording`}
-        {state.phase === 'done' && (
+        {phase === 'idle' && `BENCH: ${route.label} — loading…`}
+        {phase === 'running' && `BENCH: ${route.label} — recording`}
+        {phase === 'done' && (
           <>
             <div>BENCH COMPLETE: {route.label}</div>
             <div style={{ marginTop: 4, whiteSpace: 'pre', fontSize: 11 }}>
