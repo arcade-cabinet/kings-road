@@ -33,8 +33,6 @@ jobs:
         with:
           ref: ${{ needs.release-please.outputs.tag_name }}
       - uses: pnpm/action-setup@b307475762933b98ed359c036b0e51f26b63b74b # v5.0.0
-        with:
-          version: 10
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 22
@@ -63,8 +61,6 @@ jobs:
           java-version: 21
       - uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
       - uses: pnpm/action-setup@b307475762933b98ed359c036b0e51f26b63b74b # v5.0.0
-        with:
-          version: 10
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 22
@@ -91,8 +87,6 @@ jobs:
         with:
           ref: ${{ needs.release-please.outputs.tag_name }}
       - uses: pnpm/action-setup@b307475762933b98ed359c036b0e51f26b63b74b # v5.0.0
-        with:
-          version: 10
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 22
