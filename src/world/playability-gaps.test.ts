@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { KingdomConfigSchema } from '@/schemas/kingdom.schema';
-import kingdomConfigJson from '../../content/world/kingdom-config.json';
+import kingdomConfigJson from '../content/world/kingdom-config.json';
 import {
   buildFeatureIndex,
   generateFeaturePlacements,

@@ -686,7 +686,7 @@ export function runValidation(contentDir: string): TroveReport {
 }
 
 function main() {
-  const contentDir = path.resolve(process.cwd(), 'content');
+  const contentDir = path.resolve(process.cwd(), 'src/content');
 
   if (!fs.existsSync(contentDir)) {
     console.log('No content/ directory found. Nothing to validate.');

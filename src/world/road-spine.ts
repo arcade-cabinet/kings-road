@@ -3,7 +3,7 @@ import {
   type RoadSpine,
   RoadSpineSchema,
 } from '@/schemas/world.schema';
-import roadSpineData from '../../content/world/road-spine.json';
+import roadSpineData from '../content/world/road-spine.json';
 
 let cachedSpine: RoadSpine | null = null;
 

@@ -14,19 +14,19 @@ import { layoutTown } from './town-layout';
 
 // Load all content JSON using Vite/Vitest glob imports
 const buildingModules = import.meta.glob<{ default: { id: string } }>(
-  '../../content/buildings/*.json',
+  '../content/buildings/*.json',
   { eager: true },
 );
 const npcModules = import.meta.glob<{ default: { id: string } }>(
-  '../../content/npcs/*.json',
+  '../content/npcs/*.json',
   { eager: true },
 );
 const npcPoolModules = import.meta.glob<{ default: { archetype: string } }>(
-  '../../content/npcs/pools/*.json',
+  '../content/npcs/pools/*.json',
   { eager: true },
 );
 const townModules = import.meta.glob<{ default: { id: string } }>(
-  '../../content/towns/*.json',
+  '../content/towns/*.json',
   { eager: true },
 );
 

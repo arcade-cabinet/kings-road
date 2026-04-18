@@ -588,7 +588,7 @@ function formatIndexSummary(index: IdIndex): string {
 
 function main() {
   const verbose = process.argv.includes('--verbose');
-  const contentDir = path.resolve(process.cwd(), 'content');
+  const contentDir = path.resolve(process.cwd(), 'src/content');
 
   if (!fs.existsSync(contentDir)) {
     console.log('No content/ directory found.');

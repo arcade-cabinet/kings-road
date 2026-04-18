@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import type { GameConfig } from '@/schemas/game-config.schema';
 import { GameConfigSchema } from '@/schemas/game-config.schema';
 
-const CONFIG_PATH = path.resolve(__dirname, '../../content/game-config.json');
+const CONFIG_PATH = path.resolve(__dirname, '../content/game-config.json');
 
 function loadConfig(): GameConfig {
   const raw = fs.readFileSync(CONFIG_PATH, 'utf-8');

@@ -16,7 +16,7 @@ import * as path from 'node:path';
 import initSqlJs from 'sql.js';
 
 const ROOT = process.cwd();
-const CONTENT = path.join(ROOT, 'content');
+const CONTENT = path.join(ROOT, 'src', 'content');
 const CONFIG = path.join(ROOT, 'config');
 const DB_PATH = path.join(CONFIG, 'game.db');
 
