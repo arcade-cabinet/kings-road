@@ -20,7 +20,7 @@ King's Road is a config-driven RPG engine. Content is authored as JSON, validate
 │  validate-content.ts: schema conformance + referential integrity  │
 ├──────────────────────────────────────────────────────────────────┤
 │                        Database Layer                             │
-│  compile-content-db.ts --> SQLite (expo-sqlite + Drizzle ORM)    │
+│  compile-content-db.ts --> SQLite (-community/sqlite + sql.js + Drizzle ORM)    │
 │  Content tables: monsters, items, quests, buildings, towns, etc. │
 │  Save tables: save_slots, player_state, quest_progress, etc.     │
 ├──────────────────────────────────────────────────────────────────┤
@@ -165,7 +165,7 @@ src/
 │   │   └── pacing.ts            # RoadPosition, IsOnRoad, IsAnchor, IsFeature
 │   └── actions/                 # Entity spawning and state mutations
 │
-├── db/                          # Database layer (Drizzle ORM + expo-sqlite)
+├── db/                          # Database layer (Drizzle ORM + -community/sqlite + sql.js)
 │   ├── schema.ts                # Content tables + save state tables
 │   ├── content-queries.ts       # Type-safe queries for content data
 │   ├── load-content-db.ts       # DB initialization at runtime

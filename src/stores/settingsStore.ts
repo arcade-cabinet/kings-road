@@ -23,6 +23,7 @@ export interface DisplaySettings {
   shadows: boolean;
   viewDistance: number; // 1-3 (chunk radius)
   fullscreen: boolean;
+  postProcessing: boolean;
 }
 
 export interface SettingsState {
@@ -55,6 +56,7 @@ const DEFAULT_DISPLAY: DisplaySettings = {
   shadows: true,
   viewDistance: 1,
   fullscreen: false,
+  postProcessing: true,
 };
 
 // ── localStorage persistence ─────────────────────────────────────────────

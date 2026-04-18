@@ -68,7 +68,7 @@ MainMenu, GameHUD, DialogueBox, PauseMenu, SettingsPanel, QuestLog, InventoryScr
 
 ### Build and Deployment
 
-- Expo SDK 55 for web build (`expo export --platform web`)
+- Vite 7 + Capacitor 7 for web and native (`vite build`)
 - GitHub Actions CI: lint, type-check, test, content validation
 - GitHub Actions CD: deploy to GitHub Pages on push to main
 - Dependabot: weekly dependency updates
@@ -141,4 +141,4 @@ Combat resolver is implemented but EncounterSystem is minimal. Skills from the s
 |------|----|--------|
 | Zustand `gameStore` | Koota ECS traits | Partial; core game state still in Zustand |
 | Vite raw JSON imports | SQLite content DB | Complete |
-| Vite dev server | Expo/Metro | Complete |
+| Vite dev server | Complete |

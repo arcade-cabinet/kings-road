@@ -16,7 +16,7 @@ pnpm install
 pnpm dev
 ```
 
-Open `http://localhost:8081` in your browser (Expo dev server).
+Open `http://localhost:5173` in your browser (Vite dev server).
 
 ## The Game
 
@@ -31,10 +31,10 @@ The main quest follows a Holy Grail narrative across 6 anchor points. Side quest
 | Rendering | React Three Fiber, drei, postprocessing |
 | ECS | Koota (pmndrs) |
 | Schemas | Zod 4 |
-| Database | expo-sqlite, Drizzle ORM |
+| Database | -community/sqlite + sql.js, Drizzle ORM |
 | State | Zustand (UI/HUD state) |
 | UI | React 19, Tailwind CSS v4 |
-| Build | Expo (web), Vite (local dev), TypeScript |
+| Build | , Vite (local dev), TypeScript |
 | Testing | Vitest, Playwright (e2e + component) |
 | Formatting | Biome |
 | Audio | Tone.js |
@@ -108,8 +108,8 @@ Game content lives in `content/` as JSON. To add quests, NPCs, buildings, or fea
 ## Commands
 
 ```bash
-pnpm dev                   # Start Expo dev server
-pnpm build                 # Production build (expo export --platform web)
+pnpm dev                   # Start Vite dev server
+pnpm build                 # Production build (vite build)
 pnpm test                  # Run unit tests
 pnpm test:watch            # Watch mode
 pnpm test:coverage         # Coverage report (80% thresholds)
