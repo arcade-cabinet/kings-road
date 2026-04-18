@@ -10,7 +10,7 @@ import {
   generateSeedPhrase,
   useGameStore,
 } from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
+import { syncInventory } from '@/ecs/actions/inventory-ui';
 import { useQuestStore } from '@/stores/questStore';
 import { useWorldStore } from '@/stores/worldStore';
 import { CHUNK_SIZE, PLAYER_HEIGHT } from '@/utils/worldCoords';
@@ -83,7 +83,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
         },
         mergeGameState: (partial) => useGameStore.setState(partial),
         restoreInventory: (items, gold, equipment) => {
-          useInventoryStore.getState().sync(items, 20, gold, equipment);
+          syncInventory(items, 20, gold, equipment);
         },
         restoreQuests: (a, c, t) => {
           useQuestStore.getState().restoreQuests(a, c, t);

@@ -1,10 +1,20 @@
+import { beforeEach, expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
-import { expect, test } from 'vitest';
 import { InventoryScreen } from '@app/views/Gameplay/InventoryScreen';
-import { useInventoryStore } from '@/stores/inventoryStore';
+import {
+  closeInventory,
+  openInventory,
+} from '@/ecs/actions/inventory-ui';
+import { unsafe_resetSessionEntity } from '@/ecs/world';
+import { useGameStore } from '@/stores/gameStore';
+
+beforeEach(() => {
+  unsafe_resetSessionEntity();
+  useGameStore.setState({ gameActive: true });
+});
 
 test('InventoryScreen renders children when open', async () => {
-  useInventoryStore.setState({ isOpen: true });
+  openInventory();
   const screen = await render(<InventoryScreen />);
   const root = screen.container.firstElementChild;
   if (!root) throw new Error('InventoryScreen rendered nothing');
@@ -12,7 +22,7 @@ test('InventoryScreen renders children when open', async () => {
 });
 
 test('InventoryScreen returns null when closed', async () => {
-  useInventoryStore.setState({ isOpen: false });
+  closeInventory();
   const screen = await render(<InventoryScreen />);
   expect(screen.container.firstElementChild).toBeNull();
 });

@@ -10,10 +10,12 @@ import { LoadingOverlay } from '@app/views/Gameplay/LoadingOverlay';
 import { MainMenu } from '@app/views/MainMenu/MainMenu';
 import { PauseMenu } from '@app/views/Gameplay/PauseMenu';
 import { QuestLog } from '@app/views/Gameplay/QuestLog';
+import { useTrait } from 'koota/react';
+import { InventoryUI } from '@/ecs/traits/session-inventory';
+import { getSessionEntity } from '@/ecs/world';
 import { TouchOverlay } from '@/input/providers/TouchProvider';
 import { useInputManager } from '@/input/useInputManager';
 import { useGameStore } from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
 
 export function Game() {
   // Register all input providers (keyboard/mouse, gamepad, touch)
@@ -23,7 +25,7 @@ export function Game() {
   const paused = useGameStore((s) => s.paused);
   const inDialogue = useGameStore((s) => s.inDialogue);
   const inCombat = useGameStore((s) => s.inCombat);
-  const inventoryOpen = useInventoryStore((s) => s.isOpen);
+  const inventoryOpen = useTrait(getSessionEntity(), InventoryUI)?.isOpen ?? false;
 
   // Request pointer lock on click when game is active
   useEffect(() => {
@@ -36,13 +38,17 @@ export function Game() {
         return;
       }
       const state = useGameStore.getState();
-      const inv = useInventoryStore.getState();
+      const inv = (getSessionEntity() as unknown as {
+        has: (t: typeof InventoryUI) => boolean;
+        get: (t: typeof InventoryUI) => { isOpen: boolean };
+      });
+      const invOpen = inv.has(InventoryUI) ? inv.get(InventoryUI).isOpen : false;
       if (
         state.gameActive &&
         !state.paused &&
         !state.inDialogue &&
         !state.inCombat &&
-        !inv.isOpen
+        !invOpen
       ) {
         document.body.requestPointerLock().catch(() => {
           // Pointer lock can fail if document isn't focused or valid — safe to ignore

@@ -1,15 +1,18 @@
 import { OrbitControls, Stage, useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
+import { useTrait } from 'koota/react';
 import { Suspense, useState } from 'react';
-import type { ItemStack } from '@/ecs/traits/inventory';
-import type { ItemDefinition } from '@/schemas/item.schema';
-import { useGameStore } from '@/stores/gameStore';
 import {
+  closeInventory,
   getItemInfo,
   getRarityColor,
   getSlotLabel,
-  useInventoryStore,
-} from '@/stores/inventoryStore';
+} from '@/ecs/actions/inventory-ui';
+import type { ItemStack } from '@/ecs/traits/inventory';
+import { InventoryUI } from '@/ecs/traits/session-inventory';
+import { getSessionEntity } from '@/ecs/world';
+import type { ItemDefinition } from '@/schemas/item.schema';
+import { useGameStore } from '@/stores/gameStore';
 
 // ── Constants ────────────────────────────────────────────────────────────
 
@@ -362,8 +365,10 @@ function EquipmentSlot({
   slot: string;
   onHover: (id: string | null) => void;
 }) {
-  const equipped = useInventoryStore((s) => s.equipped);
-  const itemId = equipped[slot as keyof typeof equipped];
+  const ui = useTrait(getSessionEntity(), InventoryUI);
+  const itemId = ui
+    ? ui.equipped[slot as keyof typeof ui.equipped]
+    : null;
   const [hovered, setHovered] = useState(false);
   const def = itemId ? getItemInfo(itemId) : undefined;
   const rarityColor = def ? getRarityColor(def.rarity) : undefined;
@@ -443,11 +448,12 @@ function EquipmentSlot({
 // ── Main Inventory Screen ────────────────────────────────────────────────
 
 export function InventoryScreen() {
-  const isOpen = useInventoryStore((s) => s.isOpen);
-  const items = useInventoryStore((s) => s.items);
-  const maxSlots = useInventoryStore((s) => s.maxSlots);
-  const gold = useInventoryStore((s) => s.gold);
-  const close = useInventoryStore((s) => s.close);
+  const ui = useTrait(getSessionEntity(), InventoryUI);
+  const isOpen = ui?.isOpen ?? false;
+  const items = ui?.items ?? [];
+  const maxSlots = ui?.maxSlots ?? 20;
+  const gold = ui?.gold ?? 0;
+  const close = closeInventory;
   const gameActive = useGameStore((s) => s.gameActive);
 
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);

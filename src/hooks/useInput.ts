@@ -1,8 +1,12 @@
 /** @deprecated Use InputManager providers instead. This file is no longer imported. */
 
 import { useCallback, useEffect, useRef } from 'react';
+import {
+  closeInventory,
+  isInventoryOpen,
+  toggleInventory,
+} from '@/ecs/actions/inventory-ui';
 import { useGameStore } from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
 
 export function useKeyboardInput() {
   const setKey = useGameStore((state) => state.setKey);
@@ -24,25 +28,21 @@ export function useKeyboardInput() {
         if (!gameActive) return;
         if (dlg) {
           closeDialogue();
-        } else if (useInventoryStore.getState().isOpen) {
-          useInventoryStore.getState().close();
+        } else if (isInventoryOpen()) {
+          closeInventory();
         } else {
           togglePause();
         }
         return;
       }
 
-      if (
-        inDialogue ||
-        useGameStore.getState().paused ||
-        useInventoryStore.getState().isOpen
-      )
+      if (inDialogue || useGameStore.getState().paused || isInventoryOpen())
         return;
 
       // I toggles inventory
       if (k === 'KeyI') {
         e.preventDefault();
-        useInventoryStore.getState().toggle();
+        toggleInventory();
         return;
       }
 

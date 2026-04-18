@@ -1,11 +1,18 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import type { RapierRigidBody } from '@react-three/rapier';
 import { CapsuleCollider, RigidBody, useRapier } from '@react-three/rapier';
+import { useTrait } from 'koota/react';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import {
+  closeInventory,
+  isInventoryOpen,
+  toggleInventory,
+} from '@/ecs/actions/inventory-ui';
+import { InventoryUI } from '@/ecs/traits/session-inventory';
+import { getSessionEntity } from '@/ecs/world';
 import { inputManager } from '@/input/InputManager';
 import { useGameStore } from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
 import { useWorldStore } from '@/stores/worldStore';
 import { getTerrainHeight, PLAYER_HEIGHT } from '@/utils/worldGen';
 import { DUNGEON_DEPTH } from '@/world/dungeon-generator';
@@ -53,7 +60,7 @@ export function PlayerController() {
   const inCombat = useGameStore((state) => state.inCombat);
   const paused = useGameStore((state) => state.paused);
   const gameActive = useGameStore((state) => state.gameActive);
-  const inventoryOpen = useInventoryStore((state) => state.isOpen);
+  const inventoryOpen = useTrait(getSessionEntity(), InventoryUI)?.isOpen ?? false;
 
   // Create Rapier character controller
   useEffect(() => {
@@ -81,13 +88,12 @@ export function PlayerController() {
     // --- UI toggles (one-shot actions) ---
     if (input.pause) {
       const gs = useGameStore.getState();
-      const inv = useInventoryStore.getState();
       if (gs.inDialogue) gs.closeDialogue();
-      else if (inv.isOpen) inv.close();
+      else if (isInventoryOpen()) closeInventory();
       else gs.togglePause();
     }
     if (input.inventory && !inDialogue && !paused) {
-      useInventoryStore.getState().toggle();
+      toggleInventory();
     }
     if (input.interact && !inDialogue && !paused && !inventoryOpen) {
       const interactable = useGameStore.getState().currentInteractable;

@@ -10,7 +10,10 @@ import {
 } from '@/db/save-service';
 import { cn } from '@/lib/utils';
 import { type ActiveDungeon, useGameStore } from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
+import {
+  getInventorySnapshot,
+  syncInventory,
+} from '@/ecs/actions/inventory-ui';
 import { useQuestStore } from '@/stores/questStore';
 import { useWorldStore } from '@/stores/worldStore';
 import { generateDungeonLayout } from '@/world/dungeon-generator';
@@ -103,7 +106,7 @@ function formatDate(iso: string): string {
 function captureSnapshot() {
   const gs = useGameStore.getState();
   const qs = useQuestStore.getState();
-  const inv = useInventoryStore.getState();
+  const inv = getInventorySnapshot();
   return snapshotGameState(
     gs,
     qs,
@@ -342,7 +345,7 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
         useGameStore.setState(partial);
       },
       restoreInventory: (items, gold, equipment) => {
-        useInventoryStore.getState().sync(items, 20, gold, equipment);
+        syncInventory(items, 20, gold, equipment);
       },
       restoreQuests: (activeQuests, completedQuests, triggeredQuests) => {
         useQuestStore
