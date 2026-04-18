@@ -1,4 +1,10 @@
 /*
+ * Game CSS — Tailwind import must precede @font-face per CSS spec
+ * (@import only allowed before @font-face / other at-rules).
+ */
+@import "tailwindcss";
+
+/*
  * Fonts: self-hosted in public/assets/fonts/ so the game works offline and
  * when packaged inside Capacitor native shells (where external CDN loads
  * are unreliable and fail silently).
@@ -52,9 +58,6 @@
   font-display: swap;
   src: url('/assets/fonts/crimsontext-italic-400.woff2') format('woff2');
 }
-
-/* Game CSS */
-@import "tailwindcss";
 
 /* Base styles - warm pastoral medieval theme */
 @layer base {
