@@ -155,14 +155,6 @@ export interface PlacedVegetation {
   deadTree: VegetationInstance[];
   heather: VegetationInstance[];
   boulder: VegetationInstance[];
-  /** @deprecated retained for transitional compatibility — always empty. */
-  pineTrunk: VegetationInstance[];
-  /** @deprecated retained for transitional compatibility — always empty. */
-  pineLeaves: VegetationInstance[];
-  /** @deprecated retained for transitional compatibility — always empty. */
-  oakTrunk: VegetationInstance[];
-  /** @deprecated retained for transitional compatibility — always empty. */
-  oakLeaves: VegetationInstance[];
 }
 
 // ── Placement function ──────────────────────────────────────────────────
@@ -201,12 +193,6 @@ export function placeVegetation(
     deadTree: [],
     heather: [],
     boulder: [],
-    // legacy fields still required by PlacedVegetation type until Chunk.tsx
-    // drops them — they remain empty.
-    pineTrunk: [],
-    pineLeaves: [],
-    oakTrunk: [],
-    oakLeaves: [],
   };
 
   // Helper: get ground height at a world position

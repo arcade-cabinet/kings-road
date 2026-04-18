@@ -101,7 +101,9 @@ export function Game() {
         {/* Diegetic body-sense layer: wound vignette, breath fog, combat
             impact flashes, heartbeat, and low-opacity belt/journal pips. */}
         <DiegeticLayer />
-        {/* Dialogue — HTML fallback until the in-Canvas billboard lands */}
+        {/* Dialogue — illuminated-manuscript HTML overlay. An in-Canvas
+            billboard variant may replace this later but this is the
+            production dialogue surface, not a fallback. */}
         <DialogueBox />
         {/* Inventory panel — triggered by belt tap */}
         <InventoryScreen />
