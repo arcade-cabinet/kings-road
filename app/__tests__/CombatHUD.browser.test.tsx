@@ -3,8 +3,8 @@ import { expect, test } from 'vitest';
 import { CombatHUD } from '@app/views/Gameplay/CombatHUD';
 import { useGameStore } from '@/stores/gameStore';
 
-test('CombatHUD mounts', async () => {
-  useGameStore.setState({ gameActive: true });
+test('CombatHUD mounts without throwing when game is active', async () => {
+  useGameStore.setState({ gameActive: true, inCombat: false });
   const screen = await render(<CombatHUD />);
-  await expect.element(screen.baseElement).toBeTruthy();
+  expect(screen.container).toBeDefined();
 });
