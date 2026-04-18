@@ -44,9 +44,7 @@ function entity(): Entity {
   return getSessionEntity();
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: Koota's Trait generic resolves
-// correctly at the call site; the helper's internal type is erased.
-function ensure<T extends Trait<any>>(t: T): Entity {
+function ensure<T extends Trait<() => object>>(t: T): Entity {
   const e = entity();
   if (!e.has(t)) e.add(t);
   return e;
