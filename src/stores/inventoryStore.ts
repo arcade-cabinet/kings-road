@@ -65,7 +65,7 @@ function writeInventoryOpen(isOpen: boolean): void {
   proxy.set(InventoryUI, { isOpen });
 }
 
-export const useInventoryStore = create<InventoryUIState>((set) => ({
+export const useInventoryStore = create<InventoryUIState>((set, get) => ({
   items: [],
   maxSlots: 20,
   gold: 0,
@@ -75,12 +75,12 @@ export const useInventoryStore = create<InventoryUIState>((set) => ({
   sync: (items, maxSlots, gold, equipped) =>
     set({ items, maxSlots, gold, equipped }),
 
-  toggle: () =>
-    set((s) => {
-      const next = !s.isOpen;
-      writeInventoryOpen(next);
-      return { isOpen: next };
-    }),
+  toggle: () => {
+    // Read current state outside the set updater so the updater stays pure.
+    const next = !get().isOpen;
+    writeInventoryOpen(next);
+    set({ isOpen: next });
+  },
   open: () => {
     writeInventoryOpen(true);
     set({ isOpen: true });
