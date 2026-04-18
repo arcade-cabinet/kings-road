@@ -16,7 +16,7 @@ Project-specific guidance for Claude Code sessions on King's Road.
 - **Database**: sql.js (web) + `@capacitor-community/sqlite` (native) via Drizzle ORM. Content compiled at build time; save state written at runtime.
 - **ECS**: Koota (pmndrs). New game state goes in Koota traits, not Zustand.
 - **Rendering**: React Three Fiber + drei + postprocessing.
-- **Testing**: Vitest (unit), Playwright CT (components), Playwright (e2e).
+- **Testing**: Vitest unit + `happy-dom`; Vitest browser mode (`@vitest/browser` + `@vitest/browser-playwright` + `vitest-browser-react`) for component + WebGL smoke; Playwright for E2E only.
 - **Formatting**: Biome (not Prettier/ESLint).
 
 See `docs/ARCHITECTURE.md` for the full data-flow diagram and code layout.

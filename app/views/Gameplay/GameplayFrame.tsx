@@ -32,7 +32,13 @@ export function GameplayFrame({ children }: { children?: React.ReactNode }) {
   const lastRegionRef = useRef<string>('');
 
   useEffect(() => {
-    if (!gameActive) return;
+    // When gameplay stops (returning to menu, death, etc.) reset the gate so
+    // the next game session's first region fades in cleanly.
+    if (!gameActive) {
+      lastRegionRef.current = '';
+      setVisibleRegion(null);
+      return;
+    }
     const label = chunkToRegionLabel(currentChunkName, currentChunkType);
     if (!label || label === lastRegionRef.current) return;
     lastRegionRef.current = label;
@@ -66,42 +72,41 @@ export function GameplayFrame({ children }: { children?: React.ReactNode }) {
  * No time-of-day dial, no weather icon — those are diegetic (you feel it in the world).
  */
 function TopBand({ regionName }: { regionName: string | null }) {
+  // Region label is fully transient — empty DOM when nothing to show.
+  // Pause affordance is a low-opacity tap zone rendered as a thin quill glyph
+  // that dissolves into the vignette. No button chrome, no border, no card.
   return (
-    <div className="absolute top-0 left-0 right-0 flex items-start justify-between px-5 pt-3 pointer-events-none">
-      {/* Region label — transient, manuscript-style */}
-      <div
-        className={cn(
-          'font-lora italic text-[#4a3820] text-sm md:text-base',
-          'tracking-[0.08em] transition-all duration-700 ease-out',
-          regionName
-            ? 'opacity-80 translate-y-0'
-            : 'opacity-0 -translate-y-1 pointer-events-none',
-        )}
-        style={{
-          textShadow:
-            '0 1px 0 rgba(255,255,255,0.6), 0 0 12px rgba(255,255,255,0.4)',
-        }}
-      >
-        {regionName}
-      </div>
-
-      {/* Quill — pause button, diegetic top-right */}
+    <>
+      {regionName && (
+        <div
+          className={cn(
+            'absolute top-0 left-0 right-0 flex justify-center pt-[max(env(safe-area-inset-top),1rem)]',
+            'font-lora italic text-[#4a3820] text-base md:text-lg',
+            'tracking-[0.12em] pointer-events-none',
+            'animate-kr-region-fade',
+          )}
+          style={{
+            textShadow:
+              '0 1px 0 rgba(255,255,255,0.6), 0 0 12px rgba(255,255,255,0.5)',
+          }}
+        >
+          {regionName}
+        </div>
+      )}
       <button
         type="button"
         aria-label="Pause"
         className={cn(
-          'pointer-events-auto w-10 h-10 rounded-full',
-          'flex items-center justify-center',
-          'bg-white/15 backdrop-blur-sm',
-          'border border-white/25',
-          'active:scale-95 transition-transform duration-200',
-          'shadow-[0_2px_8px_rgba(0,0,0,0.12)]',
+          'absolute w-12 h-12 flex items-center justify-center pointer-events-auto',
+          'top-[max(env(safe-area-inset-top),0.5rem)] right-[max(env(safe-area-inset-right),0.5rem)]',
+          'opacity-40 hover:opacity-90 active:opacity-100',
+          'active:scale-95 transition-all duration-200',
         )}
         onClick={() => useGameStore.getState().togglePause()}
       >
         <QuillIcon />
       </button>
-    </div>
+    </>
   );
 }
 

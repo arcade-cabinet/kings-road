@@ -53,11 +53,9 @@ export function CombatParticles() {
       lastDamageRef.current = lastDamageTime;
       // Player hit burst (blood)
       const bursts = burstsRef.current;
-      // Limit active bursts to the last 4 before appending
-      if (bursts.length >= 5) {
-        burstsRef.current = bursts.slice(-4);
-      }
-      burstsRef.current.push({
+      // Cap active bursts at 5 via in-place shift — no slice() allocation.
+      while (bursts.length >= 5) bursts.shift();
+      bursts.push({
         id: nextBurstId.current++,
         x: playerPos.x,
         y: playerPos.y + 0.5,
@@ -79,10 +77,8 @@ export function CombatParticles() {
         const hitZ = playerPos.z + dirVec.z * 2;
 
         const bursts = burstsRef.current;
-        if (bursts.length >= 5) {
-          burstsRef.current = bursts.slice(-4);
-        }
-        burstsRef.current.push({
+        while (bursts.length >= 5) bursts.shift();
+        bursts.push({
           id: nextBurstId.current++,
           x: hitX,
           y: hitY,

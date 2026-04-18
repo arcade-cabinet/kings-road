@@ -43,7 +43,12 @@ export function MainMenu() {
 
   useEffect(() => {
     if (!gameActive) {
-      hasAnySave().then(setHasSaves);
+      hasAnySave()
+        .then(setHasSaves)
+        .catch((err) => {
+          console.warn('[MainMenu] hasAnySave failed; hiding Continue:', err);
+          setHasSaves(false);
+        });
     }
   }, [gameActive]);
 

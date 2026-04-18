@@ -124,8 +124,10 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
       inFlightRef.current = true;
       setBootError(null);
       try {
-        const currentSeed = seed ?? generateSeedPhrase();
-        if (!seed) setSeedPhrase(currentSeed);
+        // Treat null, undefined, and whitespace-only as missing.
+        const trimmed = seed?.trim() ?? '';
+        const currentSeed = trimmed || generateSeedPhrase();
+        if (currentSeed !== seed) setSeedPhrase(currentSeed);
 
         setFadeOut(true);
         await wait(FADE_OUT_MS);

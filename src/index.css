@@ -72,6 +72,17 @@
   animation: kr-menu-sweep 1.2s ease-in-out;
 }
 
+/* Region-name fade-in when the pilgrim crosses into a named place. */
+@keyframes kr-region-fade {
+  0%   { opacity: 0; transform: translateY(-4px); }
+  20%  { opacity: 0.85; transform: translateY(0); }
+  80%  { opacity: 0.85; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+.animate-kr-region-fade {
+  animation: kr-region-fade 2.8s ease-in-out forwards;
+}
+
 /* Base styles - warm pastoral medieval theme */
 @layer base {
   * {
