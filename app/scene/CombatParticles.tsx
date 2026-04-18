@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { getCombatUI } from '@/ecs/actions/combat-ui';
-import { useGameStore } from '@/stores/gameStore';
+import { getPlayer } from '@/ecs/actions/game';
 
 const PARTICLE_COUNT = 32;
 
@@ -40,7 +40,7 @@ export function CombatParticles() {
 
   useFrame((_state, _delta) => {
     const { lastDamageTime, lastHitTime, damagePopups } = getCombatUI();
-    const playerPos = useGameStore.getState().playerPosition;
+    const playerPos = getPlayer().playerPosition;
     const now = performance.now();
 
     // ── Check for new bursts ─────────────────────────────────────────

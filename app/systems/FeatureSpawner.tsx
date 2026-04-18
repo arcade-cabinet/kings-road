@@ -7,17 +7,19 @@ import {
   isContentStoreReady,
 } from '@/db/content-queries';
 import type { FeatureDefinition } from '@/schemas/feature.schema';
-import { useGameStore } from '@/stores/gameStore';
-import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
+  addGlobalInteractables,
+  getFlags,
+  getPlayer,
+  getSeedPhrase,
+  removeGlobalInteractables,
+} from '@/ecs/actions/game';
+import {
+  useChunkState,
+  useFlags,
+  useSeed,
+} from '@/ecs/hooks/useGameSession';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import type { Interactable } from '@/types/game';
 import { cyrb128, mulberry32 } from '@/utils/random';
 
@@ -332,13 +334,9 @@ const MAX_SPAWNED_FEATURES = 30;
 const INITIAL_GRACE = 3;
 
 export function FeatureSpawner() {
-  const gameActive = useGameStore((s) => s.gameActive);
-  const currentChunkType = useGameStore((s) => s.currentChunkType);
-  const seedPhrase = useGameStore((s) => s.seedPhrase);
-  const addGlobalInteractables = useGameStore((s) => s.addGlobalInteractables);
-  const removeGlobalInteractables = useGameStore(
-    (s) => s.removeGlobalInteractables,
-  );
+  const { gameActive } = useFlags();
+  const { currentChunkType } = useChunkState();
+  const { seedPhrase } = useSeed();
 
   // When kingdom map has pre-placed features, skip timer-based spawning.
   // Features are placed deterministically by the chunk system instead.
@@ -402,7 +400,7 @@ export function FeatureSpawner() {
 
     if (tiersToSpawn.length === 0) return;
 
-    const playerPosition = useGameStore.getState().playerPosition;
+    const { playerPosition } = getPlayer();
 
     // Spawn one feature per triggered tier
     for (const tier of tiersToSpawn) {

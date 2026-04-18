@@ -4,7 +4,8 @@ import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { assetUrl, npcLabelFontUrl } from '@/lib/assets';
 import type { NPCBlueprint } from '@/schemas/npc-blueprint.schema';
-import { useGameStore } from '@/stores/gameStore';
+import { getPlayer, getInteraction } from '@/ecs/actions/game';
+import { useInteraction } from '@/ecs/hooks/useGameSession';
 import type { Interactable } from '@/types/game';
 
 // Reusable vector — avoids per-NPC per-frame allocation
@@ -97,9 +98,7 @@ export function NPC({ interactable, blueprint }: NPCProps) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
 
-  const currentInteractable = useGameStore(
-    (state) => state.currentInteractable,
-  );
+  const { currentInteractable } = useInteraction();
 
   const [highlightIntensity, setHighlightIntensity] = useState(0);
 
@@ -144,7 +143,7 @@ export function NPC({ interactable, blueprint }: NPCProps) {
 
   // Animation
   useFrame((_state, delta) => {
-    const playerPosition = useGameStore.getState().playerPosition;
+    const playerPosition = getPlayer().playerPosition;
     if (!groupRef.current || !npcPosition || !playerPosition) return;
     elapsedRef.current += delta;
 

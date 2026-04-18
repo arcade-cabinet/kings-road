@@ -12,18 +12,18 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { WeatherProfile } from '@/schemas/kingdom.schema';
-import { useGameStore, type WeatherState } from '@/stores/gameStore';
-import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import type { WeatherState } from '@/ecs/traits/session-game';
 import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
-import { gridToWorldOrigin, worldToGrid } from '@/utils/worldCoords';
+  getEnvironment,
+  getFlags,
+  getPlayer,
+  getSeedPhrase,
+  setCurrentWeather,
+} from '@/ecs/actions/game';
+import { useEnvironment } from '@/ecs/hooks/useGameSession';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import { getWorldState } from '@/ecs/actions/world';
+import { worldToGrid } from '@/utils/worldCoords';
 import { createRng } from '@/utils/random';
 import { getRegionAt } from '@/world/kingdom-gen';
 
@@ -147,7 +147,7 @@ function resolveWeather(
 
 function RainParticles() {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const currentWeather = useGameStore((state) => state.currentWeather);
+  const { currentWeather } = useEnvironment();
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   // Per-particle offsets (deterministic)
@@ -174,7 +174,7 @@ function RainParticles() {
     if (!meshRef.current.visible) return;
 
     elapsedRef.current += delta;
-    const pp = useGameStore.getState().playerPosition;
+    const { playerPosition: pp } = getPlayer();
     const px = pp?.x ?? 0;
     const pz = pp?.z ?? 0;
     const wind = currentWeather.windStrength;
@@ -258,7 +258,7 @@ export function WeatherSystem() {
   const fogColorCurrent = useMemo(() => new THREE.Color(0xf5f0e8), []);
 
   useFrame((_, delta) => {
-    const gameActive = useGameStore.getState().gameActive;
+    const { gameActive } = getFlags();
     if (!gameActive) return;
 
     const dt = Math.min(delta, 0.1);
@@ -268,7 +268,9 @@ export function WeatherSystem() {
     if (checkTimerRef.current >= WEATHER_CHECK_INTERVAL) {
       checkTimerRef.current = 0;
 
-      const { playerPosition, timeOfDay, seedPhrase } = useGameStore.getState();
+      const { playerPosition } = getPlayer();
+      const { timeOfDay } = getEnvironment();
+      const seedPhrase = getSeedPhrase();
       const kingdomMap = getWorldState().kingdomMap;
 
       if (kingdomMap && playerPosition) {
@@ -287,8 +289,8 @@ export function WeatherSystem() {
 
         targetRef.current = newWeather;
 
-        // Update store (for HUD display and other systems)
-        useGameStore.getState().setCurrentWeather(newWeather);
+        // Update Koota trait (for HUD display and other systems)
+        setCurrentWeather(newWeather);
         lastRegionRef.current = regionId;
       }
     }
@@ -306,7 +308,7 @@ export function WeatherSystem() {
 
     // ── Apply fog ─────────────────────────────────────────────────────
     if (scene.fog instanceof THREE.Fog) {
-      const timeOfDay = useGameStore.getState().timeOfDay;
+      const { timeOfDay } = getEnvironment();
       const theta = (timeOfDay - 0.25) * Math.PI * 2;
       const isDay = Math.sin(theta) > 0;
 

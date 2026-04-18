@@ -19,17 +19,21 @@ import * as THREE from 'three';
 import { isContentStoreReady } from '@/db/content-queries';
 import type { DungeonLayout } from '@/schemas/dungeon.schema';
 import type { Settlement } from '@/schemas/kingdom.schema';
-import { type ActiveDungeon, useGameStore } from '@/stores/gameStore';
-import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import { type ActiveDungeon } from '@/ecs/traits/session-game';
 import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
+  addGlobalInteractables,
+  closeDialogue,
+  enterDungeon,
+  getFlags,
+  getInteraction,
+  getPlayer,
+  getCamera,
+  removeGlobalInteractables,
+  setPlayerPosition,
+  setCameraYaw,
+} from '@/ecs/actions/game';
+import { useFlags } from '@/ecs/hooks/useGameSession';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import type { Interactable } from '@/types/game';
 import { CHUNK_SIZE } from '@/utils/worldGen';
 import {
@@ -83,8 +87,7 @@ function findSettlementForDungeon(
  * handles entry transitions.
  */
 export function DungeonEntrySystem() {
-  const gameActive = useGameStore((s) => s.gameActive);
-  const inDungeon = useGameStore((s) => s.inDungeon);
+  const { gameActive, inDungeon } = useFlags();
   const kingdomMap = useWorldSession().kingdomMap;
 
   const registeredRef = useRef(false);
@@ -139,7 +142,6 @@ export function DungeonEntrySystem() {
     }
 
     if (newInteractables.length > 0) {
-      const { addGlobalInteractables } = useGameStore.getState();
       addGlobalInteractables(newInteractables);
       entrancesRef.current = entrances;
       interactablesRef.current = newInteractables;
@@ -148,7 +150,6 @@ export function DungeonEntrySystem() {
 
     return () => {
       if (interactablesRef.current.length > 0) {
-        const { removeGlobalInteractables } = useGameStore.getState();
         removeGlobalInteractables(interactablesRef.current);
         entrancesRef.current = [];
         interactablesRef.current = [];
@@ -161,11 +162,11 @@ export function DungeonEntrySystem() {
   useFrame(() => {
     if (!gameActive || inDungeon) return;
 
-    const state = useGameStore.getState();
-    if (!state.inDialogue) return;
+    const { inDialogue } = getFlags();
+    if (!inDialogue) return;
 
     // Check if the current interactable is a dungeon entrance
-    const current = state.currentInteractable;
+    const { currentInteractable: current } = getInteraction();
     if (!current || !current.id.startsWith(DUNGEON_ENTRANCE_PREFIX)) return;
 
     // Find the matching entrance
@@ -175,7 +176,7 @@ export function DungeonEntrySystem() {
     if (!entrance) return;
 
     // Close dialogue and enter dungeon
-    state.closeDialogue();
+    closeDialogue();
     transitionIntoDungeon(entrance);
   });
 
@@ -200,8 +201,6 @@ export function DungeonEntrySystem() {
  * Generate dungeon layout and transition the player into it.
  */
 function transitionIntoDungeon(entrance: DungeonEntrance) {
-  const state = useGameStore.getState();
-
   // Generate spatial layout from the dungeon definition
   const spatial = generateDungeonLayout(entrance.layout);
 
@@ -216,14 +215,17 @@ function transitionIntoDungeon(entrance: DungeonEntrance) {
 
   const entranceIndex = spatial.rooms.indexOf(entranceRoom);
 
+  const { playerPosition } = getPlayer();
+  const { cameraYaw } = getCamera();
+
   // Build active dungeon state
   const activeDungeon: ActiveDungeon = {
     id: entrance.layout.id,
     name: entrance.layout.name,
     spatial,
     currentRoomIndex: entranceIndex,
-    overworldPosition: state.playerPosition.clone(),
-    overworldYaw: state.cameraYaw,
+    overworldPosition: playerPosition.clone(),
+    overworldYaw: cameraYaw,
   };
 
   // Teleport player to the entrance room center
@@ -233,9 +235,9 @@ function transitionIntoDungeon(entrance: DungeonEntrance) {
     entranceRoom.worldZ,
   );
 
-  state.setPlayerPosition(dungeonPos);
-  state.setCameraYaw(Math.PI); // Face north (into the dungeon)
-  state.enterDungeon(activeDungeon);
+  setPlayerPosition(dungeonPos);
+  setCameraYaw(Math.PI); // Face north (into the dungeon)
+  enterDungeon(activeDungeon);
 }
 
 // ── Overworld entrance visual — stone archway ────────────────────────

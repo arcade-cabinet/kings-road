@@ -20,7 +20,13 @@ import {
   recordDialogue,
 } from '@/ecs/actions/quest';
 import type { ActiveQuest, QuestEvents } from '@/ecs/traits/session-quest';
-import { useGameStore } from '@/stores/gameStore';
+import {
+  getCombatSession,
+  getChunkState,
+  getFlags,
+  getInteraction,
+  getPlayer,
+} from '@/ecs/actions/game';
 import { CHUNK_SIZE } from '@/utils/worldGen';
 import { getAnchorById } from '@/world/road-spine';
 
@@ -66,21 +72,22 @@ export function QuestSystem() {
   const prevInCombatRef = useRef(false);
 
   useFrame((_, delta) => {
-    const gameState = useGameStore.getState();
-    const { gameActive, playerPosition } = gameState;
+    const { gameActive } = getFlags();
     if (!gameActive) return;
 
     const dt = Math.min(delta, 0.1);
 
-    // ── Detect dialogue close events ──────────────────────────────────
-    // When inDialogue transitions from true to false, record the NPC
-    // interaction so step conditions can match against it.
-    const wasInDialogue = prevInDialogueRef.current;
-    prevInDialogueRef.current = gameState.inDialogue;
+    const { inDialogue, inCombat, isDead } = getFlags();
+    const { playerPosition } = getPlayer();
+    const { currentChunkType } = getChunkState();
 
-    if (wasInDialogue && !gameState.inDialogue) {
+    // ── Detect dialogue close events ──────────────────────────────────
+    const wasInDialogue = prevInDialogueRef.current;
+    prevInDialogueRef.current = inDialogue;
+
+    if (wasInDialogue && !inDialogue) {
       // currentInteractable may still be set on the close frame
-      const interactable = gameState.currentInteractable;
+      const { currentInteractable: interactable } = getInteraction();
       if (interactable) {
         recordDialogue(interactable.type, interactable.name);
       }
@@ -88,24 +95,24 @@ export function QuestSystem() {
 
     // ── Detect combat end events ──────────────────────────────────────
     const wasInCombat = prevInCombatRef.current;
-    prevInCombatRef.current = gameState.inCombat;
+    prevInCombatRef.current = inCombat;
 
-    if (wasInCombat && !gameState.inCombat && !gameState.isDead) {
+    if (wasInCombat && !inCombat && !isDead) {
       // Combat ended with player alive = victory
       // The encounter system already resolved loot; we just track the event.
-      const encounter = gameState.activeEncounter;
-      const monstersKilled = encounter?.monsters.length ?? 0;
+      const { activeEncounter } = getCombatSession();
+      const monstersKilled = activeEncounter?.monsters.length ?? 0;
       recordCombatVictory(null, monstersKilled);
     }
 
     // Don't evaluate triggers or steps while in dialogue or combat
-    if (gameState.inDialogue || gameState.inCombat) return;
+    if (inDialogue || inCombat) return;
 
     // ── Trigger evaluation (throttled) ────────────────────────────────
     triggerTimerRef.current += dt;
     if (triggerTimerRef.current >= TRIGGER_CHECK_INTERVAL) {
       triggerTimerRef.current = 0;
-      evaluateTriggers(playerPosition, gameState.currentChunkType);
+      evaluateTriggers(playerPosition, currentChunkType);
     }
 
     // ── Step condition evaluation (throttled) ─────────────────────────

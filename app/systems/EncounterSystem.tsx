@@ -19,18 +19,24 @@ import {
 import { CombatUI } from '@/ecs/traits/session-combat';
 import { getSessionEntity } from '@/ecs/world';
 import { inputManager } from '@/input/InputManager';
-import { useGameStore } from '@/stores/gameStore';
+import {
+  die,
+  endCombat,
+  getChunkState,
+  getFlags,
+  getPlayer,
+  getSeedPhrase,
+  setHealth,
+  startCombat,
+} from '@/ecs/actions/game';
+import {
+  useCombatSession,
+  useChunkState,
+  useFlags,
+  useSeed,
+} from '@/ecs/hooks/useGameSession';
 import { recordCombatVictory } from '@/ecs/actions/quest';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
-import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
 import type { ActiveEncounter, SpawnedMonster } from '@/types/game';
 import { createRng } from '@/utils/random';
 import { CHUNK_SIZE } from '@/utils/worldGen';
@@ -118,18 +124,10 @@ function rollEncounterTable(
 // --- Component ---
 
 export function EncounterSystem() {
-  const gameActive = useGameStore((s) => s.gameActive);
-  const seedPhrase = useGameStore((s) => s.seedPhrase);
-  const inCombat = useGameStore((s) => s.inCombat);
-  const inDialogue = useGameStore((s) => s.inDialogue);
-  const paused = useGameStore((s) => s.paused);
-  const activeEncounter = useGameStore((s) => s.activeEncounter);
-  const currentChunkType = useGameStore((s) => s.currentChunkType);
-  const startCombat = useGameStore((s) => s.startCombat);
-  const endCombat = useGameStore((s) => s.endCombat);
-  const setHealth = useGameStore((s) => s.setHealth);
-  const isDead = useGameStore((s) => s.isDead);
-  const die = useGameStore((s) => s.die);
+  const { gameActive, inCombat, inDialogue, paused, isDead } = useFlags();
+  const { seedPhrase } = useSeed();
+  const { activeEncounter } = useCombatSession();
+  const { currentChunkType } = useChunkState();
   const kingdomMap = useWorldSession().kingdomMap;
 
   const combatUI = useTrait(getSessionEntity(), CombatUI);
@@ -165,7 +163,7 @@ export function EncounterSystem() {
     if (!inCombat) {
       combatInitializedRef.current = false;
     }
-  }, [inCombat, activeEncounter, seedPhrase, startCombatUI]);
+  }, [inCombat, activeEncounter, seedPhrase]);
 
   // Handle attack — player attacks nearest alive monster
   const doPlayerAttack = useCallback(() => {
@@ -189,7 +187,7 @@ export function EncounterSystem() {
     if (result.isDead) {
       addDamagePopup('Defeated!', '#66bb6a', popupX, popupY - 0.05, false);
     }
-  }, [playerAttackDamage, addDamagePopup]);
+  }, [playerAttackDamage]);
 
   useFrame((_, delta) => {
     if (!gameActive || inDialogue || paused || !kingdomMap || isDead) return;
@@ -258,7 +256,7 @@ export function EncounterSystem() {
         if (aliveMonsters.length > 0) {
           const { totalDamage, attacks } = monstersTurn(rng);
           if (totalDamage > 0) {
-            const currentHealth = useGameStore.getState().health;
+            const { health: currentHealth } = getPlayer();
             setHealth(currentHealth - totalDamage);
             setRecentDamageTaken(totalDamage);
 
@@ -294,7 +292,7 @@ export function EncounterSystem() {
       return;
     }
 
-    const playerPosition = useGameStore.getState().playerPosition;
+    const { playerPosition } = getPlayer();
     const cx = Math.floor(playerPosition.x / CHUNK_SIZE);
     const cz = Math.floor(playerPosition.z / CHUNK_SIZE);
     const tier = getDangerTier(cx, cz, currentChunkType, kingdomMap);

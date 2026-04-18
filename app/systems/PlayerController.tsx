@@ -9,20 +9,33 @@ import {
   isInventoryOpen,
   toggleInventory,
 } from '@/ecs/actions/inventory-ui';
+import {
+  closeDialogue,
+  getCamera,
+  getFlags,
+  getDungeonSession,
+  getPlayer,
+  openDialogue,
+  setCameraYaw,
+  setCameraPitch,
+  setHealth,
+  setIsGrounded,
+  setIsSprinting,
+  setPlayerPosition,
+  setPlayerVelocityY,
+  setStamina,
+  setVelocity,
+  togglePause,
+  getInteraction,
+} from '@/ecs/actions/game';
+import {
+  useFlags,
+  usePlayer,
+} from '@/ecs/hooks/useGameSession';
 import { InventoryUI } from '@/ecs/traits/session-inventory';
 import { getSessionEntity } from '@/ecs/world';
 import { inputManager } from '@/input/InputManager';
-import { useGameStore } from '@/stores/gameStore';
-import { useWorldSession } from '@/ecs/hooks/useWorldSession';
-import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
+import { getWorldState } from '@/ecs/actions/world';
 import { getTerrainHeight, PLAYER_HEIGHT } from '@/utils/worldGen';
 import { DUNGEON_DEPTH } from '@/world/dungeon-generator';
 
@@ -64,11 +77,8 @@ export function PlayerController() {
   const forwardSpeedRef = useRef(0);
   const strafeSpeedRef = useRef(0);
 
-  // Store selectors - only subscribe to what we need for performance
-  const inDialogue = useGameStore((state) => state.inDialogue);
-  const inCombat = useGameStore((state) => state.inCombat);
-  const paused = useGameStore((state) => state.paused);
-  const gameActive = useGameStore((state) => state.gameActive);
+  // Reactive subscriptions — only what we need for render/early-return logic
+  const { inDialogue, inCombat, paused, gameActive } = useFlags();
   const inventoryOpen = useTrait(getSessionEntity(), InventoryUI)?.isOpen ?? false;
 
   // Create Rapier character controller
@@ -96,25 +106,27 @@ export function PlayerController() {
 
     // --- UI toggles (one-shot actions) ---
     if (input.pause) {
-      const gs = useGameStore.getState();
-      if (gs.inDialogue) gs.closeDialogue();
+      const { inDialogue: currentInDialogue } = getFlags();
+      if (currentInDialogue) closeDialogue();
       else if (isInventoryOpen()) closeInventory();
-      else gs.togglePause();
+      else togglePause();
     }
     if (input.inventory && !inDialogue && !paused) {
       toggleInventory();
     }
     if (input.interact && !inDialogue && !paused && !inventoryOpen) {
-      const interactable = useGameStore.getState().currentInteractable;
-      if (interactable) {
-        useGameStore
-          .getState()
-          .openDialogue(interactable.name, interactable.dialogueText);
+      const { currentInteractable } = getInteraction();
+      if (currentInteractable) {
+        openDialogue(
+          currentInteractable.name,
+          currentInteractable.dialogueText,
+          currentInteractable.type,
+        );
       }
     }
 
     // Don't process movement when game is paused/inactive/in menus/dead
-    const isDead = useGameStore.getState().isDead;
+    const { isDead } = getFlags();
     if (
       !gameActive ||
       paused ||
@@ -127,18 +139,18 @@ export function PlayerController() {
       return;
     }
 
-    const state = useGameStore.getState();
     const controller = controllerRef.current;
     const body = rigidBodyRef.current;
 
     // --- Look: apply deltas to yaw and pitch ---
-    const newYaw = state.cameraYaw - input.lookDeltaX;
+    const { cameraYaw, cameraPitch } = getCamera();
+    const newYaw = cameraYaw - input.lookDeltaX;
     const newPitch = Math.max(
       PITCH_MIN,
-      Math.min(PITCH_MAX, state.cameraPitch - input.lookDeltaY),
+      Math.min(PITCH_MAX, cameraPitch - input.lookDeltaY),
     );
-    useGameStore.getState().setCameraYaw(newYaw);
-    useGameStore.getState().setCameraPitch(newPitch);
+    setCameraYaw(newYaw);
+    setCameraPitch(newPitch);
 
     // --- Movement input ---
     const targetForward = input.moveZ; // +1 forward, -1 backward
@@ -150,15 +162,16 @@ export function PlayerController() {
     let isSprinting = false;
     let maxSpeed = BASE_SPEED;
 
-    if (input.sprint && hasMovement && state.stamina > 0) {
+    const { stamina } = getPlayer();
+    if (input.sprint && hasMovement && stamina > 0) {
       isSprinting = true;
-      useGameStore.getState().setStamina(state.stamina - dt * 25);
+      setStamina(stamina - dt * 25);
       maxSpeed = BASE_SPEED * SPRINT_MULTIPLIER;
     } else {
       const regenRate = hasMovement ? 15 : 20;
-      useGameStore.getState().setStamina(state.stamina + dt * regenRate);
+      setStamina(stamina + dt * regenRate);
     }
-    useGameStore.getState().setIsSprinting(isSprinting);
+    setIsSprinting(isSprinting);
 
     // Forward/back velocity (acceleration/friction model)
     if (Math.abs(targetForward) > 0.01) {
@@ -191,7 +204,7 @@ export function PlayerController() {
       forwardSpeedRef.current * forwardSpeedRef.current +
         strafeSpeedRef.current * strafeSpeedRef.current,
     );
-    useGameStore.getState().setVelocity(combinedSpeed);
+    setVelocity(combinedSpeed);
 
     // Get current body position
     const pos = body.translation();
@@ -231,9 +244,9 @@ export function PlayerController() {
       const corrected = controller.computedMovement();
 
       // Compute terrain-aware floor height (dungeon uses fixed depth)
-      const gameState = useGameStore.getState();
+      const { inDungeon } = getFlags();
       let terrainY: number;
-      if (gameState.inDungeon) {
+      if (inDungeon) {
         terrainY = DUNGEON_DEPTH;
       } else {
         const kingdomMap = getWorldState().kingdomMap;
@@ -256,15 +269,15 @@ export function PlayerController() {
 
       body.setNextKinematicTranslation(newPos);
 
-      // Sync game store (eye-level position for other systems)
+      // Sync Koota traits (eye-level position for other systems)
       const eyePos = new THREE.Vector3(
         newPos.x,
         newPos.y + EYE_OFFSET,
         newPos.z,
       );
-      useGameStore.getState().setPlayerPosition(eyePos);
-      useGameStore.getState().setIsGrounded(controller.computedGrounded());
-      useGameStore.getState().setPlayerVelocityY(velocityYRef.current);
+      setPlayerPosition(eyePos);
+      setIsGrounded(controller.computedGrounded());
+      setPlayerVelocityY(velocityYRef.current);
 
       // Update camera to eye position
       camera.position.copy(eyePos);
@@ -284,7 +297,7 @@ export function PlayerController() {
   });
 
   // Initial position: convert eye-level store position to body center
-  const playerPosition = useGameStore((state) => state.playerPosition);
+  const { playerPosition } = usePlayer();
 
   return (
     <RigidBody
