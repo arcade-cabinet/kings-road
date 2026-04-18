@@ -20,7 +20,8 @@
 import { useGLTF } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { useMemo } from 'react';
-import type * as THREE from 'three';
+import * as THREE from 'three';
+import { SkeletonUtils } from 'three-stdlib';
 import { useTrait } from 'koota/react';
 import { InventoryUI } from '@/ecs/traits/session-inventory';
 import { useFlags } from '@/ecs/hooks/useGameSession';
@@ -28,6 +29,8 @@ import { getSessionEntity } from '@/ecs/world';
 import { assetUrl } from '@/lib/assets';
 import { isContentStoreReady, getItem } from '@/db/content-queries';
 import type { HandPose } from '@/schemas/item.schema';
+
+const DEFAULT_HAND_GLB = '/assets/hands/hand.glb';
 
 /** Local offsets + rotations per hand pose, camera-relative. */
 const POSE_TRANSFORMS: Record<
@@ -70,6 +73,39 @@ function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {
   );
 }
 
+/**
+ * Renders the player's hand just below the weapon. Uses SkeletonUtils
+ * since the hand GLB is rigged (skinned mesh, 13 joints); plain
+ * Object3D.clone would share the skeleton. Positioned slightly below
+ * and behind the weapon so it reads as "gripping" it.
+ */
+function HandMesh({ pose }: { pose: HandPose }) {
+  const gltf = useGLTF(assetUrl(DEFAULT_HAND_GLB)) as unknown as {
+    scene: THREE.Group;
+  };
+  const cloned = useMemo(
+    () => SkeletonUtils.clone(gltf.scene) as THREE.Group,
+    [gltf.scene],
+  );
+
+  const weaponTransform = POSE_TRANSFORMS[pose];
+  // Hand sits below/behind the weapon grip — slight Y offset, same X/Z.
+  const handPos: [number, number, number] = [
+    weaponTransform.position[0] - 0.05,
+    weaponTransform.position[1] - 0.1,
+    weaponTransform.position[2] + 0.1,
+  ];
+
+  return (
+    <primitive
+      object={cloned}
+      position={handPos}
+      rotation={weaponTransform.rotation}
+      scale={weaponTransform.scale * 0.8}
+    />
+  );
+}
+
 export function FPSViewmodel() {
   const { camera } = useThree();
   const { gameActive } = useFlags();
@@ -87,15 +123,18 @@ export function FPSViewmodel() {
 
   if (!gameActive || !viewmodelConfig) return null;
 
-  // Parent the weapon group to the camera so it stays pinned to the
-  // viewport in first-person. The camera itself is already in the R3F
-  // tree; attaching this `primitive` makes the weapon ride along.
+  // Parent the weapon + hand group to the camera so it stays pinned to
+  // the viewport in first-person. The camera itself is already in the
+  // R3F tree; attaching this `primitive` makes both ride along.
   return (
     <primitive object={camera}>
       <WeaponMesh
         glb={viewmodelConfig.glb}
         pose={viewmodelConfig.handPose}
       />
+      <HandMesh pose={viewmodelConfig.handPose} />
     </primitive>
   );
 }
+
+useGLTF.preload(assetUrl(DEFAULT_HAND_GLB));
