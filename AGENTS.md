@@ -1,6 +1,6 @@
 ---
 title: AGENTS.md
-updated: 2026-04-09
+updated: 2026-04-18
 status: current
 domain: technical
 ---
@@ -9,11 +9,15 @@ domain: technical
 
 Extended AI agent operating protocols for King's Road.
 
+> **Quick orientation**: See `CLAUDE.md` for the stack summary, commands, and code layout. This document adds patterns, conventions, and do/do-not rules that are too verbose for CLAUDE.md.
+
 ## Project Overview
 
-King's Road is a config-driven 3D RPG. A player walks the King's Road from Ashford to Grailsend seeking the Holy Grail. Content is defined as Zod-validated JSON, compiled into a SQLite database, consumed by a Koota ECS world, and rendered with React Three Fiber.
+King's Road is a mobile-first config-driven 3D RPG. A player walks the King's Road from Ashford to Grailsend seeking the Holy Grail. Content is defined as Zod-validated JSON, compiled into a SQLite database, consumed by a Koota ECS world, and rendered with React Three Fiber on a Vite + Capacitor stack.
 
 ## Architecture Pipeline
+
+See `docs/ARCHITECTURE.md` for the full layered diagram. Summary:
 
 ```
 Zod Schemas (src/schemas/)
@@ -22,50 +26,51 @@ Zod Schemas (src/schemas/)
 JSON Content (content/)  -->  validate-content.ts
     |
     v
-SQLite DB (src/db/)       -->  compile-content-db.ts (Drizzle ORM)
+SQLite DB                -->  compile-content-db.ts (Drizzle ORM)
+  web: sql.js / native: @capacitor-community/sqlite
     |
     v
 Koota ECS (src/ecs/)     -->  traits, actions, world
     |
     v
-React Three Fiber         -->  GameScene, Chunks, Factories
+React Three Fiber         -->  app/scene/, app/systems/
     |
     v
-Zustand (stores)          -->  game, world, quest, combat, inventory, settings
+Zustand (src/stores/)     -->  game, world, quest, combat, inventory, settings
 ```
 
-## Rendering Pipeline
+## Rendering Tree
 
 ```
-Game.tsx
-└── GameScene.tsx (Canvas)
-    ├── SceneInit (scene background)
-    ├── Environment.tsx (Sky, lighting, fog, day/night, weather)
-    ├── ChunkManager.tsx (world streaming)
-    │   ├── Chunk.tsx (instanced meshes)
-    │   ├── Building.tsx (factory-built structures)
-    │   ├── NPC.tsx (chibi factory characters)
-    │   └── Feature.tsx (roadside points of interest)
-    ├── PlayerController.tsx (physics, camera)
-    ├── InteractionSystem.tsx (NPC detection)
-    ├── QuestSystem.tsx (quest step executor)
-    ├── EncounterSystem.tsx (combat triggers)
-    └── AudioSystem.tsx (ambient layers, Tone.js)
+app/main.tsx
+└── app/App.tsx
+    └── app/Game.tsx
+        └── app/scene/GameScene.tsx (Canvas)
+            ├── app/scene/Environment.tsx (sky, lighting, fog, weather)
+            ├── app/systems/ChunkManager.tsx (world streaming)
+            │   ├── app/scene/Chunk.tsx (instanced meshes)
+            │   ├── app/scene/Building.tsx (factory-built structures)
+            │   ├── app/scene/NPC.tsx (chibi factory characters)
+            │   └── app/scene/Feature.tsx (roadside POI)
+            ├── app/systems/PlayerController.tsx (physics, camera)
+            ├── app/systems/InteractionSystem.tsx (NPC detection)
+            ├── app/systems/QuestSystem.tsx (quest step executor)
+            ├── app/systems/EncounterSystem.tsx (combat triggers)
+            └── app/systems/AudioSystem.tsx (ambient, Tone.js)
 ```
 
 ## Key Directories
 
 | Directory | Purpose |
 |-----------|---------|
+| `app/` | All TSX: entry, App, Game, scene/, systems/, ui/ |
 | `src/schemas/` | Zod schemas defining all content types |
 | `src/ecs/` | Koota ECS world, traits, and actions |
-| `src/db/` | Drizzle ORM schema and SQLite loader |
-| `src/game/components/` | R3F 3D components and UI overlays |
-| `src/game/systems/` | Game logic (no direct visual output) |
-| `src/game/world/` | World generation: road spine, pacing, dungeon, town, kingdom |
-| `src/game/factories/` | Building, NPC, monster, chibi-generator |
-| `src/game/audio/` | Ambient mixer, audio layer factory |
-| `src/game/stores/` | Zustand stores |
+| `src/db/` | Drizzle ORM schema, SQLite loader, save service |
+| `src/stores/` | Zustand stores (being migrated to Koota) |
+| `src/world/` | World generation: road spine, pacing, dungeon, town, kingdom |
+| `src/factories/` | Building, NPC, monster, chibi-generator |
+| `src/audio/` | Ambient mixer, audio layer factory |
 | `content/` | JSON content trove |
 | `scripts/` | Validation and build scripts |
 
@@ -97,7 +102,7 @@ Game.tsx
 
 ### Adding Quests
 
-1. Create a JSON file in the appropriate `content/` subdirectory
+1. Create a JSON file in `content/` subdirectory
 2. Follow `src/schemas/quest.schema.ts`
 3. Reference valid anchors from `content/world/road-spine.json`
 4. See `content/CONTRIBUTING.md` for tone guide and examples
@@ -119,13 +124,13 @@ Game.tsx
 
 1. Create JSON in `content/buildings/`
 2. Follow `src/schemas/building.schema.ts`
-3. Building factory (`src/game/factories/building-factory.ts`) instantiates from config
+3. Building factory (`src/factories/building-factory.ts`) instantiates from config
 
 ### Adding Monsters
 
 1. Create JSON in `content/monsters/`
 2. Follow `src/schemas/monster.schema.ts`
-3. Monster factory (`src/game/factories/monster-factory.ts`) instantiates from config
+3. Monster factory (`src/factories/monster-factory.ts`) instantiates from config
 
 ## ECS Architecture (Koota)
 
@@ -139,25 +144,24 @@ Game.tsx
 
 ### Actions (src/ecs/actions/)
 
-- `spawnPlayer(x, y, z)` -- creates player entity with all traits
-- `updateInput(entity, input)` -- updates player input state
+- `spawnPlayer(x, y, z)` — creates player entity with all traits
+- `updateInput(entity, input)` — updates player input state
 
 ### World
 
-`src/ecs/world.ts` -- single `createWorld()` instance wrapped in `WorldProvider` at the app root.
+`src/ecs/world.ts` — single `createWorld()` instance wrapped in `WorldProvider` at the app root.
 
 ## Code Conventions
 
 ### Formatting
 
 - Biome for formatting and linting (not Prettier/ESLint)
-- Single quotes, semicolons always
-- 2-space indent
+- Single quotes, semicolons always, 2-space indent
 
 ### State Management
 
-- Use Koota traits for new game state (not Zustand)
-- Zustand stores for UI-adjacent state (settings, HUD display values)
+- Use Koota traits for new game state (not Zustand). Zustand stores are legacy and being migrated — see `docs/plans/2026-04-18-koota-migration.md`. Do not add new state to Zustand.
+- Zustand stores remain for UI-adjacent state until migration completes (settings, HUD display values)
 - Use selectors to minimize re-renders: `useGameStore(state => state.specificValue)`
 
 ### React Three Fiber
@@ -170,22 +174,25 @@ Game.tsx
 ### TypeScript
 
 - Strict mode enabled
-- Core types in `src/game/types.ts`
+- Core types in `src/types/game.ts`
 - Schema types inferred from Zod: `z.infer<typeof SchemaName>`
 
 ### Factory Pattern
 
 Building, NPC, and monster factories follow: JSON archetype config → ECS entity + 3D geometry.
-Face textures are generated via canvas (`src/game/factories/face-texture.ts`).
-Chibi character generator: `src/game/factories/chibi-generator.ts`.
+Face textures are generated via canvas (`src/factories/face-texture.ts`).
+Chibi character generator: `src/factories/chibi-generator.ts`.
 
 ## Database Layer
 
 Content compiled into SQLite at build time via `scripts/compile-content-db.ts`.
 Drizzle schema at `src/db/schema.ts`. Content queries at `src/db/content-queries.ts`.
 Save service at `src/db/save-service.ts`.
+Web runtime: sql.js. Native runtime: `@capacitor-community/sqlite`.
 
 ## Testing
+
+See `docs/TESTING.md` for the full testing reference. Quick commands:
 
 ```bash
 pnpm test                # Vitest unit tests
@@ -200,7 +207,9 @@ npx tsx scripts/validate-content.ts  # Content validation
 - Create new React context providers (use Koota or Zustand)
 - Use `setInterval`/`setTimeout` for game loops (use `useFrame`)
 - Store Three.js objects in React state (use refs)
+- Add new state to Zustand stores (use Koota traits)
 - Add unused dependencies
 - Use grimdark, edgy, or nihilistic tone in any content
-- Put content JSON in `src/` (it belongs in `content/`)
+- Put content JSON in `src/` or `app/` (it belongs in `content/`)
 - Exceed 300 LOC per file
+- Build panel-style HUD overlays — HUD must be diegetic (see `docs/DESIGN.md`)

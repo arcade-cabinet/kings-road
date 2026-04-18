@@ -1,6 +1,6 @@
 ---
 title: King's Road
-updated: 2026-04-09
+updated: 2026-04-18
 status: current
 domain: product
 ---
@@ -31,10 +31,10 @@ The main quest follows a Holy Grail narrative across 6 anchor points. Side quest
 | Rendering | React Three Fiber, drei, postprocessing |
 | ECS | Koota (pmndrs) |
 | Schemas | Zod 4 |
-| Database | -community/sqlite + sql.js, Drizzle ORM |
-| State | Zustand (UI/HUD state) |
+| Database | sql.js (web) + @capacitor-community/sqlite (native), Drizzle ORM |
+| State | Zustand (UI/HUD state, migrating to Koota) |
 | UI | React 19, Tailwind CSS v4 |
-| Build | , Vite (local dev), TypeScript |
+| Build | Vite 7 (web + native dist), Capacitor 7 (native wrapper), TypeScript |
 | Testing | Vitest, Playwright (e2e + component) |
 | Formatting | Biome |
 | Audio | Tone.js |
@@ -42,19 +42,27 @@ The main quest follows a Holy Grail narrative across 6 anchor points. Side quest
 ## Project Structure
 
 ```
-src/
+app/                      # All TSX: entry, App, Game, scene/, systems/, ui/
+├── main.tsx              # Vite entry point
+├── App.tsx               # Root React tree
+├── Game.tsx              # Menu vs active game
+├── ErrorBoundary.tsx
+├── scene/                # R3F 3D components (Chunk, Building, NPC, Feature, etc.)
+├── systems/              # Game logic (PlayerController, ChunkManager, etc.)
+└── ui/                   # 2D overlay and diegetic HUD components
+
+src/                      # Logical subpackages
 ├── schemas/              # Zod schemas for all content types
 ├── ecs/                  # Koota ECS layer (world, traits, actions)
 ├── db/                   # Drizzle ORM schema, content DB loader, save service
-├── game/
-│   ├── components/       # R3F 3D components
-│   │   └── ui/           # 2D overlay components (HUD, menus, dialogue)
-│   ├── systems/          # Game logic: Player, Chunks, Quests, Combat, etc.
-│   ├── world/            # Road spine, pacing engine, dungeon/town/kingdom gen
-│   ├── factories/        # Building, NPC, monster, chibi-generator
-│   ├── audio/            # Ambient mixer, Tone.js layer factory
-│   ├── hooks/            # Input handling
-│   └── stores/           # Zustand stores (game, world, quest, combat, settings)
+├── stores/               # Zustand stores (game, world, quest, combat, settings)
+├── types/                # Shared TypeScript types
+├── world/                # Road spine, pacing engine, dungeon/town/kingdom gen
+├── factories/            # Building, NPC, monster, chibi-generator
+├── audio/                # Ambient mixer, Tone.js layer factory
+├── hooks/                # useInput and other React hooks
+└── utils/                # RNG, textures, utilities
+
 content/                  # JSON content trove
 ├── world/road-spine.json # 6 anchors along the 30km road
 ├── main-quest/           # Main story chapters
@@ -67,10 +75,12 @@ content/                  # JSON content trove
 ├── dungeons/             # Dungeon layouts
 ├── encounters/           # Narrative encounter definitions
 └── CONTRIBUTING.md       # Tone guide, schema examples, authoring rules
+
 scripts/
 ├── validate-content.ts   # Content validation pipeline
 ├── compile-content-db.ts # Compile JSON content to SQLite
 └── assemble-game-config.ts
+
 e2e/
 └── game.spec.ts          # Playwright end-to-end test
 ```
@@ -104,14 +114,24 @@ Game content lives in `content/` as JSON. To add quests, NPCs, buildings, or fea
 ## Commands
 
 ```bash
-pnpm dev                   # Start Vite dev server
-pnpm build                 # Production build (vite build)
-pnpm test                  # Run unit tests
+# Development
+pnpm dev                   # Vite dev server at localhost:5173
+pnpm build                 # Production web build
+
+# Native (Capacitor)
+pnpm build:native          # Build dist/ for Capacitor
+pnpm cap:sync              # Sync dist/ into android/ios
+pnpm native:android:debug  # Full Android debug APK pipeline
+
+# Tests (see docs/TESTING.md for full reference)
+pnpm test                  # Vitest unit tests
 pnpm test:watch            # Watch mode
 pnpm test:coverage         # Coverage report (80% thresholds)
 pnpm test:ct               # Playwright component tests
 pnpm test:e2e              # Playwright end-to-end tests
 pnpm test:all              # All test suites
+
+# Other
 pnpm tsc --noEmit          # Type check
 npx tsx scripts/validate-content.ts    # Validate content trove
 npx tsx scripts/compile-content-db.ts  # Recompile content DB

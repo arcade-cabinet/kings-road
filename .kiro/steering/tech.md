@@ -15,24 +15,26 @@
 | Audio | Tone.js |
 | Physics | @react-three/rapier |
 | Package manager | pnpm |
-| Mobile | Expo / React Native (secondary target) |
+| Mobile | Capacitor 7 (wraps Vite dist/, native target) |
 
 ## Path Alias
 
-`@/*` maps to `src/*` (configured in tsconfig and vite).
+`@/*` maps to `src/*`, `@app/*` maps to `app/*` (configured in tsconfig and vite).
 
 ## Commands
 
 ```bash
-pnpm dev                              # Dev server (localhost:5173)
-pnpm build                            # Production build
+pnpm dev                              # Vite dev server (localhost:5173)
+pnpm build                            # Production web build
+pnpm build:native                     # Build dist/ for Capacitor
+pnpm cap:sync                         # Sync dist/ into android/ios
+pnpm native:android:debug             # Full Android debug APK pipeline
 pnpm test                             # Vitest unit tests (single run)
 pnpm test:watch                       # Vitest watch mode
 pnpm test:coverage                    # Coverage report
 pnpm test:e2e                         # Playwright e2e
 pnpm test:ct                          # Playwright component tests
 pnpm tsc --noEmit                     # Type check
-npx tsx scripts/validate-trove.ts     # Validate content JSON against schemas
 npx tsx scripts/validate-content.ts   # Content validation
 ```
 

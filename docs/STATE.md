@@ -113,7 +113,7 @@ MainMenu, GameHUD, DialogueBox, PauseMenu, SettingsPanel, QuestLog, InventoryScr
 
 ### Priority 1: Playability
 
-The `playability-gaps.test.ts` test (in `src/game/world/`) identified that road tiles may have insufficient ambient content. Roadside features (milestone markers, wayside shrines, crossroads signs) need to spawn on or adjacent to road tiles, not just in wilderness.
+The `playability-gaps.test.ts` test (in `src/world/`) identified that road tiles may have insufficient ambient content. Roadside features (milestone markers, wayside shrines, crossroads signs) need to spawn on or adjacent to road tiles, not just in wilderness.
 
 ### Priority 2: Asset Integration
 
@@ -138,6 +138,6 @@ Combat resolver is implemented but EncounterSystem is minimal. Skills from the s
 
 | From | To | Status |
 |------|----|--------|
-| Zustand `gameStore` | Koota ECS traits | Partial; core game state still in Zustand |
+| Zustand `gameStore` | Koota ECS traits | Partial; core game state still in Zustand (see `docs/plans/2026-04-18-koota-migration.md`) |
 | Vite raw JSON imports | SQLite content DB | Complete |
-| Vite dev server | Complete |
+| Panel-style HUD overlays | Diegetic HUD | In progress (see `docs/plans/2026-04-18-diegetic-hud.md`) |

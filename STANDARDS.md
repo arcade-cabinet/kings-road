@@ -1,6 +1,6 @@
 ---
 title: Standards
-updated: 2026-04-09
+updated: 2026-04-18
 status: current
 domain: technical
 ---
@@ -35,7 +35,7 @@ Configuration lives in `biome.json`. Settings:
 - Strict mode enabled in `tsconfig.json`
 - No `any` casts without a comment explaining why
 - All schema types derived from Zod: `z.infer<typeof SchemaName>`
-- Core shared types in `src/game/types.ts`
+- Core shared types in `src/types/game.ts`
 
 ### Testing
 
@@ -108,7 +108,7 @@ Do not use:
 
 - Static geometry: `THREE.InstancedMesh` only
 - Dynamic/unique props: clone from loaded GLB nodes (hybrid CC0 technique, see `docs/HYBRID_PROCEDURAL_CC0.md`)
-- Textures: procedural canvas textures via `src/game/utils/textures.ts`
+- Textures: procedural canvas textures via `src/utils/textures.ts`
 - CHUNK_SIZE = 120 units, BLOCK_SIZE = 5 units
 
 ## CI Requirements
@@ -123,5 +123,5 @@ All PRs must pass:
 
 - Do not add dependencies without a clear, specific use case
 - Prefer zero-dependency solutions for simple utilities
-- Check that a dependency supports both web and React Native before adding it
+- Check that a dependency supports both web (Vite) and Capacitor native before adding it
 - Peer dependencies for R3F must use exact version ranges matching `three`

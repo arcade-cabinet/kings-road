@@ -1,6 +1,6 @@
 ---
 title: Testing
-updated: 2026-04-09
+updated: 2026-04-18
 status: current
 domain: quality
 ---
@@ -35,16 +35,18 @@ npx tsx scripts/validate-content.ts  # Content trove validation
 ## Coverage
 
 Coverage is collected for:
-- `src/game/stores/**` -- Zustand store logic
-- `src/game/utils/**` -- RNG, textures, utilities
-- `src/game/hooks/**` -- useInput
-- `src/game/types.ts`
+- `src/stores/**` -- Zustand store logic
+- `src/utils/**` -- RNG, textures, utilities
+- `src/hooks/**` -- useInput
+- `src/types/**`
 - `src/lib/**`
+- `src/world/**` -- world generation logic
+- `src/factories/**` -- entity factories
 
 Excluded from coverage (intentionally):
-- `src/game/components/**` -- React Three Fiber components (WebGL context required)
-- `src/game/systems/**` -- Game systems (R3F dependency)
-- `src/game/Game.tsx`
+- `app/scene/**` -- React Three Fiber components (WebGL context required)
+- `app/systems/**` -- Game systems (R3F dependency)
+- `app/Game.tsx`
 
 Coverage thresholds (all must pass):
 - Statements: 80%
@@ -63,31 +65,29 @@ src/
 │   ├── quest.schema.test.ts       # Schema validation edge cases
 │   ├── building.schema.ts
 │   └── building.schema.test.ts
-├── game/
-│   ├── systems/
-│   │   ├── combat-resolver.ts
-│   │   ├── combat-resolver.test.ts  # Deterministic combat outcomes
-│   │   ├── quest-step-executor.ts
-│   │   └── quest-step-executor.test.ts
-│   ├── world/
-│   │   ├── pacing-engine.ts
-│   │   ├── pacing-engine.test.ts    # Feature placement intervals
-│   │   ├── kingdom-gen.ts
-│   │   ├── kingdom-gen.test.ts
-│   │   ├── dungeon-generator.ts
-│   │   └── dungeon-generator.test.ts
-│   ├── factories/
-│   │   ├── building-factory.ts
-│   │   ├── building-factory.test.ts
-│   │   ├── npc-factory.ts
-│   │   ├── npc-factory.test.ts
-│   │   ├── chibi-generator.ts
-│   │   └── chibi-generator.test.ts
-│   └── stores/
-│       ├── gameStore.ts
-│       ├── gameStore.test.ts
-│       ├── questStore.ts
-│       └── questStore.test.ts
+├── combat-resolver.ts
+├── combat-resolver.test.ts        # Deterministic combat outcomes
+├── quest-step-executor.ts
+├── quest-step-executor.test.ts
+├── world/
+│   ├── pacing-engine.ts
+│   ├── pacing-engine.test.ts      # Feature placement intervals
+│   ├── kingdom-gen.ts
+│   ├── kingdom-gen.test.ts
+│   ├── dungeon-generator.ts
+│   └── dungeon-generator.test.ts
+├── factories/
+│   ├── building-factory.ts
+│   ├── building-factory.test.ts
+│   ├── npc-factory.ts
+│   ├── npc-factory.test.ts
+│   ├── chibi-generator.ts
+│   └── chibi-generator.test.ts
+└── stores/
+    ├── gameStore.ts
+    ├── gameStore.test.ts
+    ├── questStore.ts
+    └── questStore.test.ts
 ```
 
 ## Component Tests (Playwright CT)
@@ -95,7 +95,7 @@ src/
 Component tests use `@playwright/experimental-ct-react` to mount UI components in isolation with a real browser:
 
 ```
-src/game/components/ui/
+app/ui/
 ├── MainMenu.ct.tsx
 ├── GameHUD.ct.tsx
 ├── DialogueBox.ct.tsx
@@ -158,13 +158,13 @@ Select integration tests are marked and run as part of the standard Vitest suite
 World generation performance:
 
 ```
-src/game/world/
+src/benchmarks/
 └── kingdom-gen.bench.test.ts   # Kingdom gen performance
 ```
 
 Run benchmarks:
 ```bash
-pnpm test -- --reporter=verbose src/game/world/kingdom-gen.bench.test.ts
+pnpm test -- --reporter=verbose src/benchmarks/kingdom-gen.bench.test.ts
 ```
 
 ## What to Test When
@@ -173,9 +173,9 @@ pnpm test -- --reporter=verbose src/game/world/kingdom-gen.bench.test.ts
 |---------|-----|
 | Schema changes | `pnpm test -- src/schemas/` |
 | Content JSON | `npx tsx scripts/validate-content.ts` |
-| Store logic | `pnpm test -- src/game/stores/` |
-| World generation | `pnpm test -- src/game/world/` |
-| Factory logic | `pnpm test -- src/game/factories/` |
+| Store logic | `pnpm test -- src/stores/` |
+| World generation | `pnpm test -- src/world/` |
+| Factory logic | `pnpm test -- src/factories/` |
 | UI components | `pnpm test:ct` |
 | Full game | `pnpm test:e2e` |
 | All | `pnpm test:all` |

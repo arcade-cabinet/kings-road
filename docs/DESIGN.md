@@ -1,6 +1,6 @@
 ---
 title: Design
-updated: 2026-04-09
+updated: 2026-04-18
 status: current
 domain: product
 ---
@@ -114,15 +114,20 @@ font-style: italic;
 
 Centered layout on warm cream background. Title "King's Road" in Lora serif, subtitle "Seek the Holy Grail". Seed phrase shown in a parchment-styled container. Warm amber/gold "Enter Realm" button. Gentle floating particles in warm gold tones.
 
-### HUD
+### HUD (Diegetic-First)
 
-- **Top Left**: Health and stamina bars in warm tones (sage green health, amber stamina)
-- **Top Center**: Location banner with fade animation
-- **Top Right**: Time display (12-hour format), weather label ("Fair"/"Overcast"/"Fog"/"Rain"/"Storm"), day/night indicator
-- **Center**: Crosshair and interaction prompt ("[E] TALK Name")
-- **Bottom**: First-time controls tooltip (desktop only, fades after 30s, once per session)
+The HUD is **diegetic** — UI information is embedded in the world rather than displayed as overlay panels. This is the primary design direction for the mobile target.
 
-All HUD elements use semi-transparent warm cream backgrounds with soft shadows. Text in warm charcoal. Full keybindings are available in the Pause Menu > Settings > Controls tab.
+- **Health**: Screen vignette darkens as health falls; heartbeat sound cue (no numeric bar)
+- **Stamina**: Subtle desaturation / breath-sound cue when stamina is low
+- **Inventory**: Items appear on the character's belt and back, visible in third-person moments
+- **Dialogue**: Illuminated-manuscript speech bubbles anchored to the speaker in world space
+- **Location**: A parchment banner fades in briefly when the player enters a new area
+- **Time / Weather**: Visible from the sky itself (sun angle, cloud cover) — no text label
+
+When a panel-style overlay is unavoidable (e.g., quest log, settings), style it as vellum parchment (#f5f0e8), never as a flat game menu. Use Lora / Crimson Text, golden accents, scroll-corner ornaments.
+
+See `docs/plans/2026-04-18-diegetic-hud.md` for the implementation plan.
 
 ### Dialogue Box
 
@@ -150,9 +155,18 @@ Tabbed panel accessible from Pause Menu > Settings. Three tabs:
 - All settings persisted to localStorage (`kings-road:settings`)
 - Styled with same parchment background and golden accents as Pause Menu
 
-### Mobile Controls
+### Mobile Controls (Primary Input)
 
-Left half: touch area for virtual joystick spawn. Right side: circular action buttons (70x70px) for Jump and Talk. All controls use warm semi-transparent backgrounds.
+The game is mobile-first. Touch is the primary input method; keyboard/mouse is debug-only.
+
+- **Left half**: touch anywhere to spawn a floating joystick for movement. Push to the edge to sprint.
+- **Right half**: swipe to look; tap on highlighted world elements to interact (NPCs glow, interactables draw a subtle halo).
+- **Jump**: two-finger tap.
+- **Pause**: tap the quill icon (part of the in-world parchment frame, top-left).
+
+All controls use warm semi-transparent backgrounds (no blue-gray UI chrome). Button size minimum 70×70px for touch targets.
+
+Desktop keyboard shortcuts (WASD, F to interact, ESC to pause) exist for development workflow but are not maintained as the primary UX.
 
 ## 3D Visual Design
 
