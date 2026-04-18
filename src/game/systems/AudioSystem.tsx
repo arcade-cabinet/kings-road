@@ -100,7 +100,7 @@ export function AudioSystem() {
   const layersRef = useRef<AudioLayer[]>([]);
   const zonesRef = useRef<AudioZone[]>([]);
   const zoneTimerRef = useRef(0);
-  
+
   const lastHitRef = useRef(0);
   const lastDamageRef = useRef(0);
 
@@ -151,12 +151,12 @@ export function AudioSystem() {
     const { lastHitTime, lastDamageTime } = useCombatStore.getState();
 
     // ── Combat SFX ──────────────────────────────────────────────────
-    
+
     if (lastHitTime > lastHitRef.current) {
       lastHitRef.current = lastHitTime;
       hitSynth.triggerAttackRelease('16n');
     }
-    
+
     if (lastDamageTime > lastDamageRef.current) {
       lastDamageRef.current = lastDamageTime;
       damageSynth.triggerAttackRelease('G1', '8n');

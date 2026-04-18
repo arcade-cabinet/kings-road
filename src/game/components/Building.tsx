@@ -1,6 +1,5 @@
 import { useGLTF } from '@react-three/drei';
 import { useMemo } from 'react';
-import * as THREE from 'three';
 import type { BuildingArchetype } from '../../schemas/building.schema';
 import { hashString } from '../factories/chibi-generator';
 
@@ -49,7 +48,7 @@ export function Building({
   // Adjust scaling and positioning to match the game's unit scale (1 unit = 1 meter).
   // The PSX models might be scaled differently, so we apply a uniform scale.
   // We also want to rotate the building to face the road (passed via `rotation`).
-  const modelScale = 1.0; 
+  const modelScale = 1.0;
   const rotY = (rotation * Math.PI) / 180;
 
   // Fallback to a simple box if the model fails to load
@@ -69,29 +68,24 @@ export function Building({
       {/* We group the extracted meshes and apply a generic scale. 
           The origin of these meshes in the GLB might be offset, so we center them. */}
       <group scale={[modelScale, modelScale, modelScale]}>
-        <mesh 
-          geometry={variant.base.geometry} 
-          material={materials.House_Wood} 
-          castShadow 
-          receiveShadow 
+        <mesh
+          geometry={variant.base.geometry}
+          material={materials.House_Wood}
+          castShadow
+          receiveShadow
         />
-        <mesh 
-          geometry={variant.win.geometry} 
-          material={materials.Window} 
-        />
-        <mesh 
-          geometry={variant.door.geometry} 
-          material={materials.Door} 
-        />
+        <mesh geometry={variant.win.geometry} material={materials.Window} />
+        <mesh geometry={variant.door.geometry} material={materials.Door} />
         {/* If the building is an inn or tavern, maybe add the Chimny or Gazeebo? */}
-        {(archetype.id === 'inn' || archetype.id === 'tavern') && nodes.Chimny && (
-          <mesh 
-            geometry={nodes.Chimny.geometry} 
-            material={materials.House_Plaster} 
-            position={[0, 2, 0]} // rough offset
-            castShadow
-          />
-        )}
+        {(archetype.id === 'inn' || archetype.id === 'tavern') &&
+          nodes.Chimny && (
+            <mesh
+              geometry={nodes.Chimny.geometry}
+              material={materials.House_Plaster}
+              position={[0, 2, 0]} // rough offset
+              castShadow
+            />
+          )}
       </group>
     </group>
   );

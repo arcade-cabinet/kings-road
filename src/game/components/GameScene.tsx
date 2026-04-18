@@ -10,12 +10,14 @@ import { Physics } from '@react-three/rapier';
 import { BlendFunction } from 'postprocessing';
 import { Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
+import { CombatParticles } from '../components/CombatParticles';
 import { DungeonRenderer } from '../components/DungeonRenderer';
 import { OceanPlane } from '../components/OceanPlane';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { useGameStore } from '../stores/gameStore';
 import { AudioSystem } from '../systems/AudioSystem';
 import { ChunkManager } from '../systems/ChunkManager';
+import { CombatFeedback } from '../systems/CombatFeedback';
 import { DungeonEntrySystem } from '../systems/DungeonEntrySystem';
 import { EncounterSystem } from '../systems/EncounterSystem';
 import {
@@ -27,8 +29,6 @@ import {
 import { FeatureSpawner } from '../systems/FeatureSpawner';
 import { InteractionSystem } from '../systems/InteractionSystem';
 import { PlayerController } from '../systems/PlayerController';
-import { CombatFeedback } from '../systems/CombatFeedback';
-import { CombatParticles } from '../components/CombatParticles';
 import { QuestSystem } from '../systems/QuestSystem';
 import { WeatherSystem } from '../systems/WeatherSystem';
 

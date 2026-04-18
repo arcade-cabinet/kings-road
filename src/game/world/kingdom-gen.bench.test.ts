@@ -358,7 +358,7 @@ function timedGenerateKingdom(
 
   // Phase 4: Off-road settlement placement
   t0 = performance.now();
-  const rng = mulberry32(cyrb128(seed + ':kingdom'));
+  const rng = mulberry32(cyrb128(`${seed}:kingdom`));
   const offRoadConfigs = config.offRoadSettlements ?? [];
   const offRoadPlaced: Array<{
     id: string;
@@ -439,7 +439,7 @@ function timedGenerateKingdom(
   // Phase 6: Tile assembly (biome painting + road overlay)
   t0 = performance.now();
   const allRoadTiles = new Map(roadNetwork.roadTiles);
-  const tiles = terrain.tiles.map((t, idx) => {
+  const _tiles = terrain.tiles.map((t, idx) => {
     const regionId = regionMap.get(idx) ?? null;
     let biome = t.biome;
     if (regionId && t.isLand && !t.isCoast) {
@@ -477,11 +477,11 @@ function average(nums: number[]): number {
   return nums.reduce((a, b) => a + b, 0) / nums.length;
 }
 
-function formatRow(label: string, times: number[]): string {
+function _formatRow(label: string, times: number[]): string {
   const avg = average(times);
   const min = Math.min(...times);
   const max = Math.max(...times);
-  const pctOfTotal = 0; // filled later
+  const _pctOfTotal = 0; // filled later
   return `| ${label.padEnd(24)} | ${avg.toFixed(1).padStart(8)} ms | ${min.toFixed(1).padStart(8)} ms | ${max.toFixed(1).padStart(8)} ms |`;
 }
 

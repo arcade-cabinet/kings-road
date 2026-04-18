@@ -195,6 +195,7 @@ export function SkyDome() {
   const gameActive = useGameStore((state) => state.gameActive);
 
   // biome-ignore lint/suspicious/noExplicitAny: drei Sky ref type is complex
+  // biome-ignore lint/correctness/noUnusedVariables: reserved for future sky effects
   const skyRef = useRef<any>(null);
   const moonRef = useRef<THREE.Mesh>(null);
   const cloudGroupRef = useRef<THREE.Group>(null);

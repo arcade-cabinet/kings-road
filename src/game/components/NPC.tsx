@@ -104,9 +104,11 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
   // Determine model path based on archetype
   const modelName = MODEL_MAPPING[npcType] || 'basemesh';
   const isMegaPack = modelName === 'villagers';
-  
-  const { scene, nodes } = useGLTF(`${BASE_URL}/assets/npcs/${modelName}.glb`) as any;
-  
+
+  const { scene, nodes } = useGLTF(
+    `${BASE_URL}/assets/npcs/${modelName}.glb`,
+  ) as any;
+
   // Clone scene or extract specific node from mega-pack
   const clonedScene = useMemo(() => {
     if (isMegaPack) {
@@ -162,7 +164,7 @@ export function NPC({ interactable, blueprint: _blueprint }: NPCProps) {
     // Breathing bob for the 3DPSX models
     if (modelRef.current) {
       modelRef.current.position.y = Math.sin(t * 2 + idleOffset) * 0.05;
-      
+
       // Slight "sway" for extra character
       modelRef.current.rotation.z = Math.sin(t * 1.5 + idleOffset) * 0.02;
     }

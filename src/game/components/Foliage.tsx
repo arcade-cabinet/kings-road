@@ -21,7 +21,7 @@ interface FoliageProps {
 
 export function Foliage({ type, position, seed, scale = 1 }: FoliageProps) {
   const hash = useMemo(() => hashString(seed), [seed]);
-  
+
   // Deterministically select an asset variant
   let assetPath = ASSETS.tree_large;
   if (type === 'pine') {
@@ -40,9 +40,9 @@ export function Foliage({ type, position, seed, scale = 1 }: FoliageProps) {
   const finalScale = baseScale * scale * (0.9 + (hash % 20) * 0.01);
 
   return (
-    <primitive 
-      object={cloned} 
-      position={position} 
+    <primitive
+      object={cloned}
+      position={position}
       scale={[finalScale, finalScale, finalScale]}
       rotation={[0, (hash % 360) * (Math.PI / 180), 0]}
     />
@@ -50,4 +50,6 @@ export function Foliage({ type, position, seed, scale = 1 }: FoliageProps) {
 }
 
 // Preload common nature assets
-Object.values(ASSETS).forEach((path) => useGLTF.preload(path));
+for (const path of Object.values(ASSETS)) {
+  useGLTF.preload(path);
+}

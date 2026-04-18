@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { generateKingdom } from './kingdom-gen';
-import { KingdomConfigSchema } from '../../schemas/kingdom.schema';
 import kingdomConfigJson from '../../../content/world/kingdom-config.json';
-import { generateFeaturePlacements, buildFeatureIndex, getFeaturesAtTile } from './feature-placement';
+import { KingdomConfigSchema } from '../../schemas/kingdom.schema';
+import {
+  buildFeatureIndex,
+  generateFeaturePlacements,
+  getFeaturesAtTile,
+} from './feature-placement';
+import { generateKingdom } from './kingdom-gen';
 
 const config = KingdomConfigSchema.parse(kingdomConfigJson);
 
@@ -51,6 +55,9 @@ describe('Playability: Dead Zones', () => {
 
     // Assert that the maximum dead zone is less than or equal to 15 tiles
     // If this fails, the feature generator is starving the road of content!
-    expect(maxDeadZone, `Found a dead zone of ${maxDeadZone} tiles along the main road!`).toBeLessThanOrEqual(15);
+    expect(
+      maxDeadZone,
+      `Found a dead zone of ${maxDeadZone} tiles along the main road!`,
+    ).toBeLessThanOrEqual(15);
   });
 });
