@@ -51,15 +51,12 @@ export function Building({
   const modelScale = 1.0;
   const rotY = (rotation * Math.PI) / 180;
 
-  // Fallback to a simple box if the model fails to load
+  // Hard-fail to ErrorOverlay if the GLB didn't load — no silent box fallback.
   if (!variant) {
-    return (
-      <group position={position} rotation={[0, rotY, 0]}>
-        <mesh position={[0, 2, 0]} castShadow receiveShadow>
-          <boxGeometry args={[4, 4, 4]} />
-          <meshStandardMaterial color="#8B5A2B" />
-        </mesh>
-      </group>
+    throw new Error(
+      `Building: Village_Buildings GLB exposed no valid Cube/Cube_1/Cube_2 ` +
+        `variant for ${label || archetype.id} at ${position.join(',')} — ` +
+        `verify public/assets/buildings/Village_Buildings-transformed.glb`,
     );
   }
 

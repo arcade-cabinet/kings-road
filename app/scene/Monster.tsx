@@ -5,10 +5,7 @@ import type * as THREE from 'three';
 import { assetUrl } from '@/lib/assets';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
 import { hashString } from '@/utils/random';
-import {
-  buildMonsterRenderData,
-  type MonsterGeometry,
-} from '@/factories/monster-factory';
+import { buildMonsterRenderData } from '@/factories/monster-factory';
 
 interface MonsterProps {
   archetype: MonsterArchetype;
@@ -35,43 +32,6 @@ const HOVER_ARCHETYPES = new Set([
   'bloodwraith',
 ]);
 
-function GeometryMesh({
-  part,
-  color,
-}: {
-  part: MonsterGeometry;
-  color: string;
-}) {
-  switch (part.type) {
-    case 'box':
-      return (
-        <mesh position={part.position} castShadow>
-          <boxGeometry args={part.args as [number, number, number]} />
-          <meshStandardMaterial color={color} roughness={0.8} />
-        </mesh>
-      );
-    case 'cylinder':
-      return (
-        <mesh position={part.position} castShadow>
-          <cylinderGeometry args={part.args as [number, number, number]} />
-          <meshStandardMaterial color={color} roughness={0.8} />
-        </mesh>
-      );
-    case 'sphere':
-      return (
-        <mesh position={part.position} castShadow>
-          <sphereGeometry args={part.args as [number]} />
-          <meshStandardMaterial
-            color={color}
-            roughness={0.6}
-            transparent
-            opacity={0.85}
-          />
-        </mesh>
-      );
-  }
-}
-
 export function Monster({ archetype, position }: MonsterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
@@ -90,12 +50,13 @@ export function Monster({ archetype, position }: MonsterProps) {
   const elkDemon = useGLTF(ELK_DEMON_PATH) as any;
   const eyeHead = useGLTF(EYE_HEAD_PATH) as any;
 
-  const renderData = useMemo(
+  // Only `scale` is still read — the primitive body-parts path was removed
+  // when every archetype got an authored GLB mapping. Keep buildMonsterRenderData
+  // for its per-archetype scale heuristic; everything else is ignored.
+  const { scale } = useMemo(
     () => buildMonsterRenderData(archetype),
     [archetype],
   );
-
-  const { bodyParts, primaryColor, secondaryColor, scale } = renderData;
 
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
@@ -234,14 +195,13 @@ export function Monster({ archetype, position }: MonsterProps) {
       }
     }
 
-    // 10. Fallback Primitives
-    return bodyParts.map((part) => (
-      <GeometryMesh
-        key={`${part.type}-${part.position.join(',')}`}
-        part={part}
-        color={part === bodyParts[0] ? primaryColor : secondaryColor}
-      />
-    ));
+    // Every archetype should map to an authored GLB. If we fall through here
+    // it means a monster id was added without a rendering mapping — hard-fail
+    // to ErrorOverlay so it gets noticed at content-author time.
+    throw new Error(
+      `Monster archetype "${archetype.id}" has no GLB mapping in Monster.tsx ` +
+        `(add it to the Hybrid Model Selection block).`,
+    );
   }, [
     archetype.id,
     skeleton.scene,
@@ -256,9 +216,6 @@ export function Monster({ archetype, position }: MonsterProps) {
     bigfoot.scene,
     elkDemon.scene,
     eyeHead.scene,
-    bodyParts,
-    primaryColor,
-    secondaryColor,
   ]);
 
   return (

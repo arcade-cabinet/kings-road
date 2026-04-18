@@ -7,14 +7,11 @@ import {
   addGlobalAABBs,
   addGlobalInteractables,
   addChunk,
-  getFlags,
   getPlayer,
-  getSeedPhrase,
   removeChunk,
   removeGlobalAABBs,
   removeGlobalInteractables,
   setCurrentChunk,
-  getChunkState,
 } from '@/ecs/actions/game';
 import {
   useChunkState,
@@ -283,8 +280,11 @@ function generateChunkData(
         interactables.push(interactable);
         // Store as npcBlueprint below (we'll attach it after the town section)
       } else {
-        // Fallback to legacy wanderer
-        addInteractable(npcX, npcZ, 'wanderer');
+        throw new Error(
+          `ChunkManager: no NPC pool resolved for archetype "${archetype}" ` +
+            `in chunk ${key}. Every wilderness NPC must map to an authored ` +
+            `pool in src/content/npcs/pools/.`,
+        );
       }
     }
   }
