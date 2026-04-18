@@ -8,7 +8,16 @@ import {
 } from '@/db/content-queries';
 import type { FeatureDefinition } from '@/schemas/feature.schema';
 import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import type { Interactable } from '@/types/game';
 import { cyrb128, mulberry32 } from '@/utils/random';
 
@@ -333,9 +342,7 @@ export function FeatureSpawner() {
 
   // When kingdom map has pre-placed features, skip timer-based spawning.
   // Features are placed deterministically by the chunk system instead.
-  const hasKingdomFeatures = useWorldStore(
-    (s) => s.featurePlacements.length > 0,
-  );
+  const hasKingdomFeatures = useWorldSession().featurePlacements.length > 0;
 
   const spawnedRef = useRef<SpawnedFeature[]>([]);
   const ambientTimerRef = useRef(INITIAL_GRACE);

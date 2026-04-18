@@ -2,7 +2,16 @@ import { render } from 'vitest-browser-react';
 import { expect, test } from 'vitest';
 import { LoadingOverlay } from '@app/views/Gameplay/LoadingOverlay';
 import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 
 test('LoadingOverlay renders when game is active and generating', async () => {
   useGameStore.setState({
@@ -10,7 +19,7 @@ test('LoadingOverlay renders when game is active and generating', async () => {
     seedPhrase: 'Golden Verdant Meadow',
     activeChunks: new Map(),
   });
-  useWorldStore.setState({
+  setWorldState({
     isGenerating: true,
     generationProgress: 0.3,
     generationPhase: 'Shaping the terrain...',

@@ -13,7 +13,16 @@ import { InventoryUI } from '@/ecs/traits/session-inventory';
 import { getSessionEntity } from '@/ecs/world';
 import { inputManager } from '@/input/InputManager';
 import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import { getTerrainHeight, PLAYER_HEIGHT } from '@/utils/worldGen';
 import { DUNGEON_DEPTH } from '@/world/dungeon-generator';
 
@@ -227,7 +236,7 @@ export function PlayerController() {
       if (gameState.inDungeon) {
         terrainY = DUNGEON_DEPTH;
       } else {
-        const kingdomMap = useWorldStore.getState().kingdomMap;
+        const kingdomMap = getWorldState().kingdomMap;
         terrainY = kingdomMap
           ? getTerrainHeight(
               kingdomMap,

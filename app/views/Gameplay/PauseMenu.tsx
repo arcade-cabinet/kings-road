@@ -20,7 +20,16 @@ import {
   resolveNarrative,
   restoreQuests,
 } from '@/ecs/actions/quest';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import { generateDungeonLayout } from '@/world/dungeon-generator';
 import { getDungeonById } from '@/world/dungeon-registry';
 import { SettingsPanel } from '@app/views/SettingsPanel';
@@ -331,11 +340,11 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
 
     // Reset current game state
     useGameStore.getState().resetGame();
-    useWorldStore.getState().clearWorld();
+    clearWorld();
     resetQuests();
 
     // Regenerate kingdom from saved seed
-    await useWorldStore.getState().generateWorld(data.seedPhrase);
+    await generateWorld(data.seedPhrase);
 
     // Resolve quest narrative
     resolveNarrative(data.seedPhrase);
@@ -485,7 +494,7 @@ export function PauseMenu() {
     setPaused(false);
     useGameStore.getState().resetGame();
     useGameStore.getState().setGameActive(false);
-    useWorldStore.getState().clearWorld();
+    clearWorld();
   };
 
   return (

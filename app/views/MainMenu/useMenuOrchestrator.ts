@@ -15,7 +15,16 @@ import {
   resolveNarrative,
   restoreQuests,
 } from '@/ecs/actions/quest';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import { CHUNK_SIZE, PLAYER_HEIGHT } from '@/utils/worldCoords';
 import { generateDungeonLayout } from '@/world/dungeon-generator';
 import { getDungeonById } from '@/world/dungeon-registry';
@@ -71,13 +80,13 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
       setFadeOut(true);
       await wait(FADE_OUT_MS);
 
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0,
         generationPhase: 'Loading the scrolls of knowledge...',
       });
       await loadContentDb();
-      await useWorldStore.getState().generateWorld(data.seedPhrase);
+      await generateWorld(data.seedPhrase);
       resolveNarrative(data.seedPhrase);
 
       restoreGameState(data, {
@@ -115,7 +124,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
       setBootError(errorMessage(err));
       setFadeOut(false);
       setLoadingContinue(false);
-      useWorldStore.setState({ isGenerating: false });
+      setWorldState({ isGenerating: false });
     } finally {
       inFlightRef.current = false;
     }
@@ -135,14 +144,13 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
         setFadeOut(true);
         await wait(FADE_OUT_MS);
 
-        useWorldStore.setState({
+        setWorldState({
           isGenerating: true,
           generationProgress: 0,
           generationPhase: 'Loading the scrolls of knowledge...',
         });
         await loadContentDb();
 
-        const generateWorld = useWorldStore.getState().generateWorld;
         const kingdomMap = await generateWorld(currentSeed);
         resolveNarrative(currentSeed);
 
@@ -163,7 +171,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
         console.error('[MainMenu] beginNewPilgrimage failed:', err);
         setBootError(errorMessage(err));
         setFadeOut(false);
-        useWorldStore.setState({ isGenerating: false });
+        setWorldState({ isGenerating: false });
       } finally {
         inFlightRef.current = false;
       }

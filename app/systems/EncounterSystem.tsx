@@ -21,7 +21,16 @@ import { getSessionEntity } from '@/ecs/world';
 import { inputManager } from '@/input/InputManager';
 import { useGameStore } from '@/stores/gameStore';
 import { recordCombatVictory } from '@/ecs/actions/quest';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import type { ActiveEncounter, SpawnedMonster } from '@/types/game';
 import { createRng } from '@/utils/random';
 import { CHUNK_SIZE } from '@/utils/worldGen';
@@ -121,7 +130,7 @@ export function EncounterSystem() {
   const setHealth = useGameStore((s) => s.setHealth);
   const isDead = useGameStore((s) => s.isDead);
   const die = useGameStore((s) => s.die);
-  const kingdomMap = useWorldStore((s) => s.kingdomMap);
+  const kingdomMap = useWorldSession().kingdomMap;
 
   const combatUI = useTrait(getSessionEntity(), CombatUI);
   const combatPhase = combatUI?.phase ?? 'idle';

@@ -4,7 +4,16 @@ import * as THREE from 'three';
 import type { KingdomMap, Settlement } from '@/schemas/kingdom.schema';
 import { Chunk } from '@app/scene/Chunk';
 import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import type {
   AABB,
   ChunkData,
@@ -433,8 +442,8 @@ export function ChunkManager() {
   const activeChunks = useGameStore((state) => state.activeChunks);
   const chunkDeltas = useGameStore((state) => state.chunkDeltas);
   const gameActive = useGameStore((state) => state.gameActive);
-  const kingdomMap = useWorldStore((state) => state.kingdomMap);
-  const featureIndex = useWorldStore((state) => state.featureIndex);
+  const kingdomMap = useWorldSession().kingdomMap;
+  const featureIndex = useWorldSession().featureIndex;
 
   const addChunk = useGameStore((state) => state.addChunk);
   const removeChunk = useGameStore((state) => state.removeChunk);

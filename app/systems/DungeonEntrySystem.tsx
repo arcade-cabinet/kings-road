@@ -20,7 +20,16 @@ import { isContentStoreReady } from '@/db/content-queries';
 import type { DungeonLayout } from '@/schemas/dungeon.schema';
 import type { Settlement } from '@/schemas/kingdom.schema';
 import { type ActiveDungeon, useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import type { Interactable } from '@/types/game';
 import { CHUNK_SIZE } from '@/utils/worldGen';
 import {
@@ -76,7 +85,7 @@ function findSettlementForDungeon(
 export function DungeonEntrySystem() {
   const gameActive = useGameStore((s) => s.gameActive);
   const inDungeon = useGameStore((s) => s.inDungeon);
-  const kingdomMap = useWorldStore((s) => s.kingdomMap);
+  const kingdomMap = useWorldSession().kingdomMap;
 
   const registeredRef = useRef(false);
   const entrancesRef = useRef<DungeonEntrance[]>([]);

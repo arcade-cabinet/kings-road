@@ -3,7 +3,16 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { WaterConfig } from '@/shaders/gerstner-water';
 import { createWaterMaterial } from '@/shaders/gerstner-water';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 
 /** Sea level Y position — water surface sits just below the shoreline */
 const SEA_LEVEL_Y = -0.5;
@@ -35,7 +44,7 @@ const OCEAN_CONFIG: WaterConfig = {
  * Uses the Gerstner water shader for animated waves.
  */
 export function OceanPlane() {
-  const kingdomMap = useWorldStore((state) => state.kingdomMap);
+  const kingdomMap = useWorldSession().kingdomMap;
   const meshRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
 

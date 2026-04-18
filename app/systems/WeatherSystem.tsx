@@ -13,7 +13,17 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { WeatherProfile } from '@/schemas/kingdom.schema';
 import { useGameStore, type WeatherState } from '@/stores/gameStore';
-import { useWorldStore, worldToGrid } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
+import { gridToWorldOrigin, worldToGrid } from '@/utils/worldCoords';
 import { createRng } from '@/utils/random';
 import { getRegionAt } from '@/world/kingdom-gen';
 
@@ -259,7 +269,7 @@ export function WeatherSystem() {
       checkTimerRef.current = 0;
 
       const { playerPosition, timeOfDay, seedPhrase } = useGameStore.getState();
-      const kingdomMap = useWorldStore.getState().kingdomMap;
+      const kingdomMap = getWorldState().kingdomMap;
 
       if (kingdomMap && playerPosition) {
         const [gx, gy] = worldToGrid(playerPosition.x, playerPosition.z);

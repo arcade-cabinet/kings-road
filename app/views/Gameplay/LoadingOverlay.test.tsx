@@ -1,8 +1,24 @@
-import { act, render, screen } from '@testing-library/react';
+import {
+  act,
+  render as rtlRender,
+  type RenderOptions,
+  screen,
+} from '@testing-library/react';
+import { WorldProvider } from 'koota/react';
+import type { ReactElement, ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { setWorldState } from '@/ecs/actions/world';
+import { gameWorld } from '@/ecs/world';
 import { useGameStore } from '@/stores/gameStore';
-import { useWorldStore } from '@/stores/worldStore';
 import { LoadingOverlay } from './LoadingOverlay';
+
+function KootaWrapper({ children }: { children: ReactNode }) {
+  return <WorldProvider world={gameWorld}>{children}</WorldProvider>;
+}
+
+function render(ui: ReactElement, options?: RenderOptions) {
+  return rtlRender(ui, { wrapper: KootaWrapper, ...options });
+}
 
 describe('LoadingOverlay', () => {
   beforeEach(() => {
@@ -13,7 +29,7 @@ describe('LoadingOverlay', () => {
       seedPhrase: 'Golden Verdant Meadow',
       activeChunks: new Map(),
     });
-    useWorldStore.setState({
+    setWorldState({
       isGenerating: false,
       generationProgress: 0,
       generationPhase: '',
@@ -29,7 +45,7 @@ describe('LoadingOverlay', () => {
     expect(screen.queryByText('Preparing the Realm')).toBeNull();
 
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',
@@ -43,7 +59,7 @@ describe('LoadingOverlay', () => {
     render(<LoadingOverlay />);
 
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',
@@ -57,7 +73,7 @@ describe('LoadingOverlay', () => {
     render(<LoadingOverlay />);
 
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.3,
         generationPhase: 'Shaping the terrain...',
@@ -72,7 +88,7 @@ describe('LoadingOverlay', () => {
 
     // Start generation
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',
@@ -82,7 +98,7 @@ describe('LoadingOverlay', () => {
 
     // Complete generation and start game
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: false,
         generationProgress: 1,
         generationPhase: '',
@@ -118,7 +134,7 @@ describe('LoadingOverlay', () => {
 
     // Start generation
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',
@@ -128,7 +144,7 @@ describe('LoadingOverlay', () => {
 
     // Complete generation
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: false,
         generationProgress: 1,
         generationPhase: '',
@@ -168,7 +184,7 @@ describe('LoadingOverlay', () => {
 
     // First game session
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.5,
         generationPhase: 'Building roads...',
@@ -178,7 +194,7 @@ describe('LoadingOverlay', () => {
 
     // Complete generation and load
     act(() => {
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: false,
         generationProgress: 1,
         generationPhase: '',
@@ -201,7 +217,7 @@ describe('LoadingOverlay', () => {
     // Reset game (back to menu)
     act(() => {
       useGameStore.setState({ gameActive: false, activeChunks: new Map() });
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: false,
         generationProgress: 0,
         generationPhase: '',
@@ -211,7 +227,7 @@ describe('LoadingOverlay', () => {
     // Start second game session -- overlay should appear again
     act(() => {
       useGameStore.setState({ gameActive: true });
-      useWorldStore.setState({
+      setWorldState({
         isGenerating: true,
         generationProgress: 0.1,
         generationPhase: 'Shaping the terrain...',

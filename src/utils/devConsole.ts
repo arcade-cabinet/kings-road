@@ -13,12 +13,18 @@ import {
   completeQuest as completeQuestAction,
   getQuestState,
 } from '@/ecs/actions/quest';
-import { useGameStore } from '@/stores/gameStore';
 import {
-  gridToWorldOrigin,
-  useWorldStore,
-  worldToGrid,
-} from '@/stores/worldStore';
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import { useGameStore } from '@/stores/gameStore';
+import { gridToWorldOrigin, worldToGrid } from '@/utils/worldCoords';
 import { getRegionAt } from '@/world/kingdom-gen';
 import { CHUNK_SIZE, PLAYER_HEIGHT } from './worldGen';
 
@@ -42,7 +48,7 @@ const devConsole = {
   // ── Movement & teleportation ─────────────────────────────────────────
 
   moveToSettlement(settlementId: string) {
-    const map = useWorldStore.getState().kingdomMap;
+    const map = getWorldState().kingdomMap;
     if (!map) {
       console.warn('[DEV] No kingdom map — start a game first.');
       return;
@@ -100,11 +106,11 @@ const devConsole = {
 
   getPlayerInfo() {
     const gs = useGameStore.getState();
-    const ws = useWorldStore.getState();
+    const ws = getWorldState();
     const pos = gs.playerPosition;
     const [gx, gy] = worldToGrid(pos.x, pos.z);
     const map = ws.kingdomMap;
-    const tile = ws.getTileAtGrid(gx, gy);
+    const tile = getTileAtGrid(gx, gy);
     const region = map ? getRegionAt(map, gx, gy) : undefined;
     const info = {
       position: {
@@ -128,7 +134,7 @@ const devConsole = {
   },
 
   getKingdomInfo() {
-    const map = useWorldStore.getState().kingdomMap;
+    const map = getWorldState().kingdomMap;
     if (!map) {
       console.warn('[DEV] No kingdom map — start a game first.');
       return null;
@@ -146,7 +152,7 @@ const devConsole = {
   },
 
   listSettlements() {
-    const map = useWorldStore.getState().kingdomMap;
+    const map = getWorldState().kingdomMap;
     if (!map) {
       console.warn('[DEV] No kingdom map — start a game first.');
       return [];
@@ -246,7 +252,7 @@ const devConsole = {
   // ── World inspection ─────────────────────────────────────────────────
 
   inspectTile(gx: number, gy: number) {
-    const tile = useWorldStore.getState().getTileAtGrid(gx, gy);
+    const tile = getTileAtGrid(gx, gy);
     if (!tile) {
       console.warn(`[DEV] No tile at grid (${gx}, ${gy}).`);
       return null;
@@ -256,7 +262,7 @@ const devConsole = {
   },
 
   inspectRegion(gx: number, gy: number) {
-    const map = useWorldStore.getState().kingdomMap;
+    const map = getWorldState().kingdomMap;
     if (!map) {
       console.warn('[DEV] No kingdom map — start a game first.');
       return null;

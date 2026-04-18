@@ -5,7 +5,16 @@ import {
 } from '@react-three/rapier';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useWorldStore } from '@/stores/worldStore';
+import { useWorldSession } from '@/ecs/hooks/useWorldSession';
+import {
+  clearWorld,
+  generateWorld,
+  getFeaturesAt,
+  getTileAtGrid,
+  getTileAtWorld,
+  getWorldState,
+  setWorldState,
+} from '@/ecs/actions/world';
 import type { ChunkData } from '@/types/game';
 import { cyrb128, mulberry32 } from '@/utils/random';
 import { getBiomeGroundMaterial, getMaterials } from '@/utils/textures';
@@ -213,7 +222,7 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   const oZ = cz * CHUNK_SIZE;
 
   // Kingdom map from world store for heightmap sampling (needed early for vegetation)
-  const kingdomMap = useWorldStore((state) => state.kingdomMap);
+  const kingdomMap = useWorldSession().kingdomMap;
 
   // Generate all mesh data for this chunk
   const meshData = useMemo(() => {
