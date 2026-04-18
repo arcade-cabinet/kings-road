@@ -16,31 +16,31 @@ import {
 } from '@/ecs/actions/quest';
 import { unsafe_resetSessionEntity } from '@/ecs/world';
 // --- Load quest JSON files for test data ---
-import chapter00 from '../../../content/quests/main/chapter-00.json';
-import chapter01 from '../../../content/quests/main/chapter-01.json';
-import chapter02 from '../../../content/quests/main/chapter-02.json';
-import chapter03 from '../../../content/quests/main/chapter-03.json';
-import chapter04 from '../../../content/quests/main/chapter-04.json';
-import chapter05 from '../../../content/quests/main/chapter-05.json';
-import aldricsMissingHammer from '../../../content/quests/side/aldrics-missing-hammer.json';
-import banditAmbush from '../../../content/quests/side/bandit-ambush.json';
-import besssSecretRecipe from '../../../content/quests/side/besss-secret-recipe.json';
-import fatherCedricsLostHymnal from '../../../content/quests/side/father-cedrics-lost-hymnal.json';
-import lordAshwicksSecret from '../../../content/quests/side/lord-ashwicks-secret.json';
-import lostPilgrim from '../../../content/quests/side/lost-pilgrim.json';
-import merchantsBrokenCart from '../../../content/quests/side/merchants-broken-cart.json';
-import sisterMaevesGarden from '../../../content/quests/side/sister-maeves-garden.json';
-import strangeShrine from '../../../content/quests/side/strange-shrine.json';
-import theBridgeTroll from '../../../content/quests/side/the-bridge-troll.json';
-import theCartographersMap from '../../../content/quests/side/the-cartographers-map.json';
-import theCursedRing from '../../../content/quests/side/the-cursed-ring.json';
-import theDeserter from '../../../content/quests/side/the-deserter.json';
-import theHerbalistsJourney from '../../../content/quests/side/the-herbalists-journey.json';
-import theMissingManuscript from '../../../content/quests/side/the-missing-manuscript.json';
-import theMissingMerchant from '../../../content/quests/side/the-missing-merchant.json';
-import thePoisonedWell from '../../../content/quests/side/the-poisoned-well.json';
-import theUnderground from '../../../content/quests/side/the-underground.json';
-import woundedSoldier from '../../../content/quests/side/wounded-soldier.json';
+import chapter00 from '../../content/quests/main/chapter-00.json';
+import chapter01 from '../../content/quests/main/chapter-01.json';
+import chapter02 from '../../content/quests/main/chapter-02.json';
+import chapter03 from '../../content/quests/main/chapter-03.json';
+import chapter04 from '../../content/quests/main/chapter-04.json';
+import chapter05 from '../../content/quests/main/chapter-05.json';
+import aldricsMissingHammer from '../../content/quests/side/aldrics-missing-hammer.json';
+import banditAmbush from '../../content/quests/side/bandit-ambush.json';
+import besssSecretRecipe from '../../content/quests/side/besss-secret-recipe.json';
+import fatherCedricsLostHymnal from '../../content/quests/side/father-cedrics-lost-hymnal.json';
+import lordAshwicksSecret from '../../content/quests/side/lord-ashwicks-secret.json';
+import lostPilgrim from '../../content/quests/side/lost-pilgrim.json';
+import merchantsBrokenCart from '../../content/quests/side/merchants-broken-cart.json';
+import sisterMaevesGarden from '../../content/quests/side/sister-maeves-garden.json';
+import strangeShrine from '../../content/quests/side/strange-shrine.json';
+import theBridgeTroll from '../../content/quests/side/the-bridge-troll.json';
+import theCartographersMap from '../../content/quests/side/the-cartographers-map.json';
+import theCursedRing from '../../content/quests/side/the-cursed-ring.json';
+import theDeserter from '../../content/quests/side/the-deserter.json';
+import theHerbalistsJourney from '../../content/quests/side/the-herbalists-journey.json';
+import theMissingManuscript from '../../content/quests/side/the-missing-manuscript.json';
+import theMissingMerchant from '../../content/quests/side/the-missing-merchant.json';
+import thePoisonedWell from '../../content/quests/side/the-poisoned-well.json';
+import theUnderground from '../../content/quests/side/the-underground.json';
+import woundedSoldier from '../../content/quests/side/wounded-soldier.json';
 
 const TEST_QUESTS = [
   chapter00,

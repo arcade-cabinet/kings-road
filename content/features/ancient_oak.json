@@ -1,8 +1,0 @@
-{
-  "id": "ancient_oak",
-  "tier": "ambient",
-  "name": "Ancient Oak",
-  "description": "A gnarled oak stands sentinel beside the road, its canopy so vast it casts the path in cool, dappled shadow.",
-  "visualType": "ancient_oak",
-  "interactable": false
-}

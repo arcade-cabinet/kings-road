@@ -11,7 +11,7 @@ import { generateKingdom } from './kingdom-gen';
 
 // Load feature JSON files for the content store
 const featureModules = import.meta.glob<{ default: { id: string } }>(
-  '../../content/features/*.json',
+  '../content/features/*.json',
   { eager: true },
 );
 

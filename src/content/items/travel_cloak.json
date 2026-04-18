@@ -1,0 +1,15 @@
+{
+  "id": "travel_cloak",
+  "name": "Travel Cloak",
+  "description": "A thick wool cloak dyed forest green. It wards off chill and bramble, letting the wearer move swiftly through the wilds.",
+  "type": "equipment",
+  "effect": {
+    "stat": "speed",
+    "value": 2
+  },
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/MISC_2025-transformed.glb",
+    "handPose": "open"
+  }
+}

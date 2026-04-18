@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { validateFile } from '../../scripts/validate-trove';
 import { PacingConfigSchema } from './pacing.schema';
 
-const CONTENT_DIR = path.resolve(__dirname, '../../content');
+const CONTENT_DIR = path.resolve(__dirname, '../content');
 const CONFIG_PATH = path.join(CONTENT_DIR, 'pacing/config.json');
 
 describe('pacing config integration', () => {

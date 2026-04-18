@@ -1,0 +1,11 @@
+{
+  "id": "map-fragment-03",
+  "name": "Ravensgate Map Fragment",
+  "description": "A creased parchment bearing the Ravensgate cartographer's careful hand. It depicts the final stretches of the road where the land grows wild and sacred.",
+  "type": "key_item",
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/books.glb",
+    "handPose": "open"
+  }
+}

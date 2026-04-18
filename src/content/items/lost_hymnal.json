@@ -1,0 +1,11 @@
+{
+  "id": "lost_hymnal",
+  "name": "Lost Hymnal",
+  "description": "An illuminated book of sacred hymns that went missing from the chapel at Pilgrim's Rest. Brother Anselm seeks its return for the quest 'Songs of the Faithful' (quest: side-songs-faithful).",
+  "type": "quest_item",
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/books.glb",
+    "handPose": "open"
+  }
+}

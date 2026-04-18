@@ -42,6 +42,7 @@ import {
 } from '@/world/dungeon-generator';
 import { getAllDungeons } from '@/world/dungeon-registry';
 import { getAnchorById } from '@/world/road-spine';
+import { Model as SupportBeam } from '@app/scene/generated/mine/supportbeam';
 
 const PLAYER_EYE_HEIGHT = 1.6;
 const ENTRANCE_INTERACTION_RADIUS = 6;
@@ -242,12 +243,6 @@ function transitionIntoDungeon(entrance: DungeonEntrance) {
 
 // ── Overworld entrance visual — stone archway ────────────────────────
 
-const archMaterial = new THREE.MeshStandardMaterial({
-  color: 0x6a6a5e,
-  roughness: 0.9,
-  metalness: 0.05,
-});
-
 const darkInteriorMaterial = new THREE.MeshBasicMaterial({
   color: 0x111111,
 });
@@ -255,50 +250,15 @@ const darkInteriorMaterial = new THREE.MeshBasicMaterial({
 function DungeonEntranceMesh({ position }: { position: THREE.Vector3 }) {
   const archWidth = 3;
   const archHeight = 4;
-  const pillarWidth = 0.8;
-  const pillarDepth = 0.8;
-  const lintelHeight = 0.5;
 
   return (
     <group position={[position.x, position.y, position.z]}>
-      {/* Left pillar */}
-      <mesh
-        position={[-(archWidth / 2 + pillarWidth / 2), archHeight / 2, 0]}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry args={[pillarWidth, archHeight, pillarDepth]} />
-        <primitive object={archMaterial} attach="material" />
-      </mesh>
-      {/* Right pillar */}
-      <mesh
-        position={[archWidth / 2 + pillarWidth / 2, archHeight / 2, 0]}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry args={[pillarWidth, archHeight, pillarDepth]} />
-        <primitive object={archMaterial} attach="material" />
-      </mesh>
-      {/* Lintel */}
-      <mesh
-        position={[0, archHeight + lintelHeight / 2, 0]}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry
-          args={[archWidth + pillarWidth * 2, lintelHeight, pillarDepth]}
-        />
-        <primitive object={archMaterial} attach="material" />
-      </mesh>
-      {/* Dark interior plane */}
-      <mesh position={[0, archHeight / 2, -pillarDepth / 2 + 0.01]}>
+      {/* Authored mine support-beam as the entry arch frame. */}
+      <SupportBeam scale={[archWidth, archHeight, archWidth * 0.5]} />
+      {/* Dark interior plane — implies tunnel depth through the doorway. */}
+      <mesh position={[0, archHeight / 2, -0.4]}>
         <planeGeometry args={[archWidth, archHeight]} />
         <primitive object={darkInteriorMaterial} attach="material" />
-      </mesh>
-      {/* Capstone decoration */}
-      <mesh position={[0, archHeight + lintelHeight + 0.3, 0]}>
-        <boxGeometry args={[1.5, 0.6, pillarDepth * 0.8]} />
-        <primitive object={archMaterial} attach="material" />
       </mesh>
     </group>
   );

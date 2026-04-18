@@ -1,3 +1,12 @@
+// NOTE: This file is over the 300-LOC soft cap. The breakup is planned
+// for the Thornfield Phase 0 `src/composition/` package — prop buckets
+// (crate/barrel/pine/oak/bush/heather/deadTree/boulder) will move to
+// `composition/vegetation/` and `composition/village/`, and this file
+// will orchestrate rendering from the composed output. See
+// docs/superpowers/specs/2026-04-18-thornfield-phase-0.md. We
+// deliberately do NOT carve up the file in this PR because the Phase 0
+// plan reorganizes the whole rendering path — an intermediate reshuffle
+// here would have to be redone immediately.
 import {
   CuboidCollider,
   HeightfieldCollider,
@@ -6,20 +15,12 @@ import {
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
-import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
 import type { ChunkData } from '@/types/game';
 import { cyrb128, mulberry32 } from '@/utils/random';
 import { getBiomeGroundMaterial, getMaterials } from '@/utils/textures';
 import type { HeightSampler } from '@/utils/vegetation';
 import { placeVegetation } from '@/utils/vegetation';
+import { GlbInstancer } from './GlbInstancer';
 import {
   BLOCK_SIZE,
   CHUNK_SIZE,
@@ -66,10 +67,8 @@ interface MeshData {
   windowGlow: MeshInstance[];
   crate: MeshInstance[];
   barrel: MeshInstance[];
-  pineTrunk: MeshInstance[];
-  pineLeaves: MeshInstance[];
-  oakTrunk: MeshInstance[];
-  oakLeaves: MeshInstance[];
+  pine: MeshInstance[];
+  oak: MeshInstance[];
   bush: MeshInstance[];
   grassTuft: MeshInstance[];
   deadTree: MeshInstance[];
@@ -77,145 +76,17 @@ interface MeshData {
   boulder: MeshInstance[];
   gems: GemData[];
 }
-
-// Helper function to build a modular building
-function buildModularBuilding(
-  data: MeshData,
-  bx: number,
-  bz: number,
-  buildingType: string,
-  localRng: () => number,
-) {
-  let w = 2,
-    d = 2,
-    h = 1;
-  if (buildingType === 'inn') {
-    w = 3;
-    d = 4;
-    h = 2;
-  }
-  if (buildingType === 'blacksmith') {
-    w = 2;
-    d = 2;
-    h = 1;
-  }
-  if (buildingType === 'house') {
-    h = 1 + Math.floor(localRng() * 2);
-  }
-
-  const centerX = bx + (w * BLOCK_SIZE) / 2;
-  const centerZ = bz + (d * BLOCK_SIZE) / 2;
-
-  // Stone foundation
-  data.dungeonWall.push({
-    x: centerX,
-    y: 0.25,
-    z: centerZ,
-    sx: w,
-    sy: 0.1,
-    sz: d,
-  });
-
-  for (let fl = 0; fl < h; fl++) {
-    const py = fl * BLOCK_SIZE + BLOCK_SIZE / 2;
-    const overhang = buildingType === 'inn' && fl > 0 ? 0.2 : 0;
-
-    for (let ix = 0; ix < w; ix++) {
-      for (let iz = 0; iz < d; iz++) {
-        const px = bx + ix * BLOCK_SIZE + BLOCK_SIZE / 2;
-        const pz = bz + iz * BLOCK_SIZE + BLOCK_SIZE / 2;
-        const isPerimeter =
-          ix === 0 || ix === w - 1 || iz === 0 || iz === d - 1;
-
-        if (isPerimeter) {
-          // Timber frame corners
-          data.wood.push({
-            x: px - BLOCK_SIZE / 2,
-            y: py,
-            z: pz - BLOCK_SIZE / 2,
-            sx: 1,
-            sy: 1,
-            sz: 1,
-          });
-          data.wood.push({
-            x: px + BLOCK_SIZE / 2,
-            y: py,
-            z: pz + BLOCK_SIZE / 2,
-            sx: 1,
-            sy: 1,
-            sz: 1,
-          });
-
-          // Open front for blacksmith
-          if (buildingType === 'blacksmith' && fl === 0 && iz === d - 1)
-            continue;
-
-          // Door
-          if (fl === 0 && iz === d - 1 && ix === Math.floor(w / 2)) {
-            data.door.push({ x: px, y: BLOCK_SIZE / 4, z: pz });
-          } else {
-            data.townWall.push({
-              x: px,
-              y: py,
-              z: pz,
-              sx: 1 + overhang,
-              sz: 1 + overhang,
-            });
-
-            // Windows
-            if (localRng() > 0.5) {
-              let wz = pz,
-                wx = px;
-              if (iz === d - 1) wz = pz + BLOCK_SIZE / 2 + 0.05;
-              else if (iz === 0) wz = pz - BLOCK_SIZE / 2 - 0.05;
-              if (ix === w - 1) wx = px + BLOCK_SIZE / 2 + 0.05;
-              else if (ix === 0) wx = px - BLOCK_SIZE / 2 - 0.05;
-
-              if (wz !== pz || wx !== px) {
-                data.windowGlow.push({ x: wx, y: py, z: wz });
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Roof
-  data.roof.push({
-    x: centerX,
-    y: h * BLOCK_SIZE + BLOCK_SIZE * 0.6,
-    z: centerZ,
-    sx: w * 0.75,
-    sz: d * 0.75,
-  });
-
-  // Clutter
-  if (buildingType === 'blacksmith') {
-    data.barrel.push({
-      x: centerX + BLOCK_SIZE / 2,
-      y: BLOCK_SIZE * 0.25,
-      z: centerZ + BLOCK_SIZE / 2,
-    });
-  } else if (buildingType === 'inn') {
-    for (let i = 0; i < 4; i++) {
-      data.crate.push({
-        x: bx - BLOCK_SIZE / 2 + localRng() * 2,
-        y: BLOCK_SIZE * 0.2,
-        z: centerZ + localRng() * 4,
-      });
-    }
-  }
-}
-
 export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   const { cx, cz, key, type, placedBuildings, npcBlueprints } = chunkData;
-  const hasConfigTown =
-    type === 'TOWN' && placedBuildings && placedBuildings.length > 0;
-  const _rng = useMemo(
-    () => mulberry32(cyrb128(seedPhrase + key)),
-    [seedPhrase, key],
-  );
+  // `placedBuildings` is `undefined` when ChunkManager never resolved a town
+  // config for this chunk. It is `[]` when a config resolved but produced no
+  // building placements — which is still a valid "town config present" state
+  // (empty-layout test fixtures, ghost towns, ruins-without-structures, etc.).
+  // Treat presence of the array as the config-resolved signal; the count is
+  // only used to decide whether to render building meshes.
+  const hasConfigTown = type === 'TOWN' && placedBuildings !== undefined;
+  const hasPlacedBuildings =
+    hasConfigTown && (placedBuildings?.length ?? 0) > 0;
   const materials = useMemo(() => getMaterials(), []);
 
   const oX = cx * CHUNK_SIZE;
@@ -235,10 +106,8 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
       windowGlow: [],
       crate: [],
       barrel: [],
-      pineTrunk: [],
-      pineLeaves: [],
-      oakTrunk: [],
-      oakLeaves: [],
+      pine: [],
+      oak: [],
       bush: [],
       grassTuft: [],
       deadTree: [],
@@ -266,39 +135,14 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
       }
 
       if (type === 'TOWN' && !hasConfigTown) {
-        // Legacy instanced buildings — only for towns without a config
-        buildModularBuilding(data, oX + 20, oZ + 20, 'inn', localRng);
-        buildModularBuilding(
-          data,
-          oX + CHUNK_SIZE - 40,
-          oZ + 20,
-          'blacksmith',
-          localRng,
+        // Every TOWN chunk must resolve to a configured town. If getTownConfig
+        // returned no config, that's a content-authoring bug — do not fall
+        // back to primitive modular buildings. Throw to ErrorOverlay.
+        throw new Error(
+          `Chunk ${key} has type=TOWN but no town config resolved from ` +
+            `getTownConfig(). Add a JSON file under src/content/towns/ or fix ` +
+            `the chunk classification.`,
         );
-        buildModularBuilding(data, oX + 20, oZ + 80, 'house', localRng);
-        buildModularBuilding(
-          data,
-          oX + 20 + BLOCK_SIZE * 2,
-          oZ + 80,
-          'house',
-          localRng,
-        );
-        buildModularBuilding(
-          data,
-          oX + CHUNK_SIZE - 35,
-          oZ + 70,
-          'house',
-          localRng,
-        );
-
-        // Town decorations
-        for (let i = 0; i < 8; i++) {
-          data.barrel.push({
-            x: oX + 30 + localRng() * 60,
-            y: BLOCK_SIZE * 0.25,
-            z: oZ + 30 + localRng() * 60,
-          });
-        }
       } else if (type === 'TOWN' && hasConfigTown) {
         // Config-driven town — add barrels/crates as decorations only
         for (let i = 0; i < 6; i++) {
@@ -382,10 +226,8 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         localRng,
         heightSampler,
       );
-      data.pineTrunk.push(...veg.pineTrunk);
-      data.pineLeaves.push(...veg.pineLeaves);
-      data.oakTrunk.push(...veg.oakTrunk);
-      data.oakLeaves.push(...veg.oakLeaves);
+      data.pine.push(...veg.pine);
+      data.oak.push(...veg.oak);
       data.bush.push(...veg.bush);
       data.grassTuft.push(...veg.grassTuft);
       data.deadTree.push(...veg.deadTree);
@@ -602,87 +444,64 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         material={materials.windowGlow}
       />
 
-      {/* Crates */}
-      <InstancedMeshes
+      {/* Crates — extracted single-node GLB. Previously both crate and
+          barrel pointed at the packed `dungeon/Crates_and_barrels.glb`,
+          which made them render the same sub-mesh (GlbInstancer picks
+          the first mesh it finds). Now each points at its extracted
+          single-node GLB so they visually diverge. */}
+      <GlbInstancer
+        glb="dungeon/crates/crate-1.glb"
         items={meshData.crate}
-        geometry="crate"
-        material={materials.crate}
+        baseScale={0.6}
       />
 
-      {/* Barrels */}
+      {/* Barrels — distinct extracted single-node GLB. */}
       {meshData.barrel.length > 0 && (
-        <InstancedMeshes
+        <GlbInstancer
+          glb="dungeon/crates/barrel-1.glb"
           items={meshData.barrel}
-          geometry="barrel"
-          material={materials.barrel}
+          baseScale={0.5}
         />
       )}
 
-      {/* Pine trunks */}
-      <InstancedMeshes
-        items={meshData.pineTrunk}
-        geometry="pineTrunk"
-        material={materials.pineTrunk}
-      />
+      {/* Pines — authored GLB, single InstancedMesh per chunk */}
+      <GlbInstancer glb="nature/tree15.glb" items={meshData.pine} />
 
-      {/* Pine leaves */}
-      <InstancedMeshes
-        items={meshData.pineLeaves}
-        geometry="pineLeaves"
-        material={materials.pineLeaves}
-      />
+      {/* Oaks — authored GLB */}
+      <GlbInstancer glb="nature/tree01.glb" items={meshData.oak} />
 
-      {/* Oak trunks */}
-      <InstancedMeshes
-        items={meshData.oakTrunk}
-        geometry="oakTrunk"
-        material={materials.oakTrunk}
-      />
+      {/* Bushes — authored GLB */}
+      <GlbInstancer glb="nature/bush05.glb" items={meshData.bush} />
 
-      {/* Oak leaves */}
-      <InstancedMeshes
-        items={meshData.oakLeaves}
-        geometry="oakLeaves"
-        material={materials.oakLeaves}
-      />
-
-      {/* Bushes */}
-      <InstancedMeshes
-        items={meshData.bush}
-        geometry="bush"
-        material={materials.bush}
-      />
-
-      {/* Grass tufts */}
-      <InstancedMeshes
-        items={meshData.grassTuft}
-        geometry="grassTuft"
-        material={materials.grassTuft}
-      />
-
-      {/* Dead trees */}
-      <InstancedMeshes
+      {/* Dead trees — reuse tree07 GLB with the dead-tree Koota material (tinted) */}
+      <GlbInstancer
+        glb="nature/tree07.glb"
         items={meshData.deadTree}
-        geometry="deadTree"
-        material={materials.deadTree}
+        materialOverride={materials.deadTree}
       />
 
-      {/* Heather */}
-      <InstancedMeshes
+      {/* Boulders — authored GLB */}
+      <GlbInstancer glb="nature/rocks.glb" items={meshData.boulder} />
+
+      {/* Grass tufts — small bush stand-in at reduced scale (no dedicated grass GLB) */}
+      <GlbInstancer
+        glb="nature/bush01.glb"
+        items={meshData.grassTuft}
+        baseScale={0.35}
+      />
+
+      {/* Heather — bush at reduced scale */}
+      <GlbInstancer
+        glb="nature/bush01.glb"
         items={meshData.heather}
-        geometry="heather"
-        material={materials.heather}
+        baseScale={0.45}
       />
 
-      {/* Boulders */}
-      <InstancedMeshes
-        items={meshData.boulder}
-        geometry="boulder"
-        material={materials.boulder}
-      />
-
-      {/* Config-driven buildings */}
-      {hasConfigTown &&
+      {/* Config-driven buildings — only iterate when the town config
+          actually produced placements. `hasConfigTown` means "config
+          resolved"; `hasPlacedBuildings` additionally means "placement
+          non-empty". */}
+      {hasPlacedBuildings &&
         placedBuildings?.map((b) => (
           <Building
             key={`bldg-${b.label}`}

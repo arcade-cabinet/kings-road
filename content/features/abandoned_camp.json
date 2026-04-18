@@ -1,9 +1,0 @@
-{
-  "id": "abandoned_camp",
-  "tier": "minor",
-  "name": "Abandoned Camp",
-  "description": "A circle of blackened stones marks a cold campfire, surrounded by trampled grass and a torn canvas lean-to.",
-  "visualType": "abandoned_camp",
-  "interactable": true,
-  "dialogueOnInteract": "The ashes are days old but still faintly warm. A scratched message on a flat stone reads: 'Beware the road past nightfall. They walk without lanterns.'"
-}

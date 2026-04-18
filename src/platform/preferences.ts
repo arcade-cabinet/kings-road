@@ -30,8 +30,15 @@ export async function getPreferenceJSON<T>(key: string): Promise<T | null> {
   if (raw === null) return null;
   try {
     return JSON.parse(raw) as T;
-  } catch {
-    return null;
+  } catch (err) {
+    // Corrupt preference payload — throw so ErrorOverlay surfaces it rather
+    // than silently returning null (which masks a data-integrity bug as an
+    // "empty" preference).
+    throw new Error(
+      `Preference "${key}" payload is not valid JSON: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
   }
 }
 

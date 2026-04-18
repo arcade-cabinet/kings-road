@@ -1,0 +1,15 @@
+{
+  "id": "wooden_shield",
+  "name": "Wooden Shield",
+  "description": "An oak shield banded with iron. Rough-hewn but reliable, it bears the dents of many a traveller before you.",
+  "type": "equipment",
+  "effect": {
+    "stat": "defense",
+    "value": 3
+  },
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/MISC_2025-transformed.glb",
+    "handPose": "open"
+  }
+}

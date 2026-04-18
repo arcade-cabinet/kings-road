@@ -1,0 +1,22 @@
+{
+  "id": "healing_staff",
+  "name": "Healing Staff",
+  "description": "A willow staff blessed at Pilgrim's Rest. Its warm glow mends wounds slowly, restoring vitality over time.",
+  "type": "equipment",
+  "equipSlot": "weapon",
+  "rarity": "uncommon",
+  "weight": 1.0,
+  "value": 40,
+  "statModifiers": [
+    { "stat": "magic", "value": 6 }
+  ],
+  "effect": {
+    "stat": "healPower",
+    "value": 6
+  },
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/weapons/pack/bo-001.glb",
+    "handPose": "hold"
+  }
+}

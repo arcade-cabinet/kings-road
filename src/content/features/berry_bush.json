@@ -1,0 +1,11 @@
+{
+  "id": "berry_bush",
+  "tier": "ambient",
+  "name": "Berry Bush",
+  "description": "A sprawling hedgerow heavy with dark berries lines the roadside, the fruit staining the ground purple beneath it.",
+  "visualType": "berry_bush",
+  "interactable": false,
+  "glb": "nature/bush05.glb",
+  "glbScale": 1.2,
+  "glbYawRange": 360
+}

@@ -1,0 +1,12 @@
+{
+  "id": "ancient_ruins",
+  "tier": "major",
+  "name": "Ancient Ruins",
+  "description": "Crumbling stone archways rise from the earth, half-swallowed by ivy and time. A dark staircase descends into the hillside beneath the largest arch.",
+  "visualType": "ruined_archway_dungeon_entrance",
+  "interactable": true,
+  "dialogueOnInteract": "You descend the worn steps into cool darkness. The air smells of damp stone and forgotten centuries. Carvings on the walls depict a procession of knights bearing a radiant vessel \u2014 the Grail, perhaps. The passage continues deeper than your torchlight can reach.",
+  "glb": "dungeon/MineProps.glb",
+  "glbScale": 1.6,
+  "glbYawRange": 360
+}

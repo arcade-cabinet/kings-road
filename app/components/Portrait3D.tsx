@@ -1,6 +1,8 @@
-import { useGLTF } from '@react-three/drei';
+import { useAnimations, useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
+import type * as THREE from 'three';
+import { SkeletonUtils } from 'three-stdlib';
 import { assetUrl } from '@/lib/assets';
 
 const MODEL_MAPPING: Record<string, string> = {
@@ -34,13 +36,58 @@ interface Portrait3DProps {
   type: string;
 }
 
+/**
+ * Portraits should appear alive during dialogue: prefer a talking clip
+ * (`Talk_1`, `Talk_Old`) over an idle. Falls back to idle/walk for packs
+ * that don't ship a talk animation (knight/3DPSX packs).
+ */
+function pickPortraitClip(clipNames: string[]): string | null {
+  const preferences = [
+    'Talk_1',
+    'Talk_Old',
+    'Idle_1',
+    'anim_iddle',
+    'iddleanim_',
+    'Idle_2',
+  ];
+  for (const pref of preferences) {
+    if (clipNames.includes(pref)) return pref;
+  }
+  return (
+    clipNames.find(
+      (n) => n.toLowerCase().includes('talk') || n.toLowerCase().includes('idle') || n.toLowerCase().includes('iddle'),
+    ) ?? null
+  );
+}
+
 function NPCModel({ type }: { type: string }) {
   const modelName = MODEL_MAPPING[type] || 'basemesh';
-  const { scene } = useGLTF(assetUrl(`/assets/npcs/${modelName}.glb`));
-  const cloned = useMemo(() => scene.clone(), [scene]);
+  const gltf = useGLTF(assetUrl(`/assets/npcs/${modelName}.glb`)) as unknown as {
+    scene: THREE.Group;
+    animations: THREE.AnimationClip[];
+  };
+  const cloned = useMemo(
+    () => SkeletonUtils.clone(gltf.scene) as THREE.Group,
+    [gltf.scene],
+  );
+
+  const groupRef = useRef<THREE.Group>(null);
+  const { actions, names } = useAnimations(gltf.animations, groupRef);
+  useEffect(() => {
+    const clipName = pickPortraitClip(names);
+    if (!clipName) return;
+    const action = actions[clipName];
+    if (!action) return;
+    action.reset().fadeIn(0.2).play();
+    return () => {
+      action.fadeOut(0.2);
+    };
+  }, [actions, names]);
 
   return (
-    <primitive object={cloned} scale={[1.8, 1.8, 1.8]} position={[0, -1, 0]} />
+    <group ref={groupRef}>
+      <primitive object={cloned} scale={[1.8, 1.8, 1.8]} position={[0, -1, 0]} />
+    </group>
   );
 }
 

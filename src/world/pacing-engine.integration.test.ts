@@ -12,7 +12,7 @@ import { PacingConfigSchema } from '@/schemas/pacing.schema';
 import { generatePlacements, generateRoadPacing } from './pacing-engine';
 import { loadRoadSpine } from './road-spine';
 
-const CONFIG_PATH = path.resolve(__dirname, '../../content/pacing/config.json');
+const CONFIG_PATH = path.resolve(__dirname, '../content/pacing/config.json');
 
 function loadPacingConfig(): PacingConfig {
   const raw = fs.readFileSync(CONFIG_PATH, 'utf-8');

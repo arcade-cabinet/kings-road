@@ -1,0 +1,11 @@
+{
+  "id": "wild_yarrow",
+  "name": "Wild Yarrow",
+  "description": "A cluster of feathery white yarrow blossoms gathered from the roadside. Herbalists value it for staunching wounds and easing fevers.",
+  "type": "quest_item",
+  "stackable": true,
+  "viewmodel": {
+    "glb": "/assets/items/bottles.glb",
+    "handPose": "pinch"
+  }
+}

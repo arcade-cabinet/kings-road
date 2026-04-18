@@ -1,0 +1,12 @@
+{
+  "id": "old_well",
+  "tier": "minor",
+  "name": "Old Well",
+  "description": "A stone well ringed with moss sits beside the path, its rope frayed and its wooden bucket grey with age.",
+  "visualType": "old_well",
+  "interactable": true,
+  "dialogueOnInteract": "You lower the bucket and hear it splash far below. The water you draw is icy cold and sweet. Coins glint at the bottom \u2014 wishes cast by travellers long gone.",
+  "glb": "dungeon/MineProps.glb",
+  "glbScale": 1.0,
+  "glbYawRange": 360
+}

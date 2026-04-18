@@ -19,7 +19,7 @@ import {
   getRegionAt,
   getSettlementAt,
 } from '@/world/kingdom-gen';
-import kingdomConfigJson from '../../../content/world/kingdom-config.json';
+import kingdomConfigJson from '../../content/world/kingdom-config.json';
 
 export const kingdomConfig: KingdomConfig =
   KingdomConfigSchema.parse(kingdomConfigJson);

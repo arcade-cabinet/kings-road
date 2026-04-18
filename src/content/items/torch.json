@@ -1,0 +1,16 @@
+{
+  "id": "torch",
+  "name": "Torch",
+  "description": "A pitch-soaked brand that casts a warm circle of light. It keeps the dark at bay and frightens lesser creatures.",
+  "type": "consumable",
+  "effect": {
+    "stat": "visibility",
+    "value": 10,
+    "duration": 180
+  },
+  "stackable": true,
+  "viewmodel": {
+    "glb": "/assets/dungeon/mine/torch-post.glb",
+    "handPose": "palm"
+  }
+}

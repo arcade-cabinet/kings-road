@@ -3,15 +3,6 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useFlags, useSeed, useChunkState } from '@/ecs/hooks/useGameSession';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
-import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
 
 /** Fallback stage messages shown while chunks are loading (after generation) */
 const CHUNK_LOADING_STAGES = [

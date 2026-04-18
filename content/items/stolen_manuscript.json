@@ -1,7 +1,0 @@
-{
-  "id": "stolen_manuscript",
-  "name": "Stolen Manuscript",
-  "description": "A rare scholarly treatise on the history of the Grail, taken from the Ravensgate library by Lord Ashwick's men. Prisoner Silas needs it for the quest 'Forbidden Knowledge' (quest: side-forbidden-knowledge).",
-  "type": "quest_item",
-  "stackable": false
-}

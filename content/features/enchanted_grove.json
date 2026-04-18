@@ -1,9 +1,0 @@
-{
-  "id": "enchanted_grove",
-  "tier": "major",
-  "name": "Enchanted Grove",
-  "description": "A circle of silver-barked trees glows with pale inner light. The grass within is impossibly green, and the air hums with a sound just below hearing.",
-  "visualType": "glowing_tree_circle_healing",
-  "interactable": true,
-  "dialogueOnInteract": "You step into the grove and feel every ache and weariness lift from your body like morning mist. The trees seem to lean inward, sheltering you. A voice, neither male nor female, whispers through the leaves: 'Rest, pilgrim. The road is long, but you are not forgotten.'"
-}

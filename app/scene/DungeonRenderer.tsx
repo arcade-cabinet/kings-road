@@ -22,12 +22,15 @@ import {
   useDungeonSession,
   useFlags,
 } from '@/ecs/hooks/useGameSession';
+import { loadPbrMaterial } from '@/utils/textures';
 import type { PlacedRoom } from '@/world/dungeon-generator';
 import {
   DUNGEON_DEPTH,
   getRoomColor,
   ROOM_SIZE,
 } from '@/world/dungeon-generator';
+import { Model as SupportBeam } from './generated/mine/supportbeam';
+import { Model as WallTorch } from './generated/mine/wall-torch';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -45,25 +48,20 @@ const TORCH_DISTANCE = 18;
 // Reusable vectors for per-frame checks
 const _playerPos = new THREE.Vector3();
 
-// ── Materials (created once) ─────────────────────────────────────────
+// ── Materials (Polyhaven PBR for authenticity) ────────────────────────
+//
+// Floor, walls, and ceiling share the stone_block PBR set (Rustic Stone Wall).
+// Each surface gets its own cloned material so tints (ceiling darker, floor
+// neutral) don't leak across — see loadPbrMaterial() note about mutation.
 
-const floorMaterial = new THREE.MeshStandardMaterial({
-  color: 0x3a3a3a,
-  roughness: 0.95,
-  metalness: 0.0,
-});
+const floorMaterial = loadPbrMaterial('stone_block').clone();
+floorMaterial.color.setHex(0x3a3a3a);
 
-const ceilingMaterial = new THREE.MeshStandardMaterial({
-  color: 0x2a2a2a,
-  roughness: 1.0,
-  metalness: 0.0,
-});
+const ceilingMaterial = loadPbrMaterial('stone_block').clone();
+ceilingMaterial.color.setHex(0x1a1a1a);
 
-const wallMaterial = new THREE.MeshStandardMaterial({
-  color: 0x4a4a4a,
-  roughness: 0.9,
-  metalness: 0.05,
-});
+const wallMaterial = loadPbrMaterial('stone_block').clone();
+wallMaterial.color.setHex(0x5a5a5a);
 
 // ── Direction helpers ────────────────────────────────────────────────
 
@@ -193,15 +191,12 @@ function DungeonRoomMesh({
         castShadow={isCurrent}
       />
 
-      {/* Torch sconce visual — small glowing box on the wall */}
-      <mesh position={[0, WALL_HEIGHT - 1.5, 0]}>
-        <boxGeometry args={[0.15, 0.4, 0.15]} />
-        <meshStandardMaterial
-          color={0xff8800}
-          emissive={0xff6600}
-          emissiveIntensity={0.8}
-        />
-      </mesh>
+      {/* Torch sconce — authored wall-torch from the mine pack, scaled up
+          to read at dungeon room scale. */}
+      <WallTorch
+        position={[0, WALL_HEIGHT - 1.8, 0]}
+        scale={1.8}
+      />
     </group>
   );
 }
@@ -677,25 +672,10 @@ function DungeonEntranceExit({ entranceRoom }: { entranceRoom: PlacedRoom }) {
         decay={2}
         position={[0, 2, 2]}
       />
-      {/* Archway shape — two pillars and a lintel */}
-      <mesh
-        position={[-DOORWAY_WIDTH / 2 - 0.3, DOORWAY_HEIGHT / 2, 0]}
-        castShadow
-      >
-        <boxGeometry args={[0.6, DOORWAY_HEIGHT, 0.6]} />
-        <meshStandardMaterial color={0x5a5a4a} roughness={0.85} />
-      </mesh>
-      <mesh
-        position={[DOORWAY_WIDTH / 2 + 0.3, DOORWAY_HEIGHT / 2, 0]}
-        castShadow
-      >
-        <boxGeometry args={[0.6, DOORWAY_HEIGHT, 0.6]} />
-        <meshStandardMaterial color={0x5a5a4a} roughness={0.85} />
-      </mesh>
-      <mesh position={[0, DOORWAY_HEIGHT + 0.2, 0]} castShadow>
-        <boxGeometry args={[DOORWAY_WIDTH + 1.2, 0.4, 0.6]} />
-        <meshStandardMaterial color={0x5a5a4a} roughness={0.85} />
-      </mesh>
+      {/* Authored mine support-beam as the exit-arch frame. */}
+      <SupportBeam
+        scale={[DOORWAY_WIDTH + 0.6, DOORWAY_HEIGHT + 0.4, 0.6]}
+      />
       {/* Light plane behind to suggest daylight */}
       <mesh position={[0, DOORWAY_HEIGHT / 2, 1]}>
         <planeGeometry args={[DOORWAY_WIDTH, DOORWAY_HEIGHT]} />

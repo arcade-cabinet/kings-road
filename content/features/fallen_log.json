@@ -1,8 +1,0 @@
-{
-  "id": "fallen_log",
-  "tier": "ambient",
-  "name": "Fallen Log",
-  "description": "A great trunk lies half-sunk in ferns and ivy, its bark soft with age, offering an inviting seat for weary travellers.",
-  "visualType": "fallen_log",
-  "interactable": false
-}

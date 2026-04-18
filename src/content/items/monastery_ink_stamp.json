@@ -1,0 +1,11 @@
+{
+  "id": "monastery_ink_stamp",
+  "name": "Monastery Ink Stamp",
+  "description": "A carved wooden stamp bearing the monastery's seal: a cross entwined with ivy. Pressed into warm wax or damp ink, it marks documents with unquestionable authority.",
+  "type": "key_item",
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/Treasure-transformed.glb",
+    "handPose": "pinch"
+  }
+}

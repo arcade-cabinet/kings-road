@@ -16,7 +16,7 @@ import {
   type TroveReport,
 } from '../../scripts/validate-trove';
 
-const CONTENT_DIR = path.resolve(__dirname, '../../content');
+const CONTENT_DIR = path.resolve(__dirname, '../content');
 
 describe('content trove: schema validation', () => {
   let report: TroveReport;

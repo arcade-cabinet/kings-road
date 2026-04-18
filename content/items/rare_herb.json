@@ -1,7 +1,0 @@
-{
-  "id": "rare_herb",
-  "name": "Moonpetal Herb",
-  "description": "A luminous silver-leafed herb that blooms only under a full moon. Sister Maeve requires it to brew a healing salve for the quest 'The Healer's Need' (quest: side-healers-need).",
-  "type": "quest_item",
-  "stackable": false
-}

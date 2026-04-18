@@ -1,0 +1,11 @@
+{
+  "id": "old_lords_signet",
+  "name": "Lord Ashwick's Signet Ring",
+  "description": "A heavy gold ring bearing the Ashwick coat of arms: a stag beneath an oak. Its worn edges speak of years upon a lord's hand and the weight of noble obligation.",
+  "type": "key_item",
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/Treasure-transformed.glb",
+    "handPose": "pinch"
+  }
+}

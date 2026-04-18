@@ -148,10 +148,8 @@ export const DEFAULT_VEGETATION: VegetationProfile = {
 // ── Placement result ────────────────────────────────────────────────────
 
 export interface PlacedVegetation {
-  pineTrunk: VegetationInstance[];
-  pineLeaves: VegetationInstance[];
-  oakTrunk: VegetationInstance[];
-  oakLeaves: VegetationInstance[];
+  pine: VegetationInstance[];
+  oak: VegetationInstance[];
   bush: VegetationInstance[];
   grassTuft: VegetationInstance[];
   deadTree: VegetationInstance[];
@@ -188,10 +186,8 @@ export function placeVegetation(
     : DEFAULT_VEGETATION;
 
   const result: PlacedVegetation = {
-    pineTrunk: [],
-    pineLeaves: [],
-    oakTrunk: [],
-    oakLeaves: [],
+    pine: [],
+    oak: [],
     bush: [],
     grassTuft: [],
     deadTree: [],
@@ -202,53 +198,37 @@ export function placeVegetation(
   // Helper: get ground height at a world position
   const groundAt = heightAt ?? (() => 0);
 
-  // Pine trees — conical evergreens
+  // Pine trees — one authored GLB per instance, placed with trunk on ground.
   for (let i = 0; i < profile.pines; i++) {
     const px = oX + rng() * CHUNK_SIZE;
     const pz = oZ + rng() * CHUNK_SIZE;
     const s = 0.8 + rng() * 0.6;
     const h = groundAt(px, pz);
-    result.pineTrunk.push({
+    result.pine.push({
       x: px,
-      y: h + BLOCK_SIZE,
+      y: h,
       z: pz,
       sx: s,
       sy: s,
       sz: s,
-    });
-    result.pineLeaves.push({
-      x: px,
-      y: h + BLOCK_SIZE * 2.5,
-      z: pz,
-      sx: s,
-      sy: s,
-      sz: s,
-      rotY: rng() * Math.PI,
+      rotY: rng() * Math.PI * 2,
     });
   }
 
-  // Oak / broadleaf trees — rounder canopy
+  // Oak / broadleaf trees — rounder canopy via authored GLB.
   for (let i = 0; i < profile.oaks; i++) {
     const px = oX + rng() * CHUNK_SIZE;
     const pz = oZ + rng() * CHUNK_SIZE;
     const s = 0.7 + rng() * 0.8;
     const h = groundAt(px, pz);
-    result.oakTrunk.push({
+    result.oak.push({
       x: px,
-      y: h + BLOCK_SIZE * 0.8,
+      y: h,
       z: pz,
       sx: s,
       sy: s,
       sz: s,
-    });
-    result.oakLeaves.push({
-      x: px,
-      y: h + BLOCK_SIZE * 2.2,
-      z: pz,
-      sx: s * 1.3,
-      sy: s,
-      sz: s * 1.3,
-      rotY: rng() * Math.PI,
+      rotY: rng() * Math.PI * 2,
     });
   }
 

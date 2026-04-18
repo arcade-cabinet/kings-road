@@ -15,7 +15,7 @@ import { TownConfigSchema } from '@/schemas/town.schema';
 import { loadRoadSpine } from './road-spine';
 import { resolveBuildingArchetype, resolveNPCBlueprint } from './town-configs';
 
-const TOWNS_DIR = path.resolve(__dirname, '../../content/towns');
+const TOWNS_DIR = path.resolve(__dirname, '../content/towns');
 
 function loadTownFiles(): Array<{ filename: string; config: TownConfig }> {
   const files = fs.readdirSync(TOWNS_DIR).filter((f) => f.endsWith('.json'));

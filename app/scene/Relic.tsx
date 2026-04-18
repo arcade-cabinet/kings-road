@@ -1,8 +1,13 @@
+import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { collectGem, getPlayer } from '@/ecs/actions/game';
+import { assetUrl } from '@/lib/assets';
 import { PLAYER_RADIUS } from '@/utils/worldGen';
+
+const CRYSTAL_GLB = assetUrl('/assets/dungeon/mine/crystal.glb');
+useGLTF.preload(CRYSTAL_GLB);
 
 // Reusable vector for collection animation
 const _toPlayer = new THREE.Vector3();
@@ -14,13 +19,6 @@ interface RelicProps {
   collected: boolean;
 }
 
-// Particle system for collection effect
-interface CollectParticle {
-  position: THREE.Vector3;
-  velocity: THREE.Vector3;
-  life: number;
-}
-
 export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const innerMeshRef = useRef<THREE.Mesh>(null);
@@ -29,7 +27,6 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
   const [isCollected, setIsCollected] = useState(collected ?? false);
   const [collectAnimation, setCollectAnimation] = useState(0);
   const [attractAnimation, setAttractAnimation] = useState(0);
-  const _particlesRef = useRef<CollectParticle[]>([]);
 
   const elapsedRef = useRef(0);
 
@@ -200,9 +197,32 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
 
   if (isCollected && collectAnimation <= 0) return null;
 
+  const crystalGlb = useGLTF(CRYSTAL_GLB) as unknown as {
+    nodes: Record<string, THREE.Mesh>;
+  };
+  const crystalGeometry = useMemo(() => {
+    const mesh = Object.values(crystalGlb.nodes).find(
+      (n): n is THREE.Mesh => (n as THREE.Mesh).isMesh === true,
+    );
+    if (!mesh) {
+      throw new Error(
+        `Crystal relic GLB ${CRYSTAL_GLB} has no mesh node — cannot render relic geometry.`,
+      );
+    }
+    if (!mesh.geometry) {
+      throw new Error(
+        `Crystal relic GLB ${CRYSTAL_GLB} mesh "${mesh.name || '(unnamed)'}" ` +
+          `has no geometry — GLB structure changed unexpectedly.`,
+      );
+    }
+    return mesh.geometry;
+  }, [crystalGlb.nodes]);
+
   return (
     <group position={[posX, 0, posZ]}>
-      {/* Outer glow sphere */}
+      {/* Outer glow sphere — kept as an additive aura hull; no authored
+          GLB provides the soft light-sphere look, and this is a pure VFX
+          primitive (no collider, no physics). */}
       <mesh ref={outerGlowRef} position={[0, posY, 0]}>
         <sphereGeometry args={[0.8, 16, 16]} />
         <meshBasicMaterial
@@ -213,9 +233,16 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
         />
       </mesh>
 
-      {/* Main relic */}
-      <mesh ref={meshRef} position={[0, posY, 0]} castShadow>
-        <octahedronGeometry args={[0.6, 0]} />
+      {/* Main relic — crystal geometry pulled from the authored mine GLB,
+          re-tinted gold/emissive to read as an ancient relic rather than
+          a raw gem. */}
+      <mesh
+        ref={meshRef}
+        position={[0, posY, 0]}
+        geometry={crystalGeometry}
+        castShadow
+        scale={0.9}
+      >
         <meshStandardMaterial
           color={0xb8962e}
           emissive={0x8b6f1f}
@@ -227,16 +254,15 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
         />
       </mesh>
 
-      {/* Inner core glow */}
-      <mesh ref={innerMeshRef} position={[0, posY, 0]}>
-        <octahedronGeometry args={[0.35, 0]} />
+      {/* Inner core glow — same crystal geometry at smaller scale as the
+          "inner light" payload inside the outer gold facets. */}
+      <mesh
+        ref={innerMeshRef}
+        position={[0, posY, 0]}
+        geometry={crystalGeometry}
+        scale={0.5}
+      >
         <meshBasicMaterial color={0xd4af37} transparent opacity={0.6} />
-      </mesh>
-
-      {/* Inner bright core */}
-      <mesh position={[0, posY, 0]}>
-        <sphereGeometry args={[0.15, 8, 8]} />
-        <meshBasicMaterial color={0xffffff} transparent opacity={0.4} />
       </mesh>
 
       {/* Point light for glow effect */}

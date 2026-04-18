@@ -1,14 +1,11 @@
-import { useGLTF } from '@react-three/drei';
+import { useAnimations, useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import type * as THREE from 'three';
+import { useEffect, useMemo, useRef } from 'react';
+import * as THREE from 'three';
+import { SkeletonUtils } from 'three-stdlib';
 import { assetUrl } from '@/lib/assets';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
 import { hashString } from '@/utils/random';
-import {
-  buildMonsterRenderData,
-  type MonsterGeometry,
-} from '@/factories/monster-factory';
 
 interface MonsterProps {
   archetype: MonsterArchetype;
@@ -21,6 +18,12 @@ const WEREWOLF_PATH = assetUrl('/assets/monsters/werewolf-transformed.glb');
 const BLOODWRAITH_PATH = assetUrl('/assets/monsters/bloodwraith-transformed.glb');
 const PLAGUE_DOCTOR_PATH = assetUrl('/assets/monsters/plague_doctor-transformed.glb');
 const DEVIL_DEMON_PATH = assetUrl('/assets/monsters/devil_demon.glb');
+const ABOMINATION_PATH = assetUrl('/assets/monsters/abomination-2.glb');
+const GOLIATH_PATH = assetUrl('/assets/monsters/green-goliath.glb');
+const BUTCHER_PATH = assetUrl('/assets/monsters/black-butcher.glb');
+const BIGFOOT_PATH = assetUrl('/assets/monsters/bigfoot.glb');
+const ELK_DEMON_PATH = assetUrl('/assets/monsters/elk-demon.glb');
+const EYE_HEAD_PATH = assetUrl('/assets/monsters/eye-head.glb');
 
 const HOVER_ARCHETYPES = new Set([
   'butterfly_swarm',
@@ -29,41 +32,20 @@ const HOVER_ARCHETYPES = new Set([
   'bloodwraith',
 ]);
 
-function GeometryMesh({
-  part,
-  color,
-}: {
-  part: MonsterGeometry;
-  color: string;
-}) {
-  switch (part.type) {
-    case 'box':
-      return (
-        <mesh position={part.position} castShadow>
-          <boxGeometry args={part.args as [number, number, number]} />
-          <meshStandardMaterial color={color} roughness={0.8} />
-        </mesh>
-      );
-    case 'cylinder':
-      return (
-        <mesh position={part.position} castShadow>
-          <cylinderGeometry args={part.args as [number, number, number]} />
-          <meshStandardMaterial color={color} roughness={0.8} />
-        </mesh>
-      );
-    case 'sphere':
-      return (
-        <mesh position={part.position} castShadow>
-          <sphereGeometry args={part.args as [number]} />
-          <meshStandardMaterial
-            color={color}
-            roughness={0.6}
-            transparent
-            opacity={0.85}
-          />
-        </mesh>
-      );
+/**
+ * Skeleton_warrior ships `Idle_1` / `Idle_2` / `Idle_1_break` and the Bat
+ * pack ships `Bat_Idle`. Walk a preference list and return the first
+ * matching clip. Anything else returns null and the monster just stands
+ * in the bind pose.
+ */
+function pickMonsterIdleClip(clipNames: string[]): string | null {
+  const preferences = ['Idle_1', 'Bat_Idle', 'Idle_2', 'Idle_1_break'];
+  for (const pref of preferences) {
+    if (clipNames.includes(pref)) return pref;
   }
+  return (
+    clipNames.find((n) => n.toLowerCase().includes('idle')) ?? null
+  );
 }
 
 export function Monster({ archetype, position }: MonsterProps) {
@@ -77,13 +59,43 @@ export function Monster({ archetype, position }: MonsterProps) {
   const bloodwraith = useGLTF(BLOODWRAITH_PATH) as any;
   const plagueDoctor = useGLTF(PLAGUE_DOCTOR_PATH) as any;
   const devilDemon = useGLTF(DEVIL_DEMON_PATH) as any;
+  const abomination = useGLTF(ABOMINATION_PATH) as any;
+  const goliath = useGLTF(GOLIATH_PATH) as any;
+  const butcher = useGLTF(BUTCHER_PATH) as any;
+  const bigfoot = useGLTF(BIGFOOT_PATH) as any;
+  const elkDemon = useGLTF(ELK_DEMON_PATH) as any;
+  const eyeHead = useGLTF(EYE_HEAD_PATH) as any;
 
-  const renderData = useMemo(
-    () => buildMonsterRenderData(archetype),
-    [archetype],
-  );
+  // Use the archetype's declared size as the uniform scale.
+  const scale = archetype.size;
 
-  const { bodyParts, primaryColor, secondaryColor, scale } = renderData;
+  // Identify which rigged pack supplies this archetype's mesh. Only the
+  // Skeleton_warrior and Bat packs ship non-trivial animation clips; the
+  // horror monster packs export T-pose only, so there is nothing to
+  // drive for them. `useAnimations` is bound to the top-level group and
+  // references the animations from whichever pack is active. Passing an
+  // empty array when no pack has clips is a safe no-op.
+  const animationClips: THREE.AnimationClip[] = useMemo(() => {
+    if (['skeleton', 'shadow_knight', 'lich_lord'].includes(archetype.id)) {
+      return (skeleton.animations ?? []) as THREE.AnimationClip[];
+    }
+    if (['butterfly_swarm', 'bat', 'songbird'].includes(archetype.id)) {
+      return (bat.animations ?? []) as THREE.AnimationClip[];
+    }
+    return [];
+  }, [archetype.id, skeleton.animations, bat.animations]);
+
+  const { actions, names } = useAnimations(animationClips, modelRef);
+  useEffect(() => {
+    const clipName = pickMonsterIdleClip(names);
+    if (!clipName) return;
+    const action = actions[clipName];
+    if (!action) return;
+    action.reset().fadeIn(0.3).play();
+    return () => {
+      action.fadeOut(0.3);
+    };
+  }, [actions, names]);
 
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
@@ -115,7 +127,7 @@ export function Monster({ archetype, position }: MonsterProps) {
     // 1. Skeletons & Undead Knights
     if (['skeleton', 'shadow_knight', 'lich_lord'].includes(archetype.id)) {
       if (skeleton.scene) {
-        const cloned = skeleton.scene.clone();
+        const cloned = SkeletonUtils.clone(skeleton.scene) as THREE.Group;
 
         // Procedural Armor Variety for Skeletons
         cloned.traverse((child: any) => {
@@ -142,7 +154,7 @@ export function Monster({ archetype, position }: MonsterProps) {
     // 2. Flying / Hovering entities
     if (['butterfly_swarm', 'bat', 'songbird'].includes(archetype.id)) {
       if (bat.scene) {
-        const cloned = bat.scene.clone();
+        const cloned = SkeletonUtils.clone(bat.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
@@ -150,7 +162,7 @@ export function Monster({ archetype, position }: MonsterProps) {
     // 3. New Horror Monsters
     if (archetype.id === 'wolf' || archetype.id === 'werewolf') {
       if (werewolf.scene) {
-        const cloned = werewolf.scene.clone();
+        const cloned = SkeletonUtils.clone(werewolf.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
@@ -161,33 +173,74 @@ export function Monster({ archetype, position }: MonsterProps) {
       )
     ) {
       if (bloodwraith.scene) {
-        const cloned = bloodwraith.scene.clone();
+        const cloned = SkeletonUtils.clone(bloodwraith.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
 
     if (['necromancer', 'plague_doctor', 'cultist'].includes(archetype.id)) {
       if (plagueDoctor.scene) {
-        const cloned = plagueDoctor.scene.clone();
+        const cloned = SkeletonUtils.clone(plagueDoctor.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
 
     if (['dragon', 'drake', 'wyvern', 'basilisk'].includes(archetype.id)) {
       if (devilDemon.scene) {
-        const cloned = devilDemon.scene.clone();
+        const cloned = SkeletonUtils.clone(devilDemon.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
 
-    // 4. Fallback Primitives
-    return bodyParts.map((part) => (
-      <GeometryMesh
-        key={`${part.type}-${part.position.join(',')}`}
-        part={part}
-        color={part === bodyParts[0] ? primaryColor : secondaryColor}
-      />
-    ));
+    // 4. Humanoid bandits / brigands — use butcher model
+    if (['bandit', 'bandit_leader'].includes(archetype.id)) {
+      if (butcher.scene) {
+        return <primitive object={SkeletonUtils.clone(butcher.scene) as THREE.Group} />;
+      }
+    }
+
+    // 5. Large beasts — trolls / goliaths / bigfoot kin
+    if (['troll', 'stone_golem'].includes(archetype.id)) {
+      if (goliath.scene) {
+        return <primitive object={SkeletonUtils.clone(goliath.scene) as THREE.Group} />;
+      }
+    }
+
+    // 6. Shaggy wild beasts — dire wolf, thornbeast use bigfoot as stand-in
+    if (['dire_wolf', 'thornbeast'].includes(archetype.id)) {
+      if (bigfoot.scene) {
+        return <primitive object={SkeletonUtils.clone(bigfoot.scene) as THREE.Group} />;
+      }
+    }
+
+    // 7. Deer — elk-demon variant (antlered quadruped silhouette)
+    if (archetype.id === 'deer') {
+      if (elkDemon.scene) {
+        return <primitive object={SkeletonUtils.clone(elkDemon.scene) as THREE.Group} />;
+      }
+    }
+
+    // 8. Slimes / eye-head — use eye_head model as a formless entity
+    if (['slime', 'giant_spider', 'giant_rat'].includes(archetype.id)) {
+      if (eyeHead.scene) {
+        return <primitive object={SkeletonUtils.clone(eyeHead.scene) as THREE.Group} />;
+      }
+    }
+
+    // 9. Small critters (rabbit / hedgehog) — reuse abomination-2 small-scale
+    if (['rabbit', 'hedgehog'].includes(archetype.id)) {
+      if (abomination.scene) {
+        return <primitive object={SkeletonUtils.clone(abomination.scene) as THREE.Group} />;
+      }
+    }
+
+    // Every archetype should map to an authored GLB. If we fall through here
+    // it means a monster id was added without a rendering mapping — hard-fail
+    // to ErrorOverlay so it gets noticed at content-author time.
+    throw new Error(
+      `Monster archetype "${archetype.id}" has no GLB mapping in Monster.tsx ` +
+        `(add it to the Hybrid Model Selection block).`,
+    );
   }, [
     archetype.id,
     skeleton.scene,
@@ -196,9 +249,12 @@ export function Monster({ archetype, position }: MonsterProps) {
     bloodwraith.scene,
     plagueDoctor.scene,
     devilDemon.scene,
-    bodyParts,
-    primaryColor,
-    secondaryColor,
+    abomination.scene,
+    goliath.scene,
+    butcher.scene,
+    bigfoot.scene,
+    elkDemon.scene,
+    eyeHead.scene,
   ]);
 
   return (
@@ -220,3 +276,9 @@ useGLTF.preload(WEREWOLF_PATH);
 useGLTF.preload(BLOODWRAITH_PATH);
 useGLTF.preload(PLAGUE_DOCTOR_PATH);
 useGLTF.preload(DEVIL_DEMON_PATH);
+useGLTF.preload(ABOMINATION_PATH);
+useGLTF.preload(GOLIATH_PATH);
+useGLTF.preload(BUTCHER_PATH);
+useGLTF.preload(BIGFOOT_PATH);
+useGLTF.preload(ELK_DEMON_PATH);
+useGLTF.preload(EYE_HEAD_PATH);

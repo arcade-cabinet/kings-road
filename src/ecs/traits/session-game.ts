@@ -94,6 +94,16 @@ export const EnvironmentState = trait(() => ({
   currentWeather: { ...DEFAULT_WEATHER } as WeatherState,
 }));
 
+// ── Play time tracker ─────────────────────────────────────────────────────
+// Ticks every frame when the player is alive, the game is active, and the
+// pause menu is not open. Continues ticking during dialogue, combat, and
+// inventory-open — those are all states the player is actively engaged in.
+// Save payloads read this to report an accurate "2h 14m walked" figure on
+// the load screen. See PlayerController for the authoritative tick gate.
+export const PlayTime = trait(() => ({
+  playTimeSeconds: 0,
+}));
+
 // ── Combat session (encounter in flight) ──────────────────────────────────
 export const CombatSession = trait(() => ({
   activeEncounter: null as ActiveEncounter | null,

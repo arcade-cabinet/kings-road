@@ -1,9 +1,0 @@
-{
-  "id": "weather_vane",
-  "tier": "minor",
-  "name": "Weather Vane",
-  "description": "An iron rooster atop a tall wooden pole creaks in the breeze, its arrow spinning lazily above the treetops.",
-  "visualType": "weather_vane",
-  "interactable": true,
-  "dialogueOnInteract": "The vane points steadily westward despite the shifting wind. Old wives say a fixed vane means a storm is gathering beyond the hills. The sky does look darker that way."
-}

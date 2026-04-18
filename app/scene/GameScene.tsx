@@ -12,6 +12,7 @@ import { Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
 import { CombatParticles } from './CombatParticles';
 import { DungeonRenderer } from './DungeonRenderer';
+import { FPSViewmodel } from './FPSViewmodel';
 import { OceanPlane } from './OceanPlane';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { useFlags, useSeed } from '@/ecs/hooks/useGameSession';
@@ -110,21 +111,14 @@ function SceneContent() {
           <DungeonEntrySystem />
           <AudioSystem />
 
+          {/* First-person viewmodel — renders the equipped weapon */}
+          <FPSViewmodel />
+
           {/* Post Processing */}
           <PostProcessing />
         </Physics>
       )}
     </>
-  );
-}
-
-// Loading fallback component for Suspense
-function LoadingFallback() {
-  return (
-    <mesh>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshBasicMaterial color="#87CEEB" />
-    </mesh>
   );
 }
 
@@ -153,7 +147,7 @@ export function GameScene() {
         }}
       >
         <SceneInit />
-        <Suspense fallback={<LoadingFallback />}>
+        <Suspense fallback={null}>
           <SceneContent />
           <Preload all />
         </Suspense>

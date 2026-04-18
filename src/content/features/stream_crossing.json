@@ -1,0 +1,11 @@
+{
+  "id": "stream_crossing",
+  "tier": "ambient",
+  "name": "Stream Crossing",
+  "description": "A shallow brook cuts across the road over a bed of smooth stones, its water clear enough to count the pebbles on the bottom.",
+  "visualType": "stream_crossing",
+  "interactable": false,
+  "glb": "nature/rocks.glb",
+  "glbScale": 1.2,
+  "glbYawRange": 360
+}

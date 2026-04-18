@@ -1,0 +1,16 @@
+{
+  "id": "stamina_draught",
+  "name": "Stamina Draught",
+  "description": "A bitter amber tonic that quickens the blood. Grants a surge of endurance for a short while after drinking.",
+  "type": "consumable",
+  "effect": {
+    "stat": "stamina",
+    "value": 15,
+    "duration": 60
+  },
+  "stackable": true,
+  "viewmodel": {
+    "glb": "/assets/items/bottles.glb",
+    "handPose": "grip"
+  }
+}

@@ -1,7 +1,0 @@
-{
-  "id": "resistance_token",
-  "name": "Resistance Token",
-  "description": "A small bronze coin stamped with a clenched fist and a hidden motto. Those who carry it are recognized as friends of the underground resistance.",
-  "type": "key_item",
-  "stackable": false
-}

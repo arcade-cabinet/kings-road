@@ -4,15 +4,6 @@ import * as THREE from 'three';
 import type { WaterConfig } from '@/shaders/gerstner-water';
 import { createWaterMaterial } from '@/shaders/gerstner-water';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
-import {
-  clearWorld,
-  generateWorld,
-  getFeaturesAt,
-  getTileAtGrid,
-  getTileAtWorld,
-  getWorldState,
-  setWorldState,
-} from '@/ecs/actions/world';
 
 /** Sea level Y position — water surface sits just below the shoreline */
 const SEA_LEVEL_Y = -0.5;

@@ -22,24 +22,32 @@ export const ItemRarity = z.enum([
 ]);
 export type ItemRarity = z.infer<typeof ItemRarity>;
 
-/** Hand pose used when equipping this item as an FPS viewmodel weapon */
+/**
+ * Hand pose used for any item displayed in-hand (FPS viewmodel) or in a
+ * 3D inventory thumbnail. `open` is synonymous with `palm` and accepted
+ * for authoring clarity on flat objects (books, armor, shields).
+ */
 export const HandPose = z.enum([
   'grip', // standard pistol/one-handed weapon grip
   'hold', // two-handed hold (polearms, staves)
   'pinch', // small items held between fingers (throwing knife, dagger)
   'palm', // flat-palm hold (torch, shield off-hand)
+  'open', // flat object displayed on open palm (books, maps, cloaks)
 ]);
 export type HandPose = z.infer<typeof HandPose>;
 
-/** FPS viewmodel config — links weapon to a GLB and hand pose */
+/**
+ * Item 3D display config — links the item to a GLB. Used in two contexts:
+ *   1. FPS viewmodel when the item is equipped as a weapon
+ *   2. 3D inventory thumbnail when the player hovers the item in the UI
+ * The GLB must live under `/assets/` — weapons, items, or any other
+ * extracted pack directory is fine.
+ */
 export const ViewmodelSchema = z.object({
   /** Path relative to public/ root, e.g. '/assets/weapons/knife-1.glb' */
   glb: z
     .string()
-    .regex(
-      /^\/assets\/weapons\/.+\.glb$/,
-      'glb must be a /assets/weapons/*.glb path',
-    ),
+    .regex(/^\/assets\/.+\.glb$/, 'glb must be a /assets/**/*.glb path'),
   /** How the hand rig is posed when holding this weapon */
   handPose: HandPose,
   /** Scale factor for the weapon mesh in viewmodel space (default 1) */

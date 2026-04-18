@@ -11,7 +11,7 @@ import * as path from 'node:path';
 import { initContentStore } from '@/db/content-queries';
 
 const ROOT = path.resolve(__dirname, '../..');
-const CONTENT = path.join(ROOT, 'content');
+const CONTENT = path.join(ROOT, 'src', 'content');
 
 function readJson(filePath: string): unknown {
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));

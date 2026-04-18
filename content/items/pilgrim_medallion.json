@@ -1,7 +1,0 @@
-{
-  "id": "pilgrim_medallion",
-  "name": "Pilgrim's Medallion",
-  "description": "A bronze medallion stamped with the crossed-keys emblem of the old pilgrimage route. It grants passage through sacred gates along the King's Road.",
-  "type": "key_item",
-  "stackable": false
-}

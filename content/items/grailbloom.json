@@ -1,7 +1,0 @@
-{
-  "id": "grailbloom",
-  "name": "Grailbloom",
-  "description": "A rare and wondrous flower found only in the hallowed meadows near the Grail temple. Its petals glow with a warm, honeyed light at dusk.",
-  "type": "quest_item",
-  "stackable": false
-}

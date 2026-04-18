@@ -68,10 +68,10 @@ describe('BIOME_VEGETATION profiles', () => {
 describe('placeVegetation', () => {
   it('returns all expected arrays', () => {
     const result = placeVegetation('meadow', 0, 0, makeRng());
-    expect(result.pineTrunk).toBeInstanceOf(Array);
-    expect(result.pineLeaves).toBeInstanceOf(Array);
-    expect(result.oakTrunk).toBeInstanceOf(Array);
-    expect(result.oakLeaves).toBeInstanceOf(Array);
+    expect(result.pine).toBeInstanceOf(Array);
+    expect(result.pine).toBeInstanceOf(Array);
+    expect(result.oak).toBeInstanceOf(Array);
+    expect(result.oak).toBeInstanceOf(Array);
     expect(result.bush).toBeInstanceOf(Array);
     expect(result.grassTuft).toBeInstanceOf(Array);
     expect(result.boulder).toBeInstanceOf(Array);
@@ -84,8 +84,8 @@ describe('placeVegetation', () => {
     const oZ = 360;
     const result = placeVegetation('forest', oX, oZ, makeRng());
     for (const item of [
-      ...result.pineTrunk,
-      ...result.oakTrunk,
+      ...result.pine,
+      ...result.oak,
       ...result.bush,
       ...result.boulder,
     ]) {
@@ -99,10 +99,10 @@ describe('placeVegetation', () => {
   it('respects biome profile counts', () => {
     const result = placeVegetation('meadow', 0, 0, makeRng());
     const profile = BIOME_VEGETATION.meadow;
-    expect(result.pineTrunk.length).toBe(profile.pines);
-    expect(result.pineLeaves.length).toBe(profile.pines);
-    expect(result.oakTrunk.length).toBe(profile.oaks);
-    expect(result.oakLeaves.length).toBe(profile.oaks);
+    expect(result.pine.length).toBe(profile.pines);
+    expect(result.pine.length).toBe(profile.pines);
+    expect(result.oak.length).toBe(profile.oaks);
+    expect(result.oak.length).toBe(profile.oaks);
     expect(result.bush.length).toBe(profile.bushes);
     expect(result.grassTuft.length).toBe(profile.grassTufts);
     expect(result.boulder.length).toBe(profile.boulders);
@@ -112,20 +112,20 @@ describe('placeVegetation', () => {
 
   it('uses DEFAULT_VEGETATION for unknown biome', () => {
     const result = placeVegetation('unknown_biome', 0, 0, makeRng());
-    expect(result.pineTrunk.length).toBe(DEFAULT_VEGETATION.pines);
+    expect(result.pine.length).toBe(DEFAULT_VEGETATION.pines);
     expect(result.boulder.length).toBe(DEFAULT_VEGETATION.boulders);
   });
 
   it('uses DEFAULT_VEGETATION when biome is undefined', () => {
     const result = placeVegetation(undefined, 0, 0, makeRng());
-    expect(result.pineTrunk.length).toBe(DEFAULT_VEGETATION.pines);
+    expect(result.pine.length).toBe(DEFAULT_VEGETATION.pines);
   });
 
   it('produces deterministic output for same seed', () => {
     const a = placeVegetation('forest', 0, 0, makeRng('seed-A'));
     const b = placeVegetation('forest', 0, 0, makeRng('seed-A'));
-    expect(a.pineTrunk).toEqual(b.pineTrunk);
-    expect(a.oakLeaves).toEqual(b.oakLeaves);
+    expect(a.pine).toEqual(b.pine);
+    expect(a.oak).toEqual(b.oak);
     expect(a.boulder).toEqual(b.boulder);
   });
 
@@ -133,6 +133,6 @@ describe('placeVegetation', () => {
     const a = placeVegetation('forest', 0, 0, makeRng('seed-A'));
     const b = placeVegetation('forest', 0, 0, makeRng('seed-B'));
     // Extremely unlikely to be equal with different seeds
-    expect(a.pineTrunk[0]?.x).not.toBe(b.pineTrunk[0]?.x);
+    expect(a.pine[0]?.x).not.toBe(b.pine[0]?.x);
   });
 });

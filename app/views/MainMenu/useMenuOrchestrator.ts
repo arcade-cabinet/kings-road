@@ -10,6 +10,7 @@ import { generateSeedPhrase } from '@/utils/seedPhrase';
 import {
   enterDungeon,
   mergeGameState,
+  setPlayTimeSeconds,
   setSeedPhrase,
   startGame,
 } from '@/ecs/actions/game';
@@ -92,6 +93,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
       restoreGameState(data, {
         startGame: (seed, pos, yaw) => {
           startGame(seed, new THREE.Vector3(pos.x, pos.y, pos.z), yaw);
+          setPlayTimeSeconds(data.playTimeSeconds);
         },
         mergeGameState: (partial) => mergeGameState(partial),
         restoreInventory: (items, gold, equipment) => {

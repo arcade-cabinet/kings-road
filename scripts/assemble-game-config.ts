@@ -11,7 +11,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GameConfigSchema } from '../src/schemas/game-config.schema';
 
-const contentDir = path.resolve(process.cwd(), 'content');
+const contentDir = path.resolve(process.cwd(), 'src/content');
 
 function readJson(filePath: string): unknown {
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));

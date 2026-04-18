@@ -25,6 +25,7 @@ import {
   setPlayerVelocityY,
   setStamina,
   setVelocity,
+  tickPlayTime,
   togglePause,
   getInteraction,
 } from '@/ecs/actions/game';
@@ -127,14 +128,25 @@ export function PlayerController() {
 
     // Don't process movement when game is paused/inactive/in menus/dead
     const { isDead } = getFlags();
-    if (
+    const inBlockingState =
       !gameActive ||
       paused ||
       inDialogue ||
       inCombat ||
       inventoryOpen ||
-      isDead
-    ) {
+      isDead;
+
+    // Play-time ticks whenever the player is alive and the game isn't
+    // paused. We deliberately continue ticking during dialogue, combat,
+    // and while the inventory is open — those are all states the player
+    // is actively playing in, just not moving through the world. Only
+    // the pause menu, game-not-active (menus/title), and death state
+    // stop the clock.
+    if (gameActive && !paused && !isDead) {
+      tickPlayTime(dt);
+    }
+
+    if (inBlockingState) {
       inputManager.postFrame();
       return;
     }

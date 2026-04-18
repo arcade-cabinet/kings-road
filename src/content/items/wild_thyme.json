@@ -1,0 +1,11 @@
+{
+  "id": "wild_thyme",
+  "name": "Wild Thyme",
+  "description": "Sprigs of fragrant wild thyme plucked from sun-warmed limestone. Its sweet, earthy scent recalls summer meadows and the hum of bees among the clover.",
+  "type": "quest_item",
+  "stackable": true,
+  "viewmodel": {
+    "glb": "/assets/items/bottles.glb",
+    "handPose": "pinch"
+  }
+}

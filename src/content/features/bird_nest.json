@@ -1,0 +1,11 @@
+{
+  "id": "bird_nest",
+  "tier": "ambient",
+  "name": "Bird Nest",
+  "description": "A woven nest of twigs and moss sits tucked in a low branch, its occupants flitting away with sharp chirps at the sound of footsteps.",
+  "visualType": "bird_nest",
+  "interactable": false,
+  "glb": "nature/bush01.glb",
+  "glbScale": 0.5,
+  "glbYawRange": 360
+}

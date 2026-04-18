@@ -1,8 +1,0 @@
-{
-  "id": "standing_stone",
-  "tier": "ambient",
-  "name": "Standing Stone",
-  "description": "A weathered monolith rises from the grass, its surface traced with spirals so old they seem carved by the wind itself.",
-  "visualType": "standing_stone",
-  "interactable": false
-}

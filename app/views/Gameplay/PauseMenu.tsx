@@ -13,10 +13,12 @@ import { type ActiveDungeon } from '@/ecs/traits/session-game';
 import {
   enterDungeon,
   getGameSnapshot,
+  getPlayTimeSeconds,
   mergeGameState,
   resetGame,
   setGameActive,
   setPaused,
+  setPlayTimeSeconds,
   startGame,
 } from '@/ecs/actions/game';
 import { useFlags, useSeed } from '@/ecs/hooks/useGameSession';
@@ -140,7 +142,10 @@ function captureSnapshot() {
       equipment: inv.equipped,
     },
     gs.seedPhrase,
-    0, // TODO: track play time
+    // Preserve sub-second precision across saves — the UI floors to
+    // minutes when displaying, but persisted values should retain full
+    // fidelity so repeated auto-saves don't drift.
+    getPlayTimeSeconds(),
   );
 }
 
@@ -364,6 +369,9 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
       startGame: (seed, pos, yaw) => {
         const position = new THREE.Vector3(pos.x, pos.y, pos.z);
         startGame(seed, position, yaw);
+        // startGame → resetGame zeroes PlayTime; restore the saved value so
+        // the "2h 14m walked" counter keeps accumulating on top.
+        setPlayTimeSeconds(data.playTimeSeconds);
       },
       mergeGameState: (partial) => {
         mergeGameState(partial);

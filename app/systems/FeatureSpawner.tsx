@@ -1,3 +1,12 @@
+// NOTE: This file is over the 300-LOC soft cap. The breakup is planned
+// for the Thornfield Phase 0 `src/composition/` package — `FeatureMesh`
+// and `AuthoredFeatureMesh` move to `composition/story-props/`, and
+// this file becomes pure orchestration (trigger detection + lifecycle)
+// feeding the composed placement list to a single instanced renderer.
+// See docs/superpowers/specs/2026-04-18-thornfield-phase-0.md. We do
+// NOT carve up the file in this PR because Phase 0 reorganizes the
+// whole path — an intermediate reshuffle here would have to be redone.
+import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -6,12 +15,11 @@ import {
   getPacingConfig,
   isContentStoreReady,
 } from '@/db/content-queries';
+import { assetUrl } from '@/lib/assets';
 import type { FeatureDefinition } from '@/schemas/feature.schema';
 import {
   addGlobalInteractables,
-  getFlags,
   getPlayer,
-  getSeedPhrase,
   removeGlobalInteractables,
 } from '@/ecs/actions/game';
 import {
@@ -72,255 +80,43 @@ interface SpawnedFeature {
   rotation: number;
   interactable?: Interactable;
 }
-
-// --- Visual type to geometry/color mapping ---
-
-interface FeatureVisual {
-  geometry: 'stone' | 'wood' | 'foliage' | 'column' | 'mound';
-  color: string;
-  scale: [number, number, number];
-  emissive?: string;
-}
-
-function getFeatureVisual(visualType: string, tier: string): FeatureVisual {
-  // Major features are bigger
-  const tierScale = tier === 'major' ? 1.5 : tier === 'minor' ? 1.0 : 0.6;
-
-  switch (visualType) {
-    // Ambient - small natural features
-    case 'wildflower_patch':
-      return {
-        geometry: 'foliage',
-        color: '#d4a0d0',
-        scale: [1.5 * tierScale, 0.3, 1.5 * tierScale],
-      };
-    case 'ancient_oak':
-      return {
-        geometry: 'foliage',
-        color: '#4a7c3f',
-        scale: [2 * tierScale, 3, 2 * tierScale],
-      };
-    case 'berry_bush':
-      return {
-        geometry: 'foliage',
-        color: '#6b8e4e',
-        scale: [1 * tierScale, 0.8, 1 * tierScale],
-      };
-    case 'bird_nest':
-      return {
-        geometry: 'wood',
-        color: '#8b6f47',
-        scale: [0.5 * tierScale, 0.3, 0.5 * tierScale],
-      };
-    case 'fallen_log':
-      return {
-        geometry: 'wood',
-        color: '#6b5234',
-        scale: [2 * tierScale, 0.5, 0.5 * tierScale],
-      };
-    case 'fox_den':
-      return {
-        geometry: 'mound',
-        color: '#8b7355',
-        scale: [1 * tierScale, 0.6, 1 * tierScale],
-      };
-    case 'mushroom_ring':
-      return {
-        geometry: 'foliage',
-        color: '#c8a882',
-        scale: [1.2 * tierScale, 0.4, 1.2 * tierScale],
-      };
-    case 'standing_stone':
-      return {
-        geometry: 'column',
-        color: '#9a9a8e',
-        scale: [0.5 * tierScale, 2, 0.5 * tierScale],
-      };
-    case 'stream_crossing':
-      return {
-        geometry: 'stone',
-        color: '#7a8b9a',
-        scale: [2 * tierScale, 0.2, 1.5 * tierScale],
-      };
-    case 'wind_chimes':
-      return {
-        geometry: 'wood',
-        color: '#c4a747',
-        scale: [0.3 * tierScale, 1.5, 0.3 * tierScale],
-      };
-
-    // Minor - roadside points of interest
-    case 'wayside_shrine':
-      return {
-        geometry: 'stone',
-        color: '#d4cfc2',
-        scale: [0.8 * tierScale, 1.5, 0.8 * tierScale],
-      };
-    case 'stone_bridge':
-      return {
-        geometry: 'stone',
-        color: '#8a8578',
-        scale: [3 * tierScale, 1.2, 2 * tierScale],
-      };
-    case 'crossroads_sign':
-      return {
-        geometry: 'wood',
-        color: '#7a6b52',
-        scale: [0.3 * tierScale, 2.5, 0.3 * tierScale],
-      };
-    case 'milestone_marker':
-      return {
-        geometry: 'stone',
-        color: '#b0a89a',
-        scale: [0.4 * tierScale, 1.0, 0.4 * tierScale],
-      };
-    case 'old_well':
-      return {
-        geometry: 'stone',
-        color: '#8a8578',
-        scale: [1 * tierScale, 1.2, 1 * tierScale],
-      };
-    case 'abandoned_camp':
-      return {
-        geometry: 'wood',
-        color: '#6b5234',
-        scale: [2 * tierScale, 0.8, 2 * tierScale],
-      };
-    case 'fairy_circle':
-      return {
-        geometry: 'foliage',
-        color: '#a8d8a0',
-        scale: [2 * tierScale, 0.3, 2 * tierScale],
-        emissive: '#88cc88',
-      };
-    case 'hunter_blind':
-      return {
-        geometry: 'wood',
-        color: '#5a4a32',
-        scale: [1.5 * tierScale, 2, 1.5 * tierScale],
-      };
-    case 'ruined_farmstead':
-      return {
-        geometry: 'stone',
-        color: '#9a8a7a',
-        scale: [3 * tierScale, 1, 3 * tierScale],
-      };
-    case 'weather_vane':
-      return {
-        geometry: 'wood',
-        color: '#8b7355',
-        scale: [0.3 * tierScale, 2.5, 0.3 * tierScale],
-      };
-
-    // Major - significant landmarks
-    case 'ruined_archway_dungeon_entrance':
-      return {
-        geometry: 'stone',
-        color: '#6a6a5e',
-        scale: [4 * tierScale, 3, 2 * tierScale],
-      };
-    case 'dragon_bones':
-      return {
-        geometry: 'stone',
-        color: '#e8e0d0',
-        scale: [5 * tierScale, 2, 3 * tierScale],
-      };
-    case 'glowing_tree_circle_healing':
-      return {
-        geometry: 'foliage',
-        color: '#b8e8b0',
-        scale: [4 * tierScale, 3, 4 * tierScale],
-        emissive: '#88ff88',
-      };
-    case 'hermit_cave':
-      return {
-        geometry: 'mound',
-        color: '#7a7a6e',
-        scale: [3 * tierScale, 2.5, 3 * tierScale],
-      };
-    case 'watchtower_ruin':
-      return {
-        geometry: 'column',
-        color: '#8a8578',
-        scale: [2 * tierScale, 4, 2 * tierScale],
-      };
-
-    default:
-      return {
-        geometry: 'stone',
-        color: '#9a9a8e',
-        scale: [1 * tierScale, 1, 1 * tierScale],
-      };
-  }
-}
-
-// --- Geometry builders ---
-
-const geometryCache = new Map<string, THREE.BufferGeometry>();
-
-function getFeatureGeometry(type: string): THREE.BufferGeometry {
-  if (geometryCache.has(type)) return geometryCache.get(type)!;
-
-  let geo: THREE.BufferGeometry;
-  switch (type) {
-    case 'stone':
-      geo = new THREE.BoxGeometry(1, 1, 1);
-      break;
-    case 'wood':
-      geo = new THREE.BoxGeometry(1, 1, 1);
-      break;
-    case 'foliage':
-      geo = new THREE.SphereGeometry(0.5, 8, 6);
-      break;
-    case 'column':
-      geo = new THREE.CylinderGeometry(0.4, 0.5, 1, 6);
-      break;
-    case 'mound':
-      geo = new THREE.SphereGeometry(0.5, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2);
-      break;
-    default:
-      geo = new THREE.BoxGeometry(1, 1, 1);
-  }
-
-  geometryCache.set(type, geo);
-  return geo;
-}
-
 // --- Feature mesh component ---
 
 function FeatureMesh({ feature }: { feature: SpawnedFeature }) {
-  const visual = useMemo(
-    () =>
-      getFeatureVisual(feature.definition.visualType, feature.definition.tier),
-    [feature.definition.visualType, feature.definition.tier],
-  );
-  const geometry = useMemo(
-    () => getFeatureGeometry(visual.geometry),
-    [visual.geometry],
-  );
-  const material = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: visual.color,
-        roughness: 0.85,
-        metalness: 0.05,
-        emissive: visual.emissive
-          ? new THREE.Color(visual.emissive)
-          : undefined,
-        emissiveIntensity: visual.emissive ? 0.3 : 0,
-      }),
-    [visual.color, visual.emissive],
-  );
+  if (!feature.definition.glb) {
+    throw new Error(
+      `FeatureSpawner: "${feature.definition.id}" has no glb — every ` +
+        `feature definition must declare an authored GLB.`,
+    );
+  }
+  return <AuthoredFeatureMesh feature={feature} />;
+}
+
+function AuthoredFeatureMesh({ feature }: { feature: SpawnedFeature }) {
+  const { glb, glbScale, glbYawRange, tier } = feature.definition;
+  // glb is non-null here per FeatureMesh guard.
+  const gltf = useGLTF(assetUrl(`/assets/${glb}`));
+  const tierScale = tier === 'major' ? 1.5 : tier === 'minor' ? 1.0 : 0.6;
+  const scale = tierScale * glbScale;
+
+  // Deterministic per-instance yaw from the feature's id hash.
+  const yawOffset = useMemo(() => {
+    const h = feature.id
+      .split('')
+      .reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) >>> 0, 0);
+    return ((h % 360) / 360) * glbYawRange * (Math.PI / 180);
+  }, [feature.id, glbYawRange]);
+
+  // Clone the scene so multiple instances of the same GLB don't share
+  // transform state. Drei's useGLTF hands out a shared scene by default.
+  const sceneInstance = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
   return (
-    <mesh
-      geometry={geometry}
-      material={material}
+    <primitive
+      object={sceneInstance}
       position={feature.position}
-      rotation={[0, feature.rotation, 0]}
-      scale={visual.scale}
-      castShadow
-      receiveShadow
+      rotation={[0, feature.rotation + yawOffset, 0]}
+      scale={scale}
     />
   );
 }
