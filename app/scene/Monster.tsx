@@ -1,7 +1,8 @@
-import { useGLTF } from '@react-three/drei';
+import { useAnimations, useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import type * as THREE from 'three';
+import { useEffect, useMemo, useRef } from 'react';
+import * as THREE from 'three';
+import { SkeletonUtils } from 'three-stdlib';
 import { assetUrl } from '@/lib/assets';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
 import { hashString } from '@/utils/random';
@@ -31,6 +32,22 @@ const HOVER_ARCHETYPES = new Set([
   'bloodwraith',
 ]);
 
+/**
+ * Skeleton_warrior ships `Idle_1` / `Idle_2` / `Idle_1_break` and the Bat
+ * pack ships `Bat_Idle`. Walk a preference list and return the first
+ * matching clip. Anything else returns null and the monster just stands
+ * in the bind pose.
+ */
+function pickMonsterIdleClip(clipNames: string[]): string | null {
+  const preferences = ['Idle_1', 'Bat_Idle', 'Idle_2', 'Idle_1_break'];
+  for (const pref of preferences) {
+    if (clipNames.includes(pref)) return pref;
+  }
+  return (
+    clipNames.find((n) => n.toLowerCase().includes('idle')) ?? null
+  );
+}
+
 export function Monster({ archetype, position }: MonsterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
@@ -51,6 +68,34 @@ export function Monster({ archetype, position }: MonsterProps) {
 
   // Use the archetype's declared size as the uniform scale.
   const scale = archetype.size;
+
+  // Identify which rigged pack supplies this archetype's mesh. Only the
+  // Skeleton_warrior and Bat packs ship non-trivial animation clips; the
+  // horror monster packs export T-pose only, so there is nothing to
+  // drive for them. `useAnimations` is bound to the top-level group and
+  // references the animations from whichever pack is active. Passing an
+  // empty array when no pack has clips is a safe no-op.
+  const animationClips: THREE.AnimationClip[] = useMemo(() => {
+    if (['skeleton', 'shadow_knight', 'lich_lord'].includes(archetype.id)) {
+      return (skeleton.animations ?? []) as THREE.AnimationClip[];
+    }
+    if (['butterfly_swarm', 'bat', 'songbird'].includes(archetype.id)) {
+      return (bat.animations ?? []) as THREE.AnimationClip[];
+    }
+    return [];
+  }, [archetype.id, skeleton.animations, bat.animations]);
+
+  const { actions, names } = useAnimations(animationClips, modelRef);
+  useEffect(() => {
+    const clipName = pickMonsterIdleClip(names);
+    if (!clipName) return;
+    const action = actions[clipName];
+    if (!action) return;
+    action.reset().fadeIn(0.3).play();
+    return () => {
+      action.fadeOut(0.3);
+    };
+  }, [actions, names]);
 
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
@@ -82,7 +127,7 @@ export function Monster({ archetype, position }: MonsterProps) {
     // 1. Skeletons & Undead Knights
     if (['skeleton', 'shadow_knight', 'lich_lord'].includes(archetype.id)) {
       if (skeleton.scene) {
-        const cloned = skeleton.scene.clone();
+        const cloned = SkeletonUtils.clone(skeleton.scene) as THREE.Group;
 
         // Procedural Armor Variety for Skeletons
         cloned.traverse((child: any) => {
@@ -109,7 +154,7 @@ export function Monster({ archetype, position }: MonsterProps) {
     // 2. Flying / Hovering entities
     if (['butterfly_swarm', 'bat', 'songbird'].includes(archetype.id)) {
       if (bat.scene) {
-        const cloned = bat.scene.clone();
+        const cloned = SkeletonUtils.clone(bat.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
@@ -117,7 +162,7 @@ export function Monster({ archetype, position }: MonsterProps) {
     // 3. New Horror Monsters
     if (archetype.id === 'wolf' || archetype.id === 'werewolf') {
       if (werewolf.scene) {
-        const cloned = werewolf.scene.clone();
+        const cloned = SkeletonUtils.clone(werewolf.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
@@ -128,21 +173,21 @@ export function Monster({ archetype, position }: MonsterProps) {
       )
     ) {
       if (bloodwraith.scene) {
-        const cloned = bloodwraith.scene.clone();
+        const cloned = SkeletonUtils.clone(bloodwraith.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
 
     if (['necromancer', 'plague_doctor', 'cultist'].includes(archetype.id)) {
       if (plagueDoctor.scene) {
-        const cloned = plagueDoctor.scene.clone();
+        const cloned = SkeletonUtils.clone(plagueDoctor.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
 
     if (['dragon', 'drake', 'wyvern', 'basilisk'].includes(archetype.id)) {
       if (devilDemon.scene) {
-        const cloned = devilDemon.scene.clone();
+        const cloned = SkeletonUtils.clone(devilDemon.scene) as THREE.Group;
         return <primitive object={cloned} />;
       }
     }
@@ -150,42 +195,42 @@ export function Monster({ archetype, position }: MonsterProps) {
     // 4. Humanoid bandits / brigands — use butcher model
     if (['bandit', 'bandit_leader'].includes(archetype.id)) {
       if (butcher.scene) {
-        return <primitive object={butcher.scene.clone()} />;
+        return <primitive object={SkeletonUtils.clone(butcher.scene) as THREE.Group} />;
       }
     }
 
     // 5. Large beasts — trolls / goliaths / bigfoot kin
     if (['troll', 'stone_golem'].includes(archetype.id)) {
       if (goliath.scene) {
-        return <primitive object={goliath.scene.clone()} />;
+        return <primitive object={SkeletonUtils.clone(goliath.scene) as THREE.Group} />;
       }
     }
 
     // 6. Shaggy wild beasts — dire wolf, thornbeast use bigfoot as stand-in
     if (['dire_wolf', 'thornbeast'].includes(archetype.id)) {
       if (bigfoot.scene) {
-        return <primitive object={bigfoot.scene.clone()} />;
+        return <primitive object={SkeletonUtils.clone(bigfoot.scene) as THREE.Group} />;
       }
     }
 
     // 7. Deer — elk-demon variant (antlered quadruped silhouette)
     if (archetype.id === 'deer') {
       if (elkDemon.scene) {
-        return <primitive object={elkDemon.scene.clone()} />;
+        return <primitive object={SkeletonUtils.clone(elkDemon.scene) as THREE.Group} />;
       }
     }
 
     // 8. Slimes / eye-head — use eye_head model as a formless entity
     if (['slime', 'giant_spider', 'giant_rat'].includes(archetype.id)) {
       if (eyeHead.scene) {
-        return <primitive object={eyeHead.scene.clone()} />;
+        return <primitive object={SkeletonUtils.clone(eyeHead.scene) as THREE.Group} />;
       }
     }
 
     // 9. Small critters (rabbit / hedgehog) — reuse abomination-2 small-scale
     if (['rabbit', 'hedgehog'].includes(archetype.id)) {
       if (abomination.scene) {
-        return <primitive object={abomination.scene.clone()} />;
+        return <primitive object={SkeletonUtils.clone(abomination.scene) as THREE.Group} />;
       }
     }
 
