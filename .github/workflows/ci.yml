@@ -42,6 +42,22 @@ jobs:
       - name: Web build
         run: pnpm build
 
+      - name: Asset size gate
+        run: |
+          SIZE=$(du -sm public/assets/ 2>/dev/null | cut -f1)
+          if [ -z "$SIZE" ]; then
+            echo "ERROR: public/assets/ not found — check build output"
+            exit 1
+          fi
+          echo "public/assets/ is ${SIZE}MB"
+          if [ "$SIZE" -gt 150 ]; then
+            echo "ERROR: public/assets/ exceeds 150MB APK ceiling (${SIZE}MB)"
+            exit 1
+          fi
+          if [ "$SIZE" -gt 100 ]; then
+            echo "WARNING: public/assets/ exceeds 100MB baked-in target (${SIZE}MB) — delete *pr.glb duplicates and compress GLBs to reach target"
+          fi
+
       - name: Browser smoke tests
         run: pnpm test:browser
         continue-on-error: true
