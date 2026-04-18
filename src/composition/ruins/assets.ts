@@ -206,6 +206,9 @@ export function weightedPick(
   ids: RuinAssetId[],
   rng: () => number,
 ): RuinAssetId {
+  if (ids.length === 0) {
+    throw new Error('weightedPick: empty asset array');
+  }
   const total = ids.reduce(
     (sum, id) => sum + (RUIN_ASSETS[id]?.weight ?? 1),
     0,

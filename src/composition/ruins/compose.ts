@@ -29,7 +29,7 @@ function placeInRadius(
   const placed: Array<{ x: number; z: number }> = [];
   let attempts = 0;
 
-  while (placed.length < count && attempts < count * 20) {
+  while (placed.length < count && attempts < count * 50) {
     attempts++;
     const angle = rng() * Math.PI * 2;
     const dist = Math.sqrt(rng()) * radius;
