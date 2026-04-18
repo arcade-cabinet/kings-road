@@ -36,8 +36,7 @@ android/app/src/main/assets/public/
 expo-env.d.ts
 kings-road/
 
-pending-integration/*.zip
-pending-integration/*.ZIP
+pending-integration/
 
 # .remember/ is Claude's persistent memory — intentionally tracked
 .remember/logs/

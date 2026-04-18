@@ -38,7 +38,7 @@ Current development state as of 2026-04-09.
 - Chibi generator: procedural chibi character geometry
 - Face texture: canvas-based procedural NPC face textures
 
-### Schemas (18 schemas)
+### Schemas (19 schemas)
 
 world, quest, npc, npc-blueprint, feature, building, town, monster, dungeon, encounter, encounter-table, item, pacing, weather, dialogue, skill-tree, crafting, kingdom, game-config
 
@@ -105,10 +105,9 @@ MainMenu, GameHUD, DialogueBox, PauseMenu, SettingsPanel, QuestLog, InventoryScr
 
 ### Known Issues
 
-- `docs/plans/` contains completed implementation plans -- should be archived or deleted
-- `docs/Grok-Procedural_Chibi_Factory_for_RPG.md` -- large AI conversation artifact, not standard documentation
-- `.claude/hooks/typecheck.sh` was deleted (tracked in git status), may need restoration or settings.json cleanup
-- The Zustand `gameStore.ts` is partially migrated to Koota; full migration is not complete
+- The Zustand stores under `src/stores/` have not been migrated to Koota yet; see `docs/plans/2026-04-18-koota-migration.md` for the plan.
+- The game currently has no equippable gear — weapon models sit in the gitignored `pending-integration/` directory awaiting review/integration.
+- `pending-integration/*.zip` contains asset packs that still need per-pack curation before copying into `public/assets/`.
 
 ## What Is Next
 

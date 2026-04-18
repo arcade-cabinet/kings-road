@@ -64,7 +64,7 @@ Configuration lives in `biome.json`. Settings:
 
 - All game content belongs in `content/`, never in `src/`
 - Every content JSON must validate against its Zod schema in `src/schemas/`
-- Content is compiled to SQLite at build time -- never load raw JSON at runtime
+- Content is compiled at build time: web loads the JSON bundle (`game-content.json`) into in-memory Maps, native reads the same bundle via Capacitor SQLite. Never load source-trove JSON files directly from hot paths.
 - Tone: pastoral romanticized medieval. No grimdark, no modern slang, no anachronisms
 
 ### Quest Rules

@@ -82,11 +82,11 @@ e2e/
 | Key | Action |
 |-----|--------|
 | W/S | Move forward/backward |
-| A/D | Turn left/right |
-| Q/E | Strafe/turn |
+| A/D | Strafe left/right |
+| Q | Turn left |
 | SHIFT | Walk (slower) |
 | SPACE | Jump |
-| E | Interact |
+| F | Interact |
 | Mouse Drag | Look around |
 | ESC | Pause menu |
 
