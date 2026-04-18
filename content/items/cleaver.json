@@ -1,0 +1,19 @@
+{
+  "id": "cleaver",
+  "name": "Cleaver",
+  "description": "A heavy square-bladed cleaver, more commonly found hanging in a butcher's shop than at a pilgrim's hip. Its weight makes it slow but its edge is devastating against unarmoured flesh.",
+  "type": "equipment",
+  "stackable": false,
+  "equipSlot": "weapon",
+  "rarity": "common",
+  "weight": 1.5,
+  "value": 20,
+  "statModifiers": [
+    { "stat": "damage", "value": 9 },
+    { "stat": "speed", "value": -2 }
+  ],
+  "viewmodel": {
+    "glb": "/assets/weapons/cleaver.glb",
+    "handPose": "grip"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "knife_hunting",
+  "name": "Hunting Knife",
+  "description": "A sturdy drop-point blade with a wrapped leather grip. Standard issue for foresters who patrol the oak groves between Ashford and Thornfield — as useful for cutting rope as for settling disputes.",
+  "type": "equipment",
+  "stackable": false,
+  "equipSlot": "weapon",
+  "rarity": "common",
+  "weight": 0.6,
+  "value": 15,
+  "statModifiers": [
+    { "stat": "damage", "value": 5 },
+    { "stat": "luck", "value": 1 }
+  ],
+  "viewmodel": {
+    "glb": "/assets/weapons/knife-3.glb",
+    "handPose": "grip"
+  }
+}

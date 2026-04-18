@@ -1,0 +1,19 @@
+{
+  "id": "machete",
+  "name": "Machete",
+  "description": "A long, single-edged blade originally brought north by a Moorish merchant and never returned. Its length gives it reach beyond most one-handed weapons; its balance makes it surprisingly nimble.",
+  "type": "equipment",
+  "stackable": false,
+  "equipSlot": "weapon",
+  "rarity": "uncommon",
+  "weight": 1.1,
+  "value": 30,
+  "statModifiers": [
+    { "stat": "damage", "value": 10 },
+    { "stat": "speed", "value": 1 }
+  ],
+  "viewmodel": {
+    "glb": "/assets/weapons/machete.glb",
+    "handPose": "grip"
+  }
+}

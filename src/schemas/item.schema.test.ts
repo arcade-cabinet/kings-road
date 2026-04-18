@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ItemDefinitionSchema } from './item.schema';
+import { ItemDefinitionSchema, ViewmodelSchema } from './item.schema';
 
 describe('Item Schema', () => {
   it('validates a complete item definition', () => {
@@ -48,5 +48,40 @@ describe('Item Schema', () => {
     const parsed = ItemDefinitionSchema.parse(item);
     expect(parsed.stackable).toBe(true);
     expect(parsed.effect?.value).toBe(25);
+  });
+
+  it('validates a weapon with viewmodel config', () => {
+    const item = {
+      id: 'knife_bowie',
+      name: 'Bowie Knife',
+      description:
+        "A heavy-spined hunting blade favoured by scouts on the King's Road.",
+      type: 'equipment',
+      stackable: false,
+      equipSlot: 'weapon',
+      viewmodel: {
+        glb: '/assets/weapons/knife-2.glb',
+        handPose: 'grip',
+      },
+    };
+    expect(() => ItemDefinitionSchema.parse(item)).not.toThrow();
+  });
+
+  it('rejects viewmodel with invalid glb path', () => {
+    expect(() =>
+      ViewmodelSchema.parse({
+        glb: 'weapons/knife.glb',
+        handPose: 'grip',
+      }),
+    ).toThrow();
+  });
+
+  it('rejects viewmodel with invalid handPose', () => {
+    expect(() =>
+      ViewmodelSchema.parse({
+        glb: '/assets/weapons/knife-1.glb',
+        handPose: 'clench',
+      }),
+    ).toThrow();
   });
 });

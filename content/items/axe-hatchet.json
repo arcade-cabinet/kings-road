@@ -1,0 +1,19 @@
+{
+  "id": "axe_hatchet",
+  "name": "Battle Hatchet",
+  "description": "A compact one-handed hatchet with a broad poll and a seasoned hickory haft. Felling wood or felling foes — it does both with equal indifference along the King's Road.",
+  "type": "equipment",
+  "stackable": false,
+  "equipSlot": "weapon",
+  "rarity": "common",
+  "weight": 1.2,
+  "value": 22,
+  "statModifiers": [
+    { "stat": "damage", "value": 8 },
+    { "stat": "speed", "value": -1 }
+  ],
+  "viewmodel": {
+    "glb": "/assets/weapons/axe.glb",
+    "handPose": "grip"
+  }
+}
