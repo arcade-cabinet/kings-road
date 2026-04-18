@@ -5,7 +5,6 @@ import type * as THREE from 'three';
 import { assetUrl } from '@/lib/assets';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
 import { hashString } from '@/utils/random';
-import { buildMonsterRenderData } from '@/factories/monster-factory';
 
 interface MonsterProps {
   archetype: MonsterArchetype;
@@ -50,13 +49,8 @@ export function Monster({ archetype, position }: MonsterProps) {
   const elkDemon = useGLTF(ELK_DEMON_PATH) as any;
   const eyeHead = useGLTF(EYE_HEAD_PATH) as any;
 
-  // Only `scale` is still read — the primitive body-parts path was removed
-  // when every archetype got an authored GLB mapping. Keep buildMonsterRenderData
-  // for its per-archetype scale heuristic; everything else is ignored.
-  const { scale } = useMemo(
-    () => buildMonsterRenderData(archetype),
-    [archetype],
-  );
+  // Use the archetype's declared size as the uniform scale.
+  const scale = archetype.size;
 
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
