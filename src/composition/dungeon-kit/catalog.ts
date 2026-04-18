@@ -169,6 +169,9 @@ export function weightedPickKit(
   pieces: KitPieceDef[],
   rng: () => number,
 ): KitPieceDef {
+  if (pieces.length === 0) {
+    throw new Error('weightedPickKit: no pieces provided');
+  }
   const total = pieces.reduce((sum, p) => sum + p.weight, 0);
   let r = rng() * total;
   for (const piece of pieces) {

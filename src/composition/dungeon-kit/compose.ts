@@ -22,7 +22,7 @@ function placeWallLine(
   const isNS = side === 'north' || side === 'south';
   const length = isNS ? room.width : room.depth;
   const slots = Math.round(length / TILE);
-  const midSlot = Math.floor(slots / 2);
+  const midSlot = (slots - 1) / 2;
   const isExit = room.exits.includes(side);
 
   const rotY =
@@ -33,6 +33,9 @@ function placeWallLine(
         : side === 'east'
           ? -Math.PI / 2
           : Math.PI / 2;
+
+  const wallPieces = getKitPiecesByRole('wall', room.type);
+  const doorPieces = getKitPiecesByRole('doorway', room.type);
 
   for (let i = 0; i < slots; i++) {
     const offset = (i - midSlot) * TILE;
@@ -53,9 +56,10 @@ function placeWallLine(
       pz += offset;
     }
 
-    const isDoorSlot = isExit && i === midSlot;
+    const isDoorSlot = isExit && i === Math.round(midSlot);
     const role = isDoorSlot ? 'doorway' : 'wall';
-    const pieces = getKitPiecesByRole(role, room.type);
+    const pieces = isDoorSlot ? doorPieces : wallPieces;
+    if (pieces.length === 0) continue;
     const piece = weightedPickKit(pieces, rng);
 
     placements.push({

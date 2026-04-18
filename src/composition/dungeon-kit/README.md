@@ -17,7 +17,7 @@ No Three.js. No React. Same inputs → identical output.
 import { composeDungeonRoom } from '@/composition/dungeon-kit';
 
 const placements = composeDungeonRoom(
-  { id: 'r1', type: 'chamber', center: [0,0,0], width: 8, depth: 8, exits: ['north'] },
+  { id: 'r1', type: 'chamber', center: { x: 0, y: 0, z: 0 }, width: 8, depth: 8, exits: ['north'] },
   'world-seed-42',
 );
 // placements[0] → { assetId, position: Vec3, rotation: Vec3, scale, role }
