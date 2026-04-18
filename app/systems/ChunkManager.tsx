@@ -36,7 +36,7 @@ import {
   worldToChunk,
 } from '@/utils/worldCoords';
 import {
-  getChunkTypeFromKingdom,
+  getChunkRoleFromKingdom,
   getRandomDialogue,
   getRandomNPCName,
   getTerrainHeight,
@@ -69,7 +69,7 @@ function generateChunkData(
   let kingdomTile: ChunkData['kingdomTile'];
   let biome: ChunkData['biome'];
   let settlement: Settlement | undefined;
-  const resolved = getChunkTypeFromKingdom(kingdomMap, cx, cz);
+  const resolved = getChunkRoleFromKingdom(kingdomMap, cx, cz);
   if (!resolved) {
     // Outside map bounds or ocean — skip rendering
     type = 'WILD';
@@ -470,7 +470,7 @@ export function ChunkManager() {
     if (lastChunkKey.current !== newKey) {
       lastChunkKey.current = newKey;
 
-      const resolved = getChunkTypeFromKingdom(
+      const resolved = getChunkRoleFromKingdom(
         kingdomMap,
         currentCx,
         currentCz,

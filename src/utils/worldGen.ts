@@ -27,7 +27,7 @@ export const OCEAN_HEIGHT = -2;
  * When a settlement is found, it's included in the result so callers can
  * look up the appropriate town config by settlement ID.
  */
-export function getChunkTypeFromKingdom(
+export function getChunkRoleFromKingdom(
   kingdomMap: KingdomMap,
   cx: number,
   cz: number,
