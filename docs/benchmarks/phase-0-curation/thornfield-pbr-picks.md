@@ -8,11 +8,14 @@ domain: technical
 # Phase 0 Curated Asset Palette
 
 Permanent project-wide palette of PBR materials, HDRIs, and terrain treatment.
-Curated surface-by-surface from `/Volumes/home/assets/2DPhotorealistic/` with
-preview-image inspection. Thornfield (the Phase 0 benchmark biome) is the first
-consumer, but every pick is chosen for **reuse across biomes** — fabrics,
-metals, mosses, and bark carry into hills, forest, meadow, moor, town, and
-dungeon without re-curation.
+Curated surface-by-surface by reading pack preview PNGs from an AmbientCG-pack
+mirror. On this contributor's machine that mirror lives at
+`/Volumes/home/assets/2DPhotorealistic/`; other contributors point their
+`KINGS_ROAD_ASSETS` env var at a local clone (or a SMB mount of the team NAS)
+pointing at the same AmbientCG layout. Thornfield (the Phase 0 benchmark
+biome) is the first consumer, but every pick is chosen for **reuse across
+biomes** — fabrics, metals, mosses, and bark carry into hills, forest,
+meadow, moor, town, and dungeon without re-curation.
 
 **This file outlives Phase 0.** Even if we pivot from R3F to Godot, the
 material IDs and source-pack mappings here remain the single source of truth

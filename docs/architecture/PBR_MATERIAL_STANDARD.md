@@ -24,7 +24,7 @@ When `loadPbrMaterial(id)` constructs a `THREE.MeshStandardMaterial`, it probes 
 | `<Pack>_Color.jpg`            | `material.map`       | Required — always present |
 | `<Pack>_NormalGL.jpg`         | `material.normalMap` | Required — always present |
 | `<Pack>_Roughness.jpg`        | `material.roughnessMap` | Required — always present |
-| `<Pack>_Displacement.jpg`     | `material.displacementMap` | Required when present. Default `displacementScale: 0` (opt-in per-use for parallax / true displacement). |
+| `<Pack>_Displacement.jpg`     | `material.displacementMap` | Bind only when the consumer opts in (passes `displacementScale > 0`). Assigning `displacementMap` with `displacementScale: 0` still enables three.js's displacement shader path (a texture fetch per fragment), so bind-and-zero is not free — leave it unbound for the default. |
 | `<Pack>_AmbientOcclusion.jpg` | `material.aoMap`     | **Required when present.** Without it, crevices and shadowed pockets render unnaturally flat. |
 | `<Pack>_Metalness.jpg`        | `material.metalnessMap` | **Required when present.** Without it, metals (`rusted-iron`, `black-ironwork`, weapons, coins, hinges, buckles, bell) render as painted plastic. |
 
