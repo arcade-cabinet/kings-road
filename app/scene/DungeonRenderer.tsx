@@ -29,6 +29,7 @@ import {
   getRoomColor,
   ROOM_SIZE,
 } from '@/world/dungeon-generator';
+import { Model as WallTorch } from './generated/mine/wall-torch';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -189,15 +190,12 @@ function DungeonRoomMesh({
         castShadow={isCurrent}
       />
 
-      {/* Torch sconce visual — small glowing box on the wall */}
-      <mesh position={[0, WALL_HEIGHT - 1.5, 0]}>
-        <boxGeometry args={[0.15, 0.4, 0.15]} />
-        <meshStandardMaterial
-          color={0xff8800}
-          emissive={0xff6600}
-          emissiveIntensity={0.8}
-        />
-      </mesh>
+      {/* Torch sconce — authored wall-torch from the mine pack, scaled up
+          to read at dungeon room scale. */}
+      <WallTorch
+        position={[0, WALL_HEIGHT - 1.8, 0]}
+        scale={1.8}
+      />
     </group>
   );
 }
