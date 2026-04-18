@@ -1,41 +1,39 @@
 /**
- * Inventory UI store — Zustand bridge for the Koota ECS inventory state.
+ * Inventory UI store — Zustand facade wired to Koota traits.
  *
- * The ECS owns the authoritative inventory data (Inventory + Equipment traits).
- * This store provides a React-friendly snapshot that the UI can subscribe to.
- * Call `syncFromECS()` after any ECS inventory mutation to update the UI.
+ * Authoritative state now lives in the ECS:
+ *   - Player `Inventory` trait: items, maxSlots, gold
+ *   - Player `Equipment` trait: equipped slot → item id
+ *   - Session `InventoryUI` trait: UI open flag
+ *
+ * This store exists only as a compatibility shim so existing callsites
+ * (~15 across app/ + src/hooks/) keep working while we finish Phase 1.
+ * Future commits will replace each `useInventoryStore(...)` call with
+ * `useTrait(entity, Trait)` reads and then delete this module.
  */
 
 import { create } from 'zustand';
 import { getItemDef } from '@/ecs/item-registry';
 import type { EquippedItems, ItemStack } from '@/ecs/traits/inventory';
+import { InventoryUI } from '@/ecs/traits/session-inventory';
+import { getSessionEntity } from '@/ecs/world';
 import type { ItemDefinition } from '@/schemas/item.schema';
 
 export interface InventoryUIState {
-  /** Current inventory items (snapshot from ECS) */
   items: ItemStack[];
-  /** Maximum inventory slots */
   maxSlots: number;
-  /** Current gold */
   gold: number;
-  /** Equipped items by slot */
   equipped: EquippedItems;
-  /** Whether the inventory screen is open */
   isOpen: boolean;
 
-  // Actions
-  /** Sync from ECS state — called after ECS mutations */
   sync: (
     items: ItemStack[],
     maxSlots: number,
     gold: number,
     equipped: EquippedItems,
   ) => void;
-  /** Toggle inventory open/close */
   toggle: () => void;
-  /** Open inventory */
   open: () => void;
-  /** Close inventory */
   close: () => void;
 }
 
@@ -49,6 +47,24 @@ const EMPTY_EQUIPPED: EquippedItems = {
   accessory: null,
 };
 
+/**
+ * Lazy-attach InventoryUI to the session entity and return a setter that
+ * writes through to Koota while pushing a snapshot back into the store so
+ * selectors re-render.
+ */
+function writeInventoryOpen(isOpen: boolean): void {
+  const entity = getSessionEntity();
+  const proxy = entity as unknown as {
+    has: (t: typeof InventoryUI) => boolean;
+    add: (t: typeof InventoryUI) => void;
+    set: (t: typeof InventoryUI, v: { isOpen: boolean }) => void;
+  };
+  if (!proxy.has(InventoryUI)) {
+    proxy.add(InventoryUI);
+  }
+  proxy.set(InventoryUI, { isOpen });
+}
+
 export const useInventoryStore = create<InventoryUIState>((set) => ({
   items: [],
   maxSlots: 20,
@@ -59,9 +75,20 @@ export const useInventoryStore = create<InventoryUIState>((set) => ({
   sync: (items, maxSlots, gold, equipped) =>
     set({ items, maxSlots, gold, equipped }),
 
-  toggle: () => set((s) => ({ isOpen: !s.isOpen })),
-  open: () => set({ isOpen: true }),
-  close: () => set({ isOpen: false }),
+  toggle: () =>
+    set((s) => {
+      const next = !s.isOpen;
+      writeInventoryOpen(next);
+      return { isOpen: next };
+    }),
+  open: () => {
+    writeInventoryOpen(true);
+    set({ isOpen: true });
+  },
+  close: () => {
+    writeInventoryOpen(false);
+    set({ isOpen: false });
+  },
 }));
 
 /** Helper: look up item definition from the registry */
