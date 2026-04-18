@@ -38,9 +38,16 @@ interface ManifestEntry {
 }
 
 function resolveSourceDir(sourceDir: string): string {
-  return path.isAbsolute(sourceDir)
-    ? sourceDir
-    : path.join(ASSETS_ROOT, sourceDir);
+  if (path.isAbsolute(sourceDir)) return sourceDir;
+  const root = path.resolve(ASSETS_ROOT);
+  const candidate = path.resolve(root, sourceDir);
+  const rel = path.relative(root, candidate);
+  if (rel.startsWith('..') || path.isAbsolute(rel)) {
+    throw new Error(
+      `sourceDir "${sourceDir}" escapes KINGS_ROAD_ASSETS (${root}). Relative paths must stay within the assets root.`,
+    );
+  }
+  return candidate;
 }
 
 const RESOLUTION_RANK: Record<string, number> = { _1k: 0, _2k: 1, _4k: 2 };
