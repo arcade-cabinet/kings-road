@@ -3,12 +3,11 @@ import { useLoader } from '@react-three/fiber';
 import { useEffect } from 'react';
 import * as THREE from 'three';
 import { RGBELoader } from 'three-stdlib';
-import { BiomeService } from '@/biome';
+import { BiomeService, type HdriSpec, type TimeOfDayBucket } from '@/biome';
+import { BiomeError } from '@/core';
 import { getPlayer } from '@/ecs/actions/game';
 import { useEnvironment } from '@/ecs/hooks/useGameSession';
 import { assetUrl } from '@/lib/assets';
-
-type TimeOfDayBucket = 'dawn' | 'noon' | 'dusk' | 'night';
 
 /** Coarse time-of-day bucket for HDRI selection. */
 export function timeOfDayBucket(timeOfDay: number): TimeOfDayBucket {
@@ -19,14 +18,11 @@ export function timeOfDayBucket(timeOfDay: number): TimeOfDayBucket {
 }
 
 /**
- * Resolve HDRI id — supports single-string and per-bucket-dict schemas.
- * BiomeConfig.lighting.hdri is currently typed as `string` in the Zod schema;
- * the dict branch is forward-compatible once the schema is widened.
+ * Resolve HDRI id — handles both single-string and per-bucket-dict schema forms.
+ * Falls back to the noon bucket then to any defined bucket if the requested one
+ * is missing.
  */
-function resolveHdriId(
-  hdri: string | Record<string, string>,
-  bucket: TimeOfDayBucket,
-): string {
+function resolveHdriId(hdri: HdriSpec, bucket: TimeOfDayBucket): string {
   if (typeof hdri === 'string') return hdri;
   return hdri[bucket] ?? hdri.noon ?? Object.values(hdri)[0];
 }
@@ -72,14 +68,14 @@ export function EnvironmentIBL({ crossFadeDuration = 2.0 }: EnvironmentIBLProps)
     // Road distance is playerPosition.x (world X == road spine distance)
     const roadDist = getPlayer().playerPosition?.x ?? 0;
     biome = BiomeService.getCurrentBiome(roadDist);
-  } catch {
-    return null;
+  } catch (err) {
+    // BiomeService not yet initialized — render nothing until init lands.
+    // Surface any other error so genuine bugs aren't silently eaten.
+    if (err instanceof BiomeError) return null;
+    throw err;
   }
 
-  const hdriId = resolveHdriId(
-    biome.lighting.hdri as string | Record<string, string>,
-    bucket,
-  );
+  const hdriId = resolveHdriId(biome.lighting.hdri, bucket);
 
   // Key forces IBLMap remount (and new Suspense boundary resolution) on HDRI change.
   // crossFadeDuration is a hint — actual fade timing is controlled by the caller's
