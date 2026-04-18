@@ -3,5 +3,9 @@
   "name": "Cartographer's Map: Monastery",
   "description": "A reverent map piece drawn within the monastery scriptorium. Cloistered gardens, pilgrim trails, and the abbey's silhouette are rendered in a careful monastic hand.",
   "type": "key_item",
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/books.glb",
+    "handPose": "open"
+  }
 }

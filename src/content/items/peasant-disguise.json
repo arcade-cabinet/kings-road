@@ -3,5 +3,9 @@
   "name": "Peasant Disguise",
   "description": "A bundle of rough-spun clothing: a patched tunic, muddy breeches, and a battered straw hat. Enough to pass unnoticed among common folk at market or on the road.",
   "type": "equipment",
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/MISC_2025-transformed.glb",
+    "handPose": "open"
+  }
 }

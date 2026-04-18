@@ -3,5 +3,9 @@
   "name": "Aldric's Hammer",
   "description": "The prized hammer of Aldric the blacksmith, lost during a bandit raid on Ashford. Return it to him to complete the quest 'The Smith's Loss' (quest: side-smiths-loss).",
   "type": "quest_item",
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/weapons/cleaver.glb",
+    "handPose": "grip"
+  }
 }

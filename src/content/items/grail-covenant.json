@@ -3,5 +3,9 @@
   "name": "Holy Grail Covenant",
   "description": "A radiant scroll inscribed with the sacred covenant of the Grail temple. Golden lettering gleams upon ivory vellum, its words a promise sealed in faith and light.",
   "type": "key_item",
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/books.glb",
+    "handPose": "open"
+  }
 }

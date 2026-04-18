@@ -7,5 +7,9 @@
     "stat": "attack",
     "value": 2
   },
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/Sword-transformed.glb",
+    "handPose": "grip"
+  }
 }

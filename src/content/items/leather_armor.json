@@ -3,9 +3,20 @@
   "name": "Leather Armor",
   "description": "Tanned hide shaped into a breastplate and pauldrons. It offers modest protection without hindering movement.",
   "type": "equipment",
+  "equipSlot": "chest",
+  "rarity": "common",
+  "weight": 2.0,
+  "value": 30,
+  "statModifiers": [
+    { "stat": "defense", "value": 4 }
+  ],
   "effect": {
     "stat": "defense",
     "value": 4
   },
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/MISC_2025-transformed.glb",
+    "handPose": "grip"
+  }
 }

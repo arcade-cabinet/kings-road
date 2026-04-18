@@ -8,5 +8,9 @@
     "value": 10,
     "duration": 180
   },
-  "stackable": true
+  "stackable": true,
+  "viewmodel": {
+    "glb": "/assets/weapons/cleaver.glb",
+    "handPose": "grip"
+  }
 }

@@ -11,7 +11,6 @@ import {
 import type { ItemStack } from '@/ecs/traits/inventory';
 import { InventoryUI } from '@/ecs/traits/session-inventory';
 import { getSessionEntity } from '@/ecs/world';
-import { assetUrl } from '@/lib/assets';
 import type { ItemDefinition } from '@/schemas/item.schema';
 import { useFlags } from '@/ecs/hooks/useGameSession';
 
@@ -24,18 +23,6 @@ const PARCHMENT = 'rgba(245, 240, 232, 0.95)';
 const SLOT_BG = 'rgba(245, 240, 232, 0.6)';
 const SLOT_BORDER = 'rgba(139, 111, 71, 0.3)';
 const SLOT_HOVER = 'rgba(196, 167, 71, 0.2)';
-
-const ITEM_MODELS = {
-  sword: assetUrl('/assets/items/Sword-transformed.glb'),
-  treasure: assetUrl('/assets/items/Treasure-transformed.glb'),
-  stew: assetUrl('/assets/items/stew-transformed.glb'),
-  cleaver: assetUrl('/assets/items/cleaver-transformed.glb'),
-  machete: assetUrl('/assets/items/machete-transformed.glb'),
-  traps: assetUrl('/assets/items/traps-transformed.glb'),
-  bottles: assetUrl('/assets/items/bottles-transformed.glb'),
-  books: assetUrl('/assets/items/books.glb'),
-  misc: assetUrl('/assets/items/MISC_2025-transformed.glb'),
-};
 
 const ITEM_ICONS: Record<string, string> = {
   iron_sword: '⚔️',
@@ -80,11 +67,19 @@ const ITEM_TYPE_LABELS: Record<string, string> = {
 
 // ── 3D Item Preview ──────────────────────────────────────────────────────
 
-/** Renders a 3D preview using a structured viewmodel GLB from the item definition. */
+/**
+ * Renders a 3D preview using the structured viewmodel GLB declared on the
+ * item definition. Items without a `viewmodel.glb` throw — no keyword
+ * fallback, no primitive placeholder; authors must supply the asset.
+ */
 function ViewmodelPreview({ glb }: { glb: string }) {
-  const { nodes } = useGLTF(glb) as any;
-  const mesh = Object.values(nodes).find((n: any) => n?.isMesh || n?.geometry) as any;
-  if (!mesh) return null;
+  const { nodes } = useGLTF(glb) as unknown as {
+    nodes: Record<string, { isMesh?: boolean; geometry?: THREE_Geometry }>;
+  };
+  const mesh = Object.values(nodes).find((n) => n?.isMesh || n?.geometry);
+  if (!mesh?.geometry) {
+    throw new Error(`Viewmodel GLB ${glb} has no mesh nodes`);
+  }
   return (
     <mesh geometry={mesh.geometry} castShadow receiveShadow>
       <meshStandardMaterial color="#c4a747" roughness={0.4} metalness={0.8} />
@@ -92,103 +87,16 @@ function ViewmodelPreview({ glb }: { glb: string }) {
   );
 }
 
+type THREE_Geometry = import('three').BufferGeometry;
+
 function ItemModelPreview({ itemId }: { itemId: string }) {
   const def = getItemInfo(itemId);
-
-  // Prefer the structured viewmodel GLB if the item definition provides one
-  if (def?.viewmodel?.glb) {
-    return <ViewmodelPreview glb={def.viewmodel.glb} />;
+  if (!def?.viewmodel?.glb) {
+    throw new Error(
+      `Item '${itemId}' has no viewmodel.glb declared; author the viewmodel config in src/content/items/${itemId}.json`,
+    );
   }
-
-  const descriptor = `${itemId} ${def?.name ?? ''} ${def?.type ?? ''} ${def?.equipSlot ?? ''}`.toLowerCase();
-
-  let modelPath = ITEM_MODELS.treasure;
-  let nodeName = 'coin';
-
-  if (
-    descriptor.includes('sword') ||
-    descriptor.includes('staff') ||
-    descriptor.includes('branch')
-  ) {
-    modelPath = ITEM_MODELS.sword;
-    nodeName = 'Sword';
-  } else if (descriptor.includes('hammer') || descriptor.includes('torch')) {
-    modelPath = ITEM_MODELS.cleaver;
-    nodeName = 'cleaver';
-  } else if (descriptor.includes('cleaver')) {
-    modelPath = ITEM_MODELS.cleaver;
-    nodeName = 'cleaver';
-  } else if (descriptor.includes('machete')) {
-    modelPath = ITEM_MODELS.machete;
-    nodeName = 'machete';
-  } else if (
-    descriptor.includes('potion') ||
-    descriptor.includes('salve') ||
-    descriptor.includes('draught') ||
-    descriptor.includes('antidote') ||
-    descriptor.includes('herb') ||
-    descriptor.includes('leaf') ||
-    descriptor.includes('moss') ||
-    descriptor.includes('thyme') ||
-    descriptor.includes('yarrow') ||
-    descriptor.includes('comfrey') ||
-    descriptor.includes('grailbloom') ||
-    descriptor.includes('windcrown')
-  ) {
-    modelPath = ITEM_MODELS.bottles;
-    nodeName = 'Bottle_Variant_1';
-  } else if (descriptor.includes('stew') || descriptor.includes('ration')) {
-    modelPath = ITEM_MODELS.stew;
-    nodeName = 'bowl_01';
-  } else if (descriptor.includes('trap')) {
-    modelPath = ITEM_MODELS.traps;
-    nodeName = 'Bear_Trap';
-  } else if (
-    descriptor.includes('map') ||
-    descriptor.includes('ledger') ||
-    descriptor.includes('hymnal') ||
-    descriptor.includes('recipe') ||
-    descriptor.includes('manuscript') ||
-    descriptor.includes('treatise')
-  ) {
-    modelPath = ITEM_MODELS.books;
-    nodeName = 'Book';
-  } else if (
-    descriptor.includes('ring') ||
-    descriptor.includes('signet') ||
-    descriptor.includes('medallion') ||
-    descriptor.includes('seal') ||
-    descriptor.includes('token') ||
-    descriptor.includes('stamp') ||
-    descriptor.includes('grail') ||
-    descriptor.includes('key')
-  ) {
-    modelPath = ITEM_MODELS.treasure;
-    nodeName = 'Grail_1';
-  } else if (descriptor.includes('gem') || descriptor.includes('diamond')) {
-    modelPath = ITEM_MODELS.treasure;
-    nodeName = 'Diamond';
-  } else if (
-    descriptor.includes('shield') ||
-    descriptor.includes('armor') ||
-    descriptor.includes('cloak') ||
-    descriptor.includes('disguise')
-  ) {
-    modelPath = ITEM_MODELS.misc;
-  }
-
-  const { nodes } = useGLTF(modelPath) as any;
-  const mesh =
-    nodes[nodeName] ||
-    Object.values(nodes).find((n: any) => n?.isMesh || n?.geometry);
-
-  if (!mesh) return null;
-
-  return (
-    <mesh geometry={mesh.geometry} castShadow receiveShadow>
-      <meshStandardMaterial color="#c4a747" roughness={0.4} metalness={0.8} />
-    </mesh>
-  );
+  return <ViewmodelPreview glb={def.viewmodel.glb} />;
 }
 
 function ItemPreviewPane({ itemId }: { itemId: string | null }) {
@@ -684,10 +592,3 @@ export function InventoryScreen() {
   );
 }
 
-useGLTF.preload(ITEM_MODELS.sword);
-useGLTF.preload(ITEM_MODELS.treasure);
-useGLTF.preload(ITEM_MODELS.stew);
-useGLTF.preload(ITEM_MODELS.cleaver);
-useGLTF.preload(ITEM_MODELS.machete);
-useGLTF.preload(ITEM_MODELS.traps);
-useGLTF.preload(ITEM_MODELS.bottles);

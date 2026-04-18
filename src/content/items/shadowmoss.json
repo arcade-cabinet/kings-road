@@ -3,5 +3,9 @@
   "name": "Shadowmoss",
   "description": "A dark, velvety moss that thrives in the deepest shade of ancient groves. Its cool touch carries a faint earthy fragrance cherished by apothecaries.",
   "type": "quest_item",
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/bottles.glb",
+    "handPose": "pinch"
+  }
 }

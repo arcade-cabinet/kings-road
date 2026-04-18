@@ -7,5 +7,9 @@
     "stat": "defense",
     "value": 3
   },
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/MISC_2025-transformed.glb",
+    "handPose": "open"
+  }
 }

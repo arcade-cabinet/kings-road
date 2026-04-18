@@ -8,5 +8,9 @@
     "value": 30,
     "duration": 120
   },
-  "stackable": true
+  "stackable": true,
+  "viewmodel": {
+    "glb": "/assets/items/stew-transformed.glb",
+    "handPose": "open"
+  }
 }

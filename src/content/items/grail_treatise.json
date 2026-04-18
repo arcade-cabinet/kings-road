@@ -3,5 +3,9 @@
   "name": "Treatise on the Grail",
   "description": "An ancient scholarly treatise penned on heavy vellum, its margins crowded with annotations. It recounts the history and mysteries of the Grail in measured, reverent prose.",
   "type": "key_item",
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/books.glb",
+    "handPose": "open"
+  }
 }

@@ -3,5 +3,9 @@
   "name": "Ashford Map Fragment",
   "description": "A tattered piece of vellum bearing faded ink lines that trace the first leg of the pilgrim road from Ashford. The edges are softened by age and travel.",
   "type": "key_item",
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/books.glb",
+    "handPose": "open"
+  }
 }

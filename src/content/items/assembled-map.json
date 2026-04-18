@@ -3,5 +3,9 @@
   "name": "Assembled Pilgrim's Map",
   "description": "The complete map, painstakingly assembled from scattered fragments. Every bend of the King's Road is laid bare, from Ashford's gentle hills to the hallowed gates of Grailsend.",
   "type": "key_item",
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/items/books.glb",
+    "handPose": "open"
+  }
 }

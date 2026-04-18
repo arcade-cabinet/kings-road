@@ -8,5 +8,9 @@
     "value": 25,
     "duration": 0
   },
-  "stackable": true
+  "stackable": true,
+  "viewmodel": {
+    "glb": "/assets/items/bottles.glb",
+    "handPose": "grip"
+  }
 }

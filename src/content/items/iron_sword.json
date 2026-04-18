@@ -3,9 +3,20 @@
   "name": "Iron Sword",
   "description": "A sturdy blade forged by the smiths of Ashford. Its edge holds true against common foes along the King's Road.",
   "type": "equipment",
+  "equipSlot": "weapon",
+  "rarity": "common",
+  "weight": 1.4,
+  "value": 35,
+  "statModifiers": [
+    { "stat": "damage", "value": 7 }
+  ],
   "effect": {
     "stat": "attack",
     "value": 5
   },
-  "stackable": false
+  "stackable": false,
+  "viewmodel": {
+    "glb": "/assets/weapons/knight-sword.glb",
+    "handPose": "grip"
+  }
 }
