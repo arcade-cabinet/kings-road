@@ -18,7 +18,6 @@
 
 import { Capacitor } from '@capacitor/core';
 import {
-  type SQLiteConnection as _SQLiteConnection,
   CapacitorSQLite,
   SQLiteConnection,
   type SQLiteDBConnection,
