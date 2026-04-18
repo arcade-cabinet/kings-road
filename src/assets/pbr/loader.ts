@@ -72,7 +72,7 @@ export async function loadPbrMaterial(
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
         mat.displacementMap = tex;
-        mat.displacementScale = 0.05;
+        mat.displacementScale = 0.0;
       })
       .catch(() => {
         /* displacement is optional */
