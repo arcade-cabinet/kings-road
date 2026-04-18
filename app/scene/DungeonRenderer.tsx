@@ -22,6 +22,7 @@ import {
   useDungeonSession,
   useFlags,
 } from '@/ecs/hooks/useGameSession';
+import { loadPbrMaterial } from '@/utils/textures';
 import type { PlacedRoom } from '@/world/dungeon-generator';
 import {
   DUNGEON_DEPTH,
@@ -45,25 +46,20 @@ const TORCH_DISTANCE = 18;
 // Reusable vectors for per-frame checks
 const _playerPos = new THREE.Vector3();
 
-// ── Materials (created once) ─────────────────────────────────────────
+// ── Materials (Polyhaven PBR for authenticity) ────────────────────────
+//
+// Floor, walls, and ceiling share the stone_block PBR set (Rustic Stone Wall).
+// Each surface gets its own cloned material so tints (ceiling darker, floor
+// neutral) don't leak across — see loadPbrMaterial() note about mutation.
 
-const floorMaterial = new THREE.MeshStandardMaterial({
-  color: 0x3a3a3a,
-  roughness: 0.95,
-  metalness: 0.0,
-});
+const floorMaterial = loadPbrMaterial('stone_block').clone();
+floorMaterial.color.setHex(0x3a3a3a);
 
-const ceilingMaterial = new THREE.MeshStandardMaterial({
-  color: 0x2a2a2a,
-  roughness: 1.0,
-  metalness: 0.0,
-});
+const ceilingMaterial = loadPbrMaterial('stone_block').clone();
+ceilingMaterial.color.setHex(0x1a1a1a);
 
-const wallMaterial = new THREE.MeshStandardMaterial({
-  color: 0x4a4a4a,
-  roughness: 0.9,
-  metalness: 0.05,
-});
+const wallMaterial = loadPbrMaterial('stone_block').clone();
+wallMaterial.color.setHex(0x5a5a5a);
 
 // ── Direction helpers ────────────────────────────────────────────────
 
