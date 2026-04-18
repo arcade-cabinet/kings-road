@@ -1,15 +1,23 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  activateQuest,
+  chooseQuestBranch,
+  getQuestState,
+  resetQuests,
+  restoreQuests,
+} from '@/ecs/actions/quest';
+import { unsafe_resetSessionEntity } from '@/ecs/world';
+import {
   advanceQuestStep,
   chooseBranchAndStart,
   getCurrentStepAction,
   getQuestProgress,
 } from '@/quest-step-executor';
-import { useQuestStore } from '@/stores/questStore';
 
 describe('quest-step-executor', () => {
   afterEach(() => {
-    useQuestStore.getState().resetQuests();
+    unsafe_resetSessionEntity();
+    resetQuests();
   });
 
   describe('getCurrentStepAction', () => {
@@ -19,7 +27,7 @@ describe('quest-step-executor', () => {
     });
 
     it('returns needs_branch for branching quest without branch chosen', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
+      activateQuest('main-chapter-00');
       const action = getCurrentStepAction('main-chapter-00');
       expect(action.type).toBe('needs_branch');
       if (action.type === 'needs_branch') {
@@ -30,8 +38,8 @@ describe('quest-step-executor', () => {
     });
 
     it('returns first step for branching quest with branch A', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
-      useQuestStore.getState().chooseBranch('main-chapter-00', 'A');
+      activateQuest('main-chapter-00');
+      chooseQuestBranch('main-chapter-00', 'A');
       const action = getCurrentStepAction('main-chapter-00');
       expect(action.type).toBe('dialogue');
       if (action.type === 'dialogue') {
@@ -42,8 +50,8 @@ describe('quest-step-executor', () => {
     });
 
     it('returns first step for branching quest with branch B', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
-      useQuestStore.getState().chooseBranch('main-chapter-00', 'B');
+      activateQuest('main-chapter-00');
+      chooseQuestBranch('main-chapter-00', 'B');
       const action = getCurrentStepAction('main-chapter-00');
       expect(action.type).toBe('dialogue');
       if (action.type === 'dialogue') {
@@ -52,7 +60,7 @@ describe('quest-step-executor', () => {
     });
 
     it('returns first step for linear micro quest', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
       const action = getCurrentStepAction('side-wounded-soldier');
       expect(action.type).toBe('dialogue');
       if (action.type === 'dialogue') {
@@ -62,11 +70,11 @@ describe('quest-step-executor', () => {
     });
 
     it('returns quest_complete when all steps are done', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
       // Advance through all 3 steps
-      useQuestStore.getState().advanceStep('side-wounded-soldier');
-      useQuestStore.getState().advanceStep('side-wounded-soldier');
-      useQuestStore.getState().advanceStep('side-wounded-soldier');
+      advanceQuestStep('side-wounded-soldier');
+      advanceQuestStep('side-wounded-soldier');
+      advanceQuestStep('side-wounded-soldier');
 
       const action = getCurrentStepAction('side-wounded-soldier');
       expect(action.type).toBe('quest_complete');
@@ -80,9 +88,7 @@ describe('quest-step-executor', () => {
 
     it('returns error for unknown quest definition', () => {
       // Directly inject a bad quest into the store
-      useQuestStore.setState({
-        activeQuests: [{ questId: 'nonexistent-quest', currentStep: 0 }],
-      });
+      restoreQuests([{ questId: 'nonexistent-quest', currentStep: 0 }], [], []);
       const action = getCurrentStepAction('nonexistent-quest');
       expect(action.type).toBe('error');
     });
@@ -90,7 +96,7 @@ describe('quest-step-executor', () => {
 
   describe('advanceQuestStep', () => {
     it('advances to the next step', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
       const action = advanceQuestStep('side-wounded-soldier');
 
       expect(action.type).toBe('investigate');
@@ -99,14 +105,14 @@ describe('quest-step-executor', () => {
       }
 
       // Verify store updated
-      const quest = useQuestStore
-        .getState()
-        .activeQuests.find((q) => q.questId === 'side-wounded-soldier');
+      const quest = getQuestState().activeQuests.find(
+        (q) => q.questId === 'side-wounded-soldier',
+      );
       expect(quest?.currentStep).toBe(1);
     });
 
     it('advances through a dialogue step sequence', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
 
       // Step 0 -> 1 (dialogue -> investigate)
       const step1 = advanceQuestStep('side-wounded-soldier');
@@ -121,7 +127,7 @@ describe('quest-step-executor', () => {
     });
 
     it('completes quest when last step is advanced', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
 
       // Advance through all 3 steps
       advanceQuestStep('side-wounded-soldier');
@@ -135,10 +141,8 @@ describe('quest-step-executor', () => {
       }
 
       // Quest should be in completed list
-      expect(useQuestStore.getState().completedQuests).toContain(
-        'side-wounded-soldier',
-      );
-      expect(useQuestStore.getState().activeQuests).toHaveLength(0);
+      expect(getQuestState().completedQuests).toContain('side-wounded-soldier');
+      expect(getQuestState().activeQuests).toHaveLength(0);
     });
 
     it('returns error for inactive quest', () => {
@@ -147,8 +151,8 @@ describe('quest-step-executor', () => {
     });
 
     it('advances branching quest steps', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
-      useQuestStore.getState().chooseBranch('main-chapter-00', 'A');
+      activateQuest('main-chapter-00');
+      chooseQuestBranch('main-chapter-00', 'A');
 
       // Step a-01 -> a-02 (dialogue -> investigate)
       const step = advanceQuestStep('main-chapter-00');
@@ -161,7 +165,7 @@ describe('quest-step-executor', () => {
 
   describe('chooseBranchAndStart', () => {
     it('selects branch A and returns first step', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
+      activateQuest('main-chapter-00');
       const action = chooseBranchAndStart('main-chapter-00', 'A');
 
       expect(action.type).toBe('dialogue');
@@ -171,15 +175,15 @@ describe('quest-step-executor', () => {
       }
 
       // Verify branch was set
-      const quest = useQuestStore
-        .getState()
-        .activeQuests.find((q) => q.questId === 'main-chapter-00');
+      const quest = getQuestState().activeQuests.find(
+        (q) => q.questId === 'main-chapter-00',
+      );
       expect(quest?.branch).toBe('A');
       expect(quest?.currentStep).toBe(0);
     });
 
     it('selects branch B and returns first step', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
+      activateQuest('main-chapter-00');
       const action = chooseBranchAndStart('main-chapter-00', 'B');
 
       expect(action.type).toBe('dialogue');
@@ -196,7 +200,7 @@ describe('quest-step-executor', () => {
 
   describe('getQuestProgress', () => {
     it('returns progress for active linear quest', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
       const progress = getQuestProgress('side-wounded-soldier');
 
       expect(progress).not.toBeNull();
@@ -206,7 +210,7 @@ describe('quest-step-executor', () => {
     });
 
     it('updates progress after advancing', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
       advanceQuestStep('side-wounded-soldier');
 
       const progress = getQuestProgress('side-wounded-soldier');
@@ -218,15 +222,13 @@ describe('quest-step-executor', () => {
     });
 
     it('returns null for unknown quest', () => {
-      useQuestStore.setState({
-        activeQuests: [{ questId: 'nonexistent', currentStep: 0 }],
-      });
+      restoreQuests([{ questId: 'nonexistent', currentStep: 0 }], [], []);
       expect(getQuestProgress('nonexistent')).toBeNull();
     });
 
     it('returns progress for branching quest with branch', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
-      useQuestStore.getState().chooseBranch('main-chapter-00', 'A');
+      activateQuest('main-chapter-00');
+      chooseQuestBranch('main-chapter-00', 'A');
 
       const progress = getQuestProgress('main-chapter-00');
       expect(progress).not.toBeNull();
@@ -234,7 +236,7 @@ describe('quest-step-executor', () => {
     });
 
     it('returns null for branching quest without branch', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
+      activateQuest('main-chapter-00');
       const progress = getQuestProgress('main-chapter-00');
       expect(progress).toBeNull();
     });
@@ -242,7 +244,7 @@ describe('quest-step-executor', () => {
 
   describe('reward collection', () => {
     it('collects main reward for linear quest', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
       // Complete all steps
       advanceQuestStep('side-wounded-soldier');
       advanceQuestStep('side-wounded-soldier');
@@ -259,8 +261,8 @@ describe('quest-step-executor', () => {
     });
 
     it('collects both main and branch rewards for branching quest', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
-      useQuestStore.getState().chooseBranch('main-chapter-00', 'A');
+      activateQuest('main-chapter-00');
+      chooseQuestBranch('main-chapter-00', 'A');
 
       // Advance through all 5 branch-A steps
       advanceQuestStep('main-chapter-00'); // a-02
@@ -282,21 +284,21 @@ describe('quest-step-executor', () => {
 
   describe('step type coverage', () => {
     it('handles dialogue steps', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
       const action = getCurrentStepAction('side-wounded-soldier');
       expect(action.type).toBe('dialogue');
     });
 
     it('handles investigate steps', () => {
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
+      activateQuest('side-wounded-soldier');
       advanceQuestStep('side-wounded-soldier');
       const action = getCurrentStepAction('side-wounded-soldier');
       expect(action.type).toBe('investigate');
     });
 
     it('handles travel steps', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
-      useQuestStore.getState().chooseBranch('main-chapter-00', 'A');
+      activateQuest('main-chapter-00');
+      chooseQuestBranch('main-chapter-00', 'A');
       // Advance to step a-05 (travel)
       advanceQuestStep('main-chapter-00'); // a-02
       advanceQuestStep('main-chapter-00'); // a-03
@@ -312,8 +314,8 @@ describe('quest-step-executor', () => {
     });
 
     it('handles encounter steps', () => {
-      useQuestStore.getState().activateQuest('main-chapter-00');
-      useQuestStore.getState().chooseBranch('main-chapter-00', 'B');
+      activateQuest('main-chapter-00');
+      chooseQuestBranch('main-chapter-00', 'B');
       // Advance to step b-04 (encounter)
       advanceQuestStep('main-chapter-00'); // b-02
       advanceQuestStep('main-chapter-00'); // b-03
@@ -331,8 +333,8 @@ describe('quest-step-executor', () => {
   describe('full quest lifecycle', () => {
     it('runs a micro quest from start to finish', () => {
       // Activate
-      useQuestStore.getState().activateQuest('side-wounded-soldier');
-      expect(useQuestStore.getState().activeQuests).toHaveLength(1);
+      activateQuest('side-wounded-soldier');
+      expect(getQuestState().activeQuests).toHaveLength(1);
 
       // Step 0: dialogue
       const s0 = getCurrentStepAction('side-wounded-soldier');
@@ -351,15 +353,13 @@ describe('quest-step-executor', () => {
       expect(complete.type).toBe('quest_complete');
 
       // Verify final state
-      expect(useQuestStore.getState().activeQuests).toHaveLength(0);
-      expect(useQuestStore.getState().completedQuests).toContain(
-        'side-wounded-soldier',
-      );
+      expect(getQuestState().activeQuests).toHaveLength(0);
+      expect(getQuestState().completedQuests).toContain('side-wounded-soldier');
     });
 
     it('runs a branching macro quest from start to finish', () => {
       // Activate
-      useQuestStore.getState().activateQuest('main-chapter-00');
+      activateQuest('main-chapter-00');
 
       // Needs branch
       const needsBranch = getCurrentStepAction('main-chapter-00');
@@ -386,9 +386,7 @@ describe('quest-step-executor', () => {
         expect(complete.rewards.length).toBe(2);
       }
 
-      expect(useQuestStore.getState().completedQuests).toContain(
-        'main-chapter-00',
-      );
+      expect(getQuestState().completedQuests).toContain('main-chapter-00');
     });
   });
 });

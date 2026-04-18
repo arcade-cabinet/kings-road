@@ -20,7 +20,7 @@ import { CombatUI } from '@/ecs/traits/session-combat';
 import { getSessionEntity } from '@/ecs/world';
 import { inputManager } from '@/input/InputManager';
 import { useGameStore } from '@/stores/gameStore';
-import { useQuestStore } from '@/stores/questStore';
+import { recordCombatVictory } from '@/ecs/actions/quest';
 import { useWorldStore } from '@/stores/worldStore';
 import type { ActiveEncounter, SpawnedMonster } from '@/types/game';
 import { createRng } from '@/utils/random';
@@ -218,9 +218,7 @@ export function EncounterSystem() {
         });
         summaryTimerRef.current = 0;
         // Record victory for quest system immediately (no frame-delay)
-        useQuestStore
-          .getState()
-          .recordCombatVictory(null, result.monstersKilled.length);
+        recordCombatVictory(null, result.monstersKilled.length);
         return;
       }
 

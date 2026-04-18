@@ -1,10 +1,16 @@
+import {
+  advanceQuestStep as advanceQuestStepTrait,
+  chooseQuestBranch,
+  completeQuest,
+  getQuestDefinition,
+  getQuestState,
+} from '@/ecs/actions/quest';
+import type { ActiveQuest } from '@/ecs/traits/session-quest';
 import type {
   QuestDefinition,
   QuestReward,
   QuestStep,
 } from '@/schemas/quest.schema';
-import type { ActiveQuest } from '@/stores/questStore';
-import { getQuestDefinition, useQuestStore } from '@/stores/questStore';
 
 /**
  * The action the game should perform for the current quest step.
@@ -52,7 +58,7 @@ export function resolveSteps(
  * should be doing right now for a given active quest.
  */
 export function getCurrentStepAction(questId: string): StepAction {
-  const { activeQuests } = useQuestStore.getState();
+  const { activeQuests } = getQuestState();
   const activeQuest = activeQuests.find((q) => q.questId === questId);
   if (!activeQuest) {
     return { type: 'error', reason: `Quest ${questId} is not active` };
@@ -92,7 +98,7 @@ export function getCurrentStepAction(questId: string): StepAction {
  * Returns the new step action after advancing, or an error.
  */
 export function advanceQuestStep(questId: string): StepAction {
-  const { activeQuests, advanceStep, completeQuest } = useQuestStore.getState();
+  const { activeQuests } = getQuestState();
   const activeQuest = activeQuests.find((q) => q.questId === questId);
   if (!activeQuest) {
     return { type: 'error', reason: `Quest ${questId} is not active` };
@@ -117,7 +123,7 @@ export function advanceQuestStep(questId: string): StepAction {
     return { type: 'quest_complete', questId, rewards };
   }
 
-  advanceStep(questId);
+  advanceQuestStepTrait(questId);
   return stepToAction(steps[nextStep]);
 }
 
@@ -128,11 +134,10 @@ export function chooseBranchAndStart(
   questId: string,
   branch: 'A' | 'B',
 ): StepAction {
-  const { chooseBranch } = useQuestStore.getState();
-  chooseBranch(questId, branch);
+  chooseQuestBranch(questId, branch);
 
   // Re-read state after mutation
-  const { activeQuests } = useQuestStore.getState();
+  const { activeQuests } = getQuestState();
   const activeQuest = activeQuests.find((q) => q.questId === questId);
   if (!activeQuest) {
     return { type: 'error', reason: `Quest ${questId} not found after branch` };
@@ -162,7 +167,7 @@ export function getQuestProgress(questId: string): {
   totalSteps: number;
   stepDescription: string;
 } | null {
-  const { activeQuests } = useQuestStore.getState();
+  const { activeQuests } = getQuestState();
   const activeQuest = activeQuests.find((q) => q.questId === questId);
   if (!activeQuest) return null;
 

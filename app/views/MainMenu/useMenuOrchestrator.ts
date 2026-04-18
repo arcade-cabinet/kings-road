@@ -11,7 +11,10 @@ import {
   useGameStore,
 } from '@/stores/gameStore';
 import { syncInventory } from '@/ecs/actions/inventory-ui';
-import { useQuestStore } from '@/stores/questStore';
+import {
+  resolveNarrative,
+  restoreQuests,
+} from '@/ecs/actions/quest';
 import { useWorldStore } from '@/stores/worldStore';
 import { CHUNK_SIZE, PLAYER_HEIGHT } from '@/utils/worldCoords';
 import { generateDungeonLayout } from '@/world/dungeon-generator';
@@ -75,7 +78,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
       });
       await loadContentDb();
       await useWorldStore.getState().generateWorld(data.seedPhrase);
-      useQuestStore.getState().resolveNarrative(data.seedPhrase);
+      resolveNarrative(data.seedPhrase);
 
       restoreGameState(data, {
         startGame: (seed, pos, yaw) => {
@@ -86,7 +89,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
           syncInventory(items, 20, gold, equipment);
         },
         restoreQuests: (a, c, t) => {
-          useQuestStore.getState().restoreQuests(a, c, t);
+          restoreQuests(a, c, t);
         },
         restoreDungeon: (dungeon) => {
           const layout = getDungeonById(dungeon.id);
@@ -141,7 +144,7 @@ export function useMenuOrchestrator(): MenuOrchestratorState &
 
         const generateWorld = useWorldStore.getState().generateWorld;
         const kingdomMap = await generateWorld(currentSeed);
-        useQuestStore.getState().resolveNarrative(currentSeed);
+        resolveNarrative(currentSeed);
 
         const ashford = kingdomMap.settlements.find((s) => s.id === 'ashford');
         const spawnGridX =

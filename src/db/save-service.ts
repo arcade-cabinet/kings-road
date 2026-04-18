@@ -12,7 +12,7 @@
 
 import type * as THREE from 'three';
 import type { EquippedItems, ItemStack } from '@/ecs/traits/inventory';
-import type { ActiveQuest } from '@/stores/questStore';
+import type { ActiveQuest } from '@/ecs/traits/session-quest';
 
 // ── Serializable types ────────────────────────────────────────────────
 

@@ -1,11 +1,10 @@
+import { useTrait } from 'koota/react';
 import { useEffect, useRef, useState } from 'react';
+import { getQuestDefinition } from '@/ecs/actions/quest';
+import { type ActiveQuest, QuestLog } from '@/ecs/traits/session-quest';
+import { getSessionEntity } from '@/ecs/world';
 import { cn } from '@/lib/utils';
 import { useGameStore } from '@/stores/gameStore';
-import {
-  type ActiveQuest,
-  getQuestDefinition,
-  useQuestStore,
-} from '@/stores/questStore';
 import { Minimap } from './Minimap';
 
 // ── Design tokens ────────────────────────────────────────────────────
@@ -224,7 +223,7 @@ function DayNightIndicator({ timeOfDay }: { timeOfDay: number }) {
 
 // ── Quest tracker — parchment card showing active quest objective ────
 function QuestTracker() {
-  const activeQuests = useQuestStore((s) => s.activeQuests);
+  const activeQuests = useTrait(getSessionEntity(), QuestLog)?.activeQuests ?? [];
 
   if (activeQuests.length === 0) return null;
 
