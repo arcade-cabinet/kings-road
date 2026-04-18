@@ -9,4 +9,5 @@ export {
   npcLabelFontUrl,
 } from './paths';
 export { loadPbrMaterial } from './pbr/loader';
+export type { PbrPaletteEntry } from './pbr/palette';
 export { PBR_PALETTE } from './pbr/palette';

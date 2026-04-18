@@ -1,17 +1,20 @@
 #!/usr/bin/env tsx
 /**
- * Ingest HDRI files from the NAS asset library into public/assets/hdri/.
+ * Ingest HDRI packs from the NAS asset library into public/assets/hdri/.
  *
  * Usage:
  *   npx tsx scripts/ingest-hdri.ts <manifest.json>
  *
  * manifest.json format:
  * [
- *   { "id": "cold-dawn", "sourcePath": "/Volumes/home/assets/HDRI/1K/cold_dawn_1k.hdr" },
+ *   { "id": "cold-dawn", "sourceDir": "/Volumes/home/assets/HDRI/1K/cold_dawn_1k" },
  *   ...
  * ]
  *
- * Each entry copies the source .hdr file to public/assets/hdri/<id>.hdr.
+ * For each entry the entire source directory is copied verbatim to
+ * public/assets/hdri/<id>/ preserving all original filenames. The loader
+ * reads public/assets/hdri/<id>/<id>.hdr.
+ *
  * The content curator (team-lead) provides the manifest.
  */
 
@@ -20,7 +23,27 @@ import * as path from 'node:path';
 
 interface ManifestEntry {
   id: string;
-  sourcePath: string;
+  sourceDir: string;
+}
+
+function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
+  const outDir = path.join(outputRoot, entry.id);
+  fs.mkdirSync(outDir, { recursive: true });
+
+  const sourceFiles = fs.readdirSync(entry.sourceDir);
+  let copied = 0;
+
+  for (const file of sourceFiles) {
+    const src = path.join(entry.sourceDir, file);
+    if (!fs.statSync(src).isFile()) continue;
+    fs.copyFileSync(src, path.join(outDir, file));
+    console.log(`  ${entry.id}/${file}`);
+    copied++;
+  }
+
+  if (copied === 0) {
+    console.warn(`  WARNING: no files found in ${entry.sourceDir}`);
+  }
 }
 
 function main() {
@@ -38,9 +61,8 @@ function main() {
 
   console.log(`Ingesting ${manifest.length} HDRI(s) → ${outputRoot}\n`);
   for (const entry of manifest) {
-    const dest = path.join(outputRoot, `${entry.id}.hdr`);
-    fs.copyFileSync(entry.sourcePath, dest);
-    console.log(`  ${entry.id}.hdr  ←  ${entry.sourcePath}`);
+    console.log(`[${entry.id}]  ${entry.sourceDir}`);
+    ingestEntry(entry, outputRoot);
   }
   console.log('\nDone.');
 }
