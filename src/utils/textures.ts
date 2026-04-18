@@ -241,8 +241,12 @@ export function getMaterials() {
 
 // ── Day/night window emissive update ─────────────────────────────────────────
 export function updateWindowEmissive(intensity: number) {
-  if (materialsCache?.windowGlow) {
-    materialsCache.windowGlow.emissiveIntensity = intensity;
+  // Update the canonical cached material so every consumer sees the change,
+  // whether they obtained the material via loadPbrMaterial('window') directly
+  // or via getMaterials().windowGlow (the latter holds the same reference).
+  const windowMat = pbrCache.get('window');
+  if (windowMat) {
+    windowMat.emissiveIntensity = intensity;
   }
 }
 
