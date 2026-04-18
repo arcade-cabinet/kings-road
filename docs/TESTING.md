@@ -35,13 +35,13 @@ npx tsx scripts/validate-content.ts  # Content trove validation
 ## Coverage
 
 Coverage is collected for:
-- `src/stores/**` -- Zustand store logic
+- `src/ecs/**` -- Koota traits, actions, hooks (authoritative game state)
 - `src/utils/**` -- RNG, textures, utilities
 - `src/hooks/**` -- useInput
 - `src/types/**`
 - `src/lib/**`
 - `src/world/**` -- world generation logic
-- `src/factories/**` -- entity factories
+- `src/factories/**` -- entity factories (building-factory only)
 
 Excluded from coverage (intentionally):
 - `app/scene/**` -- React Three Fiber components (WebGL context required)
@@ -78,16 +78,22 @@ src/
 │   └── dungeon-generator.test.ts
 ├── factories/
 │   ├── building-factory.ts
-│   ├── building-factory.test.ts
-│   ├── npc-factory.ts
-│   ├── npc-factory.test.ts
-│   ├── chibi-generator.ts
-│   └── chibi-generator.test.ts
-└── stores/
-    ├── gameStore.ts
-    ├── gameStore.test.ts
-    ├── questStore.ts
-    └── questStore.test.ts
+│   └── building-factory.test.ts
+└── ecs/
+    ├── traits/
+    │   ├── session-game.ts
+    │   ├── inventory.test.ts
+    │   ├── npc.test.ts
+    │   ├── pacing.test.ts
+    │   ├── player.test.ts
+    │   ├── quest.test.ts
+    │   └── spatial.test.ts
+    ├── actions/
+    │   ├── actions.test.ts
+    │   ├── quest.test.ts
+    │   ├── inventory.test.ts
+    │   └── inventory-ui.test.ts
+    └── world.test.ts
 ```
 
 ## Component Tests (Vitest Browser Mode)
