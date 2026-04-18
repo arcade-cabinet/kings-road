@@ -258,7 +258,7 @@ function SaveGamePage({
   }
 
   return (
-    <div className="relative bg-gradient-to-b from-yellow-50/95 to-yellow-100/90 border border-yellow-700/30 px-10 py-8 shadow-2xl w-[380px]">
+    <div className="relative bg-gradient-to-b from-yellow-50/95 to-yellow-100/90 border border-yellow-700/30 px-5 py-6 sm:px-10 sm:py-8 shadow-2xl w-[min(380px,calc(100dvw-2rem))] max-h-[min(85dvh,calc(100dvh-2rem))] overflow-y-auto">
       <div className="absolute -top-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
       <div className="absolute -bottom-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
 
@@ -395,7 +395,7 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="relative bg-gradient-to-b from-yellow-50/95 to-yellow-100/90 border border-yellow-700/30 px-10 py-8 shadow-2xl w-[380px]">
+    <div className="relative bg-gradient-to-b from-yellow-50/95 to-yellow-100/90 border border-yellow-700/30 px-5 py-6 sm:px-10 sm:py-8 shadow-2xl w-[min(380px,calc(100dvw-2rem))] max-h-[min(85dvh,calc(100dvh-2rem))] overflow-y-auto">
       <div className="absolute -top-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
       <div className="absolute -bottom-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent" />
 

@@ -386,7 +386,7 @@ export function SettingsPanel({ onBack }: { onBack: () => void }) {
   return (
     <div
       className={cn(
-        'relative px-10 py-8 shadow-2xl w-[420px] max-h-[80vh] flex flex-col',
+        'relative px-5 py-6 sm:px-10 sm:py-8 shadow-2xl w-[min(420px,calc(100dvw-2rem))] max-h-[min(80dvh,calc(100dvh-2rem))] flex flex-col',
         PARCHMENT_BG,
       )}
     >

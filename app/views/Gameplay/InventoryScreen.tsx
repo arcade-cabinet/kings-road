@@ -517,14 +517,14 @@ export function InventoryScreen() {
 
   return (
     <div
-      className="absolute inset-0 z-[54] flex items-center justify-center"
+      className="absolute inset-0 z-[54] flex items-center justify-center p-4"
       style={{
         background: 'rgba(15, 12, 8, 0.65)',
         backdropFilter: 'blur(5px)',
       }}
     >
       <div
-        className="relative flex gap-8 px-10 py-8 shadow-2xl max-h-[90vh]"
+        className="relative flex flex-col md:flex-row gap-4 md:gap-8 px-5 py-5 md:px-10 md:py-8 shadow-2xl max-h-[min(90dvh,calc(100dvh-2rem))] w-[min(900px,calc(100dvw-2rem))] overflow-y-auto"
         style={{
           background: PARCHMENT,
           border: `1.5px solid ${SLOT_BORDER}`,
