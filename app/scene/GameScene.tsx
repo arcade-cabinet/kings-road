@@ -1,21 +1,16 @@
-import { Loader, Preload } from '@react-three/drei';
+import { AdaptiveDpr, AdaptiveEvents, BakeShadows, Loader, PerformanceMonitor, Preload } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
-import {
-  Bloom,
-  EffectComposer,
-  SMAA,
-  Vignette,
-} from '@react-three/postprocessing';
 import { Physics } from '@react-three/rapier';
-import { BlendFunction } from 'postprocessing';
 import { Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
+import { BloodMetaballsEffect, ImpactDeformerEffect } from './combat';
 import { CombatParticles } from './CombatParticles';
 import { DungeonRenderer } from './DungeonRenderer';
 import { EnvironmentIBL } from './environment';
 import { FPSViewmodel } from './FPSViewmodel';
 import { OceanPlane } from './OceanPlane';
 import { ErrorBoundary } from '../ErrorBoundary';
+import { BiomePostProcessing } from '@app/postprocessing';
 import { useFlags, useSeed } from '@/ecs/hooks/useGameSession';
 import { AudioSystem } from '@app/systems/AudioSystem';
 import { ChunkManager } from '@app/systems/ChunkManager';
@@ -45,25 +40,6 @@ function SceneInit() {
   }, [scene]);
 
   return null;
-}
-
-function PostProcessing() {
-  return (
-    <EffectComposer multisampling={0}>
-      <SMAA />
-      <Bloom
-        intensity={0.3}
-        luminanceThreshold={0.8}
-        luminanceSmoothing={0.3}
-        mipmapBlur
-      />
-      <Vignette
-        offset={0.3}
-        darkness={0.3}
-        blendFunction={BlendFunction.NORMAL}
-      />
-    </EffectComposer>
-  );
 }
 
 function SceneContent() {
@@ -112,14 +88,17 @@ function SceneContent() {
           <PlayerController />
           <CombatFeedback />
           <CombatParticles />
+          {/* SDF-raymarched combat VFX — bounded hull spheres, not full-screen */}
+          <ImpactDeformerEffect impacts={[]} />
+          <BloodMetaballsEffect bursts={[]} />
           <DungeonEntrySystem />
           <AudioSystem />
 
           {/* First-person viewmodel — renders the equipped weapon */}
           <FPSViewmodel />
 
-          {/* Post Processing */}
-          <PostProcessing />
+          {/* Biome-driven post processing */}
+          <BiomePostProcessing />
         </Physics>
       )}
     </>
@@ -151,6 +130,16 @@ export function GameScene() {
         }}
       >
         <SceneInit />
+        {/* Mobile performance guard — drops DPR and disables events under frame budget pressure */}
+        <AdaptiveDpr pixelated />
+        <AdaptiveEvents />
+        <BakeShadows />
+        <PerformanceMonitor
+          onDecline={() => undefined}
+          onIncline={() => undefined}
+          flipflops={3}
+          factor={1}
+        />
         <Suspense fallback={null}>
           <SceneContent />
           <Preload all />
