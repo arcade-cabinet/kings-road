@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import type { IInputProvider, InputFrame } from '@/input/types';
-import { useGameStore } from '@/stores/gameStore';
+import { useFlags } from '@/ecs/hooks/useGameSession';
 
 // --- Constants ---
 
@@ -104,7 +104,7 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 export const TouchOverlay: React.FC = () => {
-  const gameActive = useGameStore((s) => s.gameActive);
+  const { gameActive } = useFlags();
 
   // Joystick refs
   const joystickTouchId = useRef<number | null>(null);

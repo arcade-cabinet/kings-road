@@ -6,11 +6,21 @@ import {
   isInventoryOpen,
   toggleInventory,
 } from '@/ecs/actions/inventory-ui';
-import { useGameStore } from '@/stores/gameStore';
+import {
+  closeDialogue,
+  getCamera,
+  getFlags,
+  setKey as setKeyAction,
+  setJoystick as setJoystickAction,
+  setMouseDown as setMouseDownAction,
+  setCameraYaw,
+  setCameraPitch,
+  togglePause,
+} from '@/ecs/actions/game';
+import { useFlags } from '@/ecs/hooks/useGameSession';
 
 export function useKeyboardInput() {
-  const setKey = useGameStore((state) => state.setKey);
-  const inDialogue = useGameStore((state) => state.inDialogue);
+  const { inDialogue } = useFlags();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -19,14 +29,9 @@ export function useKeyboardInput() {
       // ESC toggles pause (works even in dialogue / inventory)
       if (k === 'Escape') {
         e.preventDefault();
-        const {
-          gameActive,
-          inDialogue: dlg,
-          togglePause,
-          closeDialogue,
-        } = useGameStore.getState();
-        if (!gameActive) return;
-        if (dlg) {
+        const flags = getFlags();
+        if (!flags.gameActive) return;
+        if (flags.inDialogue) {
           closeDialogue();
         } else if (isInventoryOpen()) {
           closeInventory();
@@ -36,7 +41,7 @@ export function useKeyboardInput() {
         return;
       }
 
-      if (inDialogue || useGameStore.getState().paused || isInventoryOpen())
+      if (inDialogue || getFlags().paused || isInventoryOpen())
         return;
 
       // I toggles inventory
@@ -55,33 +60,33 @@ export function useKeyboardInput() {
       switch (k) {
         case 'KeyW':
         case 'ArrowUp':
-          setKey('w', true);
+          setKeyAction('w', true);
           break;
         case 'KeyS':
         case 'ArrowDown':
-          setKey('s', true);
+          setKeyAction('s', true);
           break;
         case 'KeyA':
         case 'ArrowLeft':
-          setKey('a', true);
+          setKeyAction('a', true);
           break;
         case 'KeyD':
         case 'ArrowRight':
-          setKey('d', true);
+          setKeyAction('d', true);
           break;
         case 'KeyQ':
-          setKey('q', true);
+          setKeyAction('q', true);
           break;
         case 'KeyE':
-          setKey('e', true);
-          setKey('action', true);
+          setKeyAction('e', true);
+          setKeyAction('action', true);
           break;
         case 'Space':
-          setKey('space', true);
+          setKeyAction('space', true);
           break;
         case 'ShiftLeft':
         case 'ShiftRight':
-          setKey('shift', true);
+          setKeyAction('shift', true);
           break;
       }
     };
@@ -91,33 +96,33 @@ export function useKeyboardInput() {
       switch (k) {
         case 'KeyW':
         case 'ArrowUp':
-          setKey('w', false);
+          setKeyAction('w', false);
           break;
         case 'KeyS':
         case 'ArrowDown':
-          setKey('s', false);
+          setKeyAction('s', false);
           break;
         case 'KeyA':
         case 'ArrowLeft':
-          setKey('a', false);
+          setKeyAction('a', false);
           break;
         case 'KeyD':
         case 'ArrowRight':
-          setKey('d', false);
+          setKeyAction('d', false);
           break;
         case 'KeyQ':
-          setKey('q', false);
+          setKeyAction('q', false);
           break;
         case 'KeyE':
-          setKey('e', false);
-          setKey('action', false);
+          setKeyAction('e', false);
+          setKeyAction('action', false);
           break;
         case 'Space':
-          setKey('space', false);
+          setKeyAction('space', false);
           break;
         case 'ShiftLeft':
         case 'ShiftRight':
-          setKey('shift', false);
+          setKeyAction('shift', false);
           break;
       }
     };
@@ -129,15 +134,11 @@ export function useKeyboardInput() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [setKey, inDialogue]);
+  }, [inDialogue]);
 }
 
 export function useMouseInput() {
-  const setMouseDown = useGameStore((state) => state.setMouseDown);
-  const setCameraYaw = useGameStore((state) => state.setCameraYaw);
-  const setCameraPitch = useGameStore((state) => state.setCameraPitch);
-  const inDialogue = useGameStore((state) => state.inDialogue);
-  const gameActive = useGameStore((state) => state.gameActive);
+  const { inDialogue, gameActive } = useFlags();
   const mousePos = useRef({ x: 0, y: 0 });
   const isDown = useRef(false);
 
@@ -146,12 +147,12 @@ export function useMouseInput() {
       if (inDialogue) return;
       isDown.current = true;
       mousePos.current = { x: e.clientX, y: e.clientY };
-      setMouseDown(true);
+      setMouseDownAction(true);
     };
 
     const handleMouseUp = () => {
       isDown.current = false;
-      setMouseDown(false);
+      setMouseDownAction(false);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -159,16 +160,16 @@ export function useMouseInput() {
         !isDown.current ||
         !gameActive ||
         inDialogue ||
-        useGameStore.getState().paused
+        getFlags().paused
       )
         return;
 
-      const state = useGameStore.getState();
+      const { cameraYaw, cameraPitch } = getCamera();
       const dx = e.clientX - mousePos.current.x;
       const dy = e.clientY - mousePos.current.y;
 
-      const newYaw = state.cameraYaw - dx * 0.005;
-      let newPitch = state.cameraPitch - dy * 0.005;
+      const newYaw = cameraYaw - dx * 0.005;
+      let newPitch = cameraPitch - dy * 0.005;
       newPitch = Math.max(-Math.PI / 2.1, Math.min(Math.PI / 2.1, newPitch));
 
       setCameraYaw(newYaw);
@@ -186,12 +187,10 @@ export function useMouseInput() {
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [setMouseDown, setCameraYaw, setCameraPitch, inDialogue, gameActive]);
+  }, [inDialogue, gameActive]);
 }
 
 export function useTouchInput() {
-  const setJoystick = useGameStore((state) => state.setJoystick);
-  const setKey = useGameStore((state) => state.setKey);
   const touchId = useRef<number | null>(null);
   const joystickBase = useRef({ x: 0, y: 0 });
 
@@ -206,10 +205,10 @@ export function useTouchInput() {
 
         touchId.current = touch.identifier;
         joystickBase.current = { x: touch.clientX, y: touch.clientY };
-        setJoystick({ x: 0, y: 0 }, 0);
+        setJoystickAction({ x: 0, y: 0 }, 0);
       }
     },
-    [setJoystick],
+    [],
   );
 
   const handleTouchMove = useCallback(
@@ -228,11 +227,11 @@ export function useTouchInput() {
             dist = maxDist;
           }
 
-          setJoystick({ x: dx / maxDist, y: dy / maxDist }, dist);
+          setJoystickAction({ x: dx / maxDist, y: dy / maxDist }, dist);
         }
       }
     },
-    [setJoystick],
+    [],
   );
 
   const handleTouchEnd = useCallback(
@@ -240,11 +239,11 @@ export function useTouchInput() {
       for (let i = 0; i < e.changedTouches.length; i++) {
         if (e.changedTouches[i].identifier === touchId.current) {
           touchId.current = null;
-          setJoystick({ x: 0, y: 0 }, 0);
+          setJoystickAction({ x: 0, y: 0 }, 0);
         }
       }
     },
-    [setJoystick],
+    [],
   );
 
   useEffect(() => {
@@ -263,5 +262,5 @@ export function useTouchInput() {
     };
   }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
-  return { setKey };
+  return { setKey: setKeyAction };
 }
