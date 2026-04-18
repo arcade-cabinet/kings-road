@@ -17,7 +17,7 @@ Drives material IBL from `.hdr` files declared in the active biome's `lighting.h
 
 - Reads the player's road position (world X = road distance) and calls `BiomeService.getCurrentBiome`.
 - Derives a coarse time-of-day bucket (`dawn | noon | dusk | night`) from `timeOfDay ∈ [0, 1)`.
-- Supports both single-string HDRI (`"hdri-id"`) and per-bucket dict (`{ dawn: "...", noon: "..." }`).
+- Supports single-string HDRI (`"hdri-id"`); per-bucket dict (`{ dawn: "...", noon: "..." }`) is forward-compatible once the schema widens `hdri` beyond `string`.
 - Cross-fades by remounting `IBLMap` under a new React key when the HDRI changes.
 - Returns `null` before `BiomeService.init()` has run — no crash at cold start.
 
@@ -32,6 +32,22 @@ Drives material IBL from `.hdr` files declared in the active biome's `lighting.h
 ### `timeOfDayBucket(timeOfDay: number): TimeOfDayBucket`
 
 Pure helper — maps a `[0, 1)` game clock value to `dawn | noon | dusk | night`.
+
+## HDRI asset layout
+
+HDRIs live at `public/assets/hdri/<id>/<id>.hdr` (subdirectory per id):
+
+```
+public/assets/hdri/
+  misty-pines/
+    misty-pines.hdr
+  kloppenheim-04/
+    kloppenheim-04.hdr
+```
+
+`IBLMap` builds the URL as `assetUrl('/assets/hdri/<id>/<id>.hdr')` and loads via
+`RGBELoader` from `three-stdlib`. The texture is passed to `<Environment map={...} />`
+from `@react-three/drei` — three.js sets `EquirectangularReflectionMapping` internally.
 
 ## Sky / Sun tint integration
 

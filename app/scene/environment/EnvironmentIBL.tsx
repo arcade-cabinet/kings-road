@@ -2,7 +2,7 @@ import { Environment } from '@react-three/drei';
 import { useLoader } from '@react-three/fiber';
 import { useEffect } from 'react';
 import * as THREE from 'three';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { RGBELoader } from 'three-stdlib';
 import { BiomeService } from '@/biome';
 import { getPlayer } from '@/ecs/actions/game';
 import { useEnvironment } from '@/ecs/hooks/useGameSession';
@@ -18,7 +18,11 @@ export function timeOfDayBucket(timeOfDay: number): TimeOfDayBucket {
   return 'dusk';
 }
 
-/** Resolve HDRI id — supports both single-string and per-bucket-dict schemas. */
+/**
+ * Resolve HDRI id — supports single-string and per-bucket-dict schemas.
+ * BiomeConfig.lighting.hdri is currently typed as `string` in the Zod schema;
+ * the dict branch is forward-compatible once the schema is widened.
+ */
 function resolveHdriId(
   hdri: string | Record<string, string>,
   bucket: TimeOfDayBucket,
@@ -29,7 +33,8 @@ function resolveHdriId(
 
 /** Inner component — suspends while HDRI loads. Remounts on key change to swap HDRIs. */
 function IBLMap({ hdriId }: { hdriId: string }) {
-  const url = assetUrl(`/assets/hdri/${hdriId}.hdr`);
+  // Subdirectory per id: public/assets/hdri/<id>/<id>.hdr
+  const url = assetUrl(`/assets/hdri/${hdriId}/${hdriId}.hdr`);
   const texture = useLoader(RGBELoader, url);
 
   useEffect(() => {

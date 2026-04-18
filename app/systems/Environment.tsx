@@ -3,6 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { BiomeService } from '@/biome';
+import type { BiomeConfig } from '@/biome';
+import { BiomeError } from '@/core';
 import { assetUrl } from '@/lib/assets';
 import {
   getEnvironment,
@@ -80,6 +82,10 @@ export function DayNightCycle() {
   const localTimeRef = useRef(timeOfDay);
   const syncTimerRef = useRef(0);
 
+  // Cache biome lookup — only re-query when road distance changes by >100 units
+  const lastBiomeQueryDistRef = useRef(-Infinity);
+  const cachedBiomeRef = useRef<BiomeConfig | null>(null);
+
   // Initialize scene background immediately on mount
   useMemo(() => {
     const skyColor = getSkyColor(timeOfDay);
@@ -132,10 +138,16 @@ export function DayNightCycle() {
       let biomeDirectionalColor: string | null = null;
       try {
         const roadDist = getPlayer().playerPosition?.x ?? 0;
-        const biome = BiomeService.getCurrentBiome(roadDist);
-        biomeDirectionalIntensity = biome.lighting.directionalIntensity;
-        biomeDirectionalColor = biome.lighting.directionalColor;
-      } catch {
+        if (Math.abs(roadDist - lastBiomeQueryDistRef.current) > 100) {
+          cachedBiomeRef.current = BiomeService.getCurrentBiome(roadDist);
+          lastBiomeQueryDistRef.current = roadDist;
+        }
+        if (cachedBiomeRef.current) {
+          biomeDirectionalIntensity = cachedBiomeRef.current.lighting.directionalIntensity;
+          biomeDirectionalColor = cachedBiomeRef.current.lighting.directionalColor;
+        }
+      } catch (err) {
+        if (!(err instanceof BiomeError)) throw err;
         // BiomeService not yet initialized — use defaults
       }
 
