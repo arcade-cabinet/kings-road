@@ -12,6 +12,51 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.2.0...kings-road-v1.3.0) (2026-04-18)
+
+
+### Added
+
+* add ECS actions for player, NPC, and quest management ([9554ced](https://github.com/arcade-cabinet/kings-road/commit/9554ced7a8b0a55a4c95197391da079cb5d841ab))
+* add master game config schema combining all sub-schemas ([f2ac063](https://github.com/arcade-cabinet/kings-road/commit/f2ac0638a3c3de94fa28a737364d016708558072))
+* add NPC, feature, item, encounter, pacing schemas ([db3ac7a](https://github.com/arcade-cabinet/kings-road/commit/db3ac7a0046338cf084adda34b9b9a009fd6b0f9))
+* add pacing engine for deterministic feature placement (E2) ([188c443](https://github.com/arcade-cabinet/kings-road/commit/188c4438ad16f47383a4cea582b18138718d41fd))
+* add quest schema — macro/meso/micro tiers with A/B branching ([964d5c2](https://github.com/arcade-cabinet/kings-road/commit/964d5c28a2295f1b43783275188243519712302c))
+* add road spine loader with Zod validation and helpers (E1) ([58036fc](https://github.com/arcade-cabinet/kings-road/commit/58036fc504590cbe4634b51d7634d79088e8d38a))
+* add trove validation pipeline and contribution guide ([9d58161](https://github.com/arcade-cabinet/kings-road/commit/9d58161606860cdd41d69afb29d9cb3141c30ec9))
+* add world schema — road spine, anchor points, regions ([355356d](https://github.com/arcade-cabinet/kings-road/commit/355356debf667b3e10a9e766407833bb5275d892))
+* add zod dependency, scaffold schema directory ([60157af](https://github.com/arcade-cabinet/kings-road/commit/60157afe969770e7aee82f2bc5b05376443b9242))
+* Capacitor migration, app/src restructure, CI fixes, browser test harness ([#33](https://github.com/arcade-cabinet/kings-road/issues/33)) ([07392df](https://github.com/arcade-cabinet/kings-road/commit/07392dfe911bc9eb821a32b27cad41c16ae30090))
+* complete content trove + NPC archetype caricature system ([#8](https://github.com/arcade-cabinet/kings-road/issues/8)) ([c947927](https://github.com/arcade-cabinet/kings-road/commit/c94792784a77471114925638f8273b8b580334ca))
+* define core ECS traits -- player, spatial, quest, NPC, pacing ([6742117](https://github.com/arcade-cabinet/kings-road/commit/6742117a650b35d861e6ff80758f0b65f4a6381d))
+* dungeon persistence, combat fixes, kingdom map gen ([#9](https://github.com/arcade-cabinet/kings-road/issues/9)) ([39ddd6a](https://github.com/arcade-cabinet/kings-road/commit/39ddd6addc7af5772bd4e881c494cc48b1f4b670))
+* **ecs:** add getSessionEntity + unsafe_resetSessionEntity (Koota Phase 0) ([#37](https://github.com/arcade-cabinet/kings-road/issues/37)) ([62e07c1](https://github.com/arcade-cabinet/kings-road/commit/62e07c1b1b4a2d18f618403f4093e167b9ce7449))
+* **ecs:** Koota Phase 1 — InventoryUI Session trait behind inventoryStore facade ([#39](https://github.com/arcade-cabinet/kings-road/issues/39)) ([9e00662](https://github.com/arcade-cabinet/kings-road/commit/9e0066222fc5ca23edd2c94db2edb61a4b9dc4b5))
+* Engine v2 — config-driven blueprint architecture ([#5](https://github.com/arcade-cabinet/kings-road/issues/5)) ([f872535](https://github.com/arcade-cabinet/kings-road/commit/f872535ea71c7ddf21d5889063c984a108ccfa35))
+* Fix web build and integrate 3DPSX Chibi NPCs ([#13](https://github.com/arcade-cabinet/kings-road/issues/13)) ([526bd80](https://github.com/arcade-cabinet/kings-road/commit/526bd80a33bc4d1d3511aa1702a72186e51964ae))
+* install koota, create ECS game world ([fca2328](https://github.com/arcade-cabinet/kings-road/commit/fca2328bc1b6526d70ae4a1cf1b0fd52870b4563))
+* King's Road — complete game engine with pastoral medieval redesign ([d15b2d2](https://github.com/arcade-cabinet/kings-road/commit/d15b2d26d8acb509078550341370d2ecb46080c1))
+* landing polish, diegetic gameplay frame, app/ reorganization, self-hosted fonts ([#36](https://github.com/arcade-cabinet/kings-road/issues/36)) ([3fa3b85](https://github.com/arcade-cabinet/kings-road/commit/3fa3b852a36b5e3d20be57eec1519e111734fb3c))
+* migrate web build from Vite to Expo/Metro ([#11](https://github.com/arcade-cabinet/kings-road/issues/11)) ([c85ec85](https://github.com/arcade-cabinet/kings-road/commit/c85ec8596723664d3aca4d5775646318902bda9c))
+* refactor worldGen to be road-aware with optional roadSpine (E3) ([cfdcb2c](https://github.com/arcade-cabinet/kings-road/commit/cfdcb2c04754f3e2d8974713cdd7c0a88f8102d8))
+* wire Koota WorldProvider into React app ([c2da24e](https://github.com/arcade-cabinet/kings-road/commit/c2da24e25d2fa01a85eae239e4bc4f713dacdcfb))
+
+
+### Fixed
+
+* ensure content JSON loads on GitHub Pages ([#12](https://github.com/arcade-cabinet/kings-road/issues/12)) ([b38907f](https://github.com/arcade-cabinet/kings-road/commit/b38907f04f55dc798c7327d5293f33d949a3462c))
+* pin @types/node to v22 matching CI Node version ([#4](https://github.com/arcade-cabinet/kings-road/issues/4)) ([b523250](https://github.com/arcade-cabinet/kings-road/commit/b52325077a98f4ff22525bd8521efda74304d7a5))
+* resolve all Biome lint errors in game components ([3fb7213](https://github.com/arcade-cabinet/kings-road/commit/3fb72135191dd858c59fd688dbb32d20f1153234))
+* resolve CI TypeScript check failures ([#3](https://github.com/arcade-cabinet/kings-road/issues/3)) ([11c8596](https://github.com/arcade-cabinet/kings-road/commit/11c8596a174ddde17dc47f81690977a453fe9030))
+* **tsc:** remove vite.config.ts from main tsconfig include (double-include caused TS6305) ([#35](https://github.com/arcade-cabinet/kings-road/issues/35)) ([f70341f](https://github.com/arcade-cabinet/kings-road/commit/f70341f5fc211b53e98639e3f39a5983fb852b80))
+
+
+### Documentation
+
+* add CLAUDE.md for Claude Code sessions ([2d7ac5b](https://github.com/arcade-cabinet/kings-road/commit/2d7ac5b9b5135201fc94694573b884daae577a1b))
+* add Ralph-TUI PRD for overnight content generation ([fefbcc8](https://github.com/arcade-cabinet/kings-road/commit/fefbcc8b5f2af08b67422c67247757e1f77a6a66))
+* rewrite all documentation for King's Road redesign ([c4f97fb](https://github.com/arcade-cabinet/kings-road/commit/c4f97fb76e7a5bea64426ec57dc380122d3cd9eb))
+
 ## [1.2.0](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.1.0...kings-road-v1.2.0) (2026-04-18)
 
 
