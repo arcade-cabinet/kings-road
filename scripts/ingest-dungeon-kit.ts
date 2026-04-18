@@ -1,9 +1,10 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env -S npx tsx
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-const SOURCE_DIR =
+const DEFAULT_SOURCE =
   '/Volumes/home/assets/3DLowPoly/Environment/Dungeon/KayKit_DungeonRemastered_1.1_FREE';
+const SOURCE_DIR = process.env['DUNGEON_KIT_SOURCE'] ?? DEFAULT_SOURCE;
 const DEST_DIR = path.resolve(
   import.meta.dirname,
   '../public/assets/dungeon/kit',
