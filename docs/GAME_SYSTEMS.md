@@ -256,7 +256,7 @@ When a chunk unloads:
 ### Memory Layout
 
 ```
-Zustand Store
+Koota ChunkState trait (src/ecs/traits/session-game.ts)
 ├── activeChunks: Map<string, ChunkData>
 │   └── ChunkData: { cx, cz, key, type, name, collidables, interactables }
 ├── globalAABBs: AABB[]          (flat collision list)
