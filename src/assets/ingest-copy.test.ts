@@ -63,8 +63,8 @@ describe('fs.cpSync recursive copy (ingest scripts contract)', () => {
 
     fs.cpSync(tmpSrc, tmpDst, { recursive: true });
 
-    expect(
-      fs.existsSync(path.join(tmpDst, 'a', 'b', 'c', 'deep.bin')),
-    ).toBe(true);
+    expect(fs.existsSync(path.join(tmpDst, 'a', 'b', 'c', 'deep.bin'))).toBe(
+      true,
+    );
   });
 });
