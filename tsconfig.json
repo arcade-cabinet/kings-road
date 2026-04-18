@@ -20,6 +20,7 @@
     "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
     "types": ["vite/client", "node"],
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
