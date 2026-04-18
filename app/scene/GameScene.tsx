@@ -118,16 +118,6 @@ function SceneContent() {
   );
 }
 
-// Loading fallback component for Suspense
-function LoadingFallback() {
-  return (
-    <mesh>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshBasicMaterial color="#87CEEB" />
-    </mesh>
-  );
-}
-
 export function GameScene() {
   return (
     <ErrorBoundary source="GameScene">
@@ -153,7 +143,7 @@ export function GameScene() {
         }}
       >
         <SceneInit />
-        <Suspense fallback={<LoadingFallback />}>
+        <Suspense fallback={null}>
           <SceneContent />
           <Preload all />
         </Suspense>
