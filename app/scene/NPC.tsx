@@ -1,10 +1,11 @@
-import { Billboard, Float, Text, useGLTF } from '@react-three/drei';
+import { Billboard, Float, Text, useAnimations, useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { SkeletonUtils } from 'three-stdlib';
 import { assetUrl, npcLabelFontUrl } from '@/lib/assets';
 import type { NPCBlueprint } from '@/schemas/npc-blueprint.schema';
-import { getPlayer, getInteraction } from '@/ecs/actions/game';
+import { getPlayer } from '@/ecs/actions/game';
 import { useInteraction } from '@/ecs/hooks/useGameSession';
 import type { Interactable } from '@/types/game';
 
@@ -94,6 +95,34 @@ const TYPE_ACCENTS: Record<string, string> = {
   priest: '#cccc88',
 };
 
+/**
+ * Each NPC pack has a rigged armature with differently-named idle clips.
+ * Return the first matching clip name found in the pack, so we can drive
+ * the character at rest instead of just bobbing a static mesh.
+ *
+ * - 3DPSX packs (archer/basemesh/merchant/ninja/student/allinone) use
+ *   `anim_iddle` (the pack author's sic spelling).
+ * - The knight pack uses `Idle_1`.
+ * - The villagers pack uses `Idle_1`.
+ */
+function pickIdleClip(clipNames: string[]): string | null {
+  const preferences = [
+    'Idle_1',
+    'anim_iddle',
+    'iddleanim_',       // ninja pack suffix style
+    'Idle_2',
+    'anim_iddle.001',
+  ];
+  for (const pref of preferences) {
+    if (clipNames.includes(pref)) return pref;
+  }
+  // Last resort: any clip whose name contains "idle" (case-insensitive)
+  return (
+    clipNames.find((n) => n.toLowerCase().includes('idle') || n.toLowerCase().includes('iddle')) ??
+    null
+  );
+}
+
 export function NPC({ interactable, blueprint }: NPCProps) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
@@ -114,30 +143,53 @@ export function NPC({ interactable, blueprint }: NPCProps) {
   const modelName = MODEL_MAPPING[npcType] || 'basemesh';
   const isMegaPack = modelName === 'villagers';
 
-  // useGLTF return type is dynamic based on GLB node names — no static shape available
-  const { scene, nodes } = useGLTF(
-    assetUrl(`/assets/npcs/${modelName}.glb`),
-  ) as any;
+  // useGLTF return type is dynamic based on GLB node names — no static
+  // shape available. `animations` is an AnimationClip[] co-shipped with
+  // every rigged pack.
+  const gltf = useGLTF(assetUrl(`/assets/npcs/${modelName}.glb`)) as unknown as {
+    scene: THREE.Group;
+    nodes: Record<string, THREE.Object3D>;
+    animations: THREE.AnimationClip[];
+  };
+  const { scene, nodes, animations } = gltf;
 
-  // Clone scene or extract specific node from mega-pack
+  // Clone scene or extract specific node from mega-pack. Uses
+  // SkeletonUtils.clone so the cloned SkinnedMesh keeps a working
+  // skeleton reference (plain Object3D.clone shares the skeleton across
+  // instances and breaks animation when multiple NPCs of the same
+  // archetype coexist).
   const clonedScene = useMemo(() => {
+    const sceneClone = SkeletonUtils.clone(scene) as THREE.Group;
+
     if (isMegaPack) {
       const nodeName = VILLAGER_NODES[npcType] || VILLAGER_NODES.wanderer;
       const targetNode = nodes[nodeName];
       if (targetNode) {
-        // If it's a SkinnedMesh, we need its group structure or at least a clone
-        // For simplicity in this hybrid approach, we clone the scene but hide other nodes
-        const sceneClone = scene.clone();
-        sceneClone.traverse((child: any) => {
-          if (child.isMesh || child.isSkinnedMesh) {
+        sceneClone.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh || (child as THREE.SkinnedMesh).isSkinnedMesh) {
             child.visible = child.name === nodeName;
           }
         });
-        return sceneClone;
       }
     }
-    return scene.clone();
+    return sceneClone;
   }, [scene, nodes, isMegaPack, npcType]);
+
+  // Drive the rigged idle animation. Each pack uses different clip names;
+  // pickIdleClip resolves the first match. Fading in on mount makes the
+  // transition from scene-load → idle smooth.
+  const animatedGroupRef = useRef<THREE.Group>(null);
+  const { actions, names } = useAnimations(animations, animatedGroupRef);
+  useEffect(() => {
+    const clipName = pickIdleClip(names);
+    if (!clipName) return;
+    const action = actions[clipName];
+    if (!action) return;
+    action.reset().fadeIn(0.3).play();
+    return () => {
+      action.fadeOut(0.3);
+    };
+  }, [actions, names]);
 
   const elapsedRef = useRef(0);
 
@@ -171,13 +223,10 @@ export function NPC({ interactable, blueprint }: NPCProps) {
       groupRef.current.rotation.y += angleDiff * delta * 2;
     }
 
-    // Breathing bob for the 3DPSX models
-    if (modelRef.current) {
-      modelRef.current.position.y = Math.sin(t * 2 + idleOffset) * 0.05;
-
-      // Slight "sway" for extra character
-      modelRef.current.rotation.z = Math.sin(t * 1.5 + idleOffset) * 0.02;
-    }
+    // The rigged idle clip drives breathing/sway — no procedural bob.
+    // `idleOffset` is retained in scope (used by future facing/turn logic).
+    void idleOffset;
+    void t;
   });
 
   if (!npcPosition) return null;
@@ -196,8 +245,12 @@ export function NPC({ interactable, blueprint }: NPCProps) {
             <meshBasicMaterial color="#000000" transparent opacity={0.3} />
           </mesh>
 
-          {/* The 3DPSX Model */}
-          <primitive object={clonedScene} />
+          {/* The 3DPSX Model — wrapped in a group so useAnimations can
+              bind its mixer to a stable node, while the SkinnedMesh lives
+              inside the cloned scene subtree. */}
+          <group ref={animatedGroupRef}>
+            <primitive object={clonedScene} />
+          </group>
         </group>
       </Float>
 
