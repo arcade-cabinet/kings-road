@@ -23,7 +23,7 @@ Types (`src/core/types/`):
 - `asArchetype`, `asBiomeId`, `asEntityId`, `asSeed` — safe cast helpers
 
 Math (`src/core/math/`):
-- `hashString`, `mulberry32`, `cyrb128`, `createRng` — deterministic PRNG / hashing
+- `hashString`, `mulberry32`, `cyrb128`, `createRng` — deterministic PRNG / hashing (canonical home; replaces legacy `src/utils/random.ts`)
 - `lerp`, `smoothstep`, `clamp`, `inverseLerp` — interpolation helpers
 
 Errors (`src/core/errors/`):

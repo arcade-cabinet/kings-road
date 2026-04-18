@@ -31,8 +31,13 @@ export interface Interactable {
   actionVerb: string;
 }
 
-/** Chunk terrain types */
-export type ChunkType = 'WILD' | 'TOWN' | 'DUNGEON' | 'ROAD';
+/**
+ * @deprecated Pre-biome chunk tag. The canonical chunk-type union lives in
+ * `@/core` and is biome-aligned (meadow, forest, thornfield, town, dungeon,
+ * ...). This legacy union stays until ecs/session traits + worldGen are
+ * migrated to biome ids — see docs/architecture/FUTURE_IMPROVEMENTS.md.
+ */
+export type LegacyChunkType = 'WILD' | 'TOWN' | 'DUNGEON' | 'ROAD';
 
 /** A building placed in the world via the town layout system */
 export interface PlacedBuildingData {
@@ -66,7 +71,7 @@ export interface ChunkData {
   cx: number;
   cz: number;
   key: string;
-  type: ChunkType;
+  type: LegacyChunkType;
   name: string;
   collidables: AABB[];
   interactables: Interactable[];

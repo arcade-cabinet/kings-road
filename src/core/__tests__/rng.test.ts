@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createRng, cyrb128, mulberry32 } from './random';
+import { createRng, cyrb128, mulberry32 } from '../math';
 
 describe('cyrb128', () => {
   it('returns a number for any string', () => {

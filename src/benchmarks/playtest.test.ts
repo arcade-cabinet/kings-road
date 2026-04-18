@@ -11,11 +11,11 @@ import {
   calculateMonsterDamage,
   calculatePlayerDamage,
 } from '@/combat-resolver';
+import { createRng } from '@/core';
 import type { EncounterTable } from '@/schemas/encounter-table.schema';
 import { KingdomConfigSchema } from '@/schemas/kingdom.schema';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
 import type { QuestDefinition } from '@/schemas/quest.schema';
-import { createRng } from '@/utils/random';
 import { getDangerTier, getEncounterChance } from '@/world/danger';
 import {
   generateKingdom,

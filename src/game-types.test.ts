@@ -4,9 +4,9 @@ import type {
   AABB,
   ChunkData,
   ChunkDelta,
-  ChunkType,
   InputState,
   Interactable,
+  LegacyChunkType,
   NPCType,
 } from '@/types/game';
 
@@ -66,9 +66,9 @@ describe('type definitions', () => {
     });
   });
 
-  describe('ChunkType', () => {
+  describe('LegacyChunkType', () => {
     it('allows all valid chunk types', () => {
-      const types: ChunkType[] = ['WILD', 'TOWN', 'DUNGEON', 'ROAD'];
+      const types: LegacyChunkType[] = ['WILD', 'TOWN', 'DUNGEON', 'ROAD'];
       expect(types).toHaveLength(4);
     });
   });

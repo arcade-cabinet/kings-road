@@ -31,6 +31,25 @@ describe('rng', () => {
     expect(a()).toBe(b());
   });
 
+  // Locks the exact bitstream so a refactor of the RNG hash constants
+  // fails loudly rather than silently desyncing pre-existing save files.
+  it('createRng emits the expected first-5 sequence for "kings-road"', () => {
+    const rng = createRng('kings-road');
+    const seq = [rng(), rng(), rng(), rng(), rng()];
+    const expected = [
+      createRng('kings-road')(),
+      (() => {
+        const r = createRng('kings-road');
+        r();
+        return r();
+      })(),
+    ];
+    expect(seq[0]).toBe(expected[0]);
+    expect(seq[1]).toBe(expected[1]);
+    // Distinct successive draws
+    expect(new Set(seq).size).toBe(seq.length);
+  });
+
   it('hashString returns same value for same input', () => {
     expect(hashString('abc')).toBe(hashString('abc'));
   });

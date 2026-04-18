@@ -8,7 +8,7 @@
 import { useGLTF } from '@react-three/drei';
 import { useMemo } from 'react';
 import { assetUrl } from '@/lib/assets';
-import { hashString } from '@/utils/random';
+import { hashString } from '@/core';
 import type { PlacedFeatureData } from '@/types/game';
 
 export function Feature({ feature }: { feature: PlacedFeatureData }) {

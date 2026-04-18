@@ -9,6 +9,7 @@
  * Content is sourced from the content store (game.db) at runtime.
  */
 
+import { cyrb128, mulberry32 } from '@/core';
 import { getAllFeatures, isContentStoreReady } from '@/db/content-queries';
 import type { FeatureDefinition } from '@/schemas/feature.schema';
 import type {
@@ -16,7 +17,6 @@ import type {
   KingdomMap,
   KingdomRegion,
 } from '@/schemas/kingdom.schema';
-import { cyrb128, mulberry32 } from '@/utils/random';
 
 // --- Biome → feature affinity ---
 

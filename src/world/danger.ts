@@ -1,5 +1,5 @@
 import type { KingdomMap, KingdomRegion } from '@/schemas/kingdom.schema';
-import type { ChunkType } from '@/types/game';
+import type { LegacyChunkType } from '@/types/game';
 import { getRegionAt } from './kingdom-gen';
 
 /**
@@ -16,7 +16,7 @@ import { getRegionAt } from './kingdom-gen';
 export function getDangerTier(
   cx: number,
   cz: number,
-  chunkType: ChunkType,
+  chunkType: LegacyChunkType,
   kingdomMap?: KingdomMap | null,
 ): number {
   if (chunkType === 'TOWN') return 0;

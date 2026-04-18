@@ -16,6 +16,7 @@
  * All functions are pure and deterministic from seed.
  */
 
+import { cyrb128, mulberry32 } from '@/core';
 import type {
   AuthoredRegion,
   KingdomBiome,
@@ -28,7 +29,6 @@ import type {
   RoadSegment as SchemaRoadSegment,
   Settlement,
 } from '@/schemas/kingdom.schema';
-import { cyrb128, mulberry32 } from '@/utils/random';
 import type { PlacedSettlement, RoadSegment } from './road-network';
 import { findPath, generateRoadNetwork } from './road-network';
 import type { TerrainData } from './terrain-gen';

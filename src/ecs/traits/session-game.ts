@@ -5,9 +5,9 @@ import type {
   ActiveEncounter,
   ChunkData,
   ChunkDelta,
-  ChunkType,
   InputState,
   Interactable,
+  LegacyChunkType,
 } from '@/types/game';
 import { PLAYER_HEIGHT } from '@/utils/worldGen';
 import type { SpatialDungeon } from '@/world/dungeon-generator';
@@ -80,7 +80,7 @@ export const SeedState = trait(() => ({
 export const ChunkState = trait(() => ({
   currentChunkKey: '',
   currentChunkName: 'The Realm',
-  currentChunkType: 'WILD' as ChunkType,
+  currentChunkType: 'WILD' as LegacyChunkType,
   activeChunks: new Map<string, ChunkData>(),
   globalAABBs: [] as AABB[],
   globalInteractables: [] as Interactable[],

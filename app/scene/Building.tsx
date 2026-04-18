@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { BuildingArchetype } from '@/schemas/building.schema';
-import { hashString } from '@/utils/random';
+import { hashString } from '@/core';
 import { Model as Building1 } from './generated/village/building-1';
 import { Model as Building2 } from './generated/village/building-2';
 import { Model as Building3 } from './generated/village/building-3';

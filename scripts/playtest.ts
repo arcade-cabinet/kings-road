@@ -14,6 +14,7 @@
  * Usage: npx tsx scripts/playtest.ts [--seeds N] [--output path]
  */
 
+import { createRng } from '@/core';
 import {
   calculateMonsterDamage,
   calculatePlayerDamage,
@@ -23,7 +24,6 @@ import type { KingdomMap, Settlement } from '../src/schemas/kingdom.schema';
 import { KingdomConfigSchema } from '../src/schemas/kingdom.schema';
 import type { MonsterArchetype } from '../src/schemas/monster.schema';
 import type { QuestDefinition } from '../src/schemas/quest.schema';
-import { createRng } from '../src/utils/random';
 import { getDangerTier, getEncounterChance } from '../src/world/danger';
 import {
   generateKingdom,

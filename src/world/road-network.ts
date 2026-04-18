@@ -9,8 +9,8 @@
  * All functions are pure and deterministic from seed + terrain.
  */
 
+import { cyrb128, mulberry32 } from '@/core';
 import type { KingdomConfig, RoadType } from '@/schemas/kingdom.schema';
-import { cyrb128, mulberry32 } from '@/utils/random';
 import type { TerrainData, TerrainTile } from './terrain-gen';
 import { getTile } from './terrain-gen';
 

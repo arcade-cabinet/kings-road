@@ -35,7 +35,7 @@ import {
 import { recordCombatVictory } from '@/ecs/actions/quest';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import type { ActiveEncounter, SpawnedMonster } from '@/types/game';
-import { createRng } from '@/utils/random';
+import { createRng } from '@/core';
 import { CHUNK_SIZE } from '@/utils/worldGen';
 import { getDangerTier, getEncounterChance } from '@/world/danger';
 import {

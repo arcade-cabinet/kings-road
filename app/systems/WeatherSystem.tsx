@@ -24,7 +24,7 @@ import { useEnvironment } from '@/ecs/hooks/useGameSession';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import { getWorldState } from '@/ecs/actions/world';
 import { worldToGrid } from '@/utils/worldCoords';
-import { createRng } from '@/utils/random';
+import { createRng } from '@/core';
 import { getRegionAt } from '@/world/kingdom-gen';
 
 // ── Constants ────────────────────────────────────────────────────────────

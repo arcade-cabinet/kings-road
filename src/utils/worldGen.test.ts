@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { cyrb128, mulberry32 } from '@/core';
 import type { KingdomConfig } from '@/schemas/kingdom.schema';
 import { generateKingdom, getKingdomTile } from '@/world/kingdom-gen';
-import { cyrb128, mulberry32 } from './random';
 import {
   BLOCK_SIZE,
   CHUNK_SIZE,

@@ -27,7 +27,7 @@ import type {
   PlacedFeatureData,
   PlacedNPCData,
 } from '@/types/game';
-import { cyrb128, mulberry32 } from '@/utils/random';
+import { cyrb128, mulberry32 } from '@/core';
 import {
   BLOCK_SIZE,
   CHUNK_SIZE,
