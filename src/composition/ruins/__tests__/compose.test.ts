@@ -17,7 +17,12 @@ const MOCK_BIOME: BiomeConfig = {
     fogNear: 20,
     fogFar: 80,
   },
-  terrain: { heightmap: 'thornfield', materials: ['mossy-stone'] },
+  terrain: {
+    heightmap: 'thornfield',
+    scale: 1,
+    materials: ['mossy-stone'],
+    displacementScale: 0,
+  },
   foliage: { density: 0.6, species: [] },
   weather: { defaultState: 'fog_thick', states: [], transitionDuration: 10 },
   audio: { ambient: [], footstepMaterial: 'grass' },
