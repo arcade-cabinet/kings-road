@@ -1,9 +1,11 @@
 import * as THREE from 'three';
+import { assetUrl } from '@/lib/assets';
 
 /**
  * Texture types supported by the PBR material system.
  *
- * 'door' and 'crate' reuse the 'wood' PBR set.
+ * 'door' and 'crate' alias to 'wood' — the same cached material instance
+ * is returned. Callers that need to tint or mutate should `.clone()` it.
  * 'window' keeps a minimal canvas fallback — tiny illuminated panes don't
  * benefit from PBR and the emissive+gradient effect is better authored in
  * canvas for the diegetic glow.
@@ -25,18 +27,21 @@ type TextureType =
 // Source: Polyhaven CC0 textures at 1k resolution.
 // Assets: painted_plaster_wall, rustic_stone_wall_02, thatch_roof_angled,
 //         medieval_wood, red_dirt_mud_01, brown_mud_leaves_01, cobblestone_large_01
-const PBR_PATHS: Partial<Record<TextureType, string>> = {
-  plaster: '/textures/plaster',
-  stone_block: '/textures/stone_block',
-  thatch: '/textures/thatch',
-  wood: '/textures/wood',
-  // door and crate reuse wood maps
-  door: '/textures/wood',
-  crate: '/textures/wood',
-  road: '/textures/road',
-  grass: '/textures/grass',
-  cobblestone: '/textures/cobblestone',
+const PBR_DIRS: Partial<Record<TextureType, string>> = {
+  plaster: 'textures/plaster',
+  stone_block: 'textures/stone_block',
+  thatch: 'textures/thatch',
+  wood: 'textures/wood',
+  road: 'textures/road',
+  grass: 'textures/grass',
+  cobblestone: 'textures/cobblestone',
   // 'window' intentionally absent — uses canvas fallback below
+};
+
+// 'door' and 'crate' alias to 'wood' so the same material instance is shared.
+const TYPE_ALIAS: Partial<Record<TextureType, TextureType>> = {
+  door: 'wood',
+  crate: 'wood',
 };
 
 // ── Module-level texture loader and cache ────────────────────────────────────
@@ -48,7 +53,15 @@ function loadMap(path: string, colorSpace: THREE.ColorSpace): THREE.Texture {
   if (textureCache.has(key)) {
     return textureCache.get(key)!;
   }
-  const tex = loader.load(path);
+  const resolved = assetUrl(path);
+  const tex = loader.load(resolved, undefined, undefined, (err) => {
+    // Hard-fail to ErrorOverlay rather than silently render missing textures
+    throw new Error(
+      `Failed to load texture ${resolved}: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
+  });
   tex.colorSpace = colorSpace;
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
@@ -58,33 +71,36 @@ function loadMap(path: string, colorSpace: THREE.ColorSpace): THREE.Texture {
 }
 
 // ── PBR material cache ────────────────────────────────────────────────────────
-const pbrCache = new Map<string, THREE.MeshStandardMaterial>();
+const pbrCache = new Map<TextureType, THREE.MeshStandardMaterial>();
 
 /**
  * Load and return a cached MeshStandardMaterial backed by Polyhaven PBR maps.
- * Diffuse uses SRGBColorSpace; normal/roughness/ao use LinearSRGBColorSpace.
+ * Diffuse uses SRGBColorSpace; normal/roughness use NoColorSpace (per three.js
+ * recommendation — they are non-color data). aoMap is omitted here because
+ * three.js requires a second UV set (geometry.uv2) for aoMap; our procedurally-
+ * generated geometries only define a single UV set.
  *
  * For 'window', falls back to a canvas-drawn emissive texture (illuminated
- * panes). All other types use authored textures from public/textures/<type>/.
+ * panes). Aliased types ('door', 'crate') return the same cached material
+ * instance as 'wood' — clone before mutating.
  */
 export function loadPbrMaterial(type: TextureType): THREE.MeshStandardMaterial {
-  if (pbrCache.has(type)) {
-    return pbrCache.get(type)!;
-  }
+  const canonical = TYPE_ALIAS[type] ?? type;
+  const cached = pbrCache.get(canonical);
+  if (cached) return cached;
 
-  const dir = PBR_PATHS[type];
+  const dir = PBR_DIRS[canonical];
 
   if (!dir) {
     // Canvas fallback for 'window'
     const mat = buildWindowFallback();
-    pbrCache.set(type, mat);
+    pbrCache.set(canonical, mat);
     return mat;
   }
 
   const diffuse = loadMap(`${dir}/diffuse.jpg`, THREE.SRGBColorSpace);
-  const normal = loadMap(`${dir}/normal.jpg`, THREE.LinearSRGBColorSpace);
-  const roughness = loadMap(`${dir}/roughness.jpg`, THREE.LinearSRGBColorSpace);
-  const ao = loadMap(`${dir}/ao.jpg`, THREE.LinearSRGBColorSpace);
+  const normal = loadMap(`${dir}/normal.jpg`, THREE.NoColorSpace);
+  const roughness = loadMap(`${dir}/roughness.jpg`, THREE.NoColorSpace);
 
   const mat = new THREE.MeshStandardMaterial({
     map: diffuse,
@@ -92,11 +108,9 @@ export function loadPbrMaterial(type: TextureType): THREE.MeshStandardMaterial {
     roughnessMap: roughness,
     roughness: 1.0,
     metalness: 0.0,
-    aoMap: ao,
-    aoMapIntensity: 1.0,
   });
 
-  pbrCache.set(type, mat);
+  pbrCache.set(canonical, mat);
   return mat;
 }
 
@@ -107,7 +121,12 @@ function buildWindowFallback(): THREE.MeshStandardMaterial {
   const canvas = document.createElement('canvas');
   canvas.width = 128;
   canvas.height = 128;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error(
+      'Canvas 2D context is unavailable — cannot build window texture fallback',
+    );
+  }
 
   ctx.fillStyle = '#0a0a0a';
   ctx.fillRect(0, 0, 128, 128);
@@ -207,7 +226,7 @@ export function getMaterials() {
     groundTown: loadPbrMaterial('cobblestone'),
     groundWild: loadPbrMaterial('grass'),
     groundRoad: loadPbrMaterial('road'),
-    barrel: loadPbrMaterial('wood'),
+    barrel: loadPbrMaterial('wood').clone(),
     water: new THREE.MeshStandardMaterial({
       color: 0x2255aa,
       transparent: true,

@@ -58,12 +58,19 @@ describe('textures module', () => {
       expect(mat.metalness).toBe(0.0);
     });
 
-    it('door reuses wood PBR maps', () => {
+    it('door aliases to wood — same material instance and maps', () => {
       const wood = loadPbrMaterial('wood');
       const door = loadPbrMaterial('door');
-      // Both use the same underlying maps (same dir), but could be same object
-      expect(wood).toBeInstanceOf(THREE.MeshStandardMaterial);
-      expect(door).toBeInstanceOf(THREE.MeshStandardMaterial);
+      expect(door).toBe(wood);
+      expect(door.map).toBe(wood.map);
+      expect(door.normalMap).toBe(wood.normalMap);
+      expect(door.roughnessMap).toBe(wood.roughnessMap);
+    });
+
+    it('crate aliases to wood — same material instance', () => {
+      const wood = loadPbrMaterial('wood');
+      const crate = loadPbrMaterial('crate');
+      expect(crate).toBe(wood);
     });
   });
 
