@@ -3,7 +3,10 @@ import { AssetError } from '@/core';
 import { assetUrl } from '@/lib/assets';
 import { PBR_PALETTE } from './palette';
 
-const cache = new Map<string, THREE.MeshStandardMaterial>();
+// Cache stores the in-flight Promise so concurrent callers share one load.
+// Resolved: subsequent callers get the settled Promise (cheap).
+// Rejected: the .catch evicts the entry so a later retry fires a new load.
+const cache = new Map<string, Promise<THREE.MeshStandardMaterial>>();
 
 const textureLoader = new THREE.TextureLoader();
 
@@ -56,84 +59,79 @@ export interface LoadPbrMaterialOptions {
  * Throws AssetError if the id is not in the palette. Caches by id — repeat
  * calls with no options return the same shared instance.
  */
-export async function loadPbrMaterial(
+export function loadPbrMaterial(
   id: string,
   options: LoadPbrMaterialOptions = {},
 ): Promise<THREE.MeshStandardMaterial> {
   const cached = cache.get(id);
   if (cached) {
-    return applyOptions(cached, options);
+    return cached.then((mat) => applyOptions(mat, options));
   }
 
   const entry = PBR_PALETTE[id];
   if (!entry) {
-    throw new AssetError(`PBR material "${id}" not found in palette`);
+    return Promise.reject(
+      new AssetError(`PBR material "${id}" not found in palette`),
+    );
   }
 
   const { packPrefix } = entry;
 
-  const [colorMap, normalMap, roughnessMap] = await Promise.all([
+  const p = Promise.all([
     loadTexture(pbrUrl(id, packPrefix, '_Color.jpg'), THREE.SRGBColorSpace),
     loadTexture(pbrUrl(id, packPrefix, '_NormalGL.jpg')),
     loadTexture(pbrUrl(id, packPrefix, '_Roughness.jpg')),
-  ]);
+  ]).then(async ([colorMap, normalMap, roughnessMap]) => {
+    for (const map of [colorMap, normalMap, roughnessMap]) {
+      map.wrapS = THREE.RepeatWrapping;
+      map.wrapT = THREE.RepeatWrapping;
+    }
 
-  for (const map of [colorMap, normalMap, roughnessMap]) {
-    map.wrapS = THREE.RepeatWrapping;
-    map.wrapT = THREE.RepeatWrapping;
-  }
+    const mat = new THREE.MeshStandardMaterial({
+      map: colorMap,
+      normalMap,
+      roughnessMap,
+    });
 
-  const mat = new THREE.MeshStandardMaterial({
-    map: colorMap,
-    normalMap,
-    roughnessMap,
+    await Promise.all([
+      loadTexture(pbrUrl(id, packPrefix, '_Displacement.jpg'))
+        .then((tex) => {
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          mat.displacementMap = tex;
+          mat.displacementScale = 0.0;
+        })
+        .catch(() => {
+          /* displacement is optional */
+        }),
+      loadTexture(pbrUrl(id, packPrefix, '_AmbientOcclusion.jpg'))
+        .then((tex) => {
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          mat.aoMap = tex;
+        })
+        .catch(() => {
+          /* AO is optional */
+        }),
+      loadTexture(pbrUrl(id, packPrefix, '_Metalness.jpg'))
+        .then((tex) => {
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          mat.metalnessMap = tex;
+          mat.metalness = 1.0;
+        })
+        .catch(() => {
+          /* Metalness is optional — non-metals won't have this map */
+        }),
+    ]);
+
+    mat.needsUpdate = true;
+    return mat;
   });
 
-  const optionalLoads: Promise<void>[] = [];
-
-  optionalLoads.push(
-    loadTexture(pbrUrl(id, packPrefix, '_Displacement.jpg'))
-      .then((tex) => {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        mat.displacementMap = tex;
-        mat.displacementScale = 0.0;
-      })
-      .catch(() => {
-        /* displacement is optional */
-      }),
-  );
-
-  optionalLoads.push(
-    loadTexture(pbrUrl(id, packPrefix, '_AmbientOcclusion.jpg'))
-      .then((tex) => {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        mat.aoMap = tex;
-      })
-      .catch(() => {
-        /* AO is optional */
-      }),
-  );
-
-  optionalLoads.push(
-    loadTexture(pbrUrl(id, packPrefix, '_Metalness.jpg'))
-      .then((tex) => {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        mat.metalnessMap = tex;
-        mat.metalness = 1.0;
-      })
-      .catch(() => {
-        /* Metalness is optional — non-metals won't have this map */
-      }),
-  );
-
-  await Promise.all(optionalLoads);
-
-  mat.needsUpdate = true;
-  cache.set(id, mat);
-  return applyOptions(mat, options);
+  p.catch(() => cache.delete(id));
+  cache.set(id, p);
+  return p.then((mat) => applyOptions(mat, options));
 }
 
 function applyOptions(

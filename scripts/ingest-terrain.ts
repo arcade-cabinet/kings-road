@@ -21,6 +21,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateEntryId } from './_ingest-helpers.js';
 
 interface ManifestEntry {
   id: string;
@@ -28,6 +29,7 @@ interface ManifestEntry {
 }
 
 function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
+  validateEntryId(entry.id);
   const outDir = path.join(outputRoot, entry.id);
 
   try {

@@ -30,6 +30,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateEntryId } from './_ingest-helpers.js';
 
 const ASSETS_ROOT = process.env.KINGS_ROAD_ASSETS ?? '/Volumes/home/assets';
 
@@ -99,6 +100,7 @@ export function aliasHdr(outDir: string, id: string): void {
 }
 
 function ingestEntry(entry: ManifestEntry, outputRoot: string): void {
+  validateEntryId(entry.id);
   const outDir = path.join(outputRoot, entry.id);
   const absSource = resolveSourceDir(entry.sourceDir);
 
