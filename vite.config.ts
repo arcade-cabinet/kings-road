@@ -33,7 +33,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     target: 'es2022',
-    chunkSizeWarningLimit: 2000,
+    chunkSizeWarningLimit: 3000,
     rollupOptions: {
       output: {
         manualChunks: {
