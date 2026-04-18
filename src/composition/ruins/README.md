@@ -19,6 +19,7 @@ domain: technical
 - `RUIN_ASSETS`, `getAssetsByCategory` — asset catalog helpers
 
 **Testing:**
+
 ```bash
 pnpm test src/composition/ruins
 ```

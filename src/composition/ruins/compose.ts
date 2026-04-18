@@ -77,6 +77,7 @@ export function composeRuins(
     const { min, max } = CATEGORY_COUNTS[category];
     const count = min + Math.floor(rng() * (max - min + 1));
     const assetIds = getAssetsByCategory(category);
+    if (assetIds.length === 0) continue;
 
     const minSpacing =
       category === 'scatter' ? 1.5 : category === 'graves' ? 2 : 3;

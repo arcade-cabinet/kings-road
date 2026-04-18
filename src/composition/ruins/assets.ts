@@ -209,13 +209,16 @@ export function weightedPick(
   if (ids.length === 0) {
     throw new Error('weightedPick: empty asset array');
   }
-  const total = ids.reduce(
-    (sum, id) => sum + (RUIN_ASSETS[id]?.weight ?? 1),
-    0,
-  );
+  const invalidIds = ids.filter((id) => !RUIN_ASSETS[id]);
+  if (invalidIds.length > 0) {
+    throw new Error(
+      `weightedPick: unknown asset ids: ${invalidIds.join(', ')}`,
+    );
+  }
+  const total = ids.reduce((sum, id) => sum + RUIN_ASSETS[id].weight, 0);
   let r = rng() * total;
   for (const id of ids) {
-    r -= RUIN_ASSETS[id]?.weight ?? 1;
+    r -= RUIN_ASSETS[id].weight;
     if (r <= 0) return id;
   }
   return ids[ids.length - 1];

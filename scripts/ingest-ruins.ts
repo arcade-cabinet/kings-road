@@ -15,7 +15,7 @@ import * as path from 'node:path';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
-const NAS = '/Volumes/home/assets';
+const NAS = process.env.ASSETS_NAS_PATH ?? '/Volumes/home/assets';
 const OUT_DIR = path.resolve('public/assets/ruins');
 
 interface IngestEntry {
@@ -188,6 +188,11 @@ async function main(): Promise<void> {
     const src = path.join(NAS, entry.src);
     const dest = path.join(OUT_DIR, entry.dest);
 
+    if (!dest.startsWith(OUT_DIR + path.sep) && dest !== OUT_DIR) {
+      console.error(`  INVALID dest path (traversal attempt?): ${entry.dest}`);
+      process.exit(1);
+    }
+
     if (!existsSync(src)) {
       console.warn(`  MISSING: ${entry.src}`);
       missing++;
@@ -204,8 +209,8 @@ async function main(): Promise<void> {
     } else {
       copyFileSync(src, dest);
       console.log(`  copied ${entry.dest}`);
+      copied++;
     }
-    copied++;
   }
 
   console.log(
