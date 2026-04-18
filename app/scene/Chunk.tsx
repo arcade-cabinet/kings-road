@@ -202,10 +202,6 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
   const { cx, cz, key, type, placedBuildings, npcBlueprints } = chunkData;
   const hasConfigTown =
     type === 'TOWN' && placedBuildings && placedBuildings.length > 0;
-  const _rng = useMemo(
-    () => mulberry32(cyrb128(seedPhrase + key)),
-    [seedPhrase, key],
-  );
   const materials = useMemo(() => getMaterials(), []);
 
   const oX = cx * CHUNK_SIZE;
@@ -613,8 +609,12 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
       {/* Bushes — authored GLB */}
       <GlbInstancer glb="nature/bush05.glb" items={meshData.bush} />
 
-      {/* Dead trees — reuse tree07 with dark tint via material override */}
-      <GlbInstancer glb="nature/tree07.glb" items={meshData.deadTree} />
+      {/* Dead trees — reuse tree07 GLB with the dead-tree Koota material (tinted) */}
+      <GlbInstancer
+        glb="nature/tree07.glb"
+        items={meshData.deadTree}
+        materialOverride={materials.deadTree}
+      />
 
       {/* Boulders — authored GLB */}
       <GlbInstancer glb="nature/rocks.glb" items={meshData.boulder} />
