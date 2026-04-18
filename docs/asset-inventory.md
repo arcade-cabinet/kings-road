@@ -1,13 +1,15 @@
 ---
-title: Asset Inventory — Pending Integration
+title: Asset Inventory — Historical (Pending Integration Packs)
 updated: 2026-04-18
-status: current
+status: archived
 domain: creative
 ---
 
-# Asset Inventory — Pending Integration
+# Asset Inventory — Historical
 
-All packs live in `pending-integration/` (gitignored). Extracted to `pending-integration/extracted/<pack>/`.
+> **Archived 2026-04-18**: all packs listed below were integrated into `public/assets/` during the v1 beta work (see v1.3.0). This file is kept as a historical record of the source packs, their structure, and priority rankings used during triage. For the current authoritative list of shipped assets, browse `public/assets/` directly or see the v1.3.0 release notes.
+
+All packs lived in `pending-integration/` (gitignored). Extracted to `pending-integration/extracted/<pack>/`.
 **Priority tiers:** P0 = game-blocker (no gear exists yet), P1 = immediate value, P2 = nice-to-have, P3 = defer.
 
 ---

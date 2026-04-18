@@ -42,13 +42,14 @@ King's Road is a config-driven RPG engine. Content is authored as JSON, validate
 ├──────────────────────────────────────────────────────────────────┤
 │                        UI Layer (diegetic-first)                  │
 │  MainMenu | LoadingOverlay | DialogueBox | PauseMenu             │
-│  Diegetic HUD (vignette health, belt inventory, manuscript HUD)  │
-│  MobileControls (virtual joystick + action buttons)              │
+│  DiegeticLayer (vignette, breath fog, heartbeat, belt pips)      │
+│  TouchOverlay (virtual joystick + action buttons on mobile)      │
 ├──────────────────────────────────────────────────────────────────┤
 │                        State Layer                                 │
-│  Zustand: gameStore, worldStore, questStore, combatStore,        │
-│           inventoryStore, settingsStore                           │
-│  (Migrating to Koota — see docs/plans/2026-04-18-koota-migration.md) │
+│  Koota ECS session traits (single source of truth)               │
+│  - session-game, session-world, session-quest, session-combat,   │
+│    session-inventory, session-settings                            │
+│  (Zustand purged in v1.3.0; zustand dependency removed)          │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -70,7 +71,7 @@ The validation pipeline (`scripts/validate-content.ts`) runs before deployment:
 
 ### 3. ECS-First Game State
 
-New game state uses Koota ECS traits, not Zustand. The Zustand stores are legacy from the original prototype and are being migrated (see `docs/plans/2026-04-18-koota-migration.md`). Koota traits are composable, queryable, and avoid the React re-render overhead of store subscriptions.
+All game state lives in Koota ECS traits on a singleton session entity. Koota traits are composable, queryable, and avoid the React re-render overhead of store subscriptions. The Zustand migration completed in v1.3.0 and the `zustand` dependency was removed entirely. Actions mutate traits through imperative helpers in `src/ecs/actions/`; React components read via `useTrait`-backed hooks in `src/ecs/hooks/`.
 
 ### 4. Instanced Rendering
 
@@ -136,13 +137,14 @@ compile-content-db.ts → public/game.db (SQLite)
 ### Runtime Input → State → Render
 
 ```
-┌──────────────┐     reads      ┌──────────────┐
-│   useInput   │ ────────────→  │  Game Store  │
-│  (src/hooks) │     writes     │  (Zustand)   │
-└──────────────┘ ←────────────  └──────────────┘
-                                       ↑
-                           reads/writes │
-                                       ↓
+┌──────────────┐   write actions   ┌──────────────────┐
+│   useInput   │ ────────────────→ │  Koota Session   │
+│  (src/hooks) │                    │  Traits          │
+└──────────────┘ ←───────────────── │  (src/ecs/*)     │
+                    useTrait reads  └──────────────────┘
+                                            ↑
+                              reads/writes  │
+                                            ↓
 ┌──────────────┐                ┌──────────────┐
 │    Player    │  collisions    │    Chunk     │
 │  Controller  │ ←──────────→  │   Manager    │
@@ -241,14 +243,24 @@ src/                                 # Logical subpackages (no game/ nesting)
 │   ├── load-content-db.ts           # DB initialization at runtime
 │   └── save-service.ts              # Save slot management
 │
-├── stores/                          # Zustand stores (being migrated to Koota)
-│   ├── gameStore.ts                 # Core game state (position, time, seed)
-│   ├── worldStore.ts                # Chunk data, AABBs, interactables
-│   ├── questStore.ts                # Active/completed quests
-│   ├── combatStore.ts               # Combat state
-│   ├── inventoryStore.ts            # Player inventory
-│   └── settingsStore.ts             # Audio/display/control settings (localStorage)
+├── ecs/                             # Koota ECS — single source of truth for state
+│   ├── world.ts                     # gameWorld + getSessionEntity()
+│   ├── item-registry.ts             # Static item-def lookup
+│   ├── traits/                      # Trait definitions per domain
+│   │   ├── session-game.ts          # GameFlags, PlayerState, CameraState, ...
+│   │   ├── session-world.ts         # Kingdom/world generation state
+│   │   ├── session-quest.ts         # Active/completed/triggered quests
+│   │   ├── session-combat.ts        # Encounter + damage popups
+│   │   ├── session-inventory.ts     # Items, gold, equipment
+│   │   ├── session-settings.ts      # Audio/display preferences
+│   │   └── (ecs runtime traits: player, npc, pacing, spatial, inventory, quest)
+│   ├── actions/                     # Imperative write API (mirrors old Zustand actions)
+│   │   ├── game.ts, world.ts, quest.ts, combat-ui.ts,
+│   │   ├── inventory.ts, inventory-ui.ts, settings.ts
+│   └── hooks/                       # Reactive read API (useTrait wrappers)
+│       ├── useGameSession.ts, useWorldSession.ts
 │
+
 ├── types/
 │   └── game.ts                      # Core shared TypeScript types
 │
@@ -267,11 +279,9 @@ src/                                 # Logical subpackages (no game/ nesting)
 │   └── quest-resolver.ts            # Quest trigger evaluation
 │
 ├── factories/                       # Entity factories
-│   ├── building-factory.ts          # BuildingArchetype → Three.js geometry
-│   ├── npc-factory.ts               # NPCDefinition → chibi entity
-│   ├── monster-factory.ts           # MonsterArchetype → monster entity
-│   ├── chibi-generator.ts           # Chibi character geometry
-│   └── face-texture.ts              # Procedural NPC face textures
+│   └── building-factory.ts          # BuildingArchetype → Three.js geometry
+│     (NPC/monster appearance is 100% authored GLBs — see app/scene/NPC.tsx,
+│      app/scene/Monster.tsx, content/npcs/, content/monsters/)
 │
 ├── audio/
 │   ├── ambient-mixer.ts             # Tone.js ambient layer management
