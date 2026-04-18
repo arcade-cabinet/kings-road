@@ -24,7 +24,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
       'A small cairn beside the road. Someone has placed a dried flower atop it.',
       "Three stones. Carved into the largest: 'Here I rested. Here I stayed.'",
     ],
-    biomeAffinity: ['thornfield'],
+    biomeAffinity: ['hills'],
     weight: 3,
   },
   {
@@ -35,7 +35,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
       'An iron blade, blade-down in rotting wood. The grip has crumbled away.',
       'Someone planted their sword here and never returned for it.',
     ],
-    biomeAffinity: ['thornfield'],
+    biomeAffinity: ['hills'],
     weight: 2,
   },
   {
@@ -57,7 +57,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
       'Dead flowers tied with a strip of cloth. Left recently, or years ago.',
       'Someone still comes here. The flowers are dry but not ancient.',
     ],
-    biomeAffinity: ['thornfield'],
+    biomeAffinity: ['hills'],
     weight: 3,
   },
   {
@@ -68,7 +68,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
       "A child's wooden doll, face worn smooth. Left in a hurry, perhaps.",
       'A tiny wagon wheel, no wagon. Someone once played here.',
     ],
-    biomeAffinity: ['thornfield', 'ashford'],
+    biomeAffinity: ['hills', 'meadow'],
     weight: 2,
   },
   {
@@ -79,7 +79,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
       'Scratch marks in groups of five, then a long gap, then three more alone.',
       'Someone counted days here. The last mark is deeper than the rest.',
     ],
-    biomeAffinity: ['thornfield'],
+    biomeAffinity: ['hills'],
     weight: 2,
   },
   {
@@ -90,7 +90,7 @@ export const STORY_PROP_CATALOG: StoryPropDef[] = [
       'Half a plough. The other half is somewhere in the tall grass.',
       'An abandoned plough, blade rusted orange. The field was never finished.',
     ],
-    biomeAffinity: ['thornfield', 'ashford'],
+    biomeAffinity: ['hills', 'meadow'],
     weight: 2,
   },
   {

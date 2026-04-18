@@ -23,40 +23,32 @@ describe('STORY_PROP_CATALOG', () => {
 });
 
 describe('composeStoryProps', () => {
-  it('returns between 4 and 12 placements for a 2000m Thornfield segment', () => {
-    const result = composeStoryProps(
-      'thornfield',
-      THORNFIELD_RANGE,
-      'test-seed',
-    );
+  it('returns at least 1 and at most 12 placements for a 2000m segment', () => {
+    const result = composeStoryProps('hills', THORNFIELD_RANGE, 'test-seed');
     expect(result.length).toBeGreaterThanOrEqual(1);
     expect(result.length).toBeLessThanOrEqual(12);
   });
 
   it('determinism — same inputs produce identical output', () => {
-    const a = composeStoryProps('thornfield', THORNFIELD_RANGE, 'seed-det');
-    const b = composeStoryProps('thornfield', THORNFIELD_RANGE, 'seed-det');
+    const a = composeStoryProps('hills', THORNFIELD_RANGE, 'seed-det');
+    const b = composeStoryProps('hills', THORNFIELD_RANGE, 'seed-det');
     expect(a).toEqual(b);
   });
 
   it('different seeds produce different output', () => {
-    const a = composeStoryProps('thornfield', THORNFIELD_RANGE, 'seed-1');
-    const b = composeStoryProps('thornfield', THORNFIELD_RANGE, 'seed-2');
+    const a = composeStoryProps('hills', THORNFIELD_RANGE, 'seed-1');
+    const b = composeStoryProps('hills', THORNFIELD_RANGE, 'seed-2');
     expect(a).not.toEqual(b);
   });
 
   it('different biomes produce different output', () => {
-    const a = composeStoryProps('thornfield', THORNFIELD_RANGE, 'same');
-    const b = composeStoryProps('ashford', THORNFIELD_RANGE, 'same');
+    const a = composeStoryProps('hills', THORNFIELD_RANGE, 'same');
+    const b = composeStoryProps('meadow', THORNFIELD_RANGE, 'same');
     expect(a).not.toEqual(b);
   });
 
   it('all placements have narrativeText', () => {
-    const result = composeStoryProps(
-      'thornfield',
-      THORNFIELD_RANGE,
-      'text-check',
-    );
+    const result = composeStoryProps('hills', THORNFIELD_RANGE, 'text-check');
     for (const p of result) {
       expect(typeof p.narrativeText).toBe('string');
       expect(p.narrativeText?.length ?? 0).toBeGreaterThan(0);
@@ -64,7 +56,7 @@ describe('composeStoryProps', () => {
   });
 
   it('no Three.js objects in output', () => {
-    const result = composeStoryProps('thornfield', THORNFIELD_RANGE, 'purity');
+    const result = composeStoryProps('hills', THORNFIELD_RANGE, 'purity');
     for (const p of result) {
       expect(typeof p.position.x).toBe('number');
       expect(typeof p.position.z).toBe('number');
@@ -74,7 +66,7 @@ describe('composeStoryProps', () => {
   });
 
   it('positions z-coordinate within the road distance range', () => {
-    const result = composeStoryProps('thornfield', THORNFIELD_RANGE, 'bounds');
+    const result = composeStoryProps('hills', THORNFIELD_RANGE, 'bounds');
     for (const p of result) {
       expect(p.position.z).toBeGreaterThanOrEqual(THORNFIELD_RANGE[0]);
       expect(p.position.z).toBeLessThanOrEqual(THORNFIELD_RANGE[1]);

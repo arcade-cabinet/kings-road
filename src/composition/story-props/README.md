@@ -7,7 +7,7 @@ domain: technical
 
 # src/composition/story-props
 
-**Intent:** Narrative seed layer compositor. Places 1-3 authored story-prop archetypes per 500m of road, seeded deterministically per biome + road segment. Each placement carries optional narrative text for future dialogue/popup systems.
+**Intent:** Narrative seed layer compositor. Places ~1 authored story-prop archetype per 500m of road (0.7–1.3 with jitter; minimum 1 per call), seeded deterministically per biome + road segment. Each placement carries optional narrative text for future dialogue/popup systems.
 
 **Owner:** Team Composition
 

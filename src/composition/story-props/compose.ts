@@ -3,7 +3,7 @@ import type { StoryPropDef } from './catalog';
 import { getPropDefsForBiome } from './catalog';
 import type { StoryPropPlacement } from './types';
 
-/** One prop per 500m of road on average, 1-3 per segment. */
+/** ~1 prop per 500m of road on average (0.7–1.3 with jitter); minimum 1 per call. */
 const DENSITY_PER_500M = 1;
 const MIN_SPACING_M = 80;
 
