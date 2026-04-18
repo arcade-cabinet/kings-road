@@ -46,3 +46,4 @@ pending-integration/
 .claude/state/
 .claude/hooks/task-batch-flush.sh
 .claude/worktrees/
+.claude/scheduled_tasks.lock
