@@ -20,6 +20,7 @@ import {
   InputLegacy,
   InteractionState,
   PlayerState,
+  PlayTime,
   SeedState,
   type WeatherState,
 } from '@/ecs/traits/session-game';
@@ -438,6 +439,8 @@ export function resetGame(): void {
     dialogueName: '',
     dialogueText: '',
   });
+  const pt = ensure(PlayTime);
+  pt.set(PlayTime, { playTimeSeconds: 0 });
 }
 
 export function startGame(
@@ -480,6 +483,26 @@ export function setJoystick(
 export function setMouseDown(down: boolean): void {
   const e = ensure(InputLegacy);
   e.set(InputLegacy, { ...e.get(InputLegacy)!, mouseDown: down });
+}
+
+// ── Play time ────────────────────────────────────────────────────────────
+export function getPlayTimeSeconds(): number {
+  return read(PlayTime).playTimeSeconds;
+}
+
+/**
+ * Advance the play-time counter. Call once per frame from a useFrame hook
+ * while gameActive && !paused && !isDead. delta is seconds.
+ */
+export function tickPlayTime(delta: number): void {
+  const e = ensure(PlayTime);
+  const cur = e.get(PlayTime)!;
+  e.set(PlayTime, { playTimeSeconds: cur.playTimeSeconds + delta });
+}
+
+export function setPlayTimeSeconds(seconds: number): void {
+  const e = ensure(PlayTime);
+  e.set(PlayTime, { playTimeSeconds: seconds });
 }
 
 // ── Snapshot for save service ───────────────────────────────────────────
