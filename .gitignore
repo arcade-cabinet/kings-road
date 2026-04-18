@@ -29,4 +29,10 @@ kings-road/
 pending-integration/*.zip
 pending-integration/*.ZIP
 
-.remember/
+# .remember/ is Claude's persistent memory — intentionally tracked
+.remember/logs/
+.remember/tmp/
+
+# Claude Code task-batch state and compaction hook
+.claude/state/
+.claude/hooks/task-batch-flush.sh
