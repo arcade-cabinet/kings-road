@@ -1,0 +1,50 @@
+{
+  "id": "moor",
+  "name": "Ravensgate Moors",
+  "description": "Boggy moorland with standing stones and persistent mist.",
+  "lighting": {
+    "hdri": "overcast-grey",
+    "ambientColor": "#506070",
+    "ambientIntensity": 0.3,
+    "directionalColor": "#a0b0c0",
+    "directionalIntensity": 0.4,
+    "fogColor": "#708090",
+    "fogNear": 15,
+    "fogFar": 100,
+    "fogDensity": 0.012
+  },
+  "terrain": {
+    "heightmap": "moor-flat",
+    "scale": 1.0,
+    "materials": ["boggy-peat", "heather", "wet-mud"],
+    "displacementScale": 0.05
+  },
+  "foliage": {
+    "density": 0.2,
+    "species": [
+      { "assetId": "heather-bush", "density": 0.6, "clusterRadius": 5 },
+      { "assetId": "standing-stone", "density": 0.05 },
+      { "assetId": "bog-grass", "density": 0.35, "clusterRadius": 3 }
+    ],
+    "groundCover": ["heather", "peat-moss", "bog-grass"]
+  },
+  "weather": {
+    "defaultState": "misty",
+    "states": [
+      { "id": "misty", "probability": 0.65, "fogMultiplier": 2.5, "windStrength": 0.15, "precipitationType": "none", "precipitationDensity": 0 },
+      { "id": "drizzle", "probability": 0.25, "fogMultiplier": 1.8, "windStrength": 0.3, "precipitationType": "rain", "precipitationDensity": 0.25 },
+      { "id": "clear", "probability": 0.1, "fogMultiplier": 0.8, "windStrength": 0.1, "precipitationType": "none", "precipitationDensity": 0 }
+    ],
+    "transitionDuration": 8
+  },
+  "audio": {
+    "ambient": ["wind-moor", "distant-crows", "bog-sounds"],
+    "footstepMaterial": "boggy-ground"
+  },
+  "monsterPool": ["bog-wraith", "moor-hound", "bandit"],
+  "playerModifiers": {
+    "staminaDrainMultiplier": 1.2,
+    "speedMultiplier": 0.88,
+    "visibilityRadius": 45
+  }
+}
