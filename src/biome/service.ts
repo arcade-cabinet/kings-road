@@ -103,6 +103,35 @@ export const BiomeService = {
   },
 
   /**
+   * Resolve the road-region enclosing the given distance and return its
+   * biome id + [startDistance, endDistance] bounds. Used by transition
+   * cross-fade math, which needs boundary positions, not just biome id.
+   */
+  getCurrentRegionBounds(
+    distanceFromStart: number,
+  ): { biomeId: string; startDistance: number; endDistance: number } | null {
+    if (!roadSpine?.regions) return null;
+    const { anchors, regions, totalDistance } = roadSpine;
+    const anchorDistance = new Map<string, number>(
+      anchors.map((a) => [a.id, a.distanceFromStart]),
+    );
+    const clamped = Math.max(0, Math.min(distanceFromStart, totalDistance));
+    for (const region of regions) {
+      const startDistance = anchorDistance.get(region.anchorRange[0]) ?? 0;
+      const endDistance =
+        anchorDistance.get(region.anchorRange[1]) ?? totalDistance;
+      if (clamped >= startDistance && clamped < endDistance) {
+        return {
+          biomeId: normalizeRegionBiome(region.biome),
+          startDistance,
+          endDistance,
+        };
+      }
+    }
+    return null;
+  },
+
+  /**
    * Return neighbor biome ids adjacent to the given biome in road order.
    * Returns up to two neighbors: [previous, next].
    */

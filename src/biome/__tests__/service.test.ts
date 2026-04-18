@@ -24,7 +24,7 @@ const TEST_SPINE = {
       anchorRange: ['anchor-01', 'anchor-02'] as [string, string],
     },
     {
-      biome: 'HILLS',
+      biome: 'THORNFIELD',
       anchorRange: ['anchor-02', 'anchor-03'] as [string, string],
     },
   ],
@@ -69,9 +69,9 @@ describe('BiomeService.getCurrentBiome', () => {
     expect(biome.id).toBe('forest');
   });
 
-  it('returns hills (thornfield) for distance in third region', () => {
+  it('returns thornfield for distance in third region', () => {
     const biome = BiomeService.getCurrentBiome(14000);
-    expect(biome.id).toBe('hills');
+    expect(biome.id).toBe('thornfield');
   });
 });
 
@@ -84,6 +84,6 @@ describe('BiomeService.getNeighbors', () => {
   it('returns correct neighbor for middle biome', () => {
     const [prev, next] = BiomeService.getNeighbors('forest');
     expect(prev).toBe('meadow');
-    expect(next).toBe('hills');
+    expect(next).toBe('thornfield');
   });
 });
