@@ -44,7 +44,9 @@ async function inspect(path: string): Promise<void> {
 async function main(): Promise<void> {
   const target = process.argv[2];
   if (!target) {
-    console.error('Usage: npx tsx scripts/inspect-glb-pack.ts <path-to-glb-or-dir>');
+    console.error(
+      'Usage: npx tsx scripts/inspect-glb-pack.ts <path-to-glb-or-dir>',
+    );
     process.exit(1);
   }
   const st = statSync(target);

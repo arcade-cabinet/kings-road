@@ -8,7 +8,7 @@
  * Usage: npx tsx scripts/bulk-viewmodel-items.ts
  */
 
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import * as path from 'node:path';
 
 const ITEMS_DIR = path.resolve('src/content/items');
@@ -25,7 +25,8 @@ interface ItemJson {
 type HandPose = 'grip' | 'hold' | 'pinch' | 'open';
 
 function pickGlb(item: ItemJson): { glb: string; handPose: HandPose } | null {
-  const desc = `${item.id} ${item.name} ${item.type} ${item.equipSlot ?? ''}`.toLowerCase();
+  const desc =
+    `${item.id} ${item.name} ${item.type} ${item.equipSlot ?? ''}`.toLowerCase();
 
   if (/sword|branch|staff|wand/.test(desc)) {
     return { glb: '/assets/items/Sword-transformed.glb', handPose: 'grip' };
@@ -42,7 +43,11 @@ function pickGlb(item: ItemJson): { glb: string; handPose: HandPose } | null {
   if (/potion|salve|draught|antidote|elixir/.test(desc)) {
     return { glb: '/assets/items/bottles.glb', handPose: 'grip' };
   }
-  if (/herb|leaf|moss|thyme|yarrow|comfrey|grailbloom|windcrown|silverleaf|shadowmoss|rare_herb/.test(desc)) {
+  if (
+    /herb|leaf|moss|thyme|yarrow|comfrey|grailbloom|windcrown|silverleaf|shadowmoss|rare_herb/.test(
+      desc,
+    )
+  ) {
     return { glb: '/assets/items/bottles.glb', handPose: 'pinch' };
   }
   if (/stew|ration|food|bread/.test(desc)) {

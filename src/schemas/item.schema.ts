@@ -47,10 +47,7 @@ export const ViewmodelSchema = z.object({
   /** Path relative to public/ root, e.g. '/assets/weapons/knife-1.glb' */
   glb: z
     .string()
-    .regex(
-      /^\/assets\/.+\.glb$/,
-      'glb must be a /assets/**/*.glb path',
-    ),
+    .regex(/^\/assets\/.+\.glb$/, 'glb must be a /assets/**/*.glb path'),
   /** How the hand rig is posed when holding this weapon */
   handPose: HandPose,
   /** Scale factor for the weapon mesh in viewmodel space (default 1) */
