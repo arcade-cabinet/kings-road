@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { AssetError } from '@/core';
 import { PBR_PALETTE } from './palette';
 
+let textureLoadCallCount = 0;
+
 vi.mock('@/lib/assets', () => ({
   assetUrl: (path: string) => path,
 }));
@@ -17,6 +19,7 @@ vi.mock('three', async (importOriginal) => {
       _onProgress: unknown,
       onError: (e: unknown) => void,
     ) {
+      textureLoadCallCount++;
       if (
         url.includes('_AmbientOcclusion') ||
         url.includes('_Displacement') ||
@@ -32,8 +35,9 @@ vi.mock('three', async (importOriginal) => {
   return { ...actual, TextureLoader: MockTextureLoader };
 });
 
-// Register fixture material with AmbientCG packPrefix convention
+// Register fixture materials before importing loader.
 PBR_PALETTE['test-stone'] = { packPrefix: 'TestStone001' };
+PBR_PALETTE['test-granite'] = { packPrefix: 'TestGranite001' };
 
 // Import loader after mocks and palette mutations are in place
 const { loadPbrMaterial } = await import('./loader');
@@ -94,5 +98,19 @@ describe('loadPbrMaterial', () => {
     const a = await loadPbrMaterial('test-stone');
     const b = await loadPbrMaterial('test-stone', { displacementScale: 0 });
     expect(b).toBe(a);
+  });
+
+  it('concurrent calls share one load (no duplicate texture fetches)', async () => {
+    // Use a fresh id that no prior test has loaded so the cache is cold.
+    textureLoadCallCount = 0;
+    const [a, b] = await Promise.all([
+      loadPbrMaterial('test-granite'),
+      loadPbrMaterial('test-granite'),
+    ]);
+    // Both resolve to the same material instance.
+    expect(a).toBe(b);
+    // One load = 3 required maps (Color + Normal + Roughness) + 3 optional attempts.
+    // Two loads would be 12. Any count <= 6 proves deduplication.
+    expect(textureLoadCallCount).toBeLessThanOrEqual(6);
   });
 });
