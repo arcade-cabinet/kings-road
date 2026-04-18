@@ -92,4 +92,28 @@ describe('computeBiomeTransition', () => {
     expect(state?.to.id).toBe('thornfield');
     expect(state?.t).toBeCloseTo(0.5, 5);
   });
+
+  it('returns null at a boundary between two regions sharing a biome id', () => {
+    // A spine where the same biome (meadow) occupies two adjacent regions —
+    // cross-fading a biome with itself is identity, so transition math
+    // should short-circuit and return null instead of a from===to blend state.
+    BiomeService.init([meadow, forest, thornfield], {
+      totalDistance: 30000,
+      anchors: [
+        { id: 'a0', distanceFromStart: 0 },
+        { id: 'a1', distanceFromStart: 6000 },
+        { id: 'a2', distanceFromStart: 12000 },
+      ],
+      regions: [
+        { biome: 'MEADOW', anchorRange: ['a0', 'a1'] as [string, string] },
+        { biome: 'MEADOW', anchorRange: ['a1', 'a2'] as [string, string] },
+      ],
+    });
+    // Leading edge of first meadow region — neighbor is meadow.
+    expect(computeBiomeTransition(5900, TRANSITION)).toBeNull();
+    // Boundary itself — falls into second region, trailing edge is meadow.
+    expect(computeBiomeTransition(6000, TRANSITION)).toBeNull();
+    // Trailing edge of second meadow region — previous neighbor is meadow.
+    expect(computeBiomeTransition(6100, TRANSITION)).toBeNull();
+  });
 });

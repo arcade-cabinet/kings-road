@@ -29,8 +29,8 @@ import type {
   ActiveEncounter,
   ChunkData,
   ChunkDelta,
+  ChunkRoleTag,
   Interactable,
-  LegacyChunkType,
 } from '@/types/game';
 import { PLAYER_HEIGHT } from '@/utils/worldGen';
 
@@ -64,7 +64,7 @@ const DEFAULT_SEED = { seedPhrase: '' };
 const DEFAULT_CHUNKS: {
   currentChunkKey: string;
   currentChunkName: string;
-  currentChunkType: LegacyChunkType;
+  currentChunkType: ChunkRoleTag;
   activeChunks: Map<string, ChunkData>;
   globalAABBs: AABB[];
   globalInteractables: Interactable[];

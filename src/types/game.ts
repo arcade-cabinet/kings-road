@@ -32,12 +32,17 @@ export interface Interactable {
 }
 
 /**
- * @deprecated Pre-biome chunk tag. The canonical chunk-type union lives in
- * `@/core` and is biome-aligned (meadow, forest, thornfield, town, dungeon,
- * ...). This legacy union stays until ecs/session traits + worldGen are
- * migrated to biome ids — see docs/architecture/FUTURE_IMPROVEMENTS.md.
+ * Role tag describing what a chunk *functionally is* — orthogonal to the
+ * biome (terrain) tag from `@/core`'s `ChunkType`. `ChunkRoleTag` answers
+ * "is this a town / road / dungeon / wilderness chunk?"; `ChunkType`
+ * answers "what biome?" (meadow, forest, thornfield, ...). Both matter
+ * simultaneously: a road tile passes through a biome, and code like
+ * `src/world/danger.ts` reads the role tag to decide encounter rates,
+ * while the terrain renderer reads the biome. See
+ * docs/architecture/FUTURE_IMPROVEMENTS.md for the rationale against
+ * collapsing them.
  */
-export type LegacyChunkType = 'WILD' | 'TOWN' | 'DUNGEON' | 'ROAD';
+export type ChunkRoleTag = 'WILD' | 'TOWN' | 'DUNGEON' | 'ROAD';
 
 /** A building placed in the world via the town layout system */
 export interface PlacedBuildingData {
@@ -71,7 +76,7 @@ export interface ChunkData {
   cx: number;
   cz: number;
   key: string;
-  type: LegacyChunkType;
+  type: ChunkRoleTag;
   name: string;
   collidables: AABB[];
   interactables: Interactable[];

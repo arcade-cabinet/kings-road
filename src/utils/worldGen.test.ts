@@ -5,7 +5,7 @@ import { generateKingdom, getKingdomTile } from '@/world/kingdom-gen';
 import {
   BLOCK_SIZE,
   CHUNK_SIZE,
-  getChunkTypeFromKingdom,
+  getChunkRoleFromKingdom,
   getRandomDialogue,
   getRandomNPCName,
   getTerrainHeight,
@@ -152,21 +152,21 @@ const KINGDOM_TEST_CONFIG: KingdomConfig = {
 const KINGDOM_SEED = 'worldgen-kingdom-test';
 const kingdomMap = generateKingdom(KINGDOM_SEED, KINGDOM_TEST_CONFIG);
 
-describe('getChunkTypeFromKingdom', () => {
+describe('getChunkRoleFromKingdom', () => {
   it('returns null for ocean tile (corner of map)', () => {
-    const result = getChunkTypeFromKingdom(kingdomMap, 0, 0);
+    const result = getChunkRoleFromKingdom(kingdomMap, 0, 0);
     expect(result).toBeNull();
   });
 
   it('returns null for out-of-bounds coordinates', () => {
-    expect(getChunkTypeFromKingdom(kingdomMap, -1, -1)).toBeNull();
-    expect(getChunkTypeFromKingdom(kingdomMap, 200, 200)).toBeNull();
+    expect(getChunkRoleFromKingdom(kingdomMap, -1, -1)).toBeNull();
+    expect(getChunkRoleFromKingdom(kingdomMap, 200, 200)).toBeNull();
   });
 
   it('returns TOWN for settlement tiles', () => {
     for (const settlement of kingdomMap.settlements) {
       const [sx, sy] = settlement.position;
-      const result = getChunkTypeFromKingdom(kingdomMap, sx, sy);
+      const result = getChunkRoleFromKingdom(kingdomMap, sx, sy);
       expect(result).not.toBeNull();
       expect(result?.type).toBe('TOWN');
       expect(result?.name).toBe(settlement.name);
@@ -185,7 +185,7 @@ describe('getChunkTypeFromKingdom', () => {
         ),
     );
     if (roadTile) {
-      const result = getChunkTypeFromKingdom(
+      const result = getChunkRoleFromKingdom(
         kingdomMap,
         roadTile.x,
         roadTile.y,
@@ -208,7 +208,7 @@ describe('getChunkTypeFromKingdom', () => {
         ),
     );
     if (wildTile) {
-      const result = getChunkTypeFromKingdom(
+      const result = getChunkRoleFromKingdom(
         kingdomMap,
         wildTile.x,
         wildTile.y,
@@ -221,7 +221,7 @@ describe('getChunkTypeFromKingdom', () => {
   it('includes the map tile in results', () => {
     const landTile = kingdomMap.tiles.find((t) => t.isLand);
     if (landTile) {
-      const result = getChunkTypeFromKingdom(
+      const result = getChunkRoleFromKingdom(
         kingdomMap,
         landTile.x,
         landTile.y,

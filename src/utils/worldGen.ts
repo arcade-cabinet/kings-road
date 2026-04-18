@@ -1,5 +1,5 @@
 import type { KingdomMap, MapTile, Settlement } from '@/schemas/kingdom.schema';
-import type { LegacyChunkType } from '@/types/game';
+import type { ChunkRoleTag } from '@/types/game';
 import { getKingdomTile, getSettlementAt } from '@/world/kingdom-gen';
 
 export const CHUNK_SIZE = 120;
@@ -19,7 +19,7 @@ export const OCEAN_HEIGHT = -2;
 // ── Kingdom-map-aware chunk resolution ────────────────────────────────
 
 /**
- * Derive LegacyChunkType from the kingdom map tile at grid coordinates.
+ * Derive ChunkRoleTag from the kingdom map tile at grid coordinates.
  *
  * The kingdom grid uses the same coordinate system as chunks (1 tile = 1 chunk).
  * Tiles outside the map bounds are treated as ocean (returns null).
@@ -27,12 +27,12 @@ export const OCEAN_HEIGHT = -2;
  * When a settlement is found, it's included in the result so callers can
  * look up the appropriate town config by settlement ID.
  */
-export function getChunkTypeFromKingdom(
+export function getChunkRoleFromKingdom(
   kingdomMap: KingdomMap,
   cx: number,
   cz: number,
 ): {
-  type: LegacyChunkType;
+  type: ChunkRoleTag;
   tile: MapTile;
   name: string;
   settlement?: Settlement;
