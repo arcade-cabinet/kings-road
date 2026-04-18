@@ -7,7 +7,7 @@ domain: technical
 
 # src/core — Layer 0
 
-**Intent:** Zero-dependency primitives used across every other package. Types, math, errors. Everyone imports it; it imports nothing internal — no zod, no three.js, no React.
+**Intent:** Zero-dependency primitives used across every other package. Types, math, errors. Everyone imports it; it imports nothing internal.
 
 **Owner:** Team Foundations
 
@@ -18,12 +18,11 @@ domain: technical
 Types (`src/core/types/`):
 - `Vec3` — 3D vector interface
 - `EntityId`, `Seed`, `BiomeId`, `Archetype` — opaque branded string types
-- `ChunkType`, `CHUNK_TYPES` — exhaustive chunk type union
-- `isChunkType` — zero-dep runtime type guard (use `ChunkTypeSchema` from `@/schemas` for Zod validation)
-- `asArchetype`, `asBiomeId`, `asEntityId`, `asSeed` — safe cast helpers
+- `asEntityId`, `asSeed`, `asBiomeId` — safe cast helpers
+- `ChunkType`, `CHUNK_TYPES`, `isChunkType`, `parseChunkType` — exhaustive chunk type union + dependency-free type guard and parser
 
 Math (`src/core/math/`):
-- `hashString`, `mulberry32`, `cyrb128`, `createRng` — deterministic PRNG / hashing (canonical home; replaces legacy `src/utils/random.ts`)
+- `hashString`, `mulberry32`, `cyrb128`, `createRng` — deterministic PRNG / hashing
 - `lerp`, `smoothstep`, `clamp`, `inverseLerp` — interpolation helpers
 
 Errors (`src/core/errors/`):

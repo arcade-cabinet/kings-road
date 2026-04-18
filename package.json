@@ -31,6 +31,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:all": "pnpm test:coverage && pnpm test:browser && pnpm test:e2e",
+    "boundaries": "npx tsx scripts/check-package-boundaries.ts",
+    "boundaries:update": "npx tsx scripts/check-package-boundaries.ts --update-baseline",
     "lint": "biome check .",
     "lint:fix": "biome check --write ."
   },

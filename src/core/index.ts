@@ -18,10 +18,10 @@ export type {
   Vec3,
 } from './types';
 export {
-  asArchetype,
   asBiomeId,
   asEntityId,
   asSeed,
   CHUNK_TYPES,
   isChunkType,
+  parseChunkType,
 } from './types';
