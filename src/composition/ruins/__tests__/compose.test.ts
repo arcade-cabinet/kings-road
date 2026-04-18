@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import type { BiomeConfig } from '@/biome';
 import { getAssetsByCategory, RUIN_ASSETS, weightedPick } from '../assets';
 import { composeRuins } from '../compose';
 import type { TownConfig } from '../types';
 
-const MOCK_BIOME = {
+const MOCK_BIOME: BiomeConfig = {
   id: 'thornfield',
   name: 'Thornfield Ruins',
   lighting: {
@@ -21,7 +22,7 @@ const MOCK_BIOME = {
   weather: { defaultState: 'fog_thick', states: [], transitionDuration: 10 },
   audio: { ambient: [], footstepMaterial: 'grass' },
   monsterPool: ['skeleton'],
-} as any;
+};
 
 const MOCK_TOWN: TownConfig = {
   id: 'thornfield-village',
@@ -30,7 +31,7 @@ const MOCK_TOWN: TownConfig = {
 };
 
 describe('composeRuins', () => {
-  it('returns at least 20 placements for a town-sized chunk', () => {
+  it('returns at least 21 placements for a town-sized chunk', () => {
     const result = composeRuins(MOCK_BIOME, MOCK_TOWN, 'test-seed');
     expect(result.length).toBeGreaterThanOrEqual(21);
   });
