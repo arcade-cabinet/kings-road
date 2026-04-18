@@ -4,7 +4,7 @@ import * as path from 'node:path';
 
 const DEFAULT_SOURCE =
   '/Volumes/home/assets/3DLowPoly/Environment/Dungeon/KayKit_DungeonRemastered_1.1_FREE';
-const SOURCE_DIR = process.env['DUNGEON_KIT_SOURCE'] ?? DEFAULT_SOURCE;
+const SOURCE_DIR = process.env.DUNGEON_KIT_SOURCE ?? DEFAULT_SOURCE;
 const DEST_DIR = path.resolve(
   import.meta.dirname,
   '../public/assets/dungeon/kit',
