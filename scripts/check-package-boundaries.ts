@@ -118,7 +118,7 @@ function repoRel(absPath: string): string {
 }
 
 async function* walkTs(dir: string): AsyncGenerator<string> {
-  let entries: Awaited<ReturnType<typeof readdir>>;
+  let entries: import('node:fs').Dirent[];
   try {
     entries = await readdir(dir, { withFileTypes: true });
   } catch {
