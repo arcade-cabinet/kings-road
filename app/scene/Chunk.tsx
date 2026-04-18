@@ -588,19 +588,19 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         material={materials.windowGlow}
       />
 
-      {/* Crates */}
-      <InstancedMeshes
+      {/* Crates — authored GLB */}
+      <GlbInstancer
+        glb="dungeon/Crates_and_barrels.glb"
         items={meshData.crate}
-        geometry="crate"
-        material={materials.crate}
+        baseScale={0.6}
       />
 
-      {/* Barrels */}
+      {/* Barrels — authored GLB */}
       {meshData.barrel.length > 0 && (
-        <InstancedMeshes
+        <GlbInstancer
+          glb="dungeon/Crates_and_barrels.glb"
           items={meshData.barrel}
-          geometry="barrel"
-          material={materials.barrel}
+          baseScale={0.5}
         />
       )}
 
