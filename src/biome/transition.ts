@@ -25,7 +25,7 @@ export function computeBiomeTransition(
   if (!region) return null;
 
   const current = BiomeService.getBiomeById(region.biomeId);
-  const [prevId, nextId] = BiomeService.getNeighbors(region.biomeId);
+  const [prevId, nextId] = BiomeService.getNeighbors(distanceFromStart);
 
   // Leading-edge: within the blend window preceding the boundary to next biome
   const leadingEdge = region.endDistance;

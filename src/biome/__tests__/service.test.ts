@@ -73,17 +73,55 @@ describe('BiomeService.getCurrentBiome', () => {
     const biome = BiomeService.getCurrentBiome(14000);
     expect(biome.id).toBe('thornfield');
   });
+
+  it('resolves the terminal boundary (distance === totalDistance)', () => {
+    // Pre-fix, regions used `< endDistance` so totalDistance fell through
+    // to the arbitrary first-registered-biome fallback.
+    const biome = BiomeService.getCurrentBiome(17000);
+    expect(biome.id).toBe('thornfield');
+  });
 });
 
 describe('BiomeService.getNeighbors', () => {
-  it('returns null for prev of first biome', () => {
-    const [prev] = BiomeService.getNeighbors('meadow');
+  it('returns null for prev when in first region', () => {
+    const [prev] = BiomeService.getNeighbors(1000);
     expect(prev).toBeNull();
   });
 
-  it('returns correct neighbor for middle biome', () => {
-    const [prev, next] = BiomeService.getNeighbors('forest');
+  it('returns correct neighbors for middle region', () => {
+    const [prev, next] = BiomeService.getNeighbors(9000);
     expect(prev).toBe('meadow');
     expect(next).toBe('thornfield');
+  });
+
+  it('returns null for next when in last region', () => {
+    const [, next] = BiomeService.getNeighbors(14000);
+    expect(next).toBeNull();
+  });
+});
+
+describe('BiomeService init failure modes', () => {
+  it('throws when a region references an unknown anchor', () => {
+    expect(() =>
+      BiomeService.init([meadow, forest, thornfield], {
+        totalDistance: 30000,
+        anchors: [{ id: 'home', distanceFromStart: 0 }],
+        regions: [
+          {
+            biome: 'MEADOW',
+            anchorRange: ['home', 'missing-anchor'] as [string, string],
+          },
+        ],
+      }),
+    ).toThrow(/unknown anchor/);
+  });
+});
+
+describe('BiomeService immutability', () => {
+  it('deep-freezes returned BiomeConfig, nested objects included', () => {
+    const config = BiomeService.getBiomeById('meadow');
+    expect(Object.isFrozen(config)).toBe(true);
+    expect(Object.isFrozen(config.lighting)).toBe(true);
+    expect(Object.isFrozen(config.terrain.materials)).toBe(true);
   });
 });

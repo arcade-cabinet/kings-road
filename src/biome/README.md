@@ -17,7 +17,7 @@ domain: technical
 
 - `BiomeConfig`, `BiomeConfigSchema` — Zod schema covering lighting, terrain, foliage, weather, particles, audio, playerModifiers, monsterPool, npcWardrobe
 - `HdriSpec`, `HdriSpecSchema` — HDRI is either a single id string or a `{dawn, noon, dusk, night}` record (EnvironmentIBL cross-fades across buckets)
-- `BiomeService` — `init(configs, roadSpine)`, `getCurrentBiome(distanceFromStart)`, `getBiomeById(id)`, `getAllBiomes()`, `getNeighbors(biomeId)`, `getCurrentRegionBounds(distanceFromStart)`
+- `BiomeService` — `init(configs, roadSpine)`, `getCurrentBiome(distanceFromStart)`, `getBiomeById(id)`, `getAllBiomes()`, `getNeighbors(distanceFromStart)`, `getCurrentRegionBounds(distanceFromStart)`. `init()` precomputes region bounds once and throws on missing anchor ids; lookup calls are O(1). `getNeighbors` is distance-keyed (not id-keyed) so biomes that recur along the road resolve unambiguously.
 - `computeBiomeTransition(distanceFromStart, transitionMeters?)` — cross-fade blend state between adjacent biomes. Window is centered on the boundary: `t=0` at `boundary - transitionMeters`, `t=0.5` at the boundary, `t=1` at `boundary + transitionMeters`. Returns `null` outside the window.
 - `BiomeTransitionState` — `{ from, to, t }` where t ∈ [0,1]
 
@@ -25,7 +25,7 @@ domain: technical
 
 **Contract:**
 - `BiomeService.getCurrentBiome(pos)` is the ONLY way to resolve the current biome. No package reads `biome/data/*` directly.
-- `BiomeConfig` objects returned by the service are frozen — mutating them is a bug.
+- `BiomeConfig` objects returned by the service are *deeply* frozen — mutating anything in the object graph is a bug.
 - Call `BiomeService.init()` once at app startup before any game logic runs.
 
 **Testing:** `pnpm test src/biome`
