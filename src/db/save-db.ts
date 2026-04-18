@@ -1,35 +1,26 @@
 /**
- * Capacitor SQLite adapter for save data.
+ * SQLite adapter for save data.
  *
- * Single shared connection, lazy-initialized. Web uses the jeep-sqlite
- * web component bundled via @capacitor-community/sqlite; native uses the
- * platform SQLite store (UserDefaults-backed on iOS, file-backed on
- * Android). One row per slot: slotId (INTEGER PRIMARY KEY) + payload
- * (TEXT JSON).
+ * Web: sql.js (wasm served from public/sql-wasm.wasm — copied at build time
+ * by scripts/copy-runtime-assets.ts). No DOM component required; eliminates
+ * the jeep-sqlite wasm ABI incompatibility introduced in v2.8.
  *
- * Why SQLite over IndexedDB for saves:
- *   - Parity across web + native (same API, same schema, same file).
- *   - Makes future Drizzle-based cross-referencing with content tables
- *     straightforward (a single SQLite file holds both read-only content
- *     and mutable save rows if we ever want that unification).
- *   - Capacitor SQLite is the plugin Kings Road's CLAUDE.md already
- *     references for persistence.
+ * Native: @capacitor-community/sqlite via CapacitorSQLite. Unchanged.
+ *
+ * Public API: sqlRun / sqlQuery / closeDb — same contract as before so
+ * save-service.ts needs no edits.
+ *
+ * Why sql.js on web instead of jeep-sqlite:
+ *   jeep-sqlite 2.8 bundles a wasm binary compiled against @stencil/core 4.15;
+ *   running under 4.20 triggers LinkError: Import #34 "a" "I": function import
+ *   requires a callable. sql.js is already a project dependency (see
+ *   copy-runtime-assets.ts) and matches CLAUDE.md's documented stack.
  */
 
 import { Capacitor } from '@capacitor/core';
-import {
-  CapacitorSQLite,
-  SQLiteConnection,
-  type SQLiteDBConnection,
-} from '@capacitor-community/sqlite';
 
 const DB_NAME = 'kings-road-saves';
 const DB_VERSION = 1;
-
-// A single, shared connection wrapper. CapacitorSQLite enforces one
-// connection per DB name per process — opening twice throws.
-let sqlite: SQLiteConnection | null = null;
-let dbPromise: Promise<SQLiteDBConnection> | null = null;
 
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS save_slots (
@@ -38,41 +29,71 @@ const SCHEMA = [
    );`,
 ];
 
-/** Initialize the jeep-sqlite web component on web platforms. */
-async function ensureWebStore(): Promise<void> {
-  if (Capacitor.getPlatform() !== 'web') return;
-  // jeep-sqlite needs a <jeep-sqlite> DOM node registered before opening
-  // the DB. Done once per document.
-  if (typeof document === 'undefined') return;
-  if (document.querySelector('jeep-sqlite')) return;
-  // Lazy-load the web component bundle — it registers the custom element.
-  await import('jeep-sqlite/loader').then((m) =>
-    m.defineCustomElements(window),
-  );
-  const el = document.createElement('jeep-sqlite');
-  document.body.appendChild(el);
-  // Initialize the web store (must be called after element mount).
-  await customElements.whenDefined('jeep-sqlite');
-  await CapacitorSQLite.initWebStore();
+// ---------------------------------------------------------------------------
+// Web path — sql.js
+// ---------------------------------------------------------------------------
+
+type SqlJsDatabase = import('sql.js').Database;
+
+let webDb: SqlJsDatabase | null = null;
+let webDbPromise: Promise<SqlJsDatabase> | null = null;
+
+async function openWebDb(): Promise<SqlJsDatabase> {
+  if (webDbPromise) return webDbPromise;
+  webDbPromise = (async () => {
+    const initSqlJs = (await import('sql.js')).default;
+    const SQL = await initSqlJs({ locateFile: () => '/sql-wasm.wasm' });
+    const db = new SQL.Database();
+    for (const stmt of SCHEMA) {
+      db.run(stmt);
+    }
+    webDb = db;
+    return db;
+  })();
+  return webDbPromise;
 }
 
-async function openDb(): Promise<SQLiteDBConnection> {
-  if (dbPromise) return dbPromise;
-  dbPromise = (async () => {
-    await ensureWebStore();
-    if (!sqlite) sqlite = new SQLiteConnection(CapacitorSQLite);
+function webRun(db: SqlJsDatabase, query: string, values: unknown[]): void {
+  db.run(query, values as Parameters<SqlJsDatabase['run']>[1]);
+}
 
-    // Check for an existing connection (hot-reload / re-init safety).
-    const isConn = (await sqlite.isConnection(DB_NAME, /* readonly */ false))
-      .result;
+function webQuery<T>(db: SqlJsDatabase, query: string, values: unknown[]): T[] {
+  const stmt = db.prepare(query);
+  stmt.bind(values as Parameters<SqlJsDatabase['run']>[1]);
+  const rows: T[] = [];
+  while (stmt.step()) {
+    rows.push(stmt.getAsObject() as T);
+  }
+  stmt.free();
+  return rows;
+}
+
+// ---------------------------------------------------------------------------
+// Native path — @capacitor-community/sqlite (unchanged)
+// ---------------------------------------------------------------------------
+
+import {
+  CapacitorSQLite,
+  SQLiteConnection,
+  type SQLiteDBConnection,
+} from '@capacitor-community/sqlite';
+
+let nativeSqlite: SQLiteConnection | null = null;
+let nativeDbPromise: Promise<SQLiteDBConnection> | null = null;
+
+async function openNativeDb(): Promise<SQLiteDBConnection> {
+  if (nativeDbPromise) return nativeDbPromise;
+  nativeDbPromise = (async () => {
+    if (!nativeSqlite) nativeSqlite = new SQLiteConnection(CapacitorSQLite);
+    const isConn = (await nativeSqlite.isConnection(DB_NAME, false)).result;
     const db = isConn
-      ? await sqlite.retrieveConnection(DB_NAME, false)
-      : await sqlite.createConnection(
+      ? await nativeSqlite.retrieveConnection(DB_NAME, false)
+      : await nativeSqlite.createConnection(
           DB_NAME,
-          /* encrypted */ false,
+          false,
           'no-encryption',
           DB_VERSION,
-          /* readonly */ false,
+          false,
         );
     await db.open();
     for (const stmt of SCHEMA) {
@@ -80,33 +101,53 @@ async function openDb(): Promise<SQLiteDBConnection> {
     }
     return db;
   })();
-  return dbPromise;
+  return nativeDbPromise;
 }
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 export async function sqlRun(
   query: string,
   values: unknown[] = [],
 ): Promise<void> {
-  const db = await openDb();
-  await db.run(query, values);
+  if (Capacitor.getPlatform() === 'web') {
+    const db = await openWebDb();
+    webRun(db, query, values);
+  } else {
+    const db = await openNativeDb();
+    await db.run(query, values);
+  }
 }
 
 export async function sqlQuery<T = Record<string, unknown>>(
   query: string,
   values: unknown[] = [],
 ): Promise<T[]> {
-  const db = await openDb();
-  const res = await db.query(query, values);
-  return (res.values ?? []) as T[];
+  if (Capacitor.getPlatform() === 'web') {
+    const db = await openWebDb();
+    return webQuery<T>(db, query, values);
+  } else {
+    const db = await openNativeDb();
+    const res = await db.query(query, values);
+    return (res.values ?? []) as T[];
+  }
 }
 
 /** Close the shared connection. Only call at app shutdown. */
 export async function closeDb(): Promise<void> {
-  if (!sqlite) return;
-  try {
-    await sqlite.closeConnection(DB_NAME, false);
-  } finally {
-    sqlite = null;
-    dbPromise = null;
+  if (Capacitor.getPlatform() === 'web') {
+    webDb?.close();
+    webDb = null;
+    webDbPromise = null;
+  } else {
+    if (!nativeSqlite) return;
+    try {
+      await nativeSqlite.closeConnection(DB_NAME, false);
+    } finally {
+      nativeSqlite = null;
+      nativeDbPromise = null;
+    }
   }
 }
