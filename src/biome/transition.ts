@@ -4,62 +4,56 @@ import { BiomeService } from './service';
 export interface BiomeTransitionState {
   from: BiomeConfig;
   to: BiomeConfig;
-  /** 0 = fully in `from`, 1 = fully in `to` */
+  /** 0 = fully in `from`, 1 = fully in `to`. 0.5 at the exact boundary. */
   t: number;
 }
 
 /**
- * Compute cross-fade blend between adjacent biomes.
+ * Compute cross-fade blend between adjacent biomes along the road.
  *
- * blendRadius controls how many road-units on each side of a region
- * boundary constitute the transition zone.
+ * `transitionMeters` is the half-width of the blend window. The window
+ * straddles a region boundary: at `boundary - transitionMeters` t=0,
+ * at the boundary itself t=0.5, at `boundary + transitionMeters` t=1.
+ * Outside the window: returns null (caller should render the single
+ * current biome).
  */
 export function computeBiomeTransition(
   distanceFromStart: number,
-  blendRadius = 200,
+  transitionMeters = 200,
 ): BiomeTransitionState | null {
-  const current = BiomeService.getCurrentBiome(distanceFromStart);
-  const [prevId, nextId] = BiomeService.getNeighbors(current.id);
+  const region = BiomeService.getCurrentRegionBounds(distanceFromStart);
+  if (!region) return null;
 
-  // Check if we're near the leading edge (transition to next biome)
-  if (nextId) {
-    const neighbor = BiomeService.getBiomeById(nextId);
-    // Simple approximation: try both adjacent distances
-    const nextBiome = BiomeService.getCurrentBiome(
-      distanceFromStart + blendRadius,
+  const current = BiomeService.getBiomeById(region.biomeId);
+  const [prevId, nextId] = BiomeService.getNeighbors(distanceFromStart);
+
+  // Leading-edge: within the blend window preceding the boundary to next biome
+  const leadingEdge = region.endDistance;
+  if (nextId && distanceFromStart >= leadingEdge - transitionMeters) {
+    const to = BiomeService.getBiomeById(nextId);
+    const t = clamp01(
+      (distanceFromStart - (leadingEdge - transitionMeters)) /
+        (2 * transitionMeters),
     );
-    if (nextBiome.id !== current.id) {
-      const t = clampT(
-        distanceFromStart,
-        distanceFromStart + blendRadius - current.id.length,
-        distanceFromStart + blendRadius,
-      );
-      return { from: current, to: neighbor, t };
-    }
-    void neighbor; // suppress unused warning
+    return { from: current, to, t };
   }
 
-  // Check if we're near the trailing edge (transition from previous biome)
-  if (prevId) {
-    const neighbor = BiomeService.getBiomeById(prevId);
-    const prevBiome = BiomeService.getCurrentBiome(
-      distanceFromStart - blendRadius,
+  // Trailing-edge: within the blend window following the boundary from prev biome
+  const trailingEdge = region.startDistance;
+  if (prevId && distanceFromStart <= trailingEdge + transitionMeters) {
+    const from = BiomeService.getBiomeById(prevId);
+    const t = clamp01(
+      (distanceFromStart - (trailingEdge - transitionMeters)) /
+        (2 * transitionMeters),
     );
-    if (prevBiome.id !== current.id) {
-      const t = clampT(
-        distanceFromStart - blendRadius,
-        distanceFromStart,
-        distanceFromStart,
-      );
-      return { from: neighbor, to: current, t };
-    }
-    void neighbor;
+    return { from, to: current, t };
   }
 
   return null;
 }
 
-function clampT(start: number, end: number, value: number): number {
-  if (end === start) return 0;
-  return Math.max(0, Math.min(1, (value - start) / (end - start)));
+function clamp01(value: number): number {
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
 }

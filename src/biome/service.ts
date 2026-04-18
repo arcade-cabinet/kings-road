@@ -17,25 +17,99 @@ type RoadSpineData = {
   regions?: RoadSpineRegion[];
 };
 
+type ResolvedRegion = {
+  biomeId: string;
+  startDistance: number;
+  endDistance: number;
+};
+
 const registry = new Map<string, BiomeConfig>();
 let roadSpine: RoadSpineData | null = null;
+let resolvedRegions: ResolvedRegion[] = [];
+let spineTotalDistance = 0;
 
 /** Lowercase the road-spine biome string to match BiomeConfig ids. */
 function normalizeRegionBiome(biome: string): string {
   return biome.toLowerCase();
 }
 
+/**
+ * Recursively freeze an object and all its nested objects/arrays.
+ * Plain Object.freeze is shallow; the service contract promises
+ * returned BiomeConfig objects are fully immutable.
+ */
+function deepFreeze<T>(value: T): T {
+  if (value === null || typeof value !== 'object') return value;
+  if (Object.isFrozen(value)) return value;
+  Object.freeze(value);
+  for (const key of Object.keys(value as object)) {
+    deepFreeze((value as Record<string, unknown>)[key]);
+  }
+  return value;
+}
+
+/**
+ * Resolve road-spine regions into absolute distance bounds once, at init().
+ * Throws if any region references an unknown anchor id — silently falling
+ * back to 0 / totalDistance would mask spine-data bugs.
+ */
+function precomputeRegions(spine: RoadSpineData): ResolvedRegion[] {
+  if (!spine.regions) return [];
+  const anchorDistance = new Map<string, number>(
+    spine.anchors.map((a) => [a.id, a.distanceFromStart]),
+  );
+  return spine.regions.map((region) => {
+    const [startAnchor, endAnchor] = region.anchorRange;
+    const startDistance = anchorDistance.get(startAnchor);
+    const endDistance = anchorDistance.get(endAnchor);
+    if (startDistance === undefined) {
+      throw new BiomeError(
+        `road-spine region references unknown anchor "${startAnchor}"`,
+      );
+    }
+    if (endDistance === undefined) {
+      throw new BiomeError(
+        `road-spine region references unknown anchor "${endAnchor}"`,
+      );
+    }
+    return {
+      biomeId: normalizeRegionBiome(region.biome),
+      startDistance,
+      endDistance,
+    };
+  });
+}
+
+/**
+ * Find the index of the region enclosing `distance`. Uses `<` on the end
+ * bound so boundaries belong to the next region, EXCEPT for the final
+ * region where `distance === totalDistance` is valid and must match.
+ */
+function findRegionIndex(distance: number): number {
+  const clamped = Math.max(0, Math.min(distance, spineTotalDistance));
+  for (let i = 0; i < resolvedRegions.length; i++) {
+    const { startDistance, endDistance } = resolvedRegions[i];
+    const isLast = i === resolvedRegions.length - 1;
+    const withinEnd = isLast ? clamped <= endDistance : clamped < endDistance;
+    if (clamped >= startDistance && withinEnd) return i;
+  }
+  return -1;
+}
+
 export const BiomeService = {
   /**
    * Register all available biome configs and the road spine.
    * Must be called once at startup before any getCurrentBiome calls.
+   * Throws BiomeError if any region references an unknown anchor.
    */
   init(configs: BiomeConfig[], spine: RoadSpineData): void {
     registry.clear();
     for (const config of configs) {
-      registry.set(config.id, Object.freeze(config));
+      registry.set(config.id, deepFreeze(config));
     }
     roadSpine = spine;
+    spineTotalDistance = spine.totalDistance;
+    resolvedRegions = precomputeRegions(spine);
   },
 
   getBiomeById(id: string): BiomeConfig {
@@ -48,8 +122,9 @@ export const BiomeService = {
 
   /**
    * Resolve the current biome from a 1D road position (distance from start).
-   * Uses road-spine regions to find the enclosing segment, then returns
-   * the BiomeConfig whose id matches the region's biome.
+   * Throws BiomeError if the enclosing region's biome id is not registered
+   * (preferring loud failure to a silent "first registered biome" fallback
+   * that would hide missing content). Accepts distance === totalDistance.
    */
   getCurrentBiome(distanceFromStart: number): BiomeConfig {
     if (!roadSpine) {
@@ -57,42 +132,15 @@ export const BiomeService = {
         'BiomeService.init() must be called before getCurrentBiome()',
       );
     }
-
-    const { anchors, regions } = roadSpine;
-
-    // Build a distance lookup for anchor ids
-    const anchorDistance = new Map<string, number>(
-      anchors.map((a) => [a.id, a.distanceFromStart]),
-    );
-
-    const clampedDistance = Math.max(
-      0,
-      Math.min(distanceFromStart, roadSpine.totalDistance),
-    );
-
-    if (regions) {
-      for (const region of regions) {
-        const startDist = anchorDistance.get(region.anchorRange[0]) ?? 0;
-        const endDist =
-          anchorDistance.get(region.anchorRange[1]) ?? roadSpine.totalDistance;
-
-        if (clampedDistance >= startDist && clampedDistance < endDist) {
-          const biomeId = normalizeRegionBiome(region.biome);
-          if (registry.has(biomeId)) {
-            return registry.get(biomeId)!;
-          }
-          // Fall through — biome data not loaded yet; return first registered biome
-          break;
-        }
+    const idx = findRegionIndex(distanceFromStart);
+    if (idx === -1) {
+      const first = registry.values().next().value;
+      if (!first) {
+        throw new BiomeError('No biomes registered in BiomeService');
       }
+      return first;
     }
-
-    // Fallback: return the first registered biome (or throw if empty)
-    const first = registry.values().next().value;
-    if (!first) {
-      throw new BiomeError('No biomes registered in BiomeService');
-    }
-    return first;
+    return this.getBiomeById(resolvedRegions[idx].biomeId);
   },
 
   /**
@@ -103,27 +151,34 @@ export const BiomeService = {
   },
 
   /**
-   * Return neighbor biome ids adjacent to the given biome in road order.
-   * Returns up to two neighbors: [previous, next].
+   * Resolve the road-region enclosing the given distance and return its
+   * biome id + [startDistance, endDistance] bounds. Used by transition
+   * cross-fade math, which needs boundary positions, not just biome id.
    */
-  getNeighbors(biomeId: string): [string | null, string | null] {
-    if (!roadSpine?.regions) return [null, null];
+  getCurrentRegionBounds(distanceFromStart: number): ResolvedRegion | null {
+    if (!roadSpine) return null;
+    const idx = findRegionIndex(distanceFromStart);
+    if (idx === -1) return null;
+    return resolvedRegions[idx];
+  },
 
-    const { regions } = roadSpine;
-
-    const normalized = biomeId.toLowerCase();
-    const idx = regions.findIndex(
-      (r) => normalizeRegionBiome(r.biome) === normalized,
-    );
-
+  /**
+   * Return the biome ids of regions immediately before and after the
+   * region enclosing `distanceFromStart`. Distance-keyed (not biome-id
+   * keyed) because the same biome can appear in multiple non-adjacent
+   * regions along the road (e.g. HILLS recurs), and an id-keyed lookup
+   * would collapse those into one position. Returns [null, null] when
+   * the distance falls outside any region.
+   */
+  getNeighbors(distanceFromStart: number): [string | null, string | null] {
+    if (!roadSpine) return [null, null];
+    const idx = findRegionIndex(distanceFromStart);
     if (idx === -1) return [null, null];
-
-    const prev = idx > 0 ? normalizeRegionBiome(regions[idx - 1].biome) : null;
+    const prev = idx > 0 ? resolvedRegions[idx - 1].biomeId : null;
     const next =
-      idx < regions.length - 1
-        ? normalizeRegionBiome(regions[idx + 1].biome)
+      idx < resolvedRegions.length - 1
+        ? resolvedRegions[idx + 1].biomeId
         : null;
-
     return [prev, next];
   },
 };

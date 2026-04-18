@@ -28,6 +28,57 @@ describe('BiomeConfigSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('accepts per-time-of-day hdri record', () => {
+    const config = {
+      id: 'x',
+      name: 'X',
+      lighting: {
+        hdri: {
+          dawn: 'h-dawn',
+          noon: 'h-noon',
+          dusk: 'h-dusk',
+          night: 'h-night',
+        },
+        ambientColor: '#fff',
+        ambientIntensity: 0.5,
+        directionalColor: '#fff',
+        directionalIntensity: 0.5,
+        fogColor: '#fff',
+        fogNear: 10,
+        fogFar: 100,
+      },
+      terrain: { heightmap: 'h', materials: [] },
+      foliage: { density: 0.5, species: [] },
+      weather: { defaultState: 's', states: [], transitionDuration: 10 },
+      audio: { ambient: [] },
+    };
+    const result = BiomeConfigSchema.safeParse(config);
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects hdri record with unknown time bucket', () => {
+    const config = {
+      id: 'x',
+      name: 'X',
+      lighting: {
+        hdri: { midnight: 'h' },
+        ambientColor: '#fff',
+        ambientIntensity: 0.5,
+        directionalColor: '#fff',
+        directionalIntensity: 0.5,
+        fogColor: '#fff',
+        fogNear: 10,
+        fogFar: 100,
+      },
+      terrain: { heightmap: 'h', materials: [] },
+      foliage: { density: 0.5, species: [] },
+      weather: { defaultState: 's', states: [], transitionDuration: 10 },
+      audio: { ambient: [] },
+    };
+    const result = BiomeConfigSchema.safeParse(config);
+    expect(result.success).toBe(false);
+  });
+
   it('defaults monsterPool to empty array', () => {
     const minimal = {
       id: 'x',

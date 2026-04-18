@@ -1,7 +1,17 @@
 import { z } from 'zod';
 
+const TIME_OF_DAY_BUCKETS = ['dawn', 'noon', 'dusk', 'night'] as const;
+
+export const HdriSpecSchema = z.union([
+  z.string(),
+  z.record(z.enum(TIME_OF_DAY_BUCKETS), z.string()),
+]);
+
+export type HdriSpec = z.infer<typeof HdriSpecSchema>;
+export type TimeOfDayBucket = (typeof TIME_OF_DAY_BUCKETS)[number];
+
 const LightingSchema = z.object({
-  hdri: z.string(),
+  hdri: HdriSpecSchema,
   ambientColor: z.string(),
   ambientIntensity: z.number(),
   directionalColor: z.string(),
