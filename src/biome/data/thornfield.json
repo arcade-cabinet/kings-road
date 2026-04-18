@@ -1,0 +1,110 @@
+{
+  "id": "hills",
+  "name": "Thornfield",
+  "description": "Ancient ruins wrapped in dead forest and cold dawn fog. The worst-case biome.",
+  "lighting": {
+    "hdri": "cold-dawn",
+    "ambientColor": "#4a6070",
+    "ambientIntensity": 0.4,
+    "directionalColor": "#c8d8e8",
+    "directionalIntensity": 0.6,
+    "fogColor": "#8090a0",
+    "fogNear": 20,
+    "fogFar": 120,
+    "fogDensity": 0.015,
+    "skyTint": "#6a8090"
+  },
+  "terrain": {
+    "heightmap": "Terrain003",
+    "scale": 1.5,
+    "materials": [
+      "mossy-stone",
+      "lichen-stone",
+      "dead-grass",
+      "packed-mud"
+    ],
+    "splatWeights": {
+      "mossy-stone": 0.35,
+      "lichen-stone": 0.25,
+      "dead-grass": 0.25,
+      "packed-mud": 0.15
+    },
+    "displacementScale": 0.3
+  },
+  "foliage": {
+    "density": 0.55,
+    "species": [
+      { "assetId": "gnarled-dead-oak", "density": 0.4, "scaleRange": [0.8, 1.4] },
+      { "assetId": "hawthorn", "density": 0.25, "scaleRange": [0.6, 1.0], "clusterRadius": 3 },
+      { "assetId": "thorn-bush", "density": 0.2, "scaleRange": [0.4, 0.8], "clusterRadius": 2 },
+      { "assetId": "ivy-ground", "density": 0.1, "scaleRange": [0.5, 1.0] },
+      { "assetId": "lone-fern", "density": 0.05, "scaleRange": [0.3, 0.6] }
+    ],
+    "groundCover": ["fallen-leaves", "ivy-ground", "dead-grass"]
+  },
+  "weather": {
+    "defaultState": "cold-fog",
+    "states": [
+      {
+        "id": "cold-fog",
+        "probability": 0.6,
+        "fogMultiplier": 2.0,
+        "windStrength": 0.2,
+        "precipitationType": "none",
+        "precipitationDensity": 0
+      },
+      {
+        "id": "overcast",
+        "probability": 0.25,
+        "fogMultiplier": 1.0,
+        "windStrength": 0.3,
+        "precipitationType": "none",
+        "precipitationDensity": 0
+      },
+      {
+        "id": "drizzle",
+        "probability": 0.15,
+        "fogMultiplier": 1.5,
+        "windStrength": 0.4,
+        "precipitationType": "rain",
+        "precipitationDensity": 0.3
+      }
+    ],
+    "transitionDuration": 15
+  },
+  "particles": {
+    "ash": {
+      "count": 200,
+      "size": [0.01, 0.04],
+      "speed": 0.05,
+      "opacity": 0.3,
+      "color": "#8090a0",
+      "noise": 0.2,
+      "scale": 12
+    },
+    "fog-wisps": {
+      "count": 80,
+      "size": [0.2, 0.6],
+      "speed": 0.02,
+      "opacity": 0.15,
+      "color": "#90a0b0",
+      "noise": 0.5,
+      "scale": 8
+    }
+  },
+  "audio": {
+    "ambient": ["wind-cold", "dead-branches", "distant-raven"],
+    "music": "thornfield-theme",
+    "footstepMaterial": "dead-leaves"
+  },
+  "playerModifiers": {
+    "staminaDrainMultiplier": 1.15,
+    "speedMultiplier": 0.95,
+    "visibilityRadius": 60
+  },
+  "monsterPool": ["skeleton-warrior", "skeleton-archer", "wraith", "grave-hound"],
+  "npcWardrobe": {
+    "villager": "ragged-peasant",
+    "guard": "rusted-iron-armor"
+  }
+}
