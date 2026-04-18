@@ -30,9 +30,13 @@ function pbrUrl(id: string, packPrefix: string, suffix: string): string {
 
 /**
  * Load a PBR material by tactile ID. Returns a configured MeshStandardMaterial
- * with Color + NormalGL + Roughness maps bound, and Displacement + AO + Metalness
- * when present on disk. Throws AssetError if the id is not in the palette.
- * Caches by id — repeat calls return the same instance.
+ * with Color + NormalGL + Roughness maps bound (required), and Displacement +
+ * AmbientOcclusion + Metalness bound when present on disk (optional per pack).
+ * Metalness presence sets `material.metalness = 1.0`; non-metals omit the map
+ * and retain the default `metalness = 0.0`. Displacement is bound with
+ * `displacementScale = 0.0` — consumers opt in to parallax by assigning a
+ * non-zero scale at the use site. Throws AssetError if the id is not in the
+ * palette. Caches by id — repeat calls return the same instance.
  */
 export async function loadPbrMaterial(
   id: string,

@@ -34,17 +34,11 @@ When `loadPbrMaterial(id)` constructs a `THREE.MeshStandardMaterial`, it probes 
 |---------------------------|-------------|
 | `<Pack>_NormalDX.jpg`     | WebGL/three uses OpenGL normal convention. Shipping both would duplicate ~500KB/pack for no runtime benefit. |
 
-### UV2 for AO
+### UV channels for AO (three r150+)
 
-`aoMap` in three.js reads from the `uv2` attribute. When a mesh's geometry has no `uv2`, the loader copies `uv` → `uv2` at material-apply time:
+`MeshStandardMaterial.aoMap` reads from whichever attribute the texture's `channel` property points at — default `channel = 0` resolves to the `uv` attribute, `channel = 2` resolves to `uv2`. The project leaves `channel` at its default, so aoMap draws from the same `uv` set as Color/Normal/Roughness.
 
-```ts
-if (geometry.attributes.uv && !geometry.attributes.uv2) {
-  geometry.setAttribute('uv2', geometry.attributes.uv);
-}
-```
-
-Authored GLBs from the 3DPSX / Kenney / 3DLowPoly packs ship with single-UV-channel geometry. This copy costs nothing at load time and makes AO "just work." Compositors should call a `prepareGeometryForPbr(geometry)` helper from `src/assets/pbr/` before assigning a PBR material.
+**No uv→uv2 copy is required.** The older "clone uv → uv2" pattern is a three pre-r150 convention and has no effect on `aoMap` in three r183 (the pinned version). `prepareGeometryForPbr(geometry)` from `src/assets/pbr/` verifies the geometry has a `uv` attribute and warns if it doesn't — that's the only invariant AO needs. Compositors still call it to fail loudly on malformed GLBs, but it no longer mutates geometry.
 
 ### Default material settings
 
