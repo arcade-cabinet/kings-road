@@ -1,11 +1,10 @@
+import { useTrait } from 'koota/react';
 import { useState } from 'react';
+import { getQuestDefinition } from '@/ecs/actions/quest';
+import { type ActiveQuest, QuestLog as QuestLogTrait } from '@/ecs/traits/session-quest';
+import { getSessionEntity } from '@/ecs/world';
 import { cn } from '@/lib/utils';
 import { useGameStore } from '@/stores/gameStore';
-import {
-  type ActiveQuest,
-  getQuestDefinition,
-  useQuestStore,
-} from '@/stores/questStore';
 
 function QuestEntry({ quest }: { quest: ActiveQuest }) {
   const def = getQuestDefinition(quest.questId);
@@ -49,7 +48,7 @@ function QuestEntry({ quest }: { quest: ActiveQuest }) {
 }
 
 export function QuestLog() {
-  const activeQuests = useQuestStore((s) => s.activeQuests);
+  const activeQuests = useTrait(getSessionEntity(), QuestLogTrait)?.activeQuests ?? [];
   const gameActive = useGameStore((s) => s.gameActive);
   const [expanded, setExpanded] = useState(false);
 

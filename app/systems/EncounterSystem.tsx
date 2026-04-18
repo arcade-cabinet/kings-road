@@ -6,10 +6,21 @@ import {
   isContentStoreReady,
 } from '@/db/content-queries';
 import { Monster } from '@app/scene/Monster';
+import { useTrait } from 'koota/react';
+import {
+  addDamagePopup,
+  clearExpiredPopups,
+  dismissCombatSummary,
+  setAttackCooldown,
+  setRecentDamageTaken,
+  showCombatSummary,
+  startCombatUI,
+} from '@/ecs/actions/combat-ui';
+import { CombatUI } from '@/ecs/traits/session-combat';
+import { getSessionEntity } from '@/ecs/world';
 import { inputManager } from '@/input/InputManager';
-import { useCombatStore } from '@/stores/combatStore';
 import { useGameStore } from '@/stores/gameStore';
-import { useQuestStore } from '@/stores/questStore';
+import { recordCombatVictory } from '@/ecs/actions/quest';
 import { useWorldStore } from '@/stores/worldStore';
 import type { ActiveEncounter, SpawnedMonster } from '@/types/game';
 import { createRng } from '@/utils/random';
@@ -112,15 +123,9 @@ export function EncounterSystem() {
   const die = useGameStore((s) => s.die);
   const kingdomMap = useWorldStore((s) => s.kingdomMap);
 
-  const combatPhase = useCombatStore((s) => s.phase);
-  const startCombatUI = useCombatStore((s) => s.startCombatUI);
-  const addDamagePopup = useCombatStore((s) => s.addDamagePopup);
-  const clearExpiredPopups = useCombatStore((s) => s.clearExpiredPopups);
-  const setRecentDamageTaken = useCombatStore((s) => s.setRecentDamageTaken);
-  const showSummary = useCombatStore((s) => s.showSummary);
-  const dismissSummary = useCombatStore((s) => s.dismissSummary);
-  const setAttackCooldown = useCombatStore((s) => s.setAttackCooldown);
-  const playerAttackDamage = useCombatStore((s) => s.playerAttackDamage);
+  const combatUI = useTrait(getSessionEntity(), CombatUI);
+  const combatPhase = combatUI?.phase ?? 'idle';
+  const playerAttackDamage = combatUI?.playerAttackDamage ?? 8;
 
   const cooldownRef = useRef(INITIAL_GRACE_PERIOD);
   const playerAttackTimerRef = useRef(0);
@@ -195,7 +200,7 @@ export function EncounterSystem() {
       if (combatPhase === 'summary') {
         summaryTimerRef.current += dt;
         if (summaryTimerRef.current >= SUMMARY_DISPLAY_TIME) {
-          dismissSummary();
+          dismissCombatSummary();
           clearCombat();
           cooldownRef.current = 0;
           endCombat();
@@ -206,16 +211,14 @@ export function EncounterSystem() {
       // Check if combat is over (all monsters dead)
       if (isCombatOver()) {
         const result = resolveCombat(rng);
-        showSummary({
+        showCombatSummary({
           xpGained: result.totalXp,
           loot: result.allLoot,
           monstersKilled: result.monstersKilled.length,
         });
         summaryTimerRef.current = 0;
         // Record victory for quest system immediately (no frame-delay)
-        useQuestStore
-          .getState()
-          .recordCombatVictory(null, result.monstersKilled.length);
+        recordCombatVictory(null, result.monstersKilled.length);
         return;
       }
 

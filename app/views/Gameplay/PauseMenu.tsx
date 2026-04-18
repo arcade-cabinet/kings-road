@@ -10,8 +10,16 @@ import {
 } from '@/db/save-service';
 import { cn } from '@/lib/utils';
 import { type ActiveDungeon, useGameStore } from '@/stores/gameStore';
-import { useInventoryStore } from '@/stores/inventoryStore';
-import { useQuestStore } from '@/stores/questStore';
+import {
+  getInventorySnapshot,
+  syncInventory,
+} from '@/ecs/actions/inventory-ui';
+import {
+  getQuestState,
+  resetQuests,
+  resolveNarrative,
+  restoreQuests,
+} from '@/ecs/actions/quest';
 import { useWorldStore } from '@/stores/worldStore';
 import { generateDungeonLayout } from '@/world/dungeon-generator';
 import { getDungeonById } from '@/world/dungeon-registry';
@@ -102,8 +110,8 @@ function formatDate(iso: string): string {
 /** Build a snapshot of current game state for saving. */
 function captureSnapshot() {
   const gs = useGameStore.getState();
-  const qs = useQuestStore.getState();
-  const inv = useInventoryStore.getState();
+  const qs = getQuestState();
+  const inv = getInventorySnapshot();
   return snapshotGameState(
     gs,
     qs,
@@ -324,13 +332,13 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
     // Reset current game state
     useGameStore.getState().resetGame();
     useWorldStore.getState().clearWorld();
-    useQuestStore.getState().resetQuests();
+    resetQuests();
 
     // Regenerate kingdom from saved seed
     await useWorldStore.getState().generateWorld(data.seedPhrase);
 
     // Resolve quest narrative
-    useQuestStore.getState().resolveNarrative(data.seedPhrase);
+    resolveNarrative(data.seedPhrase);
 
     // Restore all saved state via centralized restoreGameState
     restoreGameState(data, {
@@ -342,12 +350,10 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
         useGameStore.setState(partial);
       },
       restoreInventory: (items, gold, equipment) => {
-        useInventoryStore.getState().sync(items, 20, gold, equipment);
+        syncInventory(items, 20, gold, equipment);
       },
       restoreQuests: (activeQuests, completedQuests, triggeredQuests) => {
-        useQuestStore
-          .getState()
-          .restoreQuests(activeQuests, completedQuests, triggeredQuests);
+        restoreQuests(activeQuests, completedQuests, triggeredQuests);
       },
       restoreDungeon: (dungeon) => {
         const layout = getDungeonById(dungeon.id);

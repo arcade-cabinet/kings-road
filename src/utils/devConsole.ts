@@ -8,8 +8,12 @@
  */
 
 import * as THREE from 'three';
+import {
+  activateQuest as activateQuestAction,
+  completeQuest as completeQuestAction,
+  getQuestState,
+} from '@/ecs/actions/quest';
 import { useGameStore } from '@/stores/gameStore';
-import { useQuestStore } from '@/stores/questStore';
 import {
   gridToWorldOrigin,
   useWorldStore,
@@ -269,7 +273,7 @@ const devConsole = {
   // ── Quest helpers ────────────────────────────────────────────────────
 
   listQuests() {
-    const qs = useQuestStore.getState();
+    const qs = getQuestState();
     const info = {
       active: qs.activeQuests,
       completed: qs.completedQuests,
@@ -280,12 +284,12 @@ const devConsole = {
   },
 
   activateQuest(questId: string, branch?: 'A' | 'B') {
-    useQuestStore.getState().activateQuest(questId, branch);
+    activateQuestAction(questId, branch);
     fmt('Quest activated', { questId, branch });
   },
 
   completeQuest(questId: string) {
-    useQuestStore.getState().completeQuest(questId);
+    completeQuestAction(questId);
     fmt('Quest completed', questId);
   },
 };

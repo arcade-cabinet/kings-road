@@ -1,14 +1,31 @@
 import { trait } from 'koota';
+import type { EquippedItems, ItemStack } from '@/ecs/traits/inventory';
 
 /**
- * Session-scoped inventory UI state (per Koota Phase 1).
+ * Session-scoped inventory state.
  *
- * The inventory *data* (items, gold, equipment) still lives on the player
- * entity's `Inventory` + `Equipment` traits — that's the authoritative model.
- * This trait captures the UI-only flag: is the inventory panel open on screen?
+ * Holds the player's live inventory snapshot (items, gold, equipment) as
+ * well as the UI open flag. Authoritative for inventory UI rendering.
+ * Populated by save restore, panel actions, and loot pickups via the
+ * action functions in `@/ecs/actions/inventory-ui`.
  *
  * Attached to the singleton session entity via `getSessionEntity()`.
  */
+
+const EMPTY_EQUIPPED: EquippedItems = {
+  head: null,
+  chest: null,
+  legs: null,
+  feet: null,
+  weapon: null,
+  shield: null,
+  accessory: null,
+};
+
 export const InventoryUI = trait(() => ({
   isOpen: false,
+  items: [] as ItemStack[],
+  maxSlots: 20,
+  gold: 0,
+  equipped: { ...EMPTY_EQUIPPED } as EquippedItems,
 }));
