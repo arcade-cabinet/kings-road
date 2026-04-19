@@ -41,7 +41,24 @@ function IBLMap({ hdriId }: { hdriId: string }) {
     texture.mapping = THREE.EquirectangularReflectionMapping;
   }, [texture]);
 
-  return <Environment map={texture} background={false} environmentIntensity={1.0} />;
+  // `background` projects the HDRI onto the sky sphere so the scene's
+  // horizon actually shows what the lighting rig is sampling — without
+  // it, DayNightCycle was painting the sky with a hand-picked solid
+  // colour while IBL sampled a completely different environment, which
+  // meant bright HDRI lighting under a cold pastel sky. `backgroundBlurriness`
+  // softens the sharp HDRI pixels enough to read as atmospheric haze
+  // while preserving the horizon gradient's warmth/coolness. Set the
+  // intensity a bit below 1 so the HDRI doesn't over-brighten the sky
+  // relative to the rest of the scene.
+  return (
+    <Environment
+      map={texture}
+      background
+      backgroundBlurriness={0.15}
+      backgroundIntensity={0.85}
+      environmentIntensity={1.0}
+    />
+  );
 }
 
 export interface EnvironmentIBLProps {

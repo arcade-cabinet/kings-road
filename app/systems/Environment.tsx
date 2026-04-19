@@ -34,43 +34,12 @@ const cloudConfigs = Array.from({ length: 8 }, (_, i) => ({
   scale: 20 + (i % 4) * 8,
 }));
 
-// Sky color gradient for different times of day. Tuned for the
-// "warm pastoral English dawn" aesthetic called out in DESIGN.md —
-// morning holds a longer golden-haze tint before going full noon-blue,
-// sunset uses a softer amber-rose than the previous pure-red.
-const skyColorsGradient = [
-  { pct: 0.0, c: new THREE.Color(0x050510) }, // Midnight
-  { pct: 0.2, c: new THREE.Color(0x0a0a1a) }, // Pre-dawn
-  { pct: 0.25, c: new THREE.Color(0xff8844) }, // Sunrise
-  { pct: 0.33, c: new THREE.Color(0xe8b888) }, // Morning haze (warm golden)
-  { pct: 0.42, c: new THREE.Color(0x88b0dc) }, // Mid-morning (pastel blue)
-  { pct: 0.5, c: new THREE.Color(0x4488cc) }, // Noon
-  { pct: 0.65, c: new THREE.Color(0x88b0dc) }, // Afternoon
-  { pct: 0.75, c: new THREE.Color(0xe89068) }, // Sunset (amber-rose)
-  { pct: 0.85, c: new THREE.Color(0x1a1020) }, // Dusk
-  { pct: 1.0, c: new THREE.Color(0x050510) }, // Midnight
-];
-
-// Reusable objects — hoisted out of useFrame to avoid per-frame GC pressure
-const _skyResult = new THREE.Color();
+// Reusable colors hoisted out of useFrame to avoid per-frame GC pressure.
+// Sky gradient / getSkyColor were removed when EnvironmentIBL took over
+// the scene background — the HDRI now owns the horizon colour and
+// DayNightCycle only drives the sun light.
 const _amberColor = new THREE.Color(0xffd4a0);
 const _noonColor = new THREE.Color(0xfff8e7);
-
-function getSkyColor(timeOfDay: number): THREE.Color {
-  for (let i = 0; i < skyColorsGradient.length - 1; i++) {
-    if (
-      timeOfDay >= skyColorsGradient[i].pct &&
-      timeOfDay <= skyColorsGradient[i + 1].pct
-    ) {
-      const range = skyColorsGradient[i + 1].pct - skyColorsGradient[i].pct;
-      const lerp = (timeOfDay - skyColorsGradient[i].pct) / range;
-      return _skyResult
-        .copy(skyColorsGradient[i].c)
-        .lerp(skyColorsGradient[i + 1].c, lerp);
-    }
-  }
-  return _skyResult.copy(skyColorsGradient[0].c);
-}
 
 /** How often (in seconds) to push timeOfDay into Zustand for UI consumers. */
 const TIME_SYNC_INTERVAL = 2.0;
@@ -91,11 +60,11 @@ export function DayNightCycle() {
   const lastBiomeQueryDistRef = useRef(-Infinity);
   const cachedBiomeRef = useRef<BiomeConfig | null>(null);
 
-  // Initialize scene background immediately on mount
-  useMemo(() => {
-    const skyColor = getSkyColor(timeOfDay);
-    scene.background = skyColor;
-  }, [scene, timeOfDay]);
+  // EnvironmentIBL paints the HDRI onto scene.background with
+  // `backgroundBlurriness`; DayNightCycle no longer clobbers it with a
+  // hand-picked solid colour. Kept the `getSkyColor` helper around for
+  // the SceneInit early-boot clear colour (renders before IBL loads)
+  // but don't apply it here.
 
   useFrame((_, delta) => {
     if (!gameActive) return;
@@ -117,12 +86,12 @@ export function DayNightCycle() {
     const theta = (newTime - 0.25) * Math.PI * 2;
     const sunY = Math.sin(theta);
 
-    // Update sky background — fog is owned by <Fog /> (biome-driven), so we
-    // don't overwrite scene.fog.color here. Night darkening of fog could be
-    // added later by multiplying the biome base with a time-of-day factor
-    // inside the Fog component.
-    const skyColor = getSkyColor(newTime);
-    scene.background = skyColor;
+    // Sky background is owned by EnvironmentIBL (HDRI with
+    // backgroundBlurriness). Fog is owned by <Fog /> (biome-driven).
+    // DayNightCycle only drives the directional sun light + player
+    // lantern; it used to paint scene.background with `getSkyColor` but
+    // that was a solid colour that fought the HDRI every frame and
+    // produced the flat-sky look user flagged.
 
     // Update sun light — base intensity from biome if available, else default
     if (sunLightRef.current) {

@@ -119,19 +119,15 @@ function SceneContent() {
           <FPSViewmodel />
 
           {/*
-            Biome-driven post-processing is disabled for the Pages playtest.
-            Verified rendering paths tried:
-             1. @react-three/postprocessing → crashes React 19 with a
-                JSON-cycle serialization (Resolution ↔ Resizable mutual refs).
-             2. Raw `postprocessing` lib with `useFrame(cb, 1)` to suppress
-                R3F's default render → composer.render() runs but RenderPass
-                produces a flat-tinted output, not the actual scene. The
-                R3F 9 scene / renderer state isn't captured by the stock
-                RenderPass; further investigation needed.
-            The Pages deploy stays playable without effects until we have a
-            working composer path. Tracked as task #26.
+            Biome-driven post-processing — bloom, chroma aberration,
+            vignette, ACES tone mapping. Uses the raw `postprocessing`
+            lib directly (not @react-three/postprocessing, which crashes
+            React 19 with a JSON-cycle serialization on Resolution ↔
+            Resizable mutual refs). Rendered via useFrame(cb, 1) so
+            priority > 0 suppresses R3F 9's default gl.render() call;
+            see BiomePostProcessing.tsx for full explanation.
           */}
-          {/* <BiomePostProcessing /> */}
+          <BiomePostProcessing />
         </Physics>
       )}
     </>
