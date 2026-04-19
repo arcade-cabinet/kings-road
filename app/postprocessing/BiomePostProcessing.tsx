@@ -109,10 +109,15 @@ export function BiomePostProcessing() {
     // scene all the way to the tone-mapping pass at the end. Without
     // it, bright values from bloom/IBL saturate to 1.0 in the first
     // pass and the ToneMappingEffect has nothing to roll off — the
-    // earlier "flat-tinted output" symptom. `multisampling: 0` is
-    // still correct because post-processing does its own AA.
+    // earlier "flat-tinted output" symptom.
+    //
+    // `multisampling: 4` enables hardware MSAA on the composer's
+    // internal framebuffer — much cheaper than SMAA (which requires
+    // async lookup texture loading and caused a blank-frame flash at
+    // mount). 4× is the sweet spot for mobile; higher hits
+    // bandwidth on integrated GPUs without a visible gain.
     const composer = new EffectComposer(gl, {
-      multisampling: 0,
+      multisampling: 4,
       frameBufferType: THREE.HalfFloatType,
     });
     // RenderPass draws the scene into the composer's input buffer. With
