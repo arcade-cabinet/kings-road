@@ -46,8 +46,6 @@ const skyColorsGradient = [
 
 // Reusable objects — hoisted out of useFrame to avoid per-frame GC pressure
 const _skyResult = new THREE.Color();
-const _fogWarm = new THREE.Color(0xc4b99a);
-const _fogBright = new THREE.Color(0xf5f0e8);
 const _amberColor = new THREE.Color(0xffd4a0);
 const _noonColor = new THREE.Color(0xfff8e7);
 
@@ -112,17 +110,12 @@ export function DayNightCycle() {
     const theta = (newTime - 0.25) * Math.PI * 2;
     const sunY = Math.sin(theta);
 
-    // Update sky/fog color
+    // Update sky background — fog is owned by <Fog /> (biome-driven), so we
+    // don't overwrite scene.fog.color here. Night darkening of fog could be
+    // added later by multiplying the biome base with a time-of-day factor
+    // inside the Fog component.
     const skyColor = getSkyColor(newTime);
     scene.background = skyColor;
-
-    if (scene.fog) {
-      if (sunY > 0) {
-        scene.fog.color.lerpColors(_fogWarm, _fogBright, sunY);
-      } else {
-        scene.fog.color.setHex(0x0a0a1a);
-      }
-    }
 
     // Update sun light — base intensity from biome if available, else default
     if (sunLightRef.current) {
@@ -358,13 +351,41 @@ export function SkyDome() {
   );
 }
 
+/**
+ * Biome-driven fog — samples the current biome's lighting.fogColor /
+ * fogNear / fogFar from BiomeService and applies it to scene.fog every
+ * time the player's road distance moves into a new biome region. Falls
+ * back to a pastoral cream fog when the service isn't ready yet (early
+ * boot, before kingdom gen completes).
+ *
+ * Previously hardcoded to cream `(0xf5f0e8, 50, 200)` — that washed out
+ * Thornfield's cold mist (should be `#8090a0, 20, 120` per the biome
+ * config) and any biome set dusk/dawn colours had no visible effect.
+ */
 export function Fog() {
   const { scene } = useThree();
+  const lastSigRef = useRef<string>('');
 
-  useMemo(() => {
-    // Distance-based fog in cream/gold — hides chunk loading, adds pastoral depth
-    scene.fog = new THREE.Fog(0xf5f0e8, 50, 200);
-  }, [scene]);
+  useFrame(() => {
+    let color = 0xf5f0e8;
+    let near = 50;
+    let far = 200;
+    try {
+      const dist = getPlayer().playerPosition?.x ?? 0;
+      const biome = BiomeService.getCurrentBiome(dist);
+      const { fogColor, fogNear, fogFar } = biome.lighting;
+      color = new THREE.Color(fogColor).getHex();
+      near = fogNear;
+      far = fogFar;
+    } catch {
+      // fall back to defaults while BiomeService initialises
+    }
+    const sig = `${color.toString(16)}|${near}|${far}`;
+    if (sig !== lastSigRef.current) {
+      scene.fog = new THREE.Fog(color, near, far);
+      lastSigRef.current = sig;
+    }
+  });
 
   return null;
 }
