@@ -1,6 +1,9 @@
 import { Vector3 } from 'three';
+import { loadContentDb } from '@/db/load-content-db';
 import { startGame } from '@/ecs/actions/game';
 import { syncInventory } from '@/ecs/actions/inventory-ui';
+import { resolveNarrative } from '@/ecs/actions/quest';
+import { generateWorld, setWorldState } from '@/ecs/actions/world';
 import type { ItemStack } from '@/ecs/traits/inventory';
 
 /** Biome id → road distance (metres from Ashford) for known spawn points. */
@@ -42,16 +45,21 @@ export function parseSpawnParam(): string | null {
 }
 
 /**
- * Apply the debug spawn override.  No-ops in production builds.
+ * Apply the debug spawn override. No-ops in production builds.
  *
- * Call once at app startup (before the React tree renders).  When a valid
+ * Call once at app startup (before the React tree renders). When a valid
  * `?spawn=<biome>` param is detected the function:
- *   1. Picks the road anchor for that biome.
- *   2. Calls `startGame()` with a deterministic dev seed and the anchor position.
- *   3. Seeds the inventory with the starter loadout.
+ *   1. Loads the content DB and generates the kingdom map (same work the
+ *      main-menu "New Pilgrimage" path does).
+ *   2. Picks the road anchor for that biome.
+ *   3. Calls `startGame()` with a deterministic dev seed and the anchor position.
+ *   4. Seeds the inventory with the starter loadout.
  *
- * Returns true if a spawn override was applied (caller should skip the main
- * menu), false otherwise.
+ * Returns a promise that resolves to true when a spawn override was applied
+ * (caller should skip the main menu), false otherwise. The async path is fire-
+ * and-forget-safe — callers are expected to return the synchronous result as
+ * soon as it's known so React can mount the scene shell while generation
+ * progresses under the LoadingOverlay.
  */
 export function applyDebugSpawn(): boolean {
   if (!import.meta.env.DEV) return false;
@@ -70,17 +78,36 @@ export function applyDebugSpawn(): boolean {
   const pos = anchorToWorldPos(distance);
   const devSeed = `debug-${biomeId}-seed`;
 
-  startGame(devSeed, pos, 0);
+  // Kick off the same boot sequence the main menu runs. Fire-and-forget:
+  // the LoadingOverlay watches `isGenerating` + `activeChunks.size` and fades
+  // once the world is ready.
+  void (async () => {
+    try {
+      setWorldState({
+        isGenerating: true,
+        generationProgress: 0,
+        generationPhase: 'Loading the scrolls of knowledge...',
+      });
+      await loadContentDb();
+      await generateWorld(devSeed);
+      resolveNarrative(devSeed);
 
-  syncInventory(STARTER_ITEMS, 20, 0, {
-    head: null,
-    chest: null,
-    legs: null,
-    feet: null,
-    weapon: 'iron_sword',
-    shield: null,
-    accessory: null,
-  });
+      startGame(devSeed, pos, 0);
+
+      syncInventory(STARTER_ITEMS, 20, 0, {
+        head: null,
+        chest: null,
+        legs: null,
+        feet: null,
+        weapon: 'iron_sword',
+        shield: null,
+        accessory: null,
+      });
+    } catch (err) {
+      console.error('[debug/spawn] applyDebugSpawn failed:', err);
+      setWorldState({ isGenerating: false });
+    }
+  })();
 
   return true;
 }
