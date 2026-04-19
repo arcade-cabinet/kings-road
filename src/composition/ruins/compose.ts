@@ -8,11 +8,11 @@ import type { RuinsPlacement, TownConfig } from './types';
  * Thornfield biases toward graves and scatter to evoke "inhabited by the dead".
  */
 const CATEGORY_COUNTS = {
-  walls: { min: 6, max: 10 },
-  graves: { min: 5, max: 9 },
-  scatter: { min: 6, max: 10 },
-  structure: { min: 2, max: 4 },
-  flora: { min: 2, max: 5 },
+  walls: { min: 10, max: 16 },
+  graves: { min: 8, max: 14 },
+  scatter: { min: 12, max: 20 },
+  structure: { min: 3, max: 6 },
+  flora: { min: 4, max: 8 },
 } as const;
 
 type Category = keyof typeof CATEGORY_COUNTS;
@@ -91,11 +91,13 @@ export function composeRuins(
 
     for (const pos of positions) {
       const ruinId = weightedPick(assetIds, rng);
+      const variant = RUIN_ASSETS[ruinId];
+      const variation = 0.85 + rng() * 0.3;
       placements.push({
-        assetId: RUIN_ASSETS[ruinId].path.replace(/^\/assets\//, ''),
+        assetId: variant.path.replace(/^\/assets\//, ''),
         position: { x: pos.x, y: town.center.y, z: pos.z },
         rotation: { x: 0, y: rng() * Math.PI * 2, z: 0 },
-        scale: 0.85 + rng() * 0.3,
+        scale: variation * variant.baseScale,
       });
     }
   }

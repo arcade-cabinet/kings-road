@@ -38,12 +38,14 @@ const MOCK_TOWN: TownConfig = {
 describe('composeRuins', () => {
   it('returns at least 21 placements for a town-sized chunk', () => {
     const result = composeRuins(MOCK_BIOME, MOCK_TOWN, 'test-seed');
-    expect(result.length).toBeGreaterThanOrEqual(21);
+    // CATEGORY_COUNTS sum-of-mins = 10+8+12+3+4 = 37
+    expect(result.length).toBeGreaterThanOrEqual(37);
   });
 
-  it('returns no more than 38 placements', () => {
+  it('returns no more than 64 placements', () => {
     const result = composeRuins(MOCK_BIOME, MOCK_TOWN, 'test-seed');
-    expect(result.length).toBeLessThanOrEqual(38);
+    // CATEGORY_COUNTS sum-of-maxes = 16+14+20+6+8 = 64
+    expect(result.length).toBeLessThanOrEqual(64);
   });
 
   it('determinism — same inputs produce identical output', () => {
