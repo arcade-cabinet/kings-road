@@ -20,12 +20,33 @@
  */
 
 import { useTrait } from 'koota/react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { openInventory, isInventoryOpen } from '@/ecs/actions/inventory-ui';
 import { togglePause } from '@/ecs/actions/game';
 import { QuestLog } from '@/ecs/traits/session-quest';
 import { getSessionEntity } from '@/ecs/world';
 import { useFlags, usePlayer } from '@/ecs/hooks/useGameSession';
+
+/**
+ * Tracks whether pointer-lock is currently active (desktop mouse-look).
+ * Used to show a "click to look around" prompt on first load / after
+ * the player leaves lock via Escape. Returns false on touch devices so
+ * the prompt never appears on mobile.
+ */
+function usePointerLockPrompt(): boolean {
+  const [locked, setLocked] = useState(() => !!document.pointerLockElement);
+  useEffect(() => {
+    const onChange = () => setLocked(!!document.pointerLockElement);
+    document.addEventListener('pointerlockchange', onChange);
+    return () => document.removeEventListener('pointerlockchange', onChange);
+  }, []);
+  // Hide on devices that don't support pointer-lock (mobile/touch)
+  const isTouch =
+    typeof window !== 'undefined' &&
+    ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  return !locked && !isTouch;
+}
 
 const MAX_HEALTH = 100;
 const MAX_STAMINA = 100;
@@ -40,6 +61,7 @@ export function FunctionalHud({
   const questLog = useTrait(getSessionEntity(), QuestLog);
   const inventoryOpen = isInventoryOpen();
   const questCount = questLog?.activeQuests.length ?? 0;
+  const showPointerLockPrompt = usePointerLockPrompt();
 
   if (!gameActive || isDead) return null;
 
@@ -169,6 +191,27 @@ export function FunctionalHud({
       >
         <SatchelGlyph />
       </button>
+
+      {/* Desktop-only pointer-lock hint — disappears the moment the
+          player clicks into the scene (pointer-lock acquired). Hidden
+          on mobile/touch devices where gesture input replaces
+          mouse-look. Subtle bottom-centre placement keeps the ritual
+          out of the main action area. */}
+      {showPointerLockPrompt && (
+        <div
+          className={cn(
+            'absolute left-1/2 -translate-x-1/2 z-30 pointer-events-none',
+            'bottom-[max(env(safe-area-inset-bottom),5rem)]',
+            'px-4 py-2 rounded-full',
+            'bg-black/45 border border-[#c4a747]/50',
+            'text-[11px] tracking-widest text-[#f5e6c8]',
+            'drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]',
+          )}
+          aria-hidden="true"
+        >
+          ◉ Click to look around — WASD to walk, Shift to sprint
+        </div>
+      )}
     </>
   );
 }
