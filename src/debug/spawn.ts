@@ -62,10 +62,14 @@ function resolveSpawnPosition(
 /**
  * Parse `?spawn=<biome>` from the current URL.
  * Returns the normalised biome id string, or null when absent.
+ *
+ * Works in both DEV and production builds so the GitHub Pages deploy can
+ * deep-link straight into a biome for mobile playtests and benchmarks.
+ * `VITE_DEBUG_SPAWN` still lets a build be baked to auto-spawn without a
+ * query string (used by the Pages deploy to drop visitors straight into
+ * Thornfield by default).
  */
 export function parseSpawnParam(): string | null {
-  if (!import.meta.env.DEV) return null;
-
   const fromUrl = new URLSearchParams(window.location.search).get('spawn');
   if (fromUrl) return fromUrl.toLowerCase().replace(/-/g, '_');
 
@@ -94,8 +98,6 @@ export function parseSpawnParam(): string | null {
  * populated and chunks activate.
  */
 export function applyDebugSpawn(): boolean {
-  if (!import.meta.env.DEV) return false;
-
   const biomeId = parseSpawnParam();
   if (!biomeId) return false;
 

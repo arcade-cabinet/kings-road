@@ -35,6 +35,12 @@ jobs:
       - name: Build
         env:
           GITHUB_PAGES: 'true'
+          # Ship the Pages deploy with Thornfield as the default spawn so
+          # visitors land straight in the benchmark biome (hitting / on a
+          # phone / foldable should put you in the world with full effects,
+          # not at the main menu). Override with ?spawn=<biome> on any
+          # other biome id.
+          VITE_DEBUG_SPAWN: thornfield
         run: pnpm build
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v5.0.0
