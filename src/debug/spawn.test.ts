@@ -108,14 +108,14 @@ describe('applyDebugSpawn', () => {
     // Thornfield settlement at grid (50, 100) → world centre
     // (50*CHUNK_SIZE + CHUNK_SIZE/2, PLAYER_HEIGHT, 100*CHUNK_SIZE + CHUNK_SIZE/2)
     // With CHUNK_SIZE=120 → (6060, y, 12060)
-    // Debug spawn offsets the position +25 m along +X from the
-    // settlement grid centre so the village is diagonally across the
-    // forward view instead of straight ahead on the road corridor.
-    // Yaw stays at 0 (north) — yaw overrides weren't propagating
-    // through to the first-frame camera rotation; tracked on task #32.
+    // Debug spawn offsets the settlement grid centre by (-8, +18) so
+    // the player stands south-east of the settlement core with the
+    // ruin-keeper's cottage + warden's watch NPCs in the forward
+    // viewport. Previous +25m east offset faced away from the main
+    // building cluster.
     expect(gameMod.startGame).toHaveBeenCalledWith(
       'debug-thornfield-seed',
-      expect.objectContaining({ x: 6085, z: 12060 }),
+      expect.objectContaining({ x: 6052, z: 12078 }),
       0,
     );
   });

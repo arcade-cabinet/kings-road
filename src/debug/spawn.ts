@@ -52,16 +52,18 @@ function resolveSpawnPosition(
     );
   }
   const [gx, gy] = settlement.position;
-  // Offset the spawn along +X (east of the road axis) by 25m so the player
-  // isn't standing on the road itself — facing north (default yaw) then
-  // puts ruins + NPCs + road diagonally across the view instead of all
-  // hidden off-screen to the sides. Thornfield's town centre is at the
-  // road; this offset puts the player on the settlement flank where
-  // buildings and dead trees cluster.
+  // Debug spawn position: 20 m south-east of the settlement centre so
+  // the player starts outside the building footprints (ruin-keeper's
+  // camp sits at tile (-3,-2) ≈ world (-12,-8); warden's watch at
+  // (3,-3) ≈ (12,-12)). Facing north (default yaw), both buildings
+  // + their NPCs land in the upper-left / upper-right of the
+  // viewport, with the cottage-keeper in the central sweet spot at
+  // ~25 m. The previous +25 m east offset put the camera looking
+  // AWAY from the main building cluster.
   return new Vector3(
-    gx * CHUNK_SIZE + CHUNK_SIZE / 2 + 25,
+    gx * CHUNK_SIZE + CHUNK_SIZE / 2 - 8,
     PLAYER_HEIGHT,
-    gy * CHUNK_SIZE + CHUNK_SIZE / 2,
+    gy * CHUNK_SIZE + CHUNK_SIZE / 2 + 18,
   );
 }
 
