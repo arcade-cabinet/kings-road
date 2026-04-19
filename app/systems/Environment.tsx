@@ -47,6 +47,7 @@ const TIME_SYNC_INTERVAL = 2.0;
 export function DayNightCycle() {
   const { scene, camera } = useThree();
   const sunLightRef = useRef<THREE.DirectionalLight>(null);
+  const ambientLightRef = useRef<THREE.AmbientLight>(null);
   const playerLanternRef = useRef<THREE.PointLight>(null);
 
   const { gameActive } = useFlags();
@@ -134,6 +135,20 @@ export function DayNightCycle() {
       }
     }
 
+    // Ambient — biome-driven color + intensity, modulated by time-of-day so
+    // night pulls ambient down without going to zero (otherwise non-emissive
+    // props go pitch black). Previously hardcoded `intensity=0.25 color=fff8e7`
+    // ignored the biome's authored lighting config entirely.
+    if (ambientLightRef.current && cachedBiomeRef.current) {
+      const biomeAmbIntensity =
+        cachedBiomeRef.current.lighting.ambientIntensity;
+      const biomeAmbColor = cachedBiomeRef.current.lighting.ambientColor;
+      // Keep 30% of ambient at night so silhouettes remain visible.
+      const dayFactor = sunY > 0 ? 1.0 : 0.3;
+      ambientLightRef.current.intensity = biomeAmbIntensity * dayFactor;
+      ambientLightRef.current.color.set(biomeAmbColor);
+    }
+
     // Update player lantern for night
     if (playerLanternRef.current) {
       playerLanternRef.current.position.copy(camera.position);
@@ -176,11 +191,13 @@ export function DayNightCycle() {
         <primitive object={new THREE.Object3D()} attach="target" />
       </directionalLight>
 
-      {/* Warm ambient light — dropped intensity from 0.4 → 0.25 now that
-          envMapIntensity=1.4 lights the scene via HDRI IBL, so the
-          old ambient is double-counting. Lower ambient also lets
-          directional shadows read darker + more cinematic. */}
-      <ambientLight intensity={0.25} color={0xfff8e7} />
+      {/* Ambient light — drive intensity + color from biome via
+          `ambientLightRef` in DayNightCycle. The JSX values here are
+          initial placeholders until the first biome query resolves.
+          Hardcoding ignored the biome's authored `lighting.ambientColor`
+          (#7a6e5a warm for Thornfield) which let dead trees pool too
+          dark in shadow. */}
+      <ambientLight ref={ambientLightRef} intensity={0.5} color={0x7a6e5a} />
 
       {/* Player lantern for night */}
       <pointLight
