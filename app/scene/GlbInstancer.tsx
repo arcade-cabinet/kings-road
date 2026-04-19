@@ -144,6 +144,21 @@ export function GlbInstancer({
     meshRef.current.frustumCulled = false;
 
     const dummy = new THREE.Object3D();
+    // Deterministic per-instance colour jitter so 31k grass tufts or
+    // 500 trees don't all read as identical stamped clones — small
+    // ±8% HSV shift against the base tint keeps the biome palette
+    // cohesive while restoring variety the PSX-mega pack lacks (only
+    // 2-3 GLB variants per species). Seeded off the instance index so
+    // placements stay deterministic for regression tests.
+    const baseColor = new THREE.Color();
+    if ((material as THREE.MeshStandardMaterial).color) {
+      baseColor.copy((material as THREE.MeshStandardMaterial).color);
+    } else {
+      baseColor.setHex(0xffffff);
+    }
+    const instanceColor = new THREE.Color();
+    const hsl = { h: 0, s: 0, l: 0 };
+    baseColor.getHSL(hsl);
     for (let i = 0; i < itemCount; i++) {
       const it = items[i];
       if (!it) continue;
@@ -156,9 +171,24 @@ export function GlbInstancer({
       dummy.rotation.set(0, it.rotY ?? 0, 0);
       dummy.updateMatrix();
       meshRef.current.setMatrixAt(i, dummy.matrix);
+
+      // Deterministic hash from index — no per-frame rng needed.
+      const r = ((i * 2654435761) >>> 0) / 0xffffffff;
+      const r2 = ((i * 1140671485 + 12345) >>> 0) / 0xffffffff;
+      const hueShift = (r - 0.5) * 0.04; // ±2% hue
+      const lumShift = (r2 - 0.5) * 0.16; // ±8% lightness
+      instanceColor.setHSL(
+        (hsl.h + hueShift + 1) % 1,
+        hsl.s,
+        Math.max(0, Math.min(1, hsl.l + lumShift)),
+      );
+      meshRef.current.setColorAt(i, instanceColor);
     }
     meshRef.current.instanceMatrix.needsUpdate = true;
-  }, [items, itemCount, baseScale]);
+    if (meshRef.current.instanceColor) {
+      meshRef.current.instanceColor.needsUpdate = true;
+    }
+  }, [items, itemCount, baseScale, material]);
 
   if (itemCount === 0) return null;
 
