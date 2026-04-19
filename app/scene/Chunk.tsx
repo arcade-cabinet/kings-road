@@ -78,7 +78,17 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         center: { x: oX + CHUNK_SIZE / 2, y: 0, z: oZ + CHUNK_SIZE / 2 },
         radius: CHUNK_SIZE / 2,
       };
-      return biomeConfig ? composeRuins(biomeConfig, townConfig, seedPhrase) : [];
+      // Ruins + overgrown foliage — biomes like Thornfield are
+      // explicitly "dead forest wrapped around ruins" per the biome
+      // description, so a TOWN chunk without vegetation reads as a bare
+      // stone clearing. Compose both, merge the arrays.
+      const ruinPlacements = biomeConfig
+        ? composeRuins(biomeConfig, townConfig, seedPhrase)
+        : [];
+      const townVegPlacements = biomeConfig
+        ? composeVegetation(biomeConfig, cx, cz, heightSampler, seedPhrase)
+        : [];
+      return [...ruinPlacements, ...townVegPlacements];
     }
 
     if (type === 'DUNGEON') {
