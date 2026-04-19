@@ -34,15 +34,19 @@ const cloudConfigs = Array.from({ length: 8 }, (_, i) => ({
   scale: 20 + (i % 4) * 8,
 }));
 
-// Sky color gradient for different times of day
+// Sky color gradient for different times of day. Tuned for the
+// "warm pastoral English dawn" aesthetic called out in DESIGN.md —
+// morning holds a longer golden-haze tint before going full noon-blue,
+// sunset uses a softer amber-rose than the previous pure-red.
 const skyColorsGradient = [
   { pct: 0.0, c: new THREE.Color(0x050510) }, // Midnight
   { pct: 0.2, c: new THREE.Color(0x0a0a1a) }, // Pre-dawn
   { pct: 0.25, c: new THREE.Color(0xff8844) }, // Sunrise
-  { pct: 0.35, c: new THREE.Color(0x6699cc) }, // Morning
+  { pct: 0.33, c: new THREE.Color(0xe8b888) }, // Morning haze (warm golden)
+  { pct: 0.42, c: new THREE.Color(0x88b0dc) }, // Mid-morning (pastel blue)
   { pct: 0.5, c: new THREE.Color(0x4488cc) }, // Noon
-  { pct: 0.65, c: new THREE.Color(0x6699cc) }, // Afternoon
-  { pct: 0.75, c: new THREE.Color(0xaa4433) }, // Sunset
+  { pct: 0.65, c: new THREE.Color(0x88b0dc) }, // Afternoon
+  { pct: 0.75, c: new THREE.Color(0xe89068) }, // Sunset (amber-rose)
   { pct: 0.85, c: new THREE.Color(0x1a1020) }, // Dusk
   { pct: 1.0, c: new THREE.Color(0x050510) }, // Midnight
 ];
