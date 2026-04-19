@@ -155,7 +155,13 @@ export function GameScene() {
           height: '100vh',
           display: 'block',
           touchAction: 'none',
-          background: '#87CEEB',
+          // Warm cream fallback matches the pastoral mood during the brief
+          // HDRI-load window. Once <Environment background /> mounts via
+          // EnvironmentIBL, the HDRI fully owns the sky. The previous
+          // '#87CEEB' sky-blue was a hard fight against the biome's
+          // intended warmth — showed through on first frames and any
+          // dropped-composer frame as a jarring LCD blue.
+          background: '#f5f0e8',
         }}
       >
         <SceneInit />
