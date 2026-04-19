@@ -87,20 +87,20 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
     {
       id: 'grass-1',
       path: '/assets/nature/psx-mega/grass-1.glb',
-      minSpacing: 1,
-      baseScale: 1,
+      minSpacing: 1.5,
+      baseScale: 0.7,
     },
     {
       id: 'grass-2',
       path: '/assets/nature/psx-mega/grass-2.glb',
-      minSpacing: 1,
-      baseScale: 1,
+      minSpacing: 1.5,
+      baseScale: 0.7,
     },
     {
       id: 'weed-1',
       path: '/assets/nature/psx-mega/weed-1.glb',
-      minSpacing: 1.5,
-      baseScale: 1,
+      minSpacing: 2,
+      baseScale: 0.8,
     },
   ],
   'lone-fern': [
@@ -108,7 +108,7 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
       id: 'weed-1',
       path: '/assets/nature/psx-mega/weed-1.glb',
       minSpacing: 2,
-      baseScale: 1,
+      baseScale: 0.8,
     },
     {
       id: 'grass-2',
@@ -141,14 +141,14 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
     {
       id: 'grass-1',
       path: '/assets/nature/psx-mega/grass-1.glb',
-      minSpacing: 1,
-      baseScale: 1,
+      minSpacing: 1.5,
+      baseScale: 0.7,
     },
     {
       id: 'grass-2',
       path: '/assets/nature/psx-mega/grass-2.glb',
-      minSpacing: 1,
-      baseScale: 1,
+      minSpacing: 1.5,
+      baseScale: 0.7,
     },
   ],
   // ── Moor / highland biome species ────────────────────────────────
@@ -181,8 +181,8 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
     {
       id: 'grass-2',
       path: '/assets/nature/psx-mega/grass-2.glb',
-      minSpacing: 1,
-      baseScale: 1,
+      minSpacing: 1.5,
+      baseScale: 0.7,
     },
   ],
   'standing-stone': [

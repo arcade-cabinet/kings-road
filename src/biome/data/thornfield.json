@@ -13,11 +13,11 @@
     "ambientIntensity": 0.4,
     "directionalColor": "#c8d8e8",
     "directionalIntensity": 0.6,
-    "fogColor": "#8090a0",
-    "fogNear": 50,
-    "fogFar": 260,
+    "fogColor": "#a89878",
+    "fogNear": 40,
+    "fogFar": 220,
     "fogDensity": 0.015,
-    "skyTint": "#6a8090"
+    "skyTint": "#8a7a5a"
   },
   "terrain": {
     "heightmap": "procedural",
@@ -43,12 +43,12 @@
   "foliage": {
     "density": 0.4,
     "species": [
-      { "assetId": "gnarled-dead-oak", "density": 0.35, "scaleRange": [0.9, 1.5] },
-      { "assetId": "hawthorn", "density": 0.2, "scaleRange": [0.7, 1.1], "clusterRadius": 3 },
-      { "assetId": "thorn-bush", "density": 0.15, "scaleRange": [0.5, 0.9], "clusterRadius": 2 },
-      { "assetId": "lone-fern", "density": 0.1, "scaleRange": [0.4, 0.7] },
-      { "assetId": "fallen-leaves", "density": 0.1, "scaleRange": [0.5, 0.9] },
-      { "assetId": "dead-grass", "density": 0.08, "scaleRange": [0.6, 1.0] }
+      { "assetId": "gnarled-dead-oak", "density": 0.45, "scaleRange": [0.8, 1.6] },
+      { "assetId": "hawthorn", "density": 0.25, "scaleRange": [0.6, 1.2], "clusterRadius": 3 },
+      { "assetId": "thorn-bush", "density": 0.12, "scaleRange": [0.5, 0.9], "clusterRadius": 2 },
+      { "assetId": "lone-fern", "density": 0.08, "scaleRange": [0.3, 0.6] },
+      { "assetId": "fallen-leaves", "density": 0.06, "scaleRange": [0.4, 0.8] },
+      { "assetId": "dead-grass", "density": 0.04, "scaleRange": [0.5, 0.9] }
     ],
     "groundCover": ["fallen-leaves", "ivy-ground", "dead-grass", "grave-moss"]
   },
