@@ -36,7 +36,7 @@ const MOCK_TOWN: TownConfig = {
 };
 
 describe('composeRuins', () => {
-  it('returns at least 21 placements for a town-sized chunk', () => {
+  it('returns at least 37 placements for a town-sized chunk', () => {
     const result = composeRuins(MOCK_BIOME, MOCK_TOWN, 'test-seed');
     // CATEGORY_COUNTS sum-of-mins = 10+8+12+3+4 = 37
     expect(result.length).toBeGreaterThanOrEqual(37);
@@ -90,6 +90,24 @@ describe('composeRuins', () => {
       const dz = p.position.z - MOCK_TOWN.center.z;
       const dist = Math.sqrt(dx * dx + dz * dz);
       expect(dist).toBeLessThanOrEqual(MOCK_TOWN.radius + 0.001);
+    }
+  });
+
+  it('scale = variation (0.85..1.15) × variant.baseScale per placement', () => {
+    // Build a lookup from emitted assetId (post-/assets/ strip) back to the
+    // RUIN_ASSETS entry so we can assert the scale formula for each placement.
+    const byPath = new Map<string, number>();
+    for (const [, def] of Object.entries(RUIN_ASSETS)) {
+      byPath.set(def.path.replace(/^\/assets\//, ''), def.baseScale);
+    }
+    const result = composeRuins(MOCK_BIOME, MOCK_TOWN, 'scale-check');
+    for (const p of result) {
+      const baseScale = byPath.get(p.assetId);
+      expect(baseScale, `unknown assetId: ${p.assetId}`).toBeDefined();
+      // variation is in [0.85, 1.15]; final scale must land in that band ×
+      // the variant's baseScale, never the authored (tiny) scale alone.
+      expect(p.scale).toBeGreaterThanOrEqual(0.85 * baseScale!);
+      expect(p.scale).toBeLessThanOrEqual(1.15 * baseScale!);
     }
   });
 
