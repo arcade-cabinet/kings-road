@@ -54,8 +54,14 @@ function IBLMap({ hdriId }: { hdriId: string }) {
     <Environment
       map={texture}
       background
-      backgroundBlurriness={0.15}
-      backgroundIntensity={0.85}
+      // Soften the sky more (0.15 → 0.4) so sharp HDRI cloud pixels read
+      // as diffuse haze instead of blown-out patches. Drop background
+      // intensity (0.85 → 0.35) so the sky dome doesn't saturate to pure
+      // white after tone-mapping — this was the cb=138 blown-sky symptom.
+      // environmentIntensity stays high (1.4) so material IBL reflections
+      // still have punch; the background dome is just visually quieter.
+      backgroundBlurriness={0.4}
+      backgroundIntensity={0.35}
       environmentIntensity={1.4}
     />
   );
