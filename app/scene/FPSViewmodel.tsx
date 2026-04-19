@@ -40,7 +40,11 @@ const DEFAULT_HAND_GLB = '/assets/hands/hand.glb';
  * normalization step the `Villager NPCs` hand rig renders at 2.3m,
  * filling the viewport as a beige wall.
  */
-const VIEWMODEL_TARGET_METRES = 0.24;
+// Target hand fit-scale before the downstream `scale * 0.8 * fit` multiplier.
+// 0.35 × 0.8 = 0.28 on-screen hand size, matching the authored forearm length.
+// A previous revision lowered this to 0.24 without adjusting the 0.8
+// multiplier, which shrank the hand to 0.192m (visibly tiny next to the sword).
+const VIEWMODEL_TARGET_METRES = 0.35;
 // Authored blade length at viewmodel distance. 0.35m at z=-0.45 reads as
 // "holding a real sword" — big enough to feel weighty, small enough not to
 // occlude the lower third of the viewport. The previous 0.6m filled half
