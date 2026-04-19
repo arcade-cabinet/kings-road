@@ -44,9 +44,19 @@ jobs:
       - name: Web build
         run: pnpm build
 
+      # Playwright browsers MUST be installed before `pnpm test:browser`.
+      # Without this step, Vitest browser mode silently reports "no tests"
+      # with an unhandled Executable-not-found error — and because we
+      # previously had `continue-on-error: true` on the next step, every
+      # browser test was invisibly skipping in CI. Discovered 2026-04-19.
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      # NO continue-on-error — browser-test regressions MUST fail CI.
+      # A green build with zero browser tests running is worse than a
+      # red build with visible breakage.
       - name: Browser smoke tests
         run: pnpm test:browser
-        continue-on-error: true
 
       - name: Upload browser test artifacts on failure
         if: failure()
@@ -56,4 +66,16 @@ jobs:
           path: |
             test-results/
             playwright-report/
+            __screenshots__/
           retention-days: 7
+
+      # Always upload fixture screenshots so the team can visually verify
+      # the authored asset catalog on every PR, even when tests pass.
+      - name: Upload fixture screenshots (always)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: fixture-screenshots
+          path: __screenshots__/
+          if-no-files-found: ignore
+          retention-days: 30
