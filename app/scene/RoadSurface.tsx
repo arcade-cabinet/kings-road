@@ -9,22 +9,32 @@
  * producing correct straight segments, turns, and intersections.
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
+import { loadPbrMaterial } from '@/assets';
 import type {
   KingdomMap,
   MapTile,
   RoadType,
 } from '@/schemas/kingdom.schema';
 import { CHUNK_SIZE } from '@/utils/worldCoords';
-import { getTerrainHeight } from '@/utils/worldGen';
 import { getKingdomTile } from '@/world/kingdom-gen';
 
 /** Subdivisions along each road strip axis */
 const ROAD_SEGMENTS = 12;
 
-/** Small Y offset above terrain to prevent z-fighting */
-const ROAD_Y_OFFSET = 0.08;
+/**
+ * Small Y offset above terrain to prevent z-fighting. Thornfield's procedural
+ * heightmap displaces at most `displacementScale × scale = 0.375m` above the
+ * flat terrain plane at y=0, so the road can sit just above that ceiling and
+ * still read as "on the ground". The previous implementation sampled
+ * `getTerrainHeight()` which returns `elevation × 30m` (ballooning up to 15m
+ * for a moderate-elevation tile) — that's a different height system from the
+ * procedural displacement the terrain mesh actually uses, which is why roads
+ * were floating way above the ground (and the player with them, since the
+ * character controller lands on the nearest collider).
+ */
+const ROAD_Y = 0.4;
 
 /** Road width in world units per road type */
 const ROAD_WIDTHS: Record<RoadType, number> = {
@@ -34,32 +44,20 @@ const ROAD_WIDTHS: Record<RoadType, number> = {
   trail: 4,
 };
 
-/** Road material colors per road type (warm palette matching the game mood) */
-const ROAD_COLORS: Record<RoadType, number> = {
-  highway: 0xc4aa78, // warm honey cobblestone
-  secondary: 0x8b7355, // earthy brown dirt
-  path: 0x6b7a52, // trampled dark green
-  trail: 0x5a6a45, // subtle grass trail
+/**
+ * Map road type → PBR material id in the ingested palette. Keeps the road
+ * visually consistent with the ground-PBR splat-blended terrain instead of
+ * rendering as a flat matte color swatch.
+ */
+const ROAD_PBR: Record<RoadType, string> = {
+  highway: 'wet-cobblestone', // warm honey cobblestone
+  secondary: 'packed-mud', // earthy brown dirt
+  path: 'packed-dirt', // trampled path
+  trail: 'dead-grass', // subtle grass trail
 };
 
-/** Cached road materials (one per road type) */
-const roadMaterialCache = new Map<RoadType, THREE.MeshStandardMaterial>();
-
-function getRoadMaterial(roadType: RoadType): THREE.MeshStandardMaterial {
-  let mat = roadMaterialCache.get(roadType);
-  if (mat) return mat;
-
-  mat = new THREE.MeshStandardMaterial({
-    color: ROAD_COLORS[roadType],
-    roughness: roadType === 'highway' ? 0.85 : 0.95,
-    metalness: 0,
-    polygonOffset: true,
-    polygonOffsetFactor: -1,
-    polygonOffsetUnits: -1,
-  });
-  roadMaterialCache.set(roadType, mat);
-  return mat;
-}
+/** UV tile scale for road materials — keeps texel density reasonable at road width. */
+const ROAD_TILE_SCALE = 3;
 
 interface RoadNeighbors {
   north: boolean;
@@ -111,7 +109,61 @@ export function RoadSurface({
   kingdomMap,
 }: RoadSurfaceProps) {
   const roadType = kingdomTile.roadType ?? 'highway';
-  const material = useMemo(() => getRoadMaterial(roadType), [roadType]);
+
+  // Load PBR material async so the road shares the palette with the splat-blended
+  // terrain underneath. While it's loading we render nothing (no flashing flat
+  // colour). Cache is keyed by id so the same pack only downloads once for the
+  // whole session.
+  const [material, setMaterial] = useState<THREE.MeshStandardMaterial | null>(
+    null,
+  );
+  useEffect(() => {
+    let cancelled = false;
+    const pbrId = ROAD_PBR[roadType];
+    loadPbrMaterial(pbrId)
+      .then((base) => {
+        if (cancelled) return;
+        // Clone so we can tweak tiling per road mesh without mutating the
+        // cached shared material that other callers read.
+        const mat = base.clone();
+        if (mat.map) {
+          mat.map = mat.map.clone();
+          mat.map.wrapS = THREE.RepeatWrapping;
+          mat.map.wrapT = THREE.RepeatWrapping;
+          mat.map.repeat.set(ROAD_TILE_SCALE, ROAD_TILE_SCALE);
+          mat.map.needsUpdate = true;
+        }
+        if (mat.normalMap) {
+          mat.normalMap = mat.normalMap.clone();
+          mat.normalMap.wrapS = THREE.RepeatWrapping;
+          mat.normalMap.wrapT = THREE.RepeatWrapping;
+          mat.normalMap.repeat.set(ROAD_TILE_SCALE, ROAD_TILE_SCALE);
+          mat.normalMap.needsUpdate = true;
+        }
+        if (mat.roughnessMap) {
+          mat.roughnessMap = mat.roughnessMap.clone();
+          mat.roughnessMap.wrapS = THREE.RepeatWrapping;
+          mat.roughnessMap.wrapT = THREE.RepeatWrapping;
+          mat.roughnessMap.repeat.set(ROAD_TILE_SCALE, ROAD_TILE_SCALE);
+          mat.roughnessMap.needsUpdate = true;
+        }
+        mat.polygonOffset = true;
+        mat.polygonOffsetFactor = -1;
+        mat.polygonOffsetUnits = -1;
+        setMaterial(mat);
+      })
+      .catch((err) => {
+        // Never let an unhandled rejection propagate to the error overlay —
+        // a missing road texture should degrade, not crash the scene.
+        console.warn(
+          `[RoadSurface] PBR material "${pbrId}" failed to load, road will render invisible until resolved:`,
+          err,
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [roadType]);
 
   const geometry = useMemo(() => {
     const gx = kingdomTile.x;
@@ -135,82 +187,77 @@ export function RoadSurface({
       roadWidth,
       roadWidth,
       segs,
-      kingdomMap,
     );
     geometries.push(centerGeo);
 
-    // North strip: from center to north edge
     if (neighbors.north) {
-      const stripGeo = buildRoadPatch(
-        oX + halfChunk - halfRoad,
-        oZ,
-        roadWidth,
-        halfChunk - halfRoad,
-        segs,
-        kingdomMap,
+      geometries.push(
+        buildRoadPatch(
+          oX + halfChunk - halfRoad,
+          oZ,
+          roadWidth,
+          halfChunk - halfRoad,
+          segs,
+        ),
       );
-      geometries.push(stripGeo);
     }
-
-    // South strip: from center to south edge
     if (neighbors.south) {
-      const stripGeo = buildRoadPatch(
-        oX + halfChunk - halfRoad,
-        oZ + halfChunk + halfRoad,
-        roadWidth,
-        halfChunk - halfRoad,
-        segs,
-        kingdomMap,
+      geometries.push(
+        buildRoadPatch(
+          oX + halfChunk - halfRoad,
+          oZ + halfChunk + halfRoad,
+          roadWidth,
+          halfChunk - halfRoad,
+          segs,
+        ),
       );
-      geometries.push(stripGeo);
     }
-
-    // West strip: from center to west edge
     if (neighbors.west) {
-      const stripGeo = buildRoadPatch(
-        oX,
-        oZ + halfChunk - halfRoad,
-        halfChunk - halfRoad,
-        roadWidth,
-        segs,
-        kingdomMap,
+      geometries.push(
+        buildRoadPatch(
+          oX,
+          oZ + halfChunk - halfRoad,
+          halfChunk - halfRoad,
+          roadWidth,
+          segs,
+        ),
       );
-      geometries.push(stripGeo);
     }
-
-    // East strip: from center to east edge
     if (neighbors.east) {
-      const stripGeo = buildRoadPatch(
-        oX + halfChunk + halfRoad,
-        oZ + halfChunk - halfRoad,
-        halfChunk - halfRoad,
-        roadWidth,
-        segs,
-        kingdomMap,
+      geometries.push(
+        buildRoadPatch(
+          oX + halfChunk + halfRoad,
+          oZ + halfChunk - halfRoad,
+          halfChunk - halfRoad,
+          roadWidth,
+          segs,
+        ),
       );
-      geometries.push(stripGeo);
     }
 
-    // Merge all strips into one geometry
     const merged = mergeGeometries(geometries);
     for (const g of geometries) g.dispose();
     return merged;
   }, [oX, oZ, kingdomTile, kingdomMap, roadType]);
 
-  if (!geometry) return null;
+  if (!geometry || !material) return null;
 
   return <mesh geometry={geometry} material={material} receiveShadow />;
 }
 
 /**
- * Build a terrain-conforming road patch (subdivision grid).
+ * Build a flat road patch at y=ROAD_Y.
+ *
+ * The surface is a subdivision grid even though it's flat — subdivision stays
+ * in place because future visual polish (height-conforming, edge feathering)
+ * will need the extra vertices, and the mesh is still fewer than 200 verts
+ * per chunk per road strip.
  *
  * @param startX  World X of the patch's west edge
  * @param startZ  World Z of the patch's north edge
  * @param width   Patch width in world units (X axis)
  * @param depth   Patch depth in world units (Z axis)
  * @param segs    Number of subdivisions per axis
- * @param map     Kingdom map for height sampling
  */
 function buildRoadPatch(
   startX: number,
@@ -218,7 +265,6 @@ function buildRoadPatch(
   width: number,
   depth: number,
   segs: number,
-  map: KingdomMap,
 ): THREE.BufferGeometry {
   const vertsX = segs + 1;
   const vertsZ = segs + 1;
@@ -227,22 +273,19 @@ function buildRoadPatch(
   const normals = new Float32Array(vertCount * 3);
   const uvs = new Float32Array(vertCount * 2);
 
-  // Build vertices
   for (let iz = 0; iz < vertsZ; iz++) {
     for (let ix = 0; ix < vertsX; ix++) {
       const idx = iz * vertsX + ix;
       const wx = startX + (ix / segs) * width;
       const wz = startZ + (iz / segs) * depth;
-      const wy = getTerrainHeight(map, wx, wz) + ROAD_Y_OFFSET;
 
       positions[idx * 3] = wx;
-      positions[idx * 3 + 1] = wy;
+      positions[idx * 3 + 1] = ROAD_Y;
       positions[idx * 3 + 2] = wz;
 
       uvs[idx * 2] = ix / segs;
       uvs[idx * 2 + 1] = iz / segs;
 
-      // Default up normal (will be recalculated)
       normals[idx * 3] = 0;
       normals[idx * 3 + 1] = 1;
       normals[idx * 3 + 2] = 0;
