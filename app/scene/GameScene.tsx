@@ -36,14 +36,13 @@ function SceneInit() {
 
   useLayoutEffect(() => {
     if (scene) {
-      // Sky-blue in the overworld; deep-dungeon dark when below ground so a
-      // dungeon room that hasn't fully rendered its walls this frame does not
-      // expose the sky clear-colour as a blue flash. User report: "walking
-      // over people is what turns the map blue" — that was an accidental
-      // dungeon-entrance dialogue auto-entering the dungeon, whose first few
-      // frames rendered against the overworld sky background and read as a
-      // bright blue crash.
-      scene.background = new THREE.Color(inDungeon ? 0x0a0a10 : 0x87ceeb);
+      // Warm pastoral cream in the overworld (matches Canvas CSS fallback),
+      // deep-dungeon dark when below ground. EnvironmentIBL paints the HDRI
+      // over this background once it loads — this clear color only shows
+      // during the brief asset-load window and in any frame where a dungeon
+      // room hasn't fully rendered its walls. The previous 0x87ceeb sky-blue
+      // was a jarring LCD flash against the rest of the warm palette.
+      scene.background = new THREE.Color(inDungeon ? 0x0a0a10 : 0xf5f0e8);
     }
     // Expose the active scene / camera / renderer on window so we can
     // probe scene contents from Chrome DevTools + Playwright MCP tooling.
@@ -71,8 +70,11 @@ function SceneContent() {
   // Just conditionally render the game content inside
   return (
     <>
-      {/* Always present: base lighting for when game isn't active */}
-      <ambientLight intensity={gameActive ? 0.35 : 0.1} color={0xffeedd} />
+      {/* Menu-only fallback ambient. When `gameActive` is true, the
+          DayNightCycle in Environment.tsx owns ambient via ambientLightRef
+          (biome-driven color + intensity, modulated by time of day). Having
+          both active produced double ambient and washed the midtones. */}
+      {!gameActive && <ambientLight intensity={0.1} color={0xffeedd} />}
 
       {/* Game content - only when active AND we have a seed */}
       {gameActive && seedPhrase && (
@@ -149,13 +151,27 @@ export function GameScene() {
         gl={{
           antialias: false,
           powerPreference: 'high-performance',
+          // Disable renderer-side tone mapping — BiomePostProcessing runs
+          // an explicit ACES_FILMIC ToneMappingEffect at the end of its
+          // EffectPass. R3F's default is ACESFilmicToneMapping with
+          // exposure 1.0, which was being applied to the linear HDR
+          // scene BEFORE the composer's own ACES pass — double tone-map
+          // squashes highlights twice, producing the blown-out milky sky
+          // and muddy midtones visible on cb=131.
+          toneMapping: THREE.NoToneMapping,
         }}
         style={{
           width: '100vw',
           height: '100vh',
           display: 'block',
           touchAction: 'none',
-          background: '#87CEEB',
+          // Warm cream fallback matches the pastoral mood during the brief
+          // HDRI-load window. Once <Environment background /> mounts via
+          // EnvironmentIBL, the HDRI fully owns the sky. The previous
+          // '#87CEEB' sky-blue was a hard fight against the biome's
+          // intended warmth — showed through on first frames and any
+          // dropped-composer frame as a jarring LCD blue.
+          background: '#f5f0e8',
         }}
       >
         <SceneInit />
