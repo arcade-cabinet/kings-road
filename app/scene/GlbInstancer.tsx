@@ -66,49 +66,55 @@ export function GlbInstancer({
     }
     let material: THREE.Material = materialOverride ?? (mesh.material as THREE.Material);
 
-    // Tint default-white untextured PSX-mega materials by asset type so
-    // they read as trees/ruins instead of fog-coloured blobs. The shipped
-    // GLBs have no baseColorTexture; their authored material is just
-    // "Bark" / "Rock" with a [1,1,1,1] baseColor. Without this tint,
-    // instanced meshes blend into the biome fog once they're past ~50 m.
+    // Re-tint untextured PSX-mega and ruin GLBs by asset class so they
+    // read at distance instead of blending into biome fog. Applies
+    // whenever the authored material has no baseColorTexture — earlier
+    // revisions also required `color === (1,1,1)` but some shipped GLBs
+    // have darker authored `baseColorFactor` values (e.g. burnt-tree-1
+    // ships `0.16/0.16/0.12`) which are too muddy to read at 100+ m
+    // against grey fog. Skip the tint only when there's a real texture.
     if (
       !materialOverride &&
       material instanceof THREE.MeshStandardMaterial &&
-      !material.map &&
-      material.color.r === 1 &&
-      material.color.g === 1 &&
-      material.color.b === 1
+      !material.map
     ) {
-      const cloned = material.clone();
-      if (glb.includes('burnt-tree') || glb.includes('dead-tree')) {
-        cloned.color.setHex(0x3a2a1c); // charred bark
-        cloned.roughness = 0.95;
+      let tint: number | null = null;
+      let roughness = 0.9;
+      if (glb.includes('burnt-tree') || glb.includes('burn-tree')) {
+        tint = 0x5a3a24; // charred-but-lit bark
+        roughness = 0.95;
+      } else if (glb.includes('dead-tree')) {
+        tint = 0x6b5236; // weathered grey-brown deadwood
+        roughness = 0.95;
       } else if (glb.includes('forest-tree') || glb.includes('birtch')) {
-        cloned.color.setHex(0x4a3520); // warm bark
-        cloned.roughness = 0.9;
+        tint = 0x7a5835; // warm bark
+        roughness = 0.9;
       } else if (glb.includes('fir-tree')) {
-        cloned.color.setHex(0x2a3420); // dark evergreen
-        cloned.roughness = 0.9;
+        tint = 0x3a4825; // dark evergreen
       } else if (glb.includes('bush')) {
-        cloned.color.setHex(0x3a4a28); // mossy green
-        cloned.roughness = 0.85;
+        tint = 0x506838; // mossy green
+        roughness = 0.85;
       } else if (glb.includes('grass') || glb.includes('weed')) {
-        cloned.color.setHex(0x5a6a3a); // sage
-        cloned.roughness = 0.9;
+        tint = 0x788a48; // sage
       } else if (glb.includes('yellow-flowers')) {
-        cloned.color.setHex(0xd4b450);
-        cloned.roughness = 0.8;
+        tint = 0xdcb850;
+        roughness = 0.8;
       } else if (glb.includes('red-flowers')) {
-        cloned.color.setHex(0xa04030);
-        cloned.roughness = 0.8;
+        tint = 0xb44838;
+        roughness = 0.8;
       } else if (glb.includes('white-flowers')) {
-        cloned.color.setHex(0xd8cca0);
-        cloned.roughness = 0.8;
+        tint = 0xe2d4a8;
+        roughness = 0.8;
       } else if (glb.includes('ruins/')) {
-        cloned.color.setHex(0x6b625a); // weathered limestone
-        cloned.roughness = 0.95;
+        tint = 0x8a7e70; // light weathered limestone
+        roughness = 0.95;
       }
-      material = cloned;
+      if (tint !== null) {
+        const cloned = material.clone();
+        cloned.color.setHex(tint);
+        cloned.roughness = roughness;
+        material = cloned;
+      }
     }
 
     return { geometry: mesh.geometry, material };
