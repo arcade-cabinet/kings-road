@@ -14,8 +14,8 @@
     "directionalColor": "#c8d8e8",
     "directionalIntensity": 0.6,
     "fogColor": "#8090a0",
-    "fogNear": 35,
-    "fogFar": 160,
+    "fogNear": 50,
+    "fogFar": 260,
     "fogDensity": 0.015,
     "skyTint": "#6a8090"
   },
