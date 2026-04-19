@@ -91,21 +91,26 @@ export function GlbInstancer({
       let tint: number | null = null;
       let roughness = 0.9;
       if (glb.includes('burnt-tree') || glb.includes('burn-tree')) {
-        tint = 0x5a3a24; // charred-but-lit bark
-        roughness = 0.95;
+        // Warmer, brighter charred bark — previous 0x5a3a24 (R90,G58,B36)
+        // was too dark against warm goldenrod fog on Thornfield cb=131;
+        // trees read as pure black silhouettes with no form. Lifting to
+        // 0x8a6a48 (warm driftwood, R138,G106,B72) gives the HDRI
+        // something to shade against so tree volume reads at 80m+.
+        tint = 0x8a6a48;
+        roughness = 0.9;
       } else if (glb.includes('dead-tree')) {
-        tint = 0x6b5236; // weathered grey-brown deadwood
-        roughness = 0.95;
+        tint = 0x9a7858; // sun-weathered grey-brown
+        roughness = 0.9;
       } else if (glb.includes('forest-tree') || glb.includes('birtch')) {
-        tint = 0x7a5835; // warm bark
+        tint = 0x8c6a45; // warm bark
         roughness = 0.9;
       } else if (glb.includes('fir-tree')) {
-        tint = 0x3a4825; // dark evergreen
+        tint = 0x4a5832; // dark evergreen (lifted from 0x3a4825)
       } else if (glb.includes('bush')) {
-        tint = 0x506838; // mossy green
+        tint = 0x607844; // mossy green (lifted)
         roughness = 0.85;
       } else if (glb.includes('grass') || glb.includes('weed')) {
-        tint = 0x788a48; // sage
+        tint = 0x889a58; // sage (lifted)
       } else if (glb.includes('yellow-flowers')) {
         tint = 0xdcb850;
         roughness = 0.8;
