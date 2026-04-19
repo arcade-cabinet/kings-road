@@ -37,10 +37,12 @@ function SceneInit() {
     if (scene) {
       scene.background = new THREE.Color(0x87ceeb);
     }
-    // DEV-only: expose the active scene / camera / renderer on window so we
-    // can probe scene contents from Chrome DevTools + MCP tooling. No-op in
-    // prod builds because `import.meta.env.DEV` is tree-shaken to false.
-    if (import.meta.env.DEV && typeof window !== 'undefined') {
+    // Expose the active scene / camera / renderer on window so we can
+    // probe scene contents from Chrome DevTools + Playwright MCP tooling.
+    // Kept in production too so we can diagnose mobile/foldable reports
+    // against the live Pages deploy — these are just references to existing
+    // runtime objects, no new surface area or bundle bloat.
+    if (typeof window !== 'undefined') {
       (window as unknown as { __kr__?: unknown }).__kr__ = {
         scene,
         camera,
