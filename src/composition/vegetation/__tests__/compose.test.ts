@@ -109,11 +109,14 @@ describe('composeVegetation', () => {
     }
   });
 
-  it('scale is within biome species scaleRange', () => {
+  it('scale is species scaleRange multiplied by variant baseScale', () => {
+    // The MOCK_BIOME uses gnarled-dead-oak (baseScale=7) and thorn-bush
+    // (baseScale=2.5). Final scale = speciesScale (0.4..1.4) * baseScale,
+    // so valid range is [0.4 * 2.5, 1.4 * 7] = [1.0, 9.8].
     const result = composeVegetation(MOCK_BIOME, 0, 0, FLAT_SAMPLER, 'seed-a');
     for (const p of result) {
-      expect(p.scale).toBeGreaterThanOrEqual(0.4);
-      expect(p.scale).toBeLessThanOrEqual(1.4);
+      expect(p.scale).toBeGreaterThanOrEqual(1.0);
+      expect(p.scale).toBeLessThanOrEqual(9.8);
     }
   });
 

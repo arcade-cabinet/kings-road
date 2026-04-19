@@ -2,6 +2,19 @@ export interface FoliageAssetDef {
   id: string;
   path: string;
   minSpacing: number;
+  /**
+   * Per-asset base scale baked into every instance before the biome's
+   * species `scaleRange` multiplier. The PSX-mega GLBs are authored at
+   * tiny reference scales (0.5–1 m tall) — a gnarled oak rendered at
+   * authored scale against a 1.6 m player reads as a knee-high shrub.
+   * These multipliers bring each asset class up to its intended
+   * real-world silhouette:
+   *   trees: 4–6 m (tall adult)
+   *   bushes: 1.5–2 m (head-high)
+   *   grass/weeds: 0.5–0.8 m (calf-height)
+   *   flowers: 0.3–0.5 m (ankle-height)
+   */
+  baseScale?: number;
 }
 
 export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
@@ -10,16 +23,19 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
       id: 'burnt-tree-1',
       path: '/assets/nature/psx-mega/burnt-tree-1.glb',
       minSpacing: 4,
+      baseScale: 7,
     },
     {
       id: 'burnt-tree-2',
       path: '/assets/nature/psx-mega/burnt-tree-2.glb',
       minSpacing: 4,
+      baseScale: 7,
     },
     {
       id: 'burn-tree-3',
       path: '/assets/nature/psx-mega/burn-tree-3.glb',
       minSpacing: 4,
+      baseScale: 7,
     },
   ],
   hawthorn: [
@@ -27,42 +43,73 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
       id: 'forest-tree-1',
       path: '/assets/nature/psx-mega/forest-tree-1.glb',
       minSpacing: 3,
+      baseScale: 6,
     },
     {
       id: 'forest-tree-2',
       path: '/assets/nature/psx-mega/forest-tree-2.glb',
       minSpacing: 3,
+      baseScale: 6,
     },
   ],
   'thorn-bush': [
-    { id: 'bush-1', path: '/assets/nature/psx-mega/bush-1.glb', minSpacing: 2 },
-    { id: 'bush-2', path: '/assets/nature/psx-mega/bush-2.glb', minSpacing: 2 },
-    { id: 'bush-3', path: '/assets/nature/psx-mega/bush-3.glb', minSpacing: 2 },
-    { id: 'bush-4', path: '/assets/nature/psx-mega/bush-4.glb', minSpacing: 2 },
+    {
+      id: 'bush-1',
+      path: '/assets/nature/psx-mega/bush-1.glb',
+      minSpacing: 2,
+      baseScale: 2.5,
+    },
+    {
+      id: 'bush-2',
+      path: '/assets/nature/psx-mega/bush-2.glb',
+      minSpacing: 2,
+      baseScale: 2.5,
+    },
+    {
+      id: 'bush-3',
+      path: '/assets/nature/psx-mega/bush-3.glb',
+      minSpacing: 2,
+      baseScale: 2.5,
+    },
+    {
+      id: 'bush-4',
+      path: '/assets/nature/psx-mega/bush-4.glb',
+      minSpacing: 2,
+      baseScale: 2.5,
+    },
   ],
   'ivy-ground': [
     {
       id: 'grass-1',
       path: '/assets/nature/psx-mega/grass-1.glb',
       minSpacing: 1,
+      baseScale: 3,
     },
     {
       id: 'grass-2',
       path: '/assets/nature/psx-mega/grass-2.glb',
       minSpacing: 1,
+      baseScale: 3,
     },
     {
       id: 'weed-1',
       path: '/assets/nature/psx-mega/weed-1.glb',
       minSpacing: 1.5,
+      baseScale: 2.5,
     },
   ],
   'lone-fern': [
-    { id: 'weed-1', path: '/assets/nature/psx-mega/weed-1.glb', minSpacing: 2 },
+    {
+      id: 'weed-1',
+      path: '/assets/nature/psx-mega/weed-1.glb',
+      minSpacing: 2,
+      baseScale: 2.5,
+    },
     {
       id: 'grass-2',
       path: '/assets/nature/psx-mega/grass-2.glb',
       minSpacing: 1.5,
+      baseScale: 3,
     },
   ],
   'fallen-leaves': [
@@ -70,16 +117,19 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
       id: 'yellow-flowers-1',
       path: '/assets/nature/psx-mega/yellow-flowers-1.glb',
       minSpacing: 1,
+      baseScale: 2,
     },
     {
       id: 'red-flowers-1',
       path: '/assets/nature/psx-mega/red-flowers-1.glb',
       minSpacing: 1,
+      baseScale: 2,
     },
     {
       id: 'white-flowers-1',
       path: '/assets/nature/psx-mega/white-flowers-1.glb',
       minSpacing: 1,
+      baseScale: 2,
     },
   ],
   'dead-grass': [
@@ -87,11 +137,13 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
       id: 'grass-1',
       path: '/assets/nature/psx-mega/grass-1.glb',
       minSpacing: 1,
+      baseScale: 3,
     },
     {
       id: 'grass-2',
       path: '/assets/nature/psx-mega/grass-2.glb',
       minSpacing: 1,
+      baseScale: 3,
     },
   ],
 };
