@@ -21,14 +21,17 @@ import { updateWindowEmissive } from '@/utils/textures';
 const DAY_DURATION = 600.0; // 10 real minutes = 1 game day
 const CLOUD_TEXTURE = assetUrl('/assets/cloud.svg');
 
-// Pre-computed cloud configurations to avoid array index keys
-const cloudConfigs = Array.from({ length: 6 }, (_, i) => ({
+// Pre-computed cloud configurations to avoid array index keys.
+// Placed inside the default fogFar=120 ring so clouds actually render —
+// the previous ±180 m horizontal spread fell outside Thornfield's
+// fogFar=120 and got culled to full fog opacity.
+const cloudConfigs = Array.from({ length: 8 }, (_, i) => ({
   id: `cloud-${i}`,
-  x: Math.sin(i * 0.6 + 0.3) * 180,
-  y: 45 + (i % 3) * 15,
-  z: Math.cos(i * 0.6 + 0.3) * 180,
+  x: Math.sin(i * 0.6 + 0.3) * 70,
+  y: 35 + (i % 3) * 10,
+  z: Math.cos(i * 0.6 + 0.3) * 70,
   speed: 0.08 + (i % 3) * 0.02,
-  scale: 25 + (i % 4) * 10,
+  scale: 20 + (i % 4) * 8,
 }));
 
 // Sky color gradient for different times of day

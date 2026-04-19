@@ -132,7 +132,13 @@ export function applyDebugSpawn(): boolean {
       resolveNarrative(devSeed);
 
       const pos = resolveSpawnPosition(biomeId, map);
-      startGame(devSeed, pos, 0);
+      // Rotate the spawn yaw 45° off the road axis so the player sees the
+      // village flank (buildings, ruins, NPCs arranged around the
+      // settlement centre) instead of staring down an empty road
+      // corridor. Thornfield's town layout places all 3 buildings at
+      // grid offsets like [-3,-2]/[3,-3]/[5,2] — none of them are
+      // directly along +Z, so yaw=0 pointed the camera at a gap.
+      startGame(devSeed, pos, Math.PI / 4);
 
       syncInventory(STARTER_ITEMS, 20, 0, {
         head: null,
