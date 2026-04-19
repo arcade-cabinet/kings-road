@@ -150,6 +150,18 @@ export function RoadSurface({
         mat.polygonOffset = true;
         mat.polygonOffsetFactor = -1;
         mat.polygonOffsetUnits = -1;
+
+        // Mute the road tint so the bright-white PavingStones pack
+        // doesn't over-expose the composition — the stock texture
+        // reads ~80% luminance which blows out against fog+HDRI and
+        // makes the plaza dominate every screenshot. A warm mid-grey
+        // colour multiplier keeps the stonework readable but lets
+        // ruins/NPCs/vegetation hold the visual focus.
+        mat.color.setHex(0x7a6e60);
+        // Bump roughness since a fresh-stone appearance reads as
+        // "temple floor" for dead-town; weathered is the intent.
+        mat.roughness = Math.max(mat.roughness, 0.9);
+
         setMaterial(mat);
       })
       .catch((err) => {
