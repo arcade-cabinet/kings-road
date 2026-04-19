@@ -152,26 +152,35 @@ export function DayNightCycle() {
 
   return (
     <>
-      {/* Main sun/moon light */}
+      {/* Main sun/moon light — 2048² shadow map with a wider 60m frustum
+          so the watchtower + cottage at 25-28m dist from spawn cast
+          crisp shadows on the plaza, and trees on the edge of the
+          settlement clearance ring don't abruptly drop their shadows
+          as the player rotates. Previous 1024² + 40m frustum gave
+          visibly jaggy shadow edges on the cottage mid-screen. */}
       <directionalLight
         ref={sunLightRef}
         castShadow
         intensity={1.2}
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-camera-near={0.5}
-        shadow-camera-far={120}
-        shadow-camera-left={-40}
-        shadow-camera-right={40}
-        shadow-camera-top={40}
-        shadow-camera-bottom={-40}
-        shadow-bias={-0.001}
+        shadow-camera-far={180}
+        shadow-camera-left={-60}
+        shadow-camera-right={60}
+        shadow-camera-top={60}
+        shadow-camera-bottom={-60}
+        shadow-bias={-0.0005}
+        shadow-normalBias={0.02}
       >
         <primitive object={new THREE.Object3D()} attach="target" />
       </directionalLight>
 
-      {/* Warm ambient light */}
-      <ambientLight intensity={0.4} color={0xfff8e7} />
+      {/* Warm ambient light — dropped intensity from 0.4 → 0.25 now that
+          envMapIntensity=1.4 lights the scene via HDRI IBL, so the
+          old ambient is double-counting. Lower ambient also lets
+          directional shadows read darker + more cinematic. */}
+      <ambientLight intensity={0.25} color={0xfff8e7} />
 
       {/* Player lantern for night */}
       <pointLight
