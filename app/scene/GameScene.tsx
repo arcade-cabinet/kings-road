@@ -149,6 +149,14 @@ export function GameScene() {
         gl={{
           antialias: false,
           powerPreference: 'high-performance',
+          // Disable renderer-side tone mapping — BiomePostProcessing runs
+          // an explicit ACES_FILMIC ToneMappingEffect at the end of its
+          // EffectPass. R3F's default is ACESFilmicToneMapping with
+          // exposure 1.0, which was being applied to the linear HDR
+          // scene BEFORE the composer's own ACES pass — double tone-map
+          // squashes highlights twice, producing the blown-out milky sky
+          // and muddy midtones visible on cb=131.
+          toneMapping: THREE.NoToneMapping,
         }}
         style={{
           width: '100vw',
