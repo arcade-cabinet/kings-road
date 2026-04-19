@@ -108,12 +108,16 @@ function SceneContent() {
           {/* First-person viewmodel — renders the equipped weapon */}
           <FPSViewmodel />
 
-          {/* Biome-driven post processing — temporarily disabled for Phase 0
-              integration validation. @react-three/postprocessing hits a
-              circular-JSON serialization crash under React 19 StrictMode when
-              EffectComposer children change. Task #21 follow-up: upgrade or
-              replace the postprocessing wrapper. */}
-          {/* <BiomePostProcessing /> */}
+          {/*
+            Biome-driven post processing — bloom, vignette, chromatic
+            aberration, noise, SMAA. Disabled in DEV only: React 19 StrictMode
+            double-invokes effect setup, which @react-three/postprocessing
+            handles with a circular-JSON serialization that recursively
+            resizes through KawaseBlurPass and crashes. Production builds
+            do not double-invoke, so the Pages deploy (and any prod
+            benchmark) runs with the full biome mood enabled.
+          */}
+          {!import.meta.env.DEV && <BiomePostProcessing />}
         </Physics>
       )}
     </>

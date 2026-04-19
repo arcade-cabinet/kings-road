@@ -18,7 +18,10 @@ BiomeService.init(
 function App() {
   useEffect(() => {
     void loadSettings();
-    // Skip main menu when ?spawn=<biome> is in the URL. DEV-only, no-op in prod.
+    // Skip main menu when `?spawn=<biome>` is in the URL, or when the build
+    // has baked `VITE_DEBUG_SPAWN` (the Pages deploy sets this to
+    // `thornfield` so the public URL lands straight in the benchmark biome).
+    // Active in both DEV and production. No-op when neither signal is set.
     applyDebugSpawn();
   }, []);
 
