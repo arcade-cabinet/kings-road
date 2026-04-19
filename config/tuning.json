@@ -6,7 +6,7 @@
     "chunkSize": 120,
     "blockSize": 5,
     "viewDistance": 1,
-    "maxTerrainHeight": 30,
+    "maxTerrainHeight": 1,
     "oceanHeight": -2
   },
 

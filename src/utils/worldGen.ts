@@ -11,7 +11,23 @@ export const PLAYER_RADIUS = 0.6;
 // ── Height constants ──────────────────────────────────────────────────
 
 /** Maximum world-space height for terrain (elevation 1.0 maps to this) */
-export const MAX_TERRAIN_HEIGHT = 30;
+/**
+ * Peak world-space terrain elevation used by `getTerrainHeight` as a scale
+ * factor on the 0..1 kingdom-tile elevation field.
+ *
+ * This MUST match the actual displacement range TerrainChunk applies via
+ * `buildDisplacedGeometry` (which offsets vertices up to
+ * `biome.terrain.displacementScale * biome.terrain.scale` ≈ 0.375 m in
+ * Thornfield). It used to be `30` — a leftover from an earlier mountain-scale
+ * terrain design — but TerrainChunk renders sub-metre displacement only, so
+ * the 30× multiplier produced a "phantom floor" ~9 m above the actual
+ * rendered ground: PlayerController clamped the player to `elevation*30`,
+ * which put the camera floating ~8.7 m above the real terrain surface and
+ * hid all sub-metre vegetation below the viewport. `1.0` keeps the field
+ * positive for land (tests still pass) and brings PlayerController's floor
+ * clamp into the same frame of reference as the rendered mesh.
+ */
+export const MAX_TERRAIN_HEIGHT = 1;
 
 /** World-space height for ocean/void tiles */
 export const OCEAN_HEIGHT = -2;
