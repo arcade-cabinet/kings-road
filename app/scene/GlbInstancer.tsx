@@ -153,9 +153,19 @@ export function GlbInstancer({
 
   if (itemCount === 0) return null;
 
+  // THREE's default frustum culling uses the geometry's bounding sphere
+  // centered at the local origin — for an InstancedMesh that's wrong, the
+  // instances are scattered across a ~120 m chunk but the shared geometry
+  // bound sphere is ~1 m. Any instance more than one geometry-radius from
+  // the camera's forward view got silently culled, which is why Thornfield
+  // showed 31k vegetation instances in the scene graph but a visually
+  // empty viewport. Disable frustum culling on the InstancedMesh so all
+  // instances render regardless of the shared geometry's bounds. Cost is
+  // negligible because InstancedMesh already batches to one draw call.
   return (
     <instancedMesh
       ref={meshRef}
+      frustumCulled={false}
       args={[geometry, material as THREE.Material, itemCount]}
       castShadow
       receiveShadow
