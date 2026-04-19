@@ -343,9 +343,17 @@ export function Fog() {
       // fall back to defaults while BiomeService initialises
     }
     const sig = `${color.toString(16)}|${near}|${far}`;
-    if (sig !== lastSigRef.current) {
+    if (sig !== lastSigRef.current || !(scene.fog instanceof THREE.Fog)) {
       scene.fog = new THREE.Fog(color, near, far);
       lastSigRef.current = sig;
+    } else {
+      // Re-assert the biome's base color and distances every frame.
+      // WeatherSystem scales near/far and desaturates color; without this
+      // reset the scaling compounds toward zero over time and the biome's
+      // authored identity drifts away.
+      scene.fog.color.setHex(color);
+      scene.fog.near = near;
+      scene.fog.far = far;
     }
   });
 
