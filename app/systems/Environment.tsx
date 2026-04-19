@@ -358,13 +358,41 @@ export function SkyDome() {
   );
 }
 
+/**
+ * Biome-driven fog — samples the current biome's lighting.fogColor /
+ * fogNear / fogFar from BiomeService and applies it to scene.fog every
+ * time the player's road distance moves into a new biome region. Falls
+ * back to a pastoral cream fog when the service isn't ready yet (early
+ * boot, before kingdom gen completes).
+ *
+ * Previously hardcoded to cream `(0xf5f0e8, 50, 200)` — that washed out
+ * Thornfield's cold mist (should be `#8090a0, 20, 120` per the biome
+ * config) and any biome set dusk/dawn colours had no visible effect.
+ */
 export function Fog() {
   const { scene } = useThree();
+  const lastSigRef = useRef<string>('');
 
-  useMemo(() => {
-    // Distance-based fog in cream/gold — hides chunk loading, adds pastoral depth
-    scene.fog = new THREE.Fog(0xf5f0e8, 50, 200);
-  }, [scene]);
+  useFrame(() => {
+    let color = 0xf5f0e8;
+    let near = 50;
+    let far = 200;
+    try {
+      const dist = getPlayer().playerPosition?.x ?? 0;
+      const biome = BiomeService.getCurrentBiome(dist);
+      const { fogColor, fogNear, fogFar } = biome.lighting;
+      color = new THREE.Color(fogColor).getHex();
+      near = fogNear;
+      far = fogFar;
+    } catch {
+      // fall back to defaults while BiomeService initialises
+    }
+    const sig = `${color.toString(16)}|${near}|${far}`;
+    if (sig !== lastSigRef.current) {
+      scene.fog = new THREE.Fog(color, near, far);
+      lastSigRef.current = sig;
+    }
+  });
 
   return null;
 }
