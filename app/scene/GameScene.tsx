@@ -32,10 +32,18 @@ import { WeatherSystem } from '@app/systems/WeatherSystem';
 // Initialize scene with warm pastoral sky background
 function SceneInit() {
   const { scene, camera, gl } = useThree();
+  const { inDungeon } = useFlags();
 
   useLayoutEffect(() => {
     if (scene) {
-      scene.background = new THREE.Color(0x87ceeb);
+      // Sky-blue in the overworld; deep-dungeon dark when below ground so a
+      // dungeon room that hasn't fully rendered its walls this frame does not
+      // expose the sky clear-colour as a blue flash. User report: "walking
+      // over people is what turns the map blue" — that was an accidental
+      // dungeon-entrance dialogue auto-entering the dungeon, whose first few
+      // frames rendered against the overworld sky background and read as a
+      // bright blue crash.
+      scene.background = new THREE.Color(inDungeon ? 0x0a0a10 : 0x87ceeb);
     }
     // Expose the active scene / camera / renderer on window so we can
     // probe scene contents from Chrome DevTools + Playwright MCP tooling.
@@ -50,7 +58,7 @@ function SceneInit() {
         THREE,
       };
     }
-  }, [scene, camera, gl]);
+  }, [scene, camera, gl, inDungeon]);
 
   return null;
 }
