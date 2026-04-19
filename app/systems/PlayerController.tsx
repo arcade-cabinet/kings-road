@@ -234,10 +234,16 @@ export function PlayerController() {
     }
 
     // Compute desired horizontal movement
-    // Forward vector: facing direction projected onto XZ plane
+    // Forward vector: facing direction projected onto XZ plane.
+    //   yaw=0 → forward = (0, 0, -1)
     _forward.set(0, 0, -1).applyAxisAngle(_upAxis, newYaw);
-    // Right vector: perpendicular to forward on XZ plane
-    _right.set(_forward.z, 0, -_forward.x);
+    // Right vector: forward rotated +90° clockwise on the XZ plane (from
+    // above, with Y up). For forward=(fx, 0, fz), right = (-fz, 0, fx).
+    // The previous expression `(_forward.z, 0, -_forward.x)` was the LEFT
+    // vector (negated), which is why pressing D (moveX=+1) moved the
+    // player LEFT and A moved RIGHT. Same inversion for the on-screen
+    // touch stick since both flow through strafeSpeedRef → _right.
+    _right.set(-_forward.z, 0, _forward.x);
 
     moveVec.current.set(0, 0, 0);
     if (Math.abs(forwardSpeedRef.current) > 0) {
