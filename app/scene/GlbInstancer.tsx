@@ -73,10 +73,20 @@ export function GlbInstancer({
     // have darker authored `baseColorFactor` values (e.g. burnt-tree-1
     // ships `0.16/0.16/0.12`) which are too muddy to read at 100+ m
     // against grey fog. Skip the tint only when there's a real texture.
+    // Use duck-typing rather than `instanceof MeshStandardMaterial`. When
+    // `three` is code-split across multiple bundle chunks (as Vite does
+    // for R3F), the MeshStandardMaterial constructor imported here may
+    // not be the same reference the GLTF loader uses, so the instanceof
+    // check silently fails and the tint never fires. Checking for the
+    // standard-material type string + color + roughness duck-avoids that.
+    const isStandardMat =
+      (material as THREE.MeshStandardMaterial)?.type ===
+        'MeshStandardMaterial' &&
+      !!(material as THREE.MeshStandardMaterial)?.color;
     if (
       !materialOverride &&
-      material instanceof THREE.MeshStandardMaterial &&
-      !material.map
+      isStandardMat &&
+      !(material as THREE.MeshStandardMaterial).map
     ) {
       let tint: number | null = null;
       let roughness = 0.9;
@@ -110,7 +120,7 @@ export function GlbInstancer({
         roughness = 0.95;
       }
       if (tint !== null) {
-        const cloned = material.clone();
+        const cloned = (material as THREE.MeshStandardMaterial).clone();
         cloned.color.setHex(tint);
         cloned.roughness = roughness;
         material = cloned;
