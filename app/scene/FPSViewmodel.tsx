@@ -40,8 +40,13 @@ const DEFAULT_HAND_GLB = '/assets/hands/hand.glb';
  * normalization step the `Villager NPCs` hand rig renders at 2.3m,
  * filling the viewport as a beige wall.
  */
-const VIEWMODEL_TARGET_METRES = 0.35;
-const WEAPON_TARGET_METRES = 0.6;
+const VIEWMODEL_TARGET_METRES = 0.24;
+// Authored blade length at viewmodel distance. 0.35m at z=-0.45 reads as
+// "holding a real sword" — big enough to feel weighty, small enough not to
+// occlude the lower third of the viewport. The previous 0.6m filled half
+// the screen vertically on desktop (and more on mobile foldables), which
+// is the "T-post in the face" look from cb=131.
+const WEAPON_TARGET_METRES = 0.35;
 
 /**
  * Compute a uniform scale that fits `obj`'s authored bounding box into
@@ -63,33 +68,65 @@ function fitScale(
 
 /**
  * Local offsets + rotations per hand pose, camera-relative. Tuned for a
- * mobile/foldable viewport (~500×844 CSS, 75° FOV) so the weapon sits
- * where you'd actually see it — lower-right of the screen, but close
- * enough to center that it reads as "in hand" rather than "a line
- * sticking out of the edge."
+ * 1440×1024 desktop and ~500×844 mobile foldable viewport at 75° FOV so
+ * the weapon sits in the classic FPS grip: hilt lower-right, blade
+ * angled up-and-left across the viewport at ~30° off vertical, tip well
+ * inside the frame.
  *
- * Orientation convention: authored weapon GLBs have their blade along
- * local +Y (hilt at origin). To make the blade point AWAY from the
- * camera (into the scene, −Z in camera-local space) we pitch the model
- * ~80° forward (rotation.x ≈ −1.4 rad) and add a small yaw so the blade
- * reads as a 3D volume rather than an edge-on line. A previous revision
- * used rotation [−0.15, −0.9, 0.2] which left the blade lying almost
- * horizontal to the right — reading as "a diagonal line pointed off the
- * side of the screen" instead of "a sword gripped forward."
+ * Orientation convention: authored weapon GLBs ship with blade along
+ * local +Y (hilt at origin, blade pointing up). To render as a held
+ * sword we pitch the blade forward-and-slightly-leftward and roll it a
+ * bit toward the screen center so the flat of the blade catches light
+ * rather than reading as an edge-on line.
+ *
+ * Previous revisions:
+ *   [−0.15, −0.9, 0.2] → blade horizontal off to the right (unreadable)
+ *   [0, −0.32, −0.6] rot [−1.4, 0, 0] → blade straight up, centered,
+ *     filling half the vertical viewport (the cb=131 T-post look).
+ *   This pass: hilt lower-right, blade angled up-and-left, smaller.
  */
 const POSE_TRANSFORMS: Record<
   HandPose,
   { position: [number, number, number]; rotation: [number, number, number]; scale: number }
 > = {
-  grip: { position: [0.22, -0.3, -0.5], rotation: [-1.4, 0.2, 0.1], scale: 1.0 },
-  hold: { position: [0, -0.32, -0.6], rotation: [-1.4, 0, 0], scale: 1.0 },
-  pinch: { position: [0.18, -0.28, -0.45], rotation: [-1.2, 0.1, 0.1], scale: 0.9 },
+  // One-handed sword grip — classic FPS pose. Hilt in the lower-right,
+  // blade angled up-and-left across the viewport. Roll (z rotation)
+  // turns the flat of the blade toward the screen so it reads as a
+  // 3D volume.
+  grip: {
+    position: [0.28, -0.38, -0.45],
+    rotation: [-1.15, -0.25, -0.35],
+    scale: 1.0,
+  },
+  // Two-handed polearm hold — still biased to the right of center but
+  // pitched more vertical since the second hand implies bracing.
+  hold: {
+    position: [0.18, -0.4, -0.5],
+    rotation: [-1.25, -0.15, -0.2],
+    scale: 1.0,
+  },
+  // Small dagger/tanto — closer to the camera, tighter grip. Follows the
+  // same angle convention as `grip` so it doesn't look out of place
+  // when a dagger swaps in for a sword mid-combat.
+  pinch: {
+    position: [0.26, -0.34, -0.38],
+    rotation: [-1.1, -0.3, -0.4],
+    scale: 0.9,
+  },
   // `palm` and `open` are documented as synonymous in item.schema.ts; they
   // MUST share a single transform so the same item rendered with either
-  // pose shows identically in-hand. A previous revision diverged them and
-  // was flagged in PR review (CodeRabbit). Keep them aliased.
-  palm: { position: [0.22, -0.28, -0.5], rotation: [-0.1, -0.15, -0.1], scale: 1.0 },
-  open: { position: [0.22, -0.28, -0.5], rotation: [-0.1, -0.15, -0.1], scale: 1.0 },
+  // pose shows identically in-hand. Flat-held items (torch, shield, book)
+  // — lay near-flat toward the camera, pitched up slightly.
+  palm: {
+    position: [0.24, -0.32, -0.42],
+    rotation: [-0.15, -0.2, -0.1],
+    scale: 1.0,
+  },
+  open: {
+    position: [0.24, -0.32, -0.42],
+    rotation: [-0.15, -0.2, -0.1],
+    scale: 1.0,
+  },
 };
 
 function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {
