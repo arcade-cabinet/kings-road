@@ -119,11 +119,20 @@ describe('composeVegetation', () => {
       const [min = 0.8, max = 1.2] = species.scaleRange ?? [0.8, 1.2];
       speciesRanges[species.assetId] = [min, max];
     }
+    // Scope the lookup to ONLY species used by MOCK_BIOME so that
+    // shared asset paths (e.g. bush-1.glb appears under both
+    // 'thorn-bush' and 'heather-bush') don't collide. Only the
+    // MOCK_BIOME species should be reachable from composeVegetation
+    // output anyway.
+    const mockSpeciesIds = new Set(
+      MOCK_BIOME.foliage.species.map((s) => s.assetId),
+    );
     const variantBaseByPath = new Map<
       string,
       { speciesId: string; baseScale: number }
     >();
     for (const [speciesId, variants] of Object.entries(FOLIAGE_CATALOG)) {
+      if (!mockSpeciesIds.has(speciesId)) continue;
       for (const v of variants) {
         variantBaseByPath.set(v.path.replace(/^\/assets\//, ''), {
           speciesId,
