@@ -119,16 +119,17 @@ function SceneContent() {
           <FPSViewmodel />
 
           {/*
-            Biome-driven post processing — bloom, vignette, chromatic
-            aberration, noise, SMAA. Currently disabled: the imperative
-            postprocessing composer renders correctly but R3F's default
-            render loop still fires afterward and blits the raw scene over
-            the composer output, producing a black screen. Re-enabling
-            requires either `frameloop="demand"` on Canvas (which changes
-            the whole render model and interacts with useFrame priorities
-            across every system) or rendering the composer into an offscreen
-            target and blitting via a full-screen quad at the end of the
-            frame. Tracked as a follow-up so the Pages deploy stays playable.
+            Biome-driven post-processing is disabled for the Pages playtest.
+            Verified rendering paths tried:
+             1. @react-three/postprocessing → crashes React 19 with a
+                JSON-cycle serialization (Resolution ↔ Resizable mutual refs).
+             2. Raw `postprocessing` lib with `useFrame(cb, 1)` to suppress
+                R3F's default render → composer.render() runs but RenderPass
+                produces a flat-tinted output, not the actual scene. The
+                R3F 9 scene / renderer state isn't captured by the stock
+                RenderPass; further investigation needed.
+            The Pages deploy stays playable without effects until we have a
+            working composer path. Tracked as task #26.
           */}
           {/* <BiomePostProcessing /> */}
         </Physics>
