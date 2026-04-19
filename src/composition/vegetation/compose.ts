@@ -36,18 +36,33 @@ function poissonDisk(
   return points;
 }
 
+export interface ComposeVegetationOptions {
+  /**
+   * Optional world-space clearance — any placement within this radius of
+   * the clearCenter is dropped. Used by TOWN chunks to carve out a
+   * hole around the settlement centre so buildings and NPCs aren't
+   * buried under trees, and by spawn chunks so the player isn't
+   * standing inside a trunk on first frame.
+   */
+  clearCenter?: { x: number; z: number };
+  clearRadius?: number;
+}
+
 export function composeVegetation(
   biome: BiomeConfig,
   chunkCx: number,
   chunkCz: number,
   heightSampler: HeightSampler,
   seed: string,
+  options: ComposeVegetationOptions = {},
 ): VegetationPlacement[] {
   const rng = createRng(`veg:${biome.id}:${chunkCx}:${chunkCz}:${seed}`);
   const placements: VegetationPlacement[] = [];
 
   const chunkArea = CHUNK_SIZE * CHUNK_SIZE;
   const globalDensity = biome.foliage.density;
+  const { clearCenter, clearRadius = 0 } = options;
+  const clearRadiusSq = clearRadius * clearRadius;
 
   for (const species of biome.foliage.species) {
     const variants = getAssetVariants(species.assetId);
@@ -67,6 +82,16 @@ export function composeVegetation(
     for (const [localX, localZ] of localPoints) {
       const worldX = chunkCx * CHUNK_SIZE + localX;
       const worldZ = chunkCz * CHUNK_SIZE + localZ;
+
+      // Skip placements inside the clearance ring (e.g. around the
+      // settlement centre or the player spawn) so trees don't spawn
+      // on top of buildings/NPCs/the player.
+      if (clearCenter) {
+        const dx = worldX - clearCenter.x;
+        const dz = worldZ - clearCenter.z;
+        if (dx * dx + dz * dz < clearRadiusSq) continue;
+      }
+
       const worldY = heightSampler(worldX, worldZ);
 
       const variantIdx = Math.floor(rng() * variants.length);
