@@ -40,18 +40,21 @@ function paramsForBiomeAndTime(
 ): PostParams {
   const bucket = tod(timeOfDay);
   const isDark = biome.id === 'thornfield' || biome.id === 'moor';
-  const baseBloom = isDark ? 0.12 : 0.18;
-  const baseThreshold = isDark ? 0.82 : 0.85;
+  // Bright, readable bloom tuned for HDRI-lit scenes: Thornfield's HDR
+  // sky punches through at ~0.7 luminance so threshold must sit just
+  // under that to produce the glow halo the pastoral look calls for.
+  const baseBloom = isDark ? 0.5 : 0.6;
+  const baseThreshold = isDark ? 0.58 : 0.62;
 
   const isAtmospheric = bucket === 'dawn' || bucket === 'dusk';
-  const chromaticOffset = isAtmospheric ? 0.0006 : 0.0002;
+  const chromaticOffset = isAtmospheric ? 0.0006 : 0.0003;
 
   const isNight = bucket === 'night';
-  const vignetteOffset = isNight ? 0.35 : 0.45;
-  const vignetteDarkness = isNight ? 0.4 : 0.22;
+  const vignetteOffset = isNight ? 0.28 : 0.35;
+  const vignetteDarkness = isNight ? 0.55 : 0.42;
   const noiseOpacity = isNight ? 0.03 : 0.015;
 
-  const goldenHourBoost = isAtmospheric ? 0.05 : 0.0;
+  const goldenHourBoost = isAtmospheric ? 0.1 : 0.0;
 
   return {
     bloomIntensity: baseBloom + goldenHourBoost,
@@ -129,21 +132,25 @@ export function BiomePostProcessing() {
     composer.addPass(renderPass);
 
     const bloom = new BloomEffect({
-      intensity: 0.15,
-      luminanceThreshold: 0.85,
-      luminanceSmoothing: 0.2,
+      intensity: 0.55,
+      luminanceThreshold: 0.6,
+      luminanceSmoothing: 0.35,
       mipmapBlur: true,
     });
     const chroma = new ChromaticAberrationEffect({
-      offset: new THREE.Vector2(0.0002, 0.0002),
+      offset: new THREE.Vector2(0.0003, 0.0003),
       radialModulation: false,
       modulationOffset: 0,
     });
     const noise = new NoiseEffect({ premultiply: true });
     noise.blendMode.opacity.value = 0.015;
-    const vignette = new VignetteEffect({ offset: 0.45, darkness: 0.25 });
-    // ToneMapping restores visual parity with the R3F default renderer —
-    // without it the composer's linear output reads as a washed-out cast.
+    const vignette = new VignetteEffect({ offset: 0.35, darkness: 0.45 });
+    // ACES tone mapping + warmer exposure — bloom now triggers on
+    // luminance > 0.6 instead of 0.85, so HDRI sky + lit wet stone
+    // actually glow. Bloom intensity 0.15 → 0.55 for a visible soft
+    // halo around bright pixels. Vignette offset tightened 0.45 → 0.35
+    // with darkness 0.25 → 0.45 so the corner falloff reads as a
+    // proper cinematic vignette rather than a barely-visible mask.
     const toneMapping = new ToneMappingEffect({
       mode: ToneMappingMode.ACES_FILMIC,
     });
