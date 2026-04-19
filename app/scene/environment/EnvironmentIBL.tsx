@@ -56,7 +56,7 @@ function IBLMap({ hdriId }: { hdriId: string }) {
       background
       backgroundBlurriness={0.15}
       backgroundIntensity={0.85}
-      environmentIntensity={1.0}
+      environmentIntensity={1.4}
     />
   );
 }
