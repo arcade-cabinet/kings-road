@@ -1,0 +1,53 @@
+{
+  "id": "ocean",
+  "name": "Open Sea",
+  "description": "Deep water off the coast. Impassable to the player — rendered as a Gerstner-wave plane; no terrain, no vegetation.",
+  "lighting": {
+    "hdri": "misty-pines",
+    "ambientColor": "#8090a0",
+    "ambientIntensity": 0.5,
+    "directionalColor": "#ffe8b0",
+    "directionalIntensity": 0.8,
+    "fogColor": "#a0b8c8",
+    "fogNear": 80,
+    "fogFar": 400
+  },
+  "terrain": {
+    "heightmap": "procedural",
+    "scale": 1,
+    "materials": ["packed-mud"],
+    "displacementScale": 0
+  },
+  "foliage": {
+    "density": 0,
+    "species": [],
+    "groundCover": []
+  },
+  "weather": {
+    "defaultState": "clear",
+    "states": [
+      {
+        "id": "clear",
+        "probability": 0.7,
+        "fogMultiplier": 0.7,
+        "windStrength": 0.4,
+        "precipitationType": "none",
+        "precipitationDensity": 0
+      },
+      {
+        "id": "squall",
+        "probability": 0.3,
+        "fogMultiplier": 1.3,
+        "windStrength": 0.7,
+        "precipitationType": "rain",
+        "precipitationDensity": 0.4
+      }
+    ],
+    "transitionDuration": 20
+  },
+  "audio": {
+    "ambient": ["ocean-swell", "distant-gulls", "wind-sea"],
+    "footstepMaterial": "water"
+  },
+  "monsterPool": []
+}

@@ -29,6 +29,33 @@ let roadSpine: RoadSpineData | null = null;
 let resolvedRegions: ResolvedRegion[] = [];
 let spineTotalDistance = 0;
 
+/**
+ * Fallback map for biome ids that kingdom-gen emits but that we have no
+ * dedicated BiomeConfig for yet. Keeps the visual consistent instead of
+ * dropping terrain/vegetation for entire classes of tile. Phase 0 content
+ * has only 5 configs (meadow/forest/moor/thornfield/ocean) but terrain-gen
+ * in src/world/terrain-gen.ts classifies tiles into 12 biome ids. Rather
+ * than degrading to null (no terrain, no vegetation — the big brown walls
+ * seen at the coast spawn), map the missing ones to their closest visual
+ * neighbour until per-biome configs are authored.
+ */
+const BIOME_ALIASES: Record<string, string> = {
+  // Low elevation, dry-to-medium moisture → meadow-like pastoral.
+  farmland: 'meadow',
+  riverside: 'meadow',
+  // Coastal strip — no dedicated config; mirror meadow until authored.
+  coast: 'meadow',
+  // Wet lowlands — moor is the closest registered biome visually.
+  swamp: 'moor',
+  // Mid-upland — treat as moor until we have dedicated hills content.
+  hills: 'moor',
+  // High elevation — moor until we have a highland config (darker, rockier).
+  highland: 'moor',
+  mountain: 'moor',
+  // Dense woodland — forest already covers the look.
+  deep_forest: 'forest',
+};
+
 /** Lowercase the road-spine biome string to match BiomeConfig ids. */
 function normalizeRegionBiome(biome: string): string {
   return biome.toLowerCase();
@@ -125,6 +152,24 @@ export const BiomeService = {
       throw new BiomeError(`Unknown biome id: "${id}"`);
     }
     return config;
+  },
+
+  /**
+   * Soft-resolve a biome id for rendering. Used by chunk rendering where
+   * we'd rather fall back to an aliased neighbour than leave the chunk
+   * unconfigured (no terrain, no vegetation, no fog). Returns null only
+   * when the id is neither registered nor aliased — callers can then
+   * treat the tile as blank ground.
+   */
+  resolveForChunk(id: string): BiomeConfig | null {
+    const direct = registry.get(id);
+    if (direct) return direct;
+    const aliased = BIOME_ALIASES[id];
+    if (aliased) {
+      const alt = registry.get(aliased);
+      if (alt) return alt;
+    }
+    return null;
   },
 
   /**
