@@ -110,13 +110,17 @@ function SceneContent() {
 
           {/*
             Biome-driven post processing — bloom, vignette, chromatic
-            aberration, noise, SMAA. Uses the raw `postprocessing` library
-            directly (not @react-three/postprocessing) because the wrapper
-            crashes under React 19 with "Converting circular structure to
-            JSON" every frame in both dev and prod. Driving the composer
-            imperatively avoids the serialization path.
+            aberration, noise, SMAA. Currently disabled: the imperative
+            postprocessing composer renders correctly but R3F's default
+            render loop still fires afterward and blits the raw scene over
+            the composer output, producing a black screen. Re-enabling
+            requires either `frameloop="demand"` on Canvas (which changes
+            the whole render model and interacts with useFrame priorities
+            across every system) or rendering the composer into an offscreen
+            target and blitting via a full-screen quad at the end of the
+            frame. Tracked as a follow-up so the Pages deploy stays playable.
           */}
-          <BiomePostProcessing />
+          {/* <BiomePostProcessing /> */}
         </Physics>
       )}
     </>
