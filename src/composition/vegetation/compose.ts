@@ -71,7 +71,8 @@ export function composeVegetation(
 
       const variantIdx = Math.floor(rng() * variants.length);
       const variant = variants[variantIdx];
-      const scale = scaleMin + rng() * (scaleMax - scaleMin);
+      const speciesScale = scaleMin + rng() * (scaleMax - scaleMin);
+      const scale = speciesScale * variant.baseScale;
       const rotation = rng() * Math.PI * 2;
 
       placements.push({

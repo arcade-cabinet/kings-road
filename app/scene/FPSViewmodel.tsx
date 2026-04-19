@@ -68,20 +68,28 @@ function fitScale(
  * enough to center that it reads as "in hand" rather than "a line
  * sticking out of the edge."
  *
- * Grip pose also points the blade back toward the camera (rotation Y
- * about -55° off forward) so a thin sword reads as a 3D volume instead
- * of an edge-on line. Authors of new weapons can override these defaults
- * per-item via `ItemDefinition.viewmodel` when needed.
+ * Orientation convention: authored weapon GLBs have their blade along
+ * local +Y (hilt at origin). To make the blade point AWAY from the
+ * camera (into the scene, −Z in camera-local space) we pitch the model
+ * ~80° forward (rotation.x ≈ −1.4 rad) and add a small yaw so the blade
+ * reads as a 3D volume rather than an edge-on line. A previous revision
+ * used rotation [−0.15, −0.9, 0.2] which left the blade lying almost
+ * horizontal to the right — reading as "a diagonal line pointed off the
+ * side of the screen" instead of "a sword gripped forward."
  */
 const POSE_TRANSFORMS: Record<
   HandPose,
   { position: [number, number, number]; rotation: [number, number, number]; scale: number }
 > = {
-  grip: { position: [0.2, -0.28, -0.45], rotation: [-0.15, -0.9, 0.2], scale: 1.0 },
-  hold: { position: [0, -0.32, -0.55], rotation: [-0.15, 0.1, 0], scale: 1.0 },
-  pinch: { position: [0.18, -0.28, -0.45], rotation: [-0.1, -0.5, 0.2], scale: 0.9 },
-  palm: { position: [0.22, -0.28, -0.5], rotation: [-0.05, -0.3, -0.1], scale: 1.0 },
-  open: { position: [0.22, -0.35, -0.5], rotation: [-0.35, -0.2, 0], scale: 1.0 },
+  grip: { position: [0.22, -0.3, -0.5], rotation: [-1.4, 0.2, 0.1], scale: 1.0 },
+  hold: { position: [0, -0.32, -0.6], rotation: [-1.4, 0, 0], scale: 1.0 },
+  pinch: { position: [0.18, -0.28, -0.45], rotation: [-1.2, 0.1, 0.1], scale: 0.9 },
+  // `palm` and `open` are documented as synonymous in item.schema.ts; they
+  // MUST share a single transform so the same item rendered with either
+  // pose shows identically in-hand. A previous revision diverged them and
+  // was flagged in PR review (CodeRabbit). Keep them aliased.
+  palm: { position: [0.22, -0.28, -0.5], rotation: [-0.1, -0.15, -0.1], scale: 1.0 },
+  open: { position: [0.22, -0.28, -0.5], rotation: [-0.1, -0.15, -0.1], scale: 1.0 },
 };
 
 function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {

@@ -53,6 +53,36 @@ export function FunctionalHud({
 
   return (
     <>
+      {/* Illuminated-manuscript frame — parchment border with gold corner
+          ornaments. Pointer-events:none so it never intercepts input; it
+          sits behind the interactive HUD elements but in front of the
+          game scene. All four edges honour iOS safe-area insets via
+          env(safe-area-inset-*) so the ornaments don't fall under the
+          notch/dynamic island or get clipped by the home indicator on
+          foldables with asymmetric safe areas. */}
+      <div
+        className="absolute inset-0 pointer-events-none z-20"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute rounded-lg"
+          style={{
+            top: 'max(env(safe-area-inset-top), 0.5rem)',
+            right: 'max(env(safe-area-inset-right), 0.5rem)',
+            bottom: 'max(env(safe-area-inset-bottom), 0.5rem)',
+            left: 'max(env(safe-area-inset-left), 0.5rem)',
+            boxShadow:
+              'inset 0 0 0 1px rgba(196, 167, 71, 0.6), inset 0 0 24px rgba(0, 0, 0, 0.35), inset 0 0 80px rgba(139, 111, 71, 0.22)',
+          }}
+        />
+        {/* Corner ornaments — fleur-de-lis style accents */}
+        {(['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const).map(
+          (corner) => (
+            <CornerOrnament key={corner} corner={corner} />
+          ),
+        )}
+      </div>
+
       {/* Top strip — health + stamina bars, quest icon, pause */}
       <div
         className={cn(
@@ -205,6 +235,54 @@ function JournalGlyph() {
       <path d="M5 4h12a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2V6a2 2 0 0 1 2-2z" />
       <path d="M9 8h6" />
       <path d="M9 11h6" />
+    </svg>
+  );
+}
+
+function CornerOrnament({
+  corner,
+}: {
+  corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+}) {
+  // Each corner anchors to the matching safe-area inset so the ornament
+  // never falls under a device notch, camera cutout, or home indicator.
+  // Flip horizontally/vertically via scale transforms so one SVG serves
+  // all four corners.
+  const edgeTop = 'max(env(safe-area-inset-top), 0.25rem)';
+  const edgeRight = 'max(env(safe-area-inset-right), 0.25rem)';
+  const edgeBottom = 'max(env(safe-area-inset-bottom), 0.25rem)';
+  const edgeLeft = 'max(env(safe-area-inset-left), 0.25rem)';
+  const styles: Record<typeof corner, React.CSSProperties> = {
+    'top-left': { top: edgeTop, left: edgeLeft },
+    'top-right': { top: edgeTop, right: edgeRight, transform: 'scaleX(-1)' },
+    'bottom-left': {
+      bottom: edgeBottom,
+      left: edgeLeft,
+      transform: 'scaleY(-1)',
+    },
+    'bottom-right': {
+      bottom: edgeBottom,
+      right: edgeRight,
+      transform: 'scale(-1, -1)',
+    },
+  };
+  return (
+    <svg
+      viewBox="0 0 40 40"
+      className="absolute w-10 h-10"
+      style={styles[corner]}
+      fill="none"
+      stroke="#c4a747"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      {/* L-shaped bracket with decorative fleur bud */}
+      <path d="M4 20 L4 4 L20 4" strokeOpacity="0.85" />
+      <path d="M8 8 Q8 8, 12 12" strokeOpacity="0.7" />
+      <circle cx="6" cy="6" r="1.8" fill="#c4a747" fillOpacity="0.8" stroke="none" />
+      <path d="M10 4 Q14 2, 16 4" strokeOpacity="0.55" />
+      <path d="M4 10 Q2 14, 4 16" strokeOpacity="0.55" />
     </svg>
   );
 }

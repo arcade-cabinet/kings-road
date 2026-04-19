@@ -109,11 +109,36 @@ describe('composeVegetation', () => {
     }
   });
 
-  it('scale is within biome species scaleRange', () => {
+  it('scale is species scaleRange multiplied by variant baseScale', () => {
+    // Per-asset expected bounds = species.scaleRange × variant.baseScale.
+    // Build the lookup directly from the catalog so the test stays in sync
+    // if either baseScale or scaleRange is tuned later. A global [min,max]
+    // check would accept a tree rendered at bush scale; this catches it.
+    const speciesRanges: Record<string, [number, number]> = {};
+    for (const species of MOCK_BIOME.foliage.species) {
+      const [min = 0.8, max = 1.2] = species.scaleRange ?? [0.8, 1.2];
+      speciesRanges[species.assetId] = [min, max];
+    }
+    const variantBaseByPath = new Map<
+      string,
+      { speciesId: string; baseScale: number }
+    >();
+    for (const [speciesId, variants] of Object.entries(FOLIAGE_CATALOG)) {
+      for (const v of variants) {
+        variantBaseByPath.set(v.path.replace(/^\/assets\//, ''), {
+          speciesId,
+          baseScale: v.baseScale,
+        });
+      }
+    }
+
     const result = composeVegetation(MOCK_BIOME, 0, 0, FLAT_SAMPLER, 'seed-a');
     for (const p of result) {
-      expect(p.scale).toBeGreaterThanOrEqual(0.4);
-      expect(p.scale).toBeLessThanOrEqual(1.4);
+      const info = variantBaseByPath.get(p.assetId);
+      expect(info, `unknown assetId: ${p.assetId}`).toBeDefined();
+      const [sMin, sMax] = speciesRanges[info!.speciesId];
+      expect(p.scale).toBeGreaterThanOrEqual(sMin * info!.baseScale);
+      expect(p.scale).toBeLessThanOrEqual(sMax * info!.baseScale);
     }
   });
 
