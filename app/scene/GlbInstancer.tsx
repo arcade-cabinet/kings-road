@@ -97,13 +97,10 @@ export function GlbInstancer({
         // 0x8a6a48 (warm driftwood, R138,G106,B72) gives the HDRI
         // something to shade against so tree volume reads at 80m+.
         tint = 0x8a6a48;
-        roughness = 0.9;
       } else if (glb.includes('dead-tree')) {
         tint = 0x9a7858; // sun-weathered grey-brown
-        roughness = 0.9;
       } else if (glb.includes('forest-tree') || glb.includes('birtch')) {
         tint = 0x8c6a45; // warm bark
-        roughness = 0.9;
       } else if (glb.includes('fir-tree')) {
         tint = 0x4a5832; // dark evergreen (lifted from 0x3a4825)
       } else if (glb.includes('bush')) {
