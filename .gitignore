@@ -74,3 +74,8 @@ public/assets/terrain/**/*.png
 .claude/hooks/task-batch-flush.sh
 .claude/worktrees/
 .claude/scheduled_tasks.lock
+
+# Playwright/DevTools MCP screenshots + snapshots (local diagnostics only)
+.playwright-mcp/
+kr-*.png
+kr-*.jpg
