@@ -4,6 +4,7 @@ import { GameScene } from '@app/scene/GameScene';
 import { DeathOverlay } from '@app/views/DeathOverlay';
 import { DialogueBox } from '@app/views/Gameplay/DialogueBox';
 import { DiegeticLayer } from '@app/views/Gameplay/DiegeticLayer';
+import { FunctionalHud } from '@app/views/Gameplay/FunctionalHud';
 import { GameplayFrame } from '@app/views/Gameplay/GameplayFrame';
 import { InventoryScreen } from '@app/views/Gameplay/InventoryScreen';
 import { LoadingOverlay } from '@app/views/Gameplay/LoadingOverlay';
@@ -98,8 +99,14 @@ export function Game() {
         render inside the frame so they share safe-area padding.
       */}
       <GameplayFrame>
-        {/* Diegetic body-sense layer: wound vignette, breath fog, combat
-            impact flashes, heartbeat, and low-opacity belt/journal pips. */}
+        {/*
+          Functional HUD — health bar, stamina bar, crosshair, quest +
+          pause + inventory buttons. Replaces the pure diegetic affordance
+          pips for on-device playtest readability. DiegeticLayer still
+          runs alongside for the body-sense feedback (wound vignette,
+          heartbeat, combat hit flash) which layers on top as atmosphere.
+        */}
+        <FunctionalHud />
         <DiegeticLayer />
         {/* Dialogue — illuminated-manuscript HTML overlay. An in-Canvas
             billboard variant may replace this later but this is the
