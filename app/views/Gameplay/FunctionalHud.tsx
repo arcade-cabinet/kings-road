@@ -56,16 +56,21 @@ export function FunctionalHud({
       {/* Illuminated-manuscript frame — parchment border with gold corner
           ornaments. Pointer-events:none so it never intercepts input; it
           sits behind the interactive HUD elements but in front of the
-          game scene. The frame scales with viewport and honours iOS safe
-          areas. Kept subtle (low-opacity inner shadow, thin gold line)
-          so it reads as "parchment edge" rather than "UI chrome." */}
+          game scene. All four edges honour iOS safe-area insets via
+          env(safe-area-inset-*) so the ornaments don't fall under the
+          notch/dynamic island or get clipped by the home indicator on
+          foldables with asymmetric safe areas. */}
       <div
         className="absolute inset-0 pointer-events-none z-20"
         aria-hidden="true"
       >
         <div
-          className="absolute inset-2 rounded-lg"
+          className="absolute rounded-lg"
           style={{
+            top: 'max(env(safe-area-inset-top), 0.5rem)',
+            right: 'max(env(safe-area-inset-right), 0.5rem)',
+            bottom: 'max(env(safe-area-inset-bottom), 0.5rem)',
+            left: 'max(env(safe-area-inset-left), 0.5rem)',
             boxShadow:
               'inset 0 0 0 1px rgba(196, 167, 71, 0.6), inset 0 0 24px rgba(0, 0, 0, 0.35), inset 0 0 80px rgba(139, 111, 71, 0.22)',
           }}
@@ -239,16 +244,33 @@ function CornerOrnament({
 }: {
   corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 }) {
-  const positions: Record<typeof corner, string> = {
-    'top-left': 'top-1 left-1',
-    'top-right': 'top-1 right-1 scale-x-[-1]',
-    'bottom-left': 'bottom-1 left-1 scale-y-[-1]',
-    'bottom-right': 'bottom-1 right-1 scale-[-1]',
+  // Each corner anchors to the matching safe-area inset so the ornament
+  // never falls under a device notch, camera cutout, or home indicator.
+  // Flip horizontally/vertically via scale transforms so one SVG serves
+  // all four corners.
+  const edgeTop = 'max(env(safe-area-inset-top), 0.25rem)';
+  const edgeRight = 'max(env(safe-area-inset-right), 0.25rem)';
+  const edgeBottom = 'max(env(safe-area-inset-bottom), 0.25rem)';
+  const edgeLeft = 'max(env(safe-area-inset-left), 0.25rem)';
+  const styles: Record<typeof corner, React.CSSProperties> = {
+    'top-left': { top: edgeTop, left: edgeLeft },
+    'top-right': { top: edgeTop, right: edgeRight, transform: 'scaleX(-1)' },
+    'bottom-left': {
+      bottom: edgeBottom,
+      left: edgeLeft,
+      transform: 'scaleY(-1)',
+    },
+    'bottom-right': {
+      bottom: edgeBottom,
+      right: edgeRight,
+      transform: 'scale(-1, -1)',
+    },
   };
   return (
     <svg
       viewBox="0 0 40 40"
-      className={cn('absolute w-10 h-10', positions[corner])}
+      className="absolute w-10 h-10"
+      style={styles[corner]}
       fill="none"
       stroke="#c4a747"
       strokeWidth="1.2"

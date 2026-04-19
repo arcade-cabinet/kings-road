@@ -84,8 +84,12 @@ const POSE_TRANSFORMS: Record<
   grip: { position: [0.22, -0.3, -0.5], rotation: [-1.4, 0.2, 0.1], scale: 1.0 },
   hold: { position: [0, -0.32, -0.6], rotation: [-1.4, 0, 0], scale: 1.0 },
   pinch: { position: [0.18, -0.28, -0.45], rotation: [-1.2, 0.1, 0.1], scale: 0.9 },
+  // `palm` and `open` are documented as synonymous in item.schema.ts; they
+  // MUST share a single transform so the same item rendered with either
+  // pose shows identically in-hand. A previous revision diverged them and
+  // was flagged in PR review (CodeRabbit). Keep them aliased.
   palm: { position: [0.22, -0.28, -0.5], rotation: [-0.1, -0.15, -0.1], scale: 1.0 },
-  open: { position: [0.22, -0.35, -0.5], rotation: [-0.35, -0.1, 0], scale: 1.0 },
+  open: { position: [0.22, -0.28, -0.5], rotation: [-0.1, -0.15, -0.1], scale: 1.0 },
 };
 
 function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {

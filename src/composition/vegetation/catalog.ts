@@ -13,8 +13,13 @@ export interface FoliageAssetDef {
    *   bushes: 1.5–2 m (head-high)
    *   grass/weeds: 0.5–0.8 m (calf-height)
    *   flowers: 0.3–0.5 m (ankle-height)
+   *
+   * Required — missing baseScale would silently render an asset at its
+   * authored (tiny) size, reintroducing the "I am super big and
+   * everything else is small" playtest bug. Use `1` explicitly for
+   * assets already authored at world scale.
    */
-  baseScale?: number;
+  baseScale: number;
 }
 
 export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
