@@ -61,16 +61,27 @@ function fitScale(
   return Math.min(1, target / longest);
 }
 
-/** Local offsets + rotations per hand pose, camera-relative. */
+/**
+ * Local offsets + rotations per hand pose, camera-relative. Tuned for a
+ * mobile/foldable viewport (~500×844 CSS, 75° FOV) so the weapon sits
+ * where you'd actually see it — lower-right of the screen, but close
+ * enough to center that it reads as "in hand" rather than "a line
+ * sticking out of the edge."
+ *
+ * Grip pose also points the blade back toward the camera (rotation Y
+ * about -55° off forward) so a thin sword reads as a 3D volume instead
+ * of an edge-on line. Authors of new weapons can override these defaults
+ * per-item via `ItemDefinition.viewmodel` when needed.
+ */
 const POSE_TRANSFORMS: Record<
   HandPose,
   { position: [number, number, number]; rotation: [number, number, number]; scale: number }
 > = {
-  grip: { position: [0.35, -0.4, -0.6], rotation: [0, -0.25, 0.1], scale: 1.0 },
-  hold: { position: [0, -0.4, -0.8], rotation: [-0.1, 0, 0], scale: 1.0 },
-  pinch: { position: [0.25, -0.35, -0.5], rotation: [0, -0.3, 0.2], scale: 0.8 },
-  palm: { position: [0.3, -0.35, -0.55], rotation: [0, -0.2, -0.1], scale: 1.0 },
-  open: { position: [0.3, -0.45, -0.55], rotation: [-0.4, -0.15, 0], scale: 1.0 },
+  grip: { position: [0.2, -0.28, -0.45], rotation: [-0.15, -0.9, 0.2], scale: 1.0 },
+  hold: { position: [0, -0.32, -0.55], rotation: [-0.15, 0.1, 0], scale: 1.0 },
+  pinch: { position: [0.18, -0.28, -0.45], rotation: [-0.1, -0.5, 0.2], scale: 0.9 },
+  palm: { position: [0.22, -0.28, -0.5], rotation: [-0.05, -0.3, -0.1], scale: 1.0 },
+  open: { position: [0.22, -0.35, -0.5], rotation: [-0.35, -0.2, 0], scale: 1.0 },
 };
 
 function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {
@@ -89,38 +100,54 @@ function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {
 
   const transform = POSE_TRANSFORMS[pose];
 
-  // Normalize the authored mesh into viewmodel-sized units. Packs authored
-  // in Blender default units or PSX-pack metres range from 20cm to 3m per
-  // weapon; scale by longest-axis fit against WEAPON_TARGET_METRES so the
-  // blade sits naturally in hand regardless of the source pack.
-  const fit = useMemo(() => {
-    if (!mesh.geometry) return 1;
-    mesh.geometry.computeBoundingBox();
-    const bb = mesh.geometry.boundingBox;
-    if (!bb) return 1;
+  // Normalize the authored mesh + recenter its origin. Packs ship with
+  // varying authored scales (15cm–3m long) and varying pivot conventions
+  // (hilt-center for Kenney packs, geometric-center for PSX). We:
+  //   1. Clone the geometry so we don't mutate the shared GLTF asset.
+  //   2. Translate it so its bbox center is at (0, 0, 0) → predictable
+  //      placement regardless of pivot convention.
+  //   3. Compute a uniform scale so the longest axis fits
+  //      WEAPON_TARGET_METRES.
+  // Without recentering, a Kenney sword with pivot at the hilt renders
+  // its blade-tip 60cm away from the pose's `position`, reading as "a
+  // weird line sticking out of the edge of the screen."
+  const prepared = useMemo(() => {
+    if (!mesh.geometry) return { geometry: null, fit: 1 };
+    const geo = mesh.geometry.clone();
+    geo.computeBoundingBox();
+    const bb = geo.boundingBox;
+    if (!bb) return { geometry: geo, fit: 1 };
+    const center = new THREE.Vector3();
+    bb.getCenter(center);
+    geo.translate(-center.x, -center.y, -center.z);
     const size = new THREE.Vector3();
     bb.getSize(size);
     const longest = Math.max(size.x, size.y, size.z);
-    if (longest <= 0) return 1;
-    return Math.min(1, WEAPON_TARGET_METRES / longest);
+    const fit = longest > 0 ? Math.min(1, WEAPON_TARGET_METRES / longest) : 1;
+    return { geometry: geo, fit };
   }, [mesh.geometry]);
+
+  if (!prepared.geometry) return null;
 
   // Intentionally discard the GLB's authored material here. Viewmodels
   // render camera-parented at a fixed distance with no HDRI environment
-  // map bound yet; the authored PSX-pack materials look muddy under
-  // those conditions. A uniform honey-gold PBR reads better in-hand
-  // until the Thornfield Phase 0 lighting pass adds `<Environment>` IBL,
-  // at which point we should revisit this and let the authored material
-  // through. Tracked via the polish-pass Phase 0 spec.
+  // map bound yet; the authored PSX-pack materials look muddy under those
+  // conditions. A uniform honey-gold PBR reads better in-hand until the
+  // Thornfield Phase 0 lighting pass adds `<Environment>` IBL.
   return (
     <mesh
-      geometry={mesh.geometry}
+      geometry={prepared.geometry}
       position={transform.position}
       rotation={transform.rotation}
-      scale={transform.scale * fit}
+      scale={transform.scale * prepared.fit}
       castShadow
     >
-      <meshStandardMaterial color="#c4a747" roughness={0.3} metalness={0.8} envMapIntensity={1.0} />
+      <meshStandardMaterial
+        color="#c4a747"
+        roughness={0.3}
+        metalness={0.8}
+        envMapIntensity={1.0}
+      />
     </mesh>
   );
 }
