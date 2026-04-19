@@ -119,7 +119,10 @@ describe('composeVegetation', () => {
       const [min = 0.8, max = 1.2] = species.scaleRange ?? [0.8, 1.2];
       speciesRanges[species.assetId] = [min, max];
     }
-    const variantBaseByPath = new Map<string, { speciesId: string; baseScale: number }>();
+    const variantBaseByPath = new Map<
+      string,
+      { speciesId: string; baseScale: number }
+    >();
     for (const [speciesId, variants] of Object.entries(FOLIAGE_CATALOG)) {
       for (const v of variants) {
         variantBaseByPath.set(v.path.replace(/^\/assets\//, ''), {
