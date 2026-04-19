@@ -80,17 +80,27 @@ export function parseSpawnParam(): string | null {
 }
 
 /**
- * Apply the debug spawn override. No-ops in production builds.
+ * Apply the spawn override if one is present in the URL or build env.
+ *
+ * Runs in both DEV and production builds — the GitHub Pages deploy bakes
+ * `VITE_DEBUG_SPAWN=thornfield` into its build so hitting the root URL on a
+ * mobile/foldable drops straight into the benchmark biome without a menu
+ * click. Locally, `pnpm dev` leaves VITE_DEBUG_SPAWN unset, so the main
+ * menu still shows until a `?spawn=<biome>` query is added.
  *
  * Call once at app startup (before the React tree renders). When a valid
- * `?spawn=<id>` param is detected the function:
+ * spawn id is detected the function:
  *   1. Loads the content DB and generates the kingdom map (same work the
  *      main-menu "New Pilgrimage" path does).
  *   2. Finds the matching settlement in the generated map and spawns the
  *      player at the settlement's grid center (not 1D road distance —
  *      that puts the player in the ocean).
- *   3. Calls `startGame()` with a deterministic dev seed.
- *   4. Seeds the inventory with the starter loadout.
+ *   3. Calls `startGame()` with a deterministic dev seed derived from the
+ *      spawn id (`debug-<id>-seed`). The seed is intentionally deterministic
+ *      so benchmarks and QA runs produce the same world every time, in
+ *      both prod and dev.
+ *   4. Seeds the inventory with a starter loadout so the player arrives
+ *      ready to explore.
  *
  * Returns true when a spawn override was applied (caller should skip the
  * main menu), false otherwise. The async boot runs fire-and-forget so the
