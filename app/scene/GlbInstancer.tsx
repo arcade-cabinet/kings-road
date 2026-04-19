@@ -134,6 +134,15 @@ export function GlbInstancer({
 
   useEffect(() => {
     if (!meshRef.current || itemCount === 0) return;
+    // R3F has a known gotcha: the `frustumCulled={false}` JSX prop on
+    // <instancedMesh> doesn't always propagate through the reconciler
+    // to the underlying THREE.InstancedMesh (observed live: 263
+    // instanced meshes all still reported frustumCulled=true on the
+    // Pages deploy). Set it imperatively here. Necessary because the
+    // shared geometry bounds are ~1 m but instances span 120 m chunks,
+    // so auto-culling throws away thousands of visible instances.
+    meshRef.current.frustumCulled = false;
+
     const dummy = new THREE.Object3D();
     for (let i = 0; i < itemCount; i++) {
       const it = items[i];
