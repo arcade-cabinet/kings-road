@@ -73,20 +73,26 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     }
 
     if (type === 'TOWN' && hasConfigTown) {
+      const townCenter = { x: oX + CHUNK_SIZE / 2, z: oZ + CHUNK_SIZE / 2 };
       const townConfig: TownConfig = {
         id: key,
-        center: { x: oX + CHUNK_SIZE / 2, y: 0, z: oZ + CHUNK_SIZE / 2 },
+        center: { x: townCenter.x, y: 0, z: townCenter.z },
         radius: CHUNK_SIZE / 2,
       };
       // Ruins + overgrown foliage — biomes like Thornfield are
       // explicitly "dead forest wrapped around ruins" per the biome
       // description, so a TOWN chunk without vegetation reads as a bare
-      // stone clearing. Compose both, merge the arrays.
+      // stone clearing. Compose both, merge the arrays. Carve out a
+      // 30 m clearance around the town centre so trees don't spawn on
+      // top of the buildings and NPCs.
       const ruinPlacements = biomeConfig
         ? composeRuins(biomeConfig, townConfig, seedPhrase)
         : [];
       const townVegPlacements = biomeConfig
-        ? composeVegetation(biomeConfig, cx, cz, heightSampler, seedPhrase)
+        ? composeVegetation(biomeConfig, cx, cz, heightSampler, seedPhrase, {
+            clearCenter: townCenter,
+            clearRadius: 30,
+          })
         : [];
       return [...ruinPlacements, ...townVegPlacements];
     }
