@@ -108,10 +108,12 @@ describe('applyDebugSpawn', () => {
     // Thornfield settlement at grid (50, 100) → world centre
     // (50*CHUNK_SIZE + CHUNK_SIZE/2, PLAYER_HEIGHT, 100*CHUNK_SIZE + CHUNK_SIZE/2)
     // With CHUNK_SIZE=120 → (6060, y, 12060)
+    // Yaw=π/4 (45°) — rotates the spawn view off the road axis so the
+    // village flank is in frame instead of an empty road corridor.
     expect(gameMod.startGame).toHaveBeenCalledWith(
       'debug-thornfield-seed',
       expect.objectContaining({ x: 6060, z: 12060 }),
-      0,
+      Math.PI / 4,
     );
   });
 });

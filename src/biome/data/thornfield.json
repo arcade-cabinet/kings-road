@@ -14,8 +14,8 @@
     "directionalColor": "#c8d8e8",
     "directionalIntensity": 0.6,
     "fogColor": "#8090a0",
-    "fogNear": 20,
-    "fogFar": 120,
+    "fogNear": 35,
+    "fogFar": 160,
     "fogDensity": 0.015,
     "skyTint": "#6a8090"
   },
@@ -41,7 +41,7 @@
     "displacementScale": 0.25
   },
   "foliage": {
-    "density": 0.55,
+    "density": 0.85,
     "species": [
       { "assetId": "gnarled-dead-oak", "density": 0.4, "scaleRange": [0.8, 1.4] },
       { "assetId": "hawthorn", "density": 0.25, "scaleRange": [0.6, 1.0], "clusterRadius": 3 },
