@@ -47,26 +47,6 @@ const RAIN_HEIGHT = 20;
 /** Rain fall speed (units/sec) */
 const RAIN_FALL_SPEED = 25;
 
-// ── Fog color presets by weather ─────────────────────────────────────────
-
-const FOG_COLORS: Record<string, THREE.Color> = {
-  clear_day: new THREE.Color(0xf5f0e8),
-  clear_night: new THREE.Color(0x0a0a1a),
-  overcast_day: new THREE.Color(0xd5d0c8),
-  overcast_night: new THREE.Color(0x0a0a18),
-  foggy_day: new THREE.Color(0xcec8ba),
-  foggy_night: new THREE.Color(0x0e0e1e),
-  rainy_day: new THREE.Color(0xb0aba0),
-  rainy_night: new THREE.Color(0x080810),
-  stormy_day: new THREE.Color(0x8a8580),
-  stormy_night: new THREE.Color(0x060608),
-};
-
-// ── Fog distance presets ─────────────────────────────────────────────────
-
-const FOG_NEAR_BASE = 80;
-const FOG_FAR_BASE = 200;
-
 // ── Helper: resolve weather from profile + time ──────────────────────────
 
 function resolveWeather(
@@ -254,8 +234,7 @@ export function WeatherSystem() {
   const currentWindStrength = useRef(0.1);
 
   // Scratch color objects to avoid allocations
-  const fogColorTarget = useMemo(() => new THREE.Color(0xf5f0e8), []);
-  const fogColorCurrent = useMemo(() => new THREE.Color(0xf5f0e8), []);
+  const fogColorTarget = useMemo(() => new THREE.Color(), []);
 
   useFrame((_, delta) => {
     const { gameActive } = getFlags();
@@ -307,31 +286,42 @@ export function WeatherSystem() {
       (target.windStrength - currentWindStrength.current) * lerpFactor;
 
     // ── Apply fog ─────────────────────────────────────────────────────
+    //
+    // Environment.tsx owns fog *identity* — the biome-authored fogColor,
+    // fogNear, and fogFar live there. WeatherSystem only MODULATES those
+    // values based on the current weather condition: denser fog shortens
+    // the distances, storms desaturate. We never replace the biome's warm
+    // goldenrod with a global grey preset (which was the pre-fix bug —
+    // every frame the authored #a89878 got lerped toward 0xf5f0e8 cream,
+    // producing the washed-out milky Thornfield screenshot from cb=131).
     if (scene.fog instanceof THREE.Fog) {
-      const { timeOfDay } = getEnvironment();
-      const theta = (timeOfDay - 0.25) * Math.PI * 2;
-      const isDay = Math.sin(theta) > 0;
+      const densityFactor = 1 - currentFogDensity.current * 0.5;
 
-      // Pick target fog color based on condition + day/night
-      const colorKey = `${target.condition}_${isDay ? 'day' : 'night'}`;
-      const targetColor = FOG_COLORS[colorKey] ?? FOG_COLORS.clear_day;
-      fogColorTarget.copy(targetColor);
+      // Shorten near/far proportionally to density — keep the biome's
+      // authored base distances (Environment.tsx writes them each biome
+      // change, we just scale the current values every frame).
+      scene.fog.near *= densityFactor;
+      scene.fog.far *= densityFactor;
 
-      // Lerp fog color
-      fogColorCurrent.lerp(fogColorTarget, lerpFactor * 0.5);
-
-      // Modulate fog distances based on density
-      // Higher density = shorter visibility
-      const densityFactor = 1 - currentFogDensity.current * 0.7;
-      const near = FOG_NEAR_BASE * densityFactor;
-      const far = FOG_FAR_BASE * densityFactor;
-
-      scene.fog.near = near;
-      scene.fog.far = far;
-
-      // Blend with the existing fog color set by DayNightCycle
-      // We only override partially so both systems cooperate
-      scene.fog.color.lerp(fogColorCurrent, 0.3);
+      // Condition-based desaturation: storms wash the scene grey, clear
+      // days leave the biome color untouched. Capped so the biome identity
+      // always dominates.
+      const desatAmount =
+        target.condition === 'stormy'
+          ? 0.35
+          : target.condition === 'rainy'
+            ? 0.2
+            : target.condition === 'foggy'
+              ? 0.12
+              : 0;
+      if (desatAmount > 0) {
+        const luminance =
+          0.299 * scene.fog.color.r +
+          0.587 * scene.fog.color.g +
+          0.114 * scene.fog.color.b;
+        fogColorTarget.setRGB(luminance, luminance, luminance);
+        scene.fog.color.lerp(fogColorTarget, desatAmount * lerpFactor);
+      }
     }
   });
 
