@@ -52,8 +52,14 @@ function resolveSpawnPosition(
     );
   }
   const [gx, gy] = settlement.position;
+  // Offset the spawn along +X (east of the road axis) by 25m so the player
+  // isn't standing on the road itself — facing north (default yaw) then
+  // puts ruins + NPCs + road diagonally across the view instead of all
+  // hidden off-screen to the sides. Thornfield's town centre is at the
+  // road; this offset puts the player on the settlement flank where
+  // buildings and dead trees cluster.
   return new Vector3(
-    gx * CHUNK_SIZE + CHUNK_SIZE / 2,
+    gx * CHUNK_SIZE + CHUNK_SIZE / 2 + 25,
     PLAYER_HEIGHT,
     gy * CHUNK_SIZE + CHUNK_SIZE / 2,
   );
@@ -132,13 +138,14 @@ export function applyDebugSpawn(): boolean {
       resolveNarrative(devSeed);
 
       const pos = resolveSpawnPosition(biomeId, map);
-      // Rotate the spawn yaw 45° off the road axis so the player sees the
-      // village flank (buildings, ruins, NPCs arranged around the
-      // settlement centre) instead of staring down an empty road
-      // corridor. Thornfield's town layout places all 3 buildings at
-      // grid offsets like [-3,-2]/[3,-3]/[5,2] — none of them are
-      // directly along +Z, so yaw=0 pointed the camera at a gap.
-      startGame(devSeed, pos, Math.PI / 4);
+      // Yaw=0 (north) — combined with the +25 m X offset in
+      // resolveSpawnPosition, this puts the settlement ruins diagonally
+      // across the forward view. A previous revision set yaw=π/4 at
+      // spawn; it was silently reset somewhere between startGame and
+      // the first PlayerController frame — needs a separate
+      // investigation, tracked on task #32. Positional offset achieves
+      // the same "see the village" goal without relying on yaw.
+      startGame(devSeed, pos, 0);
 
       syncInventory(STARTER_ITEMS, 20, 0, {
         head: null,
