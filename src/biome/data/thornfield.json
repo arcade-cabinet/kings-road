@@ -5,7 +5,7 @@
   "lighting": {
     "hdri": {
       "dawn": "misty-pines",
-      "noon": "misty-pines",
+      "noon": "kloppenheim-04",
       "dusk": "kloppenheim-04",
       "night": "kloppenheim-04"
     },
