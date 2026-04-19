@@ -5,15 +5,23 @@ import { syncInventory } from '@/ecs/actions/inventory-ui';
 import { resolveNarrative } from '@/ecs/actions/quest';
 import { generateWorld, setWorldState } from '@/ecs/actions/world';
 import type { ItemStack } from '@/ecs/traits/inventory';
+import type { KingdomMap } from '@/schemas/kingdom.schema';
+import { CHUNK_SIZE, PLAYER_HEIGHT } from '@/utils/worldCoords';
 
-/** Biome id → road distance (metres from Ashford) for known spawn points. */
-const BIOME_ANCHORS: Record<string, number> = {
-  thornfield: 12000,
-  ashford: 0,
-  millbrook: 6000,
-  ravensgate: 17000,
-  pilgrims_rest: 21000,
-  grailsend: 28000,
+/**
+ * URL spawn id → kingdom-settlement id. Settlement ids in
+ * `content/world/kingdom-config.json` use hyphens (e.g. "thornfield-ruins")
+ * but URL params normalize to underscores. This map picks the settlement
+ * the user probably meant when the biome id doesn't match a settlement
+ * directly.
+ */
+const SPAWN_ID_TO_SETTLEMENT: Record<string, string> = {
+  ashford: 'ashford',
+  millbrook: 'millbrook',
+  thornfield: 'thornfield-ruins',
+  ravensgate: 'ravensgate',
+  pilgrims_rest: 'pilgrims-rest',
+  grailsend: 'grailsend',
 };
 
 /** Starter loadout granted on every debug spawn. */
@@ -23,9 +31,32 @@ const STARTER_ITEMS: ItemStack[] = [
   { itemId: 'torch', quantity: 1 },
 ];
 
-/** Player spawns slightly off-road so they don't clip into the spine path. */
-function anchorToWorldPos(distanceFromStart: number): Vector3 {
-  return new Vector3(distanceFromStart, 0, 2);
+/**
+ * Resolve a spawn id to a world-space position by looking up the matching
+ * settlement in the generated kingdom map. Falls back to a position near
+ * Ashford when the settlement can't be found (the kingdom-gen may have
+ * dropped the settlement for the seeded layout, in which case a visible
+ * spawn beats a silent crash at (0,0,0)).
+ */
+function resolveSpawnPosition(
+  spawnId: string,
+  kingdomMap: KingdomMap,
+): Vector3 {
+  const targetId = SPAWN_ID_TO_SETTLEMENT[spawnId] ?? spawnId;
+  const settlement =
+    kingdomMap.settlements.find((s) => s.id === targetId) ??
+    kingdomMap.settlements.find((s) => s.id === 'ashford');
+  if (!settlement) {
+    throw new Error(
+      `[debug/spawn] No settlement "${targetId}" and no Ashford fallback in kingdom map`,
+    );
+  }
+  const [gx, gy] = settlement.position;
+  return new Vector3(
+    gx * CHUNK_SIZE + CHUNK_SIZE / 2,
+    PLAYER_HEIGHT,
+    gy * CHUNK_SIZE + CHUNK_SIZE / 2,
+  );
 }
 
 /**
@@ -48,18 +79,19 @@ export function parseSpawnParam(): string | null {
  * Apply the debug spawn override. No-ops in production builds.
  *
  * Call once at app startup (before the React tree renders). When a valid
- * `?spawn=<biome>` param is detected the function:
+ * `?spawn=<id>` param is detected the function:
  *   1. Loads the content DB and generates the kingdom map (same work the
  *      main-menu "New Pilgrimage" path does).
- *   2. Picks the road anchor for that biome.
- *   3. Calls `startGame()` with a deterministic dev seed and the anchor position.
+ *   2. Finds the matching settlement in the generated map and spawns the
+ *      player at the settlement's grid center (not 1D road distance —
+ *      that puts the player in the ocean).
+ *   3. Calls `startGame()` with a deterministic dev seed.
  *   4. Seeds the inventory with the starter loadout.
  *
- * Returns a promise that resolves to true when a spawn override was applied
- * (caller should skip the main menu), false otherwise. The async path is fire-
- * and-forget-safe — callers are expected to return the synchronous result as
- * soon as it's known so React can mount the scene shell while generation
- * progresses under the LoadingOverlay.
+ * Returns true when a spawn override was applied (caller should skip the
+ * main menu), false otherwise. The async boot runs fire-and-forget so the
+ * LoadingOverlay can mount immediately; it fades once the kingdom map is
+ * populated and chunks activate.
  */
 export function applyDebugSpawn(): boolean {
   if (!import.meta.env.DEV) return false;
@@ -67,20 +99,15 @@ export function applyDebugSpawn(): boolean {
   const biomeId = parseSpawnParam();
   if (!biomeId) return false;
 
-  const distance = BIOME_ANCHORS[biomeId];
-  if (distance === undefined) {
+  if (!SPAWN_ID_TO_SETTLEMENT[biomeId]) {
     console.warn(
-      `[debug/spawn] Unknown biome "${biomeId}". Valid ids: ${Object.keys(BIOME_ANCHORS).join(', ')}`,
+      `[debug/spawn] Unknown spawn id "${biomeId}". Valid ids: ${Object.keys(SPAWN_ID_TO_SETTLEMENT).join(', ')}`,
     );
     return false;
   }
 
-  const pos = anchorToWorldPos(distance);
   const devSeed = `debug-${biomeId}-seed`;
 
-  // Kick off the same boot sequence the main menu runs. Fire-and-forget:
-  // the LoadingOverlay watches `isGenerating` + `activeChunks.size` and fades
-  // once the world is ready.
   void (async () => {
     try {
       setWorldState({
@@ -89,9 +116,10 @@ export function applyDebugSpawn(): boolean {
         generationPhase: 'Loading the scrolls of knowledge...',
       });
       await loadContentDb();
-      await generateWorld(devSeed);
+      const map = await generateWorld(devSeed);
       resolveNarrative(devSeed);
 
+      const pos = resolveSpawnPosition(biomeId, map);
       startGame(devSeed, pos, 0);
 
       syncInventory(STARTER_ITEMS, 20, 0, {

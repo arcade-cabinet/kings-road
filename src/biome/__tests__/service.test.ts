@@ -53,6 +53,31 @@ describe('BiomeService.getBiomeById', () => {
   });
 });
 
+describe('BiomeService.resolveForChunk', () => {
+  it('returns config for directly registered id', () => {
+    const cfg = BiomeService.resolveForChunk('meadow');
+    expect(cfg?.id).toBe('meadow');
+  });
+
+  it('resolves aliased kingdom-gen biomes to their registered neighbour', () => {
+    // farmland/riverside/coast → meadow
+    expect(BiomeService.resolveForChunk('farmland')?.id).toBe('meadow');
+    expect(BiomeService.resolveForChunk('riverside')?.id).toBe('meadow');
+    expect(BiomeService.resolveForChunk('coast')?.id).toBe('meadow');
+    // deep_forest → forest
+    expect(BiomeService.resolveForChunk('deep_forest')?.id).toBe('forest');
+  });
+
+  it('returns null for an id that is neither registered nor aliased', () => {
+    expect(BiomeService.resolveForChunk('narnia')).toBeNull();
+  });
+
+  it('returns null when the alias target is not registered', () => {
+    // hills aliases to moor, but moor is not in this test spine's registry
+    expect(BiomeService.resolveForChunk('hills')).toBeNull();
+  });
+});
+
 describe('BiomeService.getCurrentBiome', () => {
   it('returns meadow for distance 0', () => {
     const biome = BiomeService.getCurrentBiome(0);

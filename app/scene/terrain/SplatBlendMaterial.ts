@@ -31,18 +31,42 @@ export function buildSplatBlendMaterial(params: {
   const mats = [...materials];
   while (mats.length < 4) mats.push(mats[0]);
 
-  const uniforms: Record<string, THREE.IUniform> = {
+  // Custom splat/PBR uniforms. These must be merged with the stock
+  // THREE.UniformsLib slots for lights + shadow + fog — our fragment shader
+  // calls `getShadowMask()` and references `ambientLightColor` / the
+  // `directionalLights` array, and when `lights: true` is set on the
+  // ShaderMaterial the renderer tries to write into those uniform slots
+  // directly. If they aren't present, setProgram crashes with
+  // "Cannot set properties of undefined (setting 'value')" every frame.
+  const customUniforms: Record<string, THREE.IUniform> = {
     uSplatMap: { value: splatMap },
     uTileScale: { value: tileScale },
   };
 
+  // 4 layers × 3 texture samplers (Color/Normal/Roughness) + 1 splat map
+  // = 13 texture image units. Stays under the WebGL2 guaranteed minimum of
+  // 16 MAX_TEXTURE_IMAGE_UNITS. AO was previously sampled as a 4th per-layer
+  // texture (= 17 units total), which exceeded the limit on conservative
+  // drivers and blocked shader compile with "texture image units count
+  // exceeds MAX_TEXTURE_IMAGE_UNITS(16)". AO is approximated via roughness
+  // darkening in the fragment shader until we add a combined ORM map pack.
   for (let i = 0; i < 4; i++) {
-    uniforms[`uColor${i}`] = { value: mats[i].map ?? null };
-    uniforms[`uNormal${i}`] = { value: mats[i].normalMap ?? null };
-    uniforms[`uRoughness${i}`] = { value: mats[i].roughnessMap ?? null };
-    uniforms[`uAO${i}`] = { value: mats[i].aoMap ?? null };
-    uniforms[`uRoughnessVal${i}`] = { value: mats[i].roughness };
-    uniforms[`uHasAO${i}`] = { value: mats[i].aoMap != null ? 1.0 : 0.0 };
+    customUniforms[`uColor${i}`] = { value: mats[i].map ?? null };
+    customUniforms[`uNormal${i}`] = { value: mats[i].normalMap ?? null };
+    customUniforms[`uRoughness${i}`] = { value: mats[i].roughnessMap ?? null };
+    customUniforms[`uRoughnessVal${i}`] = { value: mats[i].roughness };
+  }
+
+  // Merge lights + fog from UniformsLib (so the renderer can write into the
+  // expected `ambientLightColor`, `directionalLights`, etc. slots when
+  // `lights: true`), then overlay our splat/PBR uniforms by reference so
+  // callers can mutate them later without fighting a deep clone.
+  const uniforms = THREE.UniformsUtils.merge([
+    THREE.UniformsLib.lights,
+    THREE.UniformsLib.fog,
+  ]);
+  for (const [key, value] of Object.entries(customUniforms)) {
+    uniforms[key] = value;
   }
 
   const vertexShader = /* glsl */ `
@@ -51,16 +75,26 @@ export function buildSplatBlendMaterial(params: {
     varying vec3 vViewPosition;
 
     #include <common>
+    #include <fog_pars_vertex>
     #include <shadowmap_pars_vertex>
 
     void main() {
       vUv = uv;
-      vec4 worldPos = modelMatrix * vec4(position, 1.0);
+      // Declare the locals that the three.js vertex chunks expect to find in
+      // scope: objectNormal/transformedNormal for shadowmap_vertex (via
+      // defaultnormal_vertex), worldPosition for shadowmap_vertex, and
+      // mvPosition for fog_vertex. Chunk include order matches stock three
+      // MeshStandardMaterial emission.
+      vec3 objectNormal = vec3(normal);
+      #include <defaultnormal_vertex>
+
+      vec4 worldPosition = modelMatrix * vec4(position, 1.0);
       vWorldNormal = normalize(mat3(transpose(inverse(modelMatrix))) * normal);
-      vec4 mvPosition = viewMatrix * worldPos;
+      vec4 mvPosition = viewMatrix * worldPosition;
       vViewPosition = -mvPosition.xyz;
       gl_Position = projectionMatrix * mvPosition;
 
+      #include <fog_vertex>
       #include <shadowmap_vertex>
     }
   `;
@@ -70,16 +104,16 @@ export function buildSplatBlendMaterial(params: {
     uniform float uTileScale;
 
     uniform sampler2D uColor0; uniform sampler2D uNormal0; uniform sampler2D uRoughness0;
-    uniform sampler2D uAO0; uniform float uRoughnessVal0; uniform float uHasAO0;
+    uniform float uRoughnessVal0;
 
     uniform sampler2D uColor1; uniform sampler2D uNormal1; uniform sampler2D uRoughness1;
-    uniform sampler2D uAO1; uniform float uRoughnessVal1; uniform float uHasAO1;
+    uniform float uRoughnessVal1;
 
     uniform sampler2D uColor2; uniform sampler2D uNormal2; uniform sampler2D uRoughness2;
-    uniform sampler2D uAO2; uniform float uRoughnessVal2; uniform float uHasAO2;
+    uniform float uRoughnessVal2;
 
     uniform sampler2D uColor3; uniform sampler2D uNormal3; uniform sampler2D uRoughness3;
-    uniform sampler2D uAO3; uniform float uRoughnessVal3; uniform float uHasAO3;
+    uniform float uRoughnessVal3;
 
     varying vec2 vUv;
     varying vec3 vWorldNormal;
@@ -117,14 +151,6 @@ export function buildSplatBlendMaterial(params: {
         w.a * texture2D(uRoughness3, uv).r * uRoughnessVal3;
     }
 
-    float blendAO(vec4 w, vec2 uv) {
-      float ao0 = uHasAO0 > 0.5 ? texture2D(uAO0, uv).r : 1.0;
-      float ao1 = uHasAO1 > 0.5 ? texture2D(uAO1, uv).r : 1.0;
-      float ao2 = uHasAO2 > 0.5 ? texture2D(uAO2, uv).r : 1.0;
-      float ao3 = uHasAO3 > 0.5 ? texture2D(uAO3, uv).r : 1.0;
-      return w.r * ao0 + w.g * ao1 + w.b * ao2 + w.a * ao3;
-    }
-
     void main() {
       vec4 splat = texture2D(uSplatMap, vUv);
 
@@ -137,7 +163,11 @@ export function buildSplatBlendMaterial(params: {
       vec3 albedo   = blendAlbedo(w, tiledUv);
       vec3 normal   = blendNormal(w, tiledUv);
       float rough   = blendRoughness(w, tiledUv);
-      float ao      = blendAO(w, tiledUv);
+      // AO approximated from roughness until we pack ORM into a single
+      // per-layer RGB texture — rougher surfaces read darker overall, which
+      // preserves the cavity-shading intent without the 4-extra sampler cost
+      // that pushed us over MAX_TEXTURE_IMAGE_UNITS(16).
+      float ao      = mix(1.0, 0.75, rough);
 
       // Simple Lambertian + ambient for now; hook into THREE lights via chunks.
       vec3 L = vec3(0.0);

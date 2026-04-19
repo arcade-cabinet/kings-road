@@ -17,7 +17,14 @@ vi.mock('@/ecs/actions/quest', () => ({
 }));
 
 vi.mock('@/ecs/actions/world', () => ({
-  generateWorld: vi.fn(async () => ({ width: 1, height: 1, settlements: [] })),
+  generateWorld: vi.fn(async () => ({
+    width: 128,
+    height: 256,
+    settlements: [
+      { id: 'ashford', position: [10, 10] },
+      { id: 'thornfield-ruins', position: [50, 100] },
+    ],
+  })),
   setWorldState: vi.fn(),
 }));
 
@@ -98,9 +105,12 @@ describe('applyDebugSpawn', () => {
     expect(questMod.resolveNarrative).toHaveBeenCalledWith(
       'debug-thornfield-seed',
     );
+    // Thornfield settlement at grid (50, 100) → world centre
+    // (50*CHUNK_SIZE + CHUNK_SIZE/2, PLAYER_HEIGHT, 100*CHUNK_SIZE + CHUNK_SIZE/2)
+    // With CHUNK_SIZE=120 → (6060, y, 12060)
     expect(gameMod.startGame).toHaveBeenCalledWith(
       'debug-thornfield-seed',
-      expect.objectContaining({ x: 12000, z: 2 }),
+      expect.objectContaining({ x: 6060, z: 12060 }),
       0,
     );
   });

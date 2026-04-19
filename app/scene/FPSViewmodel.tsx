@@ -33,6 +33,34 @@ import type { HandPose } from '@/schemas/item.schema';
 
 const DEFAULT_HAND_GLB = '/assets/hands/hand.glb';
 
+/**
+ * Target on-screen size (world metres) for the viewmodel's longest axis —
+ * roughly matches a real forearm-with-hand at camera distance. Authored
+ * GLBs in pending-integration packs range from 15cm to 3m; without a
+ * normalization step the `Villager NPCs` hand rig renders at 2.3m,
+ * filling the viewport as a beige wall.
+ */
+const VIEWMODEL_TARGET_METRES = 0.35;
+const WEAPON_TARGET_METRES = 0.6;
+
+/**
+ * Compute a uniform scale that fits `obj`'s authored bounding box into
+ * `target` on its longest axis. Returns 1 when the box is zero-sized or
+ * when the authored size is already <= target.
+ */
+function fitScale(
+  obj: THREE.Object3D,
+  target: number,
+  THREE_: typeof THREE = THREE,
+): number {
+  const box = new THREE_.Box3().setFromObject(obj);
+  const size = new THREE_.Vector3();
+  box.getSize(size);
+  const longest = Math.max(size.x, size.y, size.z);
+  if (longest <= 0) return 1;
+  return Math.min(1, target / longest);
+}
+
 /** Local offsets + rotations per hand pose, camera-relative. */
 const POSE_TRANSFORMS: Record<
   HandPose,
@@ -61,6 +89,22 @@ function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {
 
   const transform = POSE_TRANSFORMS[pose];
 
+  // Normalize the authored mesh into viewmodel-sized units. Packs authored
+  // in Blender default units or PSX-pack metres range from 20cm to 3m per
+  // weapon; scale by longest-axis fit against WEAPON_TARGET_METRES so the
+  // blade sits naturally in hand regardless of the source pack.
+  const fit = useMemo(() => {
+    if (!mesh.geometry) return 1;
+    mesh.geometry.computeBoundingBox();
+    const bb = mesh.geometry.boundingBox;
+    if (!bb) return 1;
+    const size = new THREE.Vector3();
+    bb.getSize(size);
+    const longest = Math.max(size.x, size.y, size.z);
+    if (longest <= 0) return 1;
+    return Math.min(1, WEAPON_TARGET_METRES / longest);
+  }, [mesh.geometry]);
+
   // Intentionally discard the GLB's authored material here. Viewmodels
   // render camera-parented at a fixed distance with no HDRI environment
   // map bound yet; the authored PSX-pack materials look muddy under
@@ -73,7 +117,7 @@ function WeaponMesh({ glb, pose }: { glb: string; pose: HandPose }) {
       geometry={mesh.geometry}
       position={transform.position}
       rotation={transform.rotation}
-      scale={transform.scale}
+      scale={transform.scale * fit}
       castShadow
     >
       <meshStandardMaterial color="#c4a747" roughness={0.3} metalness={0.8} envMapIntensity={1.0} />
@@ -96,6 +140,12 @@ function HandMesh({ pose }: { pose: HandPose }) {
     [gltf.scene],
   );
 
+  // Normalize the rigged hand GLB into viewmodel-sized units. The default
+  // hand.glb is authored at forearm-length scale (~2.3m tall); without
+  // this, the hand fills the viewport as a beige wall and occludes the
+  // entire scene.
+  const fit = useMemo(() => fitScale(cloned, VIEWMODEL_TARGET_METRES), [cloned]);
+
   const weaponTransform = POSE_TRANSFORMS[pose];
   // Hand sits below/behind the weapon grip — slight Y offset, same X/Z.
   const handPos: [number, number, number] = [
@@ -109,7 +159,7 @@ function HandMesh({ pose }: { pose: HandPose }) {
       object={cloned}
       position={handPos}
       rotation={weaponTransform.rotation}
-      scale={weaponTransform.scale * 0.8}
+      scale={weaponTransform.scale * 0.8 * fit}
     />
   );
 }

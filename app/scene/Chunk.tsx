@@ -44,13 +44,8 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
 
   const biomeConfig = useMemo(() => {
     if (!chunkData.biome) return null;
-    try {
-      return BiomeService.getBiomeById(chunkData.biome);
-    } catch (err) {
-      console.warn(`[Chunk ${key}] BiomeService.getBiomeById(${chunkData.biome}) failed:`, err);
-      return null;
-    }
-  }, [chunkData.biome, key]);
+    return BiomeService.resolveForChunk(chunkData.biome);
+  }, [chunkData.biome]);
 
   const heightSampler = useMemo<HeightSampler>(() => {
     if (kingdomMap) return (wx: number, wz: number) => getTerrainHeight(kingdomMap, wx, wz);
@@ -131,8 +126,12 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
 
   return (
     <group>
-      {/* Ground — TerrainChunk when biome config is available, flat collider otherwise */}
-      {biomeConfig ? (
+      {/* Ground — TerrainChunk for land biomes, flat collider otherwise.
+          Ocean chunks skip terrain entirely: OceanPlane (rendered once at
+          the scene root) provides the global Gerstner water surface, and
+          the flat collider prevents the player from falling through where
+          ocean tiles border land. */}
+      {biomeConfig && biomeConfig.id !== 'ocean' ? (
         <TerrainChunk biomeConfig={biomeConfig} seed={seedPhrase} cx={cx} cz={cz} />
       ) : (
         <RigidBody type="fixed" colliders={false}>

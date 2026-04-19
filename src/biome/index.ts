@@ -1,18 +1,21 @@
 import forestData from './data/forest.json';
 import meadowData from './data/meadow.json';
 import moorData from './data/moor.json';
+import oceanData from './data/ocean.json';
 import thornfieldData from './data/thornfield.json';
 import type { BiomeConfig } from './schema';
 
 export const forestConfig = forestData as BiomeConfig;
 export const meadowConfig = meadowData as BiomeConfig;
 export const moorConfig = moorData as BiomeConfig;
+export const oceanConfig = oceanData as BiomeConfig;
 export const thornfieldConfig = thornfieldData as BiomeConfig;
 
 export const biomeConfigs: BiomeConfig[] = [
   forestConfig,
   meadowConfig,
   moorConfig,
+  oceanConfig,
   thornfieldConfig,
 ];
 

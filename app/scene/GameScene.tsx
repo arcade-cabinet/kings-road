@@ -31,13 +31,24 @@ import { WeatherSystem } from '@app/systems/WeatherSystem';
 
 // Initialize scene with warm pastoral sky background
 function SceneInit() {
-  const { scene } = useThree();
+  const { scene, camera, gl } = useThree();
 
   useLayoutEffect(() => {
     if (scene) {
       scene.background = new THREE.Color(0x87ceeb);
     }
-  }, [scene]);
+    // DEV-only: expose the active scene / camera / renderer on window so we
+    // can probe scene contents from Chrome DevTools + MCP tooling. No-op in
+    // prod builds because `import.meta.env.DEV` is tree-shaken to false.
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      (window as unknown as { __kr__?: unknown }).__kr__ = {
+        scene,
+        camera,
+        gl,
+        THREE,
+      };
+    }
+  }, [scene, camera, gl]);
 
   return null;
 }

@@ -62,6 +62,9 @@ describe('buildSplatBlendMaterial', () => {
       splatMap,
       materials: [makeMaterial()],
     });
+    // UniformsUtils.merge clones the uniform container but preserves the
+    // texture reference, so identity on the slot matches.
+    expect(mat.uniforms.uSplatMap).toBeDefined();
     expect(mat.uniforms.uSplatMap.value).toBe(splatMap);
   });
 
@@ -82,22 +85,33 @@ describe('buildSplatBlendMaterial', () => {
     expect(mat.uniforms.uTileScale.value).toBe(8);
   });
 
-  it('sets uHasAO to 0 when aoMap is absent', () => {
-    const mat = buildSplatBlendMaterial({
-      splatMap: makeSplatMap(),
-      materials: [makeMaterial()],
-    });
-    expect(mat.uniforms.uHasAO0.value).toBe(0.0);
-  });
-
-  it('sets uHasAO to 1 when aoMap is present', () => {
+  it('does not bind AO samplers (MAX_TEXTURE_IMAGE_UNITS=16 cap)', () => {
+    // 4 layers × 4 samplers (color/normal/roughness/AO) + 1 splat = 17 units,
+    // which exceeds the WebGL2 guaranteed minimum and fails to compile on
+    // conservative drivers. AO is approximated from roughness in-shader.
     const m = makeMaterial();
     m.aoMap = new THREE.Texture();
     const mat = buildSplatBlendMaterial({
       splatMap: makeSplatMap(),
       materials: [m],
     });
-    expect(mat.uniforms.uHasAO0.value).toBe(1.0);
+    for (let i = 0; i < 4; i++) {
+      expect(`uAO${i}` in mat.uniforms).toBe(false);
+      expect(`uHasAO${i}` in mat.uniforms).toBe(false);
+    }
+  });
+
+  it('includes the three.js light + fog uniform slots so lights:true works', () => {
+    const mat = buildSplatBlendMaterial({
+      splatMap: makeSplatMap(),
+      materials: [makeMaterial()],
+    });
+    // These are the slots the renderer writes into when lights/fog are on;
+    // missing them crashes setProgram every frame with "Cannot set
+    // properties of undefined (setting 'value')".
+    expect(mat.uniforms.ambientLightColor).toBeDefined();
+    expect(mat.uniforms.directionalLights).toBeDefined();
+    expect(mat.uniforms.fogColor).toBeDefined();
   });
 
   it('accepts 4 materials without padding', () => {
