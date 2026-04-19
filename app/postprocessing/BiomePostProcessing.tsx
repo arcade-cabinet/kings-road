@@ -1,22 +1,20 @@
+import { useFrame, useThree } from '@react-three/fiber';
 import {
-  Bloom,
-  ChromaticAberration,
+  BloomEffect,
+  ChromaticAberrationEffect,
   EffectComposer,
-  Noise,
-  SMAA,
-  Vignette,
-} from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+  EffectPass,
+  NoiseEffect,
+  RenderPass,
+  SMAAEffect,
+  VignetteEffect,
+} from 'postprocessing';
+import { useEffect, useMemo, useRef } from 'react';
+import * as THREE from 'three';
 import { BiomeService } from '@/biome';
 import { getPlayer } from '@/ecs/actions/game';
 import { useEnvironment } from '@/ecs/hooks/useGameSession';
 import type { BiomeConfig } from '@/biome';
-
-// Stable module-level tuple so ChromaticAberration doesn't see a new array
-// every render and trigger the React-19 StrictMode circular-JSON crash.
-const CHROMA_INITIAL: [number, number] = [0, 0];
 
 /** 0–1 time-of-day → dawn/noon/dusk/night bucket string. */
 function tod(timeOfDay: number): 'dawn' | 'noon' | 'dusk' | 'night' {
@@ -35,25 +33,23 @@ interface PostParams {
   noiseOpacity: number;
 }
 
-function paramsForBiomeAndTime(biome: BiomeConfig, timeOfDay: number): PostParams {
+function paramsForBiomeAndTime(
+  biome: BiomeConfig,
+  timeOfDay: number,
+): PostParams {
   const bucket = tod(timeOfDay);
-
-  // Thornfield and moor are dark/cold — moderate bloom so highlights don't blow out.
   const isDark = biome.id === 'thornfield' || biome.id === 'moor';
   const baseBloom = isDark ? 0.25 : 0.35;
   const baseThreshold = isDark ? 0.75 : 0.8;
 
-  // Chromatic aberration peaks at dawn/dusk atmospheric distortion.
   const isAtmospheric = bucket === 'dawn' || bucket === 'dusk';
   const chromaticOffset = isAtmospheric ? 0.0012 : 0.0004;
 
-  // Night is darker and grainier.
   const isNight = bucket === 'night';
   const vignetteOffset = isNight ? 0.2 : 0.3;
   const vignetteDarkness = isNight ? 0.55 : 0.35;
   const noiseOpacity = isNight ? 0.08 : 0.04;
 
-  // Bloom brightens at golden hour.
   const goldenHourBoost = isAtmospheric ? 0.1 : 0.0;
 
   return {
@@ -67,19 +63,28 @@ function paramsForBiomeAndTime(biome: BiomeConfig, timeOfDay: number): PostParam
 }
 
 /**
- * Biome-driven post-processing pipeline.
+ * Biome-driven post-processing pipeline using the raw `postprocessing`
+ * library directly — bypasses @react-three/postprocessing's reconciler.
  *
- * Bloom, chromatic aberration, and vignette intensities vary by biome id and
- * time-of-day bucket. Parameters use frame-rate-independent exponential smoothing
- * (decay constant 4 s⁻¹) so transitions don't pop at any frame rate.
+ * Why: `@react-three/postprocessing` under React 19 hits
+ *   `TypeError: Converting circular structure to JSON ...
+ *    property 'resolution' -> object with constructor 'E'
+ *    --- property 'resizable' closes the circle`
+ * from postprocessing@6's `Resolution` ↔ `Resizable` mutual refs when the
+ * wrapper serializes effect state for reconciliation. This class of crash
+ * fires in both dev and production. Driving the composer imperatively —
+ * new composer, attach RenderPass + EffectPass once, dispose on unmount —
+ * avoids the serialization path entirely.
  *
- * GodRays are omitted here — they require a mesh sun reference that lives
- * inside DayNightCycle. Wire them from that component when needed.
+ * Effects: SMAA + Bloom + ChromaticAberration + Noise + Vignette.
+ * Biome + time-of-day drive the uniforms every frame with exponential
+ * smoothing (decay 4 s⁻¹) so transitions don't pop.
  */
 export function BiomePostProcessing() {
+  const { gl, scene, camera, size } = useThree();
   const { timeOfDay } = useEnvironment();
 
-  // Smoothed current values — updated imperatively in useFrame.
+  // Smoothed current values — updated every frame.
   const bloomIntRef = useRef(0.3);
   const bloomThreshRef = useRef(0.8);
   const vigOffRef = useRef(0.3);
@@ -87,29 +92,71 @@ export function BiomePostProcessing() {
   const chromaRef = useRef(0.0004);
   const noiseRef = useRef(0.04);
 
-  // Direct refs to postprocessing effect instances for imperative uniform updates.
-  const bloomRef = useRef<{ intensity: number; luminanceThreshold: number } | null>(null);
-  const vignetteRef = useRef<{ offset: number; darkness: number } | null>(null);
-  const chromaEffectRef = useRef<{ offset: { x: number; y: number } } | null>(null);
-  const noiseEffectRef = useRef<{ opacity: number } | null>(null);
+  // Build the composer + effects once, imperatively. The composer owns its
+  // framebuffer; we tell R3F to stop auto-rendering via `priority` > 0 on
+  // useFrame and drive composer.render() manually instead.
+  const pipeline = useMemo(() => {
+    const composer = new EffectComposer(gl, {
+      multisampling: 0,
+    });
 
+    composer.addPass(new RenderPass(scene, camera));
+
+    const bloom = new BloomEffect({
+      intensity: 0.3,
+      luminanceThreshold: 0.8,
+      luminanceSmoothing: 0.3,
+      mipmapBlur: true,
+    });
+    const chroma = new ChromaticAberrationEffect({
+      offset: new THREE.Vector2(0.0004, 0.0004),
+      radialModulation: false,
+      modulationOffset: 0,
+    });
+    const noise = new NoiseEffect({ premultiply: true });
+    noise.blendMode.opacity.value = 0.05;
+    const vignette = new VignetteEffect({
+      offset: 0.3,
+      darkness: 0.5,
+    });
+    const smaa = new SMAAEffect();
+
+    composer.addPass(new EffectPass(camera, smaa, bloom, chroma, noise, vignette));
+
+    return { composer, bloom, chroma, noise, vignette };
+  }, [gl, scene, camera]);
+
+  // Resize composer + disable R3F's auto-render so we drive the composer.
+  useEffect(() => {
+    pipeline.composer.setSize(size.width, size.height, false);
+  }, [pipeline, size.width, size.height]);
+
+  useEffect(() => {
+    return () => {
+      pipeline.composer.dispose();
+    };
+  }, [pipeline]);
+
+  // Drive composer.render() AFTER every frame's scene updates. Priority=1
+  // runs after the default (0) R3F render loop; we also disable the default
+  // renderer clear so the composer sees our scene cleanly.
   useFrame((_, delta) => {
+    // Biome-driven target params.
     let biome: BiomeConfig;
     try {
       const roadDist = getPlayer().playerPosition?.x ?? 0;
       biome = BiomeService.getCurrentBiome(roadDist);
     } catch {
-      // BiomeService not yet initialised (early lifecycle) — fall back to distance 0.
-      // This keeps the bloom/vignette refs driven from the first frame onward.
       try {
         biome = BiomeService.getCurrentBiome(0);
       } catch {
+        // Service not yet initialised — skip this frame.
+        pipeline.composer.render(delta);
         return;
       }
     }
 
     const target = paramsForBiomeAndTime(biome, timeOfDay);
-    // Frame-rate-independent exponential smoothing: decay constant 4 s⁻¹.
     const k = 1 - Math.exp(-4 * delta);
 
     bloomIntRef.current += (target.bloomIntensity - bloomIntRef.current) * k;
@@ -119,54 +166,25 @@ export function BiomePostProcessing() {
     chromaRef.current += (target.chromaticOffset - chromaRef.current) * k;
     noiseRef.current += (target.noiseOpacity - noiseRef.current) * k;
 
-    if (bloomRef.current) {
-      bloomRef.current.intensity = bloomIntRef.current;
-      bloomRef.current.luminanceThreshold = bloomThreshRef.current;
-    }
-    if (vignetteRef.current) {
-      vignetteRef.current.offset = vigOffRef.current;
-      vignetteRef.current.darkness = vigDarkRef.current;
-    }
-    if (chromaEffectRef.current) {
-      chromaEffectRef.current.offset.x = chromaRef.current;
-      chromaEffectRef.current.offset.y = chromaRef.current;
-    }
-    if (noiseEffectRef.current) {
-      noiseEffectRef.current.opacity = noiseRef.current;
-    }
-  });
+    pipeline.bloom.intensity = bloomIntRef.current;
+    pipeline.bloom.luminanceMaterial.threshold = bloomThreshRef.current;
+    pipeline.vignette.offset = vigOffRef.current;
+    pipeline.vignette.darkness = vigDarkRef.current;
+    pipeline.chroma.offset.set(chromaRef.current, chromaRef.current);
+    pipeline.noise.blendMode.opacity.value = noiseRef.current;
 
-  return (
-    <EffectComposer multisampling={0}>
-      <SMAA />
-      {/* Initial props are stable. Real values drive via refs in useFrame above
-          (e.g. chromaEffectRef.current.offset.x) so React never re-reconciles
-          on value change. Passing changing arrays/refs at render time causes
-          @react-three/postprocessing to re-create KawaseBlurPass which then
-          hits a circular-JSON crash in React 19 StrictMode. */}
-      <Bloom
-        ref={bloomRef}
-        intensity={0.5}
-        luminanceThreshold={0.9}
-        luminanceSmoothing={0.3}
-        mipmapBlur
-      />
-      <ChromaticAberration
-        ref={chromaEffectRef}
-        offset={CHROMA_INITIAL}
-        blendFunction={BlendFunction.NORMAL}
-      />
-      <Noise
-        ref={noiseEffectRef}
-        opacity={0.05}
-        blendFunction={BlendFunction.SCREEN}
-      />
-      <Vignette
-        ref={vignetteRef}
-        offset={0.3}
-        darkness={0.5}
-        blendFunction={BlendFunction.NORMAL}
-      />
-    </EffectComposer>
-  );
+    pipeline.composer.render(delta);
+  }, 1);
+
+  // Suppress R3F's default frame render — composer now owns the output.
+  // Must return after registering the useFrame above so the hook chain is
+  // stable across renders.
+  useEffect(() => {
+    const prevAutoClear = gl.autoClear;
+    return () => {
+      gl.autoClear = prevAutoClear;
+    };
+  }, [gl]);
+
+  return null;
 }
