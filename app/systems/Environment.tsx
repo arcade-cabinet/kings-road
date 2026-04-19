@@ -104,33 +104,31 @@ export function DayNightCycle() {
       sunLightRef.current.target.position.copy(camera.position);
       sunLightRef.current.target.updateMatrixWorld();
 
-      let biomeDirectionalIntensity = 1.8;
-      let biomeDirectionalColor: string | null = null;
-      try {
-        const roadDist = getPlayer().playerPosition?.x ?? 0;
-        if (Math.abs(roadDist - lastBiomeQueryDistRef.current) > 100) {
-          cachedBiomeRef.current = BiomeService.getCurrentBiome(roadDist);
-          lastBiomeQueryDistRef.current = roadDist;
-        }
-        if (cachedBiomeRef.current) {
-          biomeDirectionalIntensity = cachedBiomeRef.current.lighting.directionalIntensity;
-          biomeDirectionalColor = cachedBiomeRef.current.lighting.directionalColor;
-        }
-      } catch (err) {
-        if (!(err instanceof BiomeError)) throw err;
-        // BiomeService not yet initialized — use defaults
+      // BiomeService is synchronously initialized at App module load
+      // (see App.tsx), so getCurrentBiome() must return a valid biome here.
+      // Any throw is a real bug — let it bubble to the ErrorBoundary /
+      // runtime-error-bus rather than hiding behind defaults.
+      const roadDist = getPlayer().playerPosition?.x ?? 0;
+      if (Math.abs(roadDist - lastBiomeQueryDistRef.current) > 100) {
+        cachedBiomeRef.current = BiomeService.getCurrentBiome(roadDist);
+        lastBiomeQueryDistRef.current = roadDist;
       }
+      const biome = cachedBiomeRef.current;
+      if (!biome) {
+        throw new Error(
+          'Environment.DayNightCycle: BiomeService returned no biome for ' +
+            `roadDist=${roadDist}. BiomeService should be initialized at ` +
+            'App module load.',
+        );
+      }
+      const biomeDirectionalIntensity = biome.lighting.directionalIntensity;
+      const biomeDirectionalColor = biome.lighting.directionalColor;
 
       sunLightRef.current.intensity =
         sunY > 0 ? Math.max(0.2, sunY * biomeDirectionalIntensity) : 0;
 
       if (sunY > 0) {
-        if (biomeDirectionalColor) {
-          // Golden-hour blend: biome directional color at sunrise/set, toward white at noon
-          _amberColor.set(biomeDirectionalColor);
-        } else {
-          _amberColor.setHex(0xffd4a0);
-        }
+        _amberColor.set(biomeDirectionalColor);
         sunLightRef.current.color.lerpColors(_amberColor, _noonColor, sunY);
       }
     }
@@ -346,19 +344,15 @@ export function Fog() {
   const lastSigRef = useRef<string>('');
 
   useFrame(() => {
-    let color = 0xf5f0e8;
-    let near = 50;
-    let far = 200;
-    try {
-      const dist = getPlayer().playerPosition?.x ?? 0;
-      const biome = BiomeService.getCurrentBiome(dist);
-      const { fogColor, fogNear, fogFar } = biome.lighting;
-      color = new THREE.Color(fogColor).getHex();
-      near = fogNear;
-      far = fogFar;
-    } catch {
-      // fall back to defaults while BiomeService initialises
-    }
+    // BiomeService is synchronously initialized at App module load, so
+    // fog identity comes from the biome with no defaults. Any throw is
+    // a real bug — let it bubble.
+    const dist = getPlayer().playerPosition?.x ?? 0;
+    const biome = BiomeService.getCurrentBiome(dist);
+    const { fogColor, fogNear, fogFar } = biome.lighting;
+    const color = new THREE.Color(fogColor).getHex();
+    const near = fogNear;
+    const far = fogFar;
     const sig = `${color.toString(16)}|${near}|${far}`;
     if (sig !== lastSigRef.current || !(scene.fog instanceof THREE.Fog)) {
       scene.fog = new THREE.Fog(color, near, far);

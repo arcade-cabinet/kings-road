@@ -12,6 +12,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
 import { loadPbrMaterial } from '@/assets';
+import { reportRuntimeError } from '@app/runtime-error-bus';
 import type {
   KingdomMap,
   MapTile,
@@ -163,12 +164,12 @@ export function RoadSurface({
         setMaterial(mat);
       })
       .catch((err) => {
-        // Never let an unhandled rejection propagate to the error overlay —
-        // a missing road texture should degrade, not crash the scene.
-        console.warn(
-          `[RoadSurface] PBR material "${pbrId}" failed to load, road will render invisible until resolved:`,
-          err,
-        );
+        if (cancelled) return;
+        // Surface the failure via the runtime error bus. A missing road
+        // PBR means the asset pipeline is broken — silently rendering an
+        // invisible road masks the bug until someone notices the player
+        // walking on nothing.
+        reportRuntimeError(err, `RoadSurface.loadPbrMaterial(${pbrId})`);
       });
     return () => {
       cancelled = true;
