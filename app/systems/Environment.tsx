@@ -1,4 +1,4 @@
-import { CloudInstance, Clouds, Sky, Stars } from '@react-three/drei';
+import { CloudInstance, Clouds, Stars } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -204,9 +204,6 @@ export function SkyDome() {
   const skyMode = getSkyMode(timeOfDay);
   const { gameActive } = useFlags();
 
-  // biome-ignore lint/suspicious/noExplicitAny: drei Sky ref type is complex
-  // biome-ignore lint/correctness/noUnusedVariables: reserved for future sky effects
-  const skyRef = useRef<any>(null);
   const moonRef = useRef<THREE.Mesh>(null);
   const cloudGroupRef = useRef<THREE.Group>(null);
 
@@ -226,14 +223,8 @@ export function SkyDome() {
     const sunY = Math.sin(theta);
     const sunX = Math.cos(theta);
 
-    // Update Sky shader's sunPosition uniform directly
-    if (skyRef.current?.material?.uniforms?.sunPosition) {
-      skyRef.current.material.uniforms.sunPosition.value.set(
-        sunX * 100,
-        sunY * 100,
-        50,
-      );
-    }
+    // Sky shader removed (HDRI owns the background); only the moon
+    // position updates here now.
 
     // Update moon position
     if (moonRef.current) {
@@ -254,29 +245,15 @@ export function SkyDome() {
 
   if (!gameActive) return null;
 
-  // Initial sun position for Sky mount (reuse timeOfDay from reactive hook above)
-  const initTheta = (timeOfDay - 0.25) * Math.PI * 2;
-  const initSunPos: [number, number, number] = [
-    Math.cos(initTheta) * 100,
-    Math.sin(initTheta) * 100,
-    50,
-  ];
-
   return (
     <>
-      {!isNight && (
-        <Sky
-          ref={skyRef}
-          distance={450000}
-          sunPosition={initSunPos}
-          inclination={0.5}
-          azimuth={0.25}
-          turbidity={isDusk || isDawn ? 15 : 10}
-          rayleigh={isDusk || isDawn ? 2 : 0.5}
-          mieCoefficient={0.005}
-          mieDirectionalG={0.8}
-        />
-      )}
+      {/* Sky background ownership: EnvironmentIBL (HDRI) paints the
+          day sky onto scene.background with backgroundBlurriness. The
+          drei `<Sky>` atmospheric shader was previously rendered here
+          at full opacity, fighting the HDRI and washing it out. It is
+          now removed. <Stars> is kept for the night sky (HDRI doesn't
+          encode stars) and punches through the fade automatically via
+          the `fade` prop. */}
 
       {isNight && (
         <Stars
