@@ -151,6 +151,101 @@ export const FOLIAGE_CATALOG: Record<string, FoliageAssetDef[]> = {
       baseScale: 3,
     },
   ],
+  // ── Moor / highland biome species ────────────────────────────────
+  // Previously unconfigured — moor biome listed `heather-bush`,
+  // `standing-stone`, `bog-grass` in its foliage.species, but none of
+  // them existed in FOLIAGE_CATALOG, so `getAssetVariants` returned []
+  // and moor chunks produced zero instanced meshes. Reuse the closest
+  // existing PSX-mega GLBs so moorland at least reads as foliage-dense.
+  'heather-bush': [
+    {
+      id: 'bush-1',
+      path: '/assets/nature/psx-mega/bush-1.glb',
+      minSpacing: 2,
+      baseScale: 2,
+    },
+    {
+      id: 'bush-3',
+      path: '/assets/nature/psx-mega/bush-3.glb',
+      minSpacing: 2,
+      baseScale: 2,
+    },
+  ],
+  'bog-grass': [
+    {
+      id: 'weed-1',
+      path: '/assets/nature/psx-mega/weed-1.glb',
+      minSpacing: 1.2,
+      baseScale: 2.5,
+    },
+    {
+      id: 'grass-2',
+      path: '/assets/nature/psx-mega/grass-2.glb',
+      minSpacing: 1,
+      baseScale: 3,
+    },
+  ],
+  'standing-stone': [
+    // No dedicated monolith asset yet — substitute fir-tree log for
+    // vertical stone silhouette. Replace once a proper standing-stone
+    // GLB is authored. Without this entry, the moor biome's 0.05
+    // density × 1 species produces zero instances.
+    {
+      id: 'fir-tree-log',
+      path: '/assets/nature/psx-mega/fir-tree-log.glb',
+      minSpacing: 5,
+      baseScale: 1.5,
+    },
+  ],
+  // ── Meadow / farmland species ────────────────────────────────────
+  'wildflower-cluster': [
+    {
+      id: 'yellow-flowers-1',
+      path: '/assets/nature/psx-mega/yellow-flowers-1.glb',
+      minSpacing: 1,
+      baseScale: 2,
+    },
+    {
+      id: 'red-flowers-1',
+      path: '/assets/nature/psx-mega/red-flowers-1.glb',
+      minSpacing: 1,
+      baseScale: 2,
+    },
+    {
+      id: 'white-flowers-1',
+      path: '/assets/nature/psx-mega/white-flowers-1.glb',
+      minSpacing: 1,
+      baseScale: 2,
+    },
+  ],
+  'meadow-tree': [
+    {
+      id: 'forest-tree-1',
+      path: '/assets/nature/psx-mega/forest-tree-1.glb',
+      minSpacing: 4,
+      baseScale: 6,
+    },
+    {
+      id: 'forest-tree-2',
+      path: '/assets/nature/psx-mega/forest-tree-2.glb',
+      minSpacing: 4,
+      baseScale: 6,
+    },
+  ],
+  'grass-tuft': [
+    {
+      id: 'grass-1',
+      path: '/assets/nature/psx-mega/grass-1.glb',
+      minSpacing: 0.8,
+      baseScale: 2.5,
+    },
+    {
+      id: 'grass-2',
+      path: '/assets/nature/psx-mega/grass-2.glb',
+      minSpacing: 0.8,
+      baseScale: 2.5,
+    },
+  ],
 };
 
 export function getAssetVariants(speciesId: string): FoliageAssetDef[] {

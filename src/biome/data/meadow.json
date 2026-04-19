@@ -19,10 +19,11 @@
     "displacementScale": 0.1
   },
   "foliage": {
-    "density": 0.35,
+    "density": 0.7,
     "species": [
-      { "assetId": "oak-tree", "density": 0.4 },
-      { "assetId": "wildflower-patch", "density": 0.6, "clusterRadius": 4 }
+      { "assetId": "meadow-tree", "density": 0.5 },
+      { "assetId": "wildflower-cluster", "density": 0.6, "clusterRadius": 4 },
+      { "assetId": "grass-tuft", "density": 0.4 }
     ],
     "groundCover": ["short-grass", "daisy"]
   },
