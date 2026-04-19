@@ -105,7 +105,16 @@ export function BiomePostProcessing() {
   const noiseRef = useRef(0.04);
 
   const pipeline = useMemo(() => {
-    const composer = new EffectComposer(gl, { multisampling: 0 });
+    // HalfFloatType framebuffer preserves HDR range from the HDRI-lit
+    // scene all the way to the tone-mapping pass at the end. Without
+    // it, bright values from bloom/IBL saturate to 1.0 in the first
+    // pass and the ToneMappingEffect has nothing to roll off — the
+    // earlier "flat-tinted output" symptom. `multisampling: 0` is
+    // still correct because post-processing does its own AA.
+    const composer = new EffectComposer(gl, {
+      multisampling: 0,
+      frameBufferType: THREE.HalfFloatType,
+    });
     // RenderPass draws the scene into the composer's input buffer. With
     // `renderToScreen=true` (set automatically on the last pass) it writes
     // directly to the canvas instead — useful for the no-effects debug
