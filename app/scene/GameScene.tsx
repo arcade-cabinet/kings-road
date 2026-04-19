@@ -110,14 +110,13 @@ function SceneContent() {
 
           {/*
             Biome-driven post processing — bloom, vignette, chromatic
-            aberration, noise, SMAA. Disabled in DEV only: React 19 StrictMode
-            double-invokes effect setup, which @react-three/postprocessing
-            handles with a circular-JSON serialization that recursively
-            resizes through KawaseBlurPass and crashes. Production builds
-            do not double-invoke, so the Pages deploy (and any prod
-            benchmark) runs with the full biome mood enabled.
+            aberration, noise, SMAA. Uses the raw `postprocessing` library
+            directly (not @react-three/postprocessing) because the wrapper
+            crashes under React 19 with "Converting circular structure to
+            JSON" every frame in both dev and prod. Driving the composer
+            imperatively avoids the serialization path.
           */}
-          {!import.meta.env.DEV && <BiomePostProcessing />}
+          <BiomePostProcessing />
         </Physics>
       )}
     </>
