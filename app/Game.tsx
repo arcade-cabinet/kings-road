@@ -14,7 +14,7 @@ import { QuestLog } from '@app/views/Gameplay/QuestLog';
 import { useTrait } from 'koota/react';
 import { InventoryUI } from '@/ecs/traits/session-inventory';
 import { getSessionEntity } from '@/ecs/world';
-import { getFlags } from '@/ecs/actions/game';
+import { getFlags, setTabHidden } from '@/ecs/actions/game';
 import { isInventoryOpen } from '@/ecs/actions/inventory-ui';
 import { useFlags } from '@/ecs/hooks/useGameSession';
 import { TouchOverlay } from '@/input/providers/TouchProvider';
@@ -64,6 +64,20 @@ export function Game() {
       }
     }
   }, [paused, inDialogue, inCombat, inventoryOpen, gameActive]);
+
+  // Pause the simulation when the tab is backgrounded. rAF already throttles
+  // to ~1Hz in background tabs, but useFrame callbacks still run — without
+  // this flag, velocity × clamped-delta accumulates over the background
+  // interval and the player teleports on resume (bug #21).
+  useEffect(() => {
+    const syncTabHidden = () => setTabHidden(document.hidden);
+    syncTabHidden();
+    document.addEventListener('visibilitychange', syncTabHidden);
+    return () => {
+      document.removeEventListener('visibilitychange', syncTabHidden);
+      setTabHidden(false);
+    };
+  }, []);
 
   // Prevent default touch behaviors
   useEffect(() => {

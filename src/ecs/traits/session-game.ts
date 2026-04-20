@@ -46,6 +46,10 @@ export interface ActiveDungeon {
 export const GameFlags = trait(() => ({
   gameActive: false,
   paused: false,
+  // True when the browser tab is backgrounded/minimized. Distinct from `paused`
+  // so systems can short-circuit without surfacing the user-facing pause menu
+  // (see Game.tsx visibilitychange hook + PlayerController tick guard).
+  tabHidden: false,
   inDialogue: false,
   inCombat: false,
   inDungeon: false,

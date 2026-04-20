@@ -37,6 +37,7 @@ import { PLAYER_HEIGHT } from '@/utils/worldGen';
 const DEFAULT_FLAGS = {
   gameActive: false,
   paused: false,
+  tabHidden: false,
   inDialogue: false,
   inCombat: false,
   inDungeon: false,

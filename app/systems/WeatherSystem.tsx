@@ -250,8 +250,8 @@ export function WeatherSystem() {
   const lastWrittenFarRef = useRef<number | null>(null);
 
   useFrame((_, delta) => {
-    const { gameActive } = getFlags();
-    if (!gameActive) return;
+    const { gameActive, tabHidden } = getFlags();
+    if (!gameActive || tabHidden) return;
 
     const dt = Math.min(delta, 0.1);
     checkTimerRef.current += dt;
