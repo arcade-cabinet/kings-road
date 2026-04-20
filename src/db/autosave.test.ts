@@ -17,7 +17,9 @@ import {
   cancelPendingAutoSave,
   flushAutoSave,
   registerAutoSaveProvider,
+  resetAutoSaveThrottle,
   scheduleAutoSave,
+  scheduleAutoSaveThrottled,
   suppressAutoSave,
 } from './autosave';
 
@@ -66,6 +68,7 @@ describe('autosave', () => {
     vi.useFakeTimers();
     saveToSlotMock.mockClear();
     cancelPendingAutoSave();
+    resetAutoSaveThrottle();
     registerAutoSaveProvider(null);
   });
 
@@ -120,5 +123,62 @@ describe('autosave', () => {
     });
     await vi.advanceTimersByTimeAsync(500);
     expect(saveToSlotMock).not.toHaveBeenCalled();
+  });
+
+  describe('scheduleAutoSaveThrottled', () => {
+    it('fires on leading edge then swallows calls inside the window', async () => {
+      registerAutoSaveProvider(() => makeSaveData());
+      scheduleAutoSaveThrottled('key', 1000);
+      // Burst of calls inside the window — only the first should have
+      // actually scheduled an underlying save.
+      for (let i = 0; i < 10; i++) {
+        scheduleAutoSaveThrottled('key', 1000);
+      }
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('fires again once the window expires', async () => {
+      registerAutoSaveProvider(() => makeSaveData());
+      scheduleAutoSaveThrottled('key', 1000);
+      await vi.advanceTimersByTimeAsync(500); // lets debounce flush
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+
+      // Still inside the throttle window — should be swallowed.
+      scheduleAutoSaveThrottled('key', 1000);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+
+      // Past the window — should fire again.
+      await vi.advanceTimersByTimeAsync(600); // total 1600ms since first
+      scheduleAutoSaveThrottled('key', 1000);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('independent keys maintain independent windows', async () => {
+      registerAutoSaveProvider(() => makeSaveData());
+      scheduleAutoSaveThrottled('a', 1000);
+      scheduleAutoSaveThrottled('b', 1000);
+      // Both pass the throttle; they share the same debounce tick.
+      await vi.advanceTimersByTimeAsync(500);
+      // Note: they coalesce through the single debounce, so we see 1 flush.
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+
+      // Inside their window, both are swallowed.
+      scheduleAutoSaveThrottled('a', 1000);
+      scheduleAutoSaveThrottled('b', 1000);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('respects suppression (no fire even on leading edge)', async () => {
+      registerAutoSaveProvider(() => makeSaveData());
+      suppressAutoSave(() => {
+        scheduleAutoSaveThrottled('key', 1000);
+      });
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).not.toHaveBeenCalled();
+    });
   });
 });

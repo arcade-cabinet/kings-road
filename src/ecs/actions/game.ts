@@ -8,7 +8,11 @@
 
 import type { Entity, Trait } from 'koota';
 import type * as THREE from 'three';
-import { scheduleAutoSave } from '@/db/autosave';
+import {
+  resetAutoSaveThrottle,
+  scheduleAutoSave,
+  scheduleAutoSaveThrottled,
+} from '@/db/autosave';
 import {
   type ActiveDungeon,
   CameraState,
@@ -118,6 +122,10 @@ export function setStamina(stamina: number): void {
     ...e.get(PlayerState)!,
     stamina: Math.max(0, Math.min(100, stamina)),
   });
+  // Throttled — stamina ticks every frame during sprint, so the
+  // debounced scheduleAutoSave() would never fire. 10s window is a
+  // reasonable trade-off between persistence and IDB write volume.
+  scheduleAutoSaveThrottled('player.stamina', 10_000);
 }
 export function setHealth(health: number): void {
   const e = ensure(PlayerState);
@@ -125,6 +133,9 @@ export function setHealth(health: number): void {
     ...e.get(PlayerState)!,
     health: Math.max(0, Math.min(100, health)),
   });
+  // Throttled (see setStamina). Health changes are rarer than stamina
+  // but still potentially rapid during combat, so use the same pattern.
+  scheduleAutoSaveThrottled('player.health', 10_000);
 }
 
 // ── Camera ───────────────────────────────────────────────────────────────
@@ -471,6 +482,10 @@ export function resetGame(): void {
   });
   const pt = ensure(PlayTime);
   pt.set(PlayTime, { playTimeSeconds: 0 });
+  // Clear any stale throttle windows so the new session's first
+  // health/stamina/time-of-day tick isn't suppressed by a leftover
+  // timestamp from the previous session.
+  resetAutoSaveThrottle();
 }
 
 export function startGame(
