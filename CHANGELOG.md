@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.7](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.6...kings-road-v1.5.7) (2026-04-20)
+
+
+### Fixed
+
+* **errors:** stop showing two overlays for one uncaught error ([#179](https://github.com/arcade-cabinet/kings-road/issues/179)) ([503c5ef](https://github.com/arcade-cabinet/kings-road/commit/503c5ef5e0be92af2c3de5862ec6952cc32ca11c))
+
 ## [1.5.6](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.5...kings-road-v1.5.6) (2026-04-20)
 
 
