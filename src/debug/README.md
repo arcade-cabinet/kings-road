@@ -7,7 +7,7 @@ domain: technical
 
 # src/debug/
 
-**Intent:** Dev-only tooling for Phase 0 benchmarking. Runtime-gated via `import.meta.env.DEV` — all function bodies return immediately in production builds. The module is only tree-shaken from the production bundle if no production code imports it (app startup code must call `applyDebugSpawn()` inside a `if (import.meta.env.DEV)` guard).
+**Intent:** Phase-0 spawn-override + live-fire QA tooling. The "debug" name is historical — `applyDebugSpawn` is also the **production entry point for the Pages deploy**: `.github/workflows/cd.yml` ships `VITE_DEBUG_SPAWN=thornfield` so visitors land directly in the biome instead of the main menu. Only `live-fire.ts` is strictly dev-only (guarded with `if (!import.meta.env.DEV) return`).
 
 **Owner:** Team VFX (Phase 0)
 
@@ -17,12 +17,13 @@ domain: technical
 
 **Exports:**
 
-| Export | Purpose |
-|---|---|
-| `parseSpawnParam()` | Parse `?spawn=<biome>` / `VITE_DEBUG_SPAWN` env var |
-| `applyDebugSpawn()` | Apply spawn override at startup; returns `true` if active |
-| `createBlankSession(device)` | Create a blank live-fire checklist session |
-| `downloadLiveFireReport(session)` | Trigger markdown download of a completed session |
+| Export | Prod or Dev | Purpose |
+|---|---|---|
+| `parseSpawnParam()` | Both | Parse `?spawn=<biome>` / `VITE_DEBUG_SPAWN` env var |
+| `applyDebugSpawn()` | **Both** | Spawn override at startup; returns `true` if active. Load-bearing in prod via `VITE_DEBUG_SPAWN`. |
+| `isBenchmarkSpawn()` | Both | True when `?benchmark=<biome>` is in the URL |
+| `createBlankSession(device)` | Dev | Create a blank live-fire checklist session |
+| `downloadLiveFireReport(session)` | Dev | Trigger markdown download of a completed session |
 
 **Testing:** Run `pnpm test src/debug/` — unit tests in `spawn.test.ts`.
 
@@ -44,11 +45,17 @@ Call `applyDebugSpawn()` once at app startup, before the React tree renders. If 
 
 ### Prod safety
 
-Every export body is guarded by `if (!import.meta.env.DEV) return false` (or `return`). In production builds these become `if (false) return` and Vite's minifier eliminates the branch. To guarantee the module itself is excluded from the prod bundle, wrap the call site in a `DEV` guard:
+`applyDebugSpawn`/`parseSpawnParam`/`resolveSpawnPosition` have **no DEV guards** — they run in both dev and prod because the Pages deploy relies on `VITE_DEBUG_SPAWN=thornfield` to land visitors straight in the biome.
+
+Only `live-fire.ts`'s `downloadLiveFireReport` is strictly dev-only (guarded with `if (!import.meta.env.DEV) return`), because the browser-download UX has no place in the shipped game.
+
+If you add new exports that are truly dev-only, follow the live-fire pattern:
 
 ```ts
-if (import.meta.env.DEV) {
-  const { applyDebugSpawn } = await import('@/debug');
-  if (applyDebugSpawn()) skipMainMenu();
+export function someDevHelper(): void {
+  if (!import.meta.env.DEV) return;
+  // ...
 }
 ```
+
+Don't gate `applyDebugSpawn` without first updating `.github/workflows/cd.yml` to drop `VITE_DEBUG_SPAWN` — the current prod build depends on it firing.
