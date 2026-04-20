@@ -199,7 +199,11 @@ export function PlayerController() {
     let isSprinting = false;
     let maxSpeed = BASE_SPEED;
 
+    // Snapshot stamina before any drain/regen so that jump eligibility is
+    // evaluated against the value the player "had" at the start of this tick,
+    // not the post-sprint-drain residual (update-order independence).
     const { stamina } = getPlayer();
+    const staminaAtFrameStart = stamina;
     if (input.sprint && hasMovement && stamina > 0) {
       isSprinting = true;
       setStamina(stamina - dt * 25);
@@ -251,8 +255,9 @@ export function PlayerController() {
     if (input.jump && isGrounded) {
       // input.jump is already leading-edge (one-shot per keypress), so
       // resolveJump() is called at most once per button press.
-      const { stamina: currentStamina } = getPlayer();
-      const result = resolveJump(currentStamina);
+      // Use staminaAtFrameStart so jump eligibility is independent of
+      // whether sprint drain already ran this tick.
+      const result = resolveJump(staminaAtFrameStart);
       if (result.allowed) {
         velocityYRef.current = JUMP_FORCE;
         setStamina(result.newStamina);

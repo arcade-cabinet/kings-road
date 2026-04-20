@@ -67,3 +67,46 @@ describe('JUMP_STAMINA_COST', () => {
     expect(JUMP_STAMINA_COST).toBe(12);
   });
 });
+
+describe('resolveJump — frame-start stamina ordering', () => {
+  // Simulates: player is sprinting, stamina draining each tick.
+  // On the frame where the player presses jump, sprint drain has already
+  // run and pushed stamina just below the jump threshold.  The fix
+  // ensures jump eligibility is evaluated against the stamina value
+  // captured BEFORE sprint drain, so the jump still succeeds.
+  it('succeeds when frame-start stamina is above threshold even if post-drain stamina falls below it', () => {
+    const dt = 0.016; // ~60 fps
+    const sprintDrainRate = 25;
+
+    // Stamina at the start of the frame — just barely enough to jump.
+    const staminaAtFrameStart = JUMP_STAMINA_COST + 0.1;
+
+    // Simulate sprint drain happening first inside the tick.
+    const staminaAfterSprintDrain = staminaAtFrameStart - sprintDrainRate * dt;
+
+    // Post-drain stamina is below the jump threshold.
+    expect(staminaAfterSprintDrain).toBeLessThan(JUMP_STAMINA_COST);
+
+    // If resolveJump used the post-drain value it would block the jump.
+    const resultWithPostDrain = resolveJump(staminaAfterSprintDrain);
+    expect(resultWithPostDrain.allowed).toBe(false);
+
+    // With the fix, resolveJump uses staminaAtFrameStart — jump succeeds.
+    const resultWithFrameStart = resolveJump(staminaAtFrameStart);
+    expect(resultWithFrameStart.allowed).toBe(true);
+    if (resultWithFrameStart.allowed) {
+      expect(resultWithFrameStart.newStamina).toBeCloseTo(
+        staminaAtFrameStart - JUMP_STAMINA_COST,
+        5,
+      );
+    }
+  });
+
+  it('still blocks jump when frame-start stamina is genuinely below threshold (not just post-drain)', () => {
+    // Even with the fix, a player who truly has insufficient stamina at the
+    // start of the tick cannot jump.
+    const staminaAtFrameStart = JUMP_STAMINA_COST - 1;
+    const result = resolveJump(staminaAtFrameStart);
+    expect(result.allowed).toBe(false);
+  });
+});
