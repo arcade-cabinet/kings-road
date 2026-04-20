@@ -9,7 +9,9 @@ domain: context
 
 Current development state as of 2026-04-20. Tracking progress toward v1.0.0 release via macro/meso/micro roadmap.
 
-## Recent Merges (Last 30 commits)
+**Current release**: kings-road-v1.5.21
+
+## Recent Merged PRs
 
 **Infra & Quality:**
 - Frontmatter audit script added; fixed missing frontmatter on 8 docs (#224)
@@ -35,9 +37,9 @@ Current development state as of 2026-04-20. Tracking progress toward v1.0.0 rele
 - React Three Fiber + rapier: instanced meshes, PBR textures, kinematic controller, postprocessing (SMAA/bloom/vignette)
 
 ### World & Generation
-- Road spine: 6 anchors (Ashford → Grailsend, 28km)
+- Road spine: 6 anchors spanning 30km, Ashford at 0km, Grailsend at 28km
 - Pacing engine: deterministic feature placement
-- Dungeons: procedural rooms, per-anchor assignment
+- Dungeons: procedural room system complete; authored dungeon content (5+ unique themed dungeons) in progress
 - Kingdom gen: one-time at New Game from seed
 - Chunk streaming: 120-unit chunks within view distance
 
@@ -67,7 +69,7 @@ Current development state as of 2026-04-20. Tracking progress toward v1.0.0 rele
 ### Immediate P0 Blockers (Macros M1–M7, M12–M15)
 1. **M1 — Native persistence harden**: Tie save flush to Capacitor `pause` event on native; web stays `visibilitychange`
 2. **M2 — Perf budget + regression harness**: Benchmark on Pixel 6a / iPhone; set p95 frame-time targets; CI gate
-3. **M3 — Content volume**: ≥ 40 NPCs, ≥ 15 macros, ≥ 40 mesos, ≥ 100 micros; schema-valid, zero orphans
+3. **M3 — Content volume**: ≥ 40 unique NPC blueprints, ≥ 15 macros, ≥ 40 mesos, ≥ 100 micros; schema-valid, zero orphans
 4. **M4 — Combat feel**: Weapon reach/arcs, hit-pause (60–80ms), screen shake, monster stagger + i-frames; death rate target 15–25%
 5. **M5 — Onboarding**: Intro cinematic → Ashford grounding → first pilgrim encounter; diegetic tutorial (rune highlights, compass pip glows)
 6. **M6 — Mobile UX**: Dual-stick tuning, haptics on hit/pickup/quest/menu, touch targets ≥ 44pt, safe-area insets
@@ -91,14 +93,14 @@ Current development state as of 2026-04-20. Tracking progress toward v1.0.0 rele
 
 ## Active Plans
 
-- `2026-04-20-path-to-1.0.prq.md` — Full macro/meso/micro roadmap to 1.0.0 (15 macros, 40+ mesos, 30+ micros)
-- `2026-04-19-visual-fixtures.prq.md` — Shader + environment visual baseline
-- `2026-04-19-procedural-village.prq.md` — Procedural town layout algorithm
-- `2026-04-18-v1.0-beta-release.prq.md` — Prior beta mechanics PRD (still valid for Phase 0–3)
-- `2026-04-18-diegetic-hud.md` — HUD philosophy (in-world, no chrome)
-- `2026-04-18-koota-migration.md` — ECS architecture
-- `2026-04-18-procgen-to-authored.md` — Asset pipeline migration
-- `2026-04-17-standards-and-capacitor.prq.md` — Vite + Capacitor stack hardening
+- [Path to 1.0](./plans/2026-04-20-path-to-1.0.prq.md) — Full macro/meso/micro roadmap to 1.0.0 (15 macros, 40+ mesos, 30+ micros)
+- [Visual Fixtures](./plans/2026-04-19-visual-fixtures.prq.md) — Shader + environment visual baseline
+- [Procedural Village](./plans/2026-04-19-procedural-village.prq.md) — Procedural town layout algorithm
+- [v1.0 Beta Release](./plans/2026-04-18-v1.0-beta-release.prq.md) — Prior beta mechanics PRD (still valid for Phase 0–3)
+- [Diegetic HUD](./plans/2026-04-18-diegetic-hud.md) — HUD philosophy (in-world, no chrome)
+- [Koota Migration](./plans/2026-04-18-koota-migration.md) — ECS architecture
+- [Procgen to Authored](./plans/2026-04-18-procgen-to-authored.md) — Asset pipeline migration
+- [Standards & Capacitor](./plans/2026-04-17-standards-and-capacitor.prq.md) — Vite + Capacitor stack hardening
 
 ## Acceptance Gate for 1.0
 
