@@ -312,6 +312,12 @@ export function DialogueBox() {
   );
   const { displayedText, isComplete, skip } = useTypewriter(dialogueText, 25);
   const dialogueRef = useRef<HTMLDivElement>(null);
+  // Track the close animation timer so we can cancel it on unmount or
+  // when the component opens a fresh dialogue mid-close. Without this,
+  // closing the dialogue and immediately closing the game (e.g. back to
+  // menu) fired `closeDialogue` + `setIsClosing(false)` on an already-
+  // unmounted component, logging a "setState on unmounted" warning.
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Open animation
   useEffect(() => {
@@ -323,11 +329,24 @@ export function DialogueBox() {
     }
   }, [inDialogue]);
 
+  // Flush any pending close timer on unmount so stale setState / dispatch
+  // calls don't fire after the component is gone.
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current !== null) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
+  }, []);
+
   const handleClose = useCallback(() => {
     if (isClosing) return;
     setIsClosing(true);
     setAnimPhase('closing');
-    setTimeout(() => {
+    if (closeTimerRef.current !== null) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      closeTimerRef.current = null;
       closeDialogue();
       setIsClosing(false);
     }, 250);
