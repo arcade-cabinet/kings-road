@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.15](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.14...kings-road-v1.5.15) (2026-04-20)
+
+
+### Fixed
+
+* **audio:** dispose every Tone node on layer teardown, not just gain ([#210](https://github.com/arcade-cabinet/kings-road/issues/210)) ([83ac3f0](https://github.com/arcade-cabinet/kings-road/commit/83ac3f054bac44d0ea04566680b77eb6dc67cee2))
+
 ## [1.5.14](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.13...kings-road-v1.5.14) (2026-04-20)
 
 
