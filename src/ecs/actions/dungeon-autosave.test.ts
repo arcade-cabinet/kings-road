@@ -25,66 +25,45 @@ vi.mock('@/db/autosave', async () => {
 import { enterDungeon, exitDungeon, moveToRoom } from '@/ecs/actions/game';
 import type { ActiveDungeon } from '@/ecs/traits/session-game';
 import { unsafe_resetSessionEntity } from '@/ecs/world';
-import type { DungeonRoom } from '@/schemas/dungeon.schema';
-import type { PlacedExit, PlacedRoom } from '@/world/dungeon-generator';
 
 // ── Helpers ───────────────────────────────────────────────────────────────
+//
+// We intentionally construct a minimal, structurally-loose fixture and cast
+// through `unknown` to avoid importing the world-layer types that `ecs/` is
+// not allowed to depend on laterally (package-boundaries rule). The dungeon
+// actions under test only care that an `ActiveDungeon` shape is present on
+// the session entity and that its `spatial.rooms` array has the indexed room
+// when `moveToRoom` runs; they do not inspect nested fields like
+// `PlacedRoom.exits`.
 
-function makePlacedRoom(
-  id: string,
-  name: string,
-  overrides: Partial<PlacedRoom> = {},
-): PlacedRoom {
-  const room: DungeonRoom = {
-    id,
-    name,
-    // 'entrance' is a valid RoomType; other values are added as needed.
-    type: 'entrance',
-    description: `A sturdy ${name} hewn from grey limestone.`,
-    // DungeonRoomSchema requires at least one connection. A stub self-loop
-    // satisfies the schema minimum without coupling tests to real room graphs.
-    connections: [{ to: id, direction: 'north', locked: false, secret: false }],
-  };
-  return {
-    room,
-    gridX: 0,
-    gridZ: 0,
-    worldX: 0,
-    worldZ: 0,
-    exits: [] as PlacedExit[],
-    ...overrides,
-  };
+interface StubRoom {
+  room: { id: string; name: string };
+  gridX?: number;
 }
 
-function makeActiveDungeon(rooms: PlacedRoom[] = []): ActiveDungeon {
+function stubRoom(id: string, name: string, gridX = 0): StubRoom {
+  return { room: { id, name }, gridX };
+}
+
+function makeActiveDungeon(rooms: StubRoom[] = []): ActiveDungeon {
   const allRooms = rooms.length
     ? rooms
-    : [makePlacedRoom('entrance', 'Entrance Hall')];
-
+    : [stubRoom('entrance', 'Entrance Hall')];
   return {
     id: 'dungeon-test-001',
     name: 'Test Dungeon',
     spatial: {
-      layout: {
-        id: 'dungeon-test-001',
-        name: 'Test Dungeon',
-        anchorId: 'anchor-test',
-        description: 'A test dungeon beneath the hills of Ashford.',
-        recommendedLevel: 1,
-        entranceRoomId: allRooms[0].room.id,
-        bossRoomId: allRooms[allRooms.length - 1].room.id,
-        rooms: allRooms.map((pr) => pr.room),
-      },
+      layout: { id: 'dungeon-test-001', name: 'Test Dungeon' },
       rooms: allRooms,
       bounds: [0, 0, 1, 1],
       worldWidth: 20,
       worldDepth: 20,
-      roomById: new Map(allRooms.map((pr) => [pr.room.id, pr])),
+      roomById: new Map(allRooms.map((r) => [r.room.id, r])),
     },
     currentRoomIndex: 0,
     overworldPosition: new THREE.Vector3(100, 0, 200),
     overworldYaw: Math.PI / 4,
-  };
+  } as unknown as ActiveDungeon;
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────
@@ -107,8 +86,6 @@ describe('dungeon autosave triggers (PR #214)', () => {
 
   it('exitDungeon calls scheduleAutoSave when an active dungeon exists', () => {
     const dungeon = makeActiveDungeon();
-    // Enter first so there is an activeDungeon to exit from.
-    scheduleAutoSaveMock.mockClear();
     enterDungeon(dungeon);
     scheduleAutoSaveMock.mockClear();
 
@@ -119,8 +96,8 @@ describe('dungeon autosave triggers (PR #214)', () => {
 
   it('moveToRoom calls scheduleAutoSave when navigating to a valid room', () => {
     const rooms = [
-      makePlacedRoom('entrance', 'Entrance Hall'),
-      makePlacedRoom('boss-chamber', 'Boss Chamber', { gridX: 1 }),
+      stubRoom('entrance', 'Entrance Hall'),
+      stubRoom('boss-chamber', 'Boss Chamber', 1),
     ];
     const dungeon = makeActiveDungeon(rooms);
     enterDungeon(dungeon);
