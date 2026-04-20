@@ -28,6 +28,7 @@ import { FeatureSpawner } from '@app/systems/FeatureSpawner';
 import { InteractionSystem } from '@app/systems/InteractionSystem';
 import { PlayerController } from '@app/systems/PlayerController';
 import { QuestSystem } from '@app/systems/QuestSystem';
+import { RegionCrossingSystem } from '@app/systems/RegionCrossingSystem';
 import { WeatherSystem } from '@app/systems/WeatherSystem';
 
 // Initialize scene with warm pastoral sky background
@@ -109,6 +110,7 @@ function SceneContent() {
           {inDungeon && <DungeonRenderer />}
 
           {/* Always-active systems (work in both overworld and dungeon) */}
+          <RegionCrossingSystem />
           <PlayerController />
           <CombatFeedback />
           <CombatParticles />

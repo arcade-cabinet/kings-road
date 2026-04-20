@@ -21,6 +21,7 @@ import {
   InputLegacy,
   InteractionState,
   PlayerState,
+  RegionCrossing,
   SeedState,
 } from '@/ecs/traits/session-game';
 import { getSessionEntity } from '@/ecs/world';
@@ -155,4 +156,8 @@ export function useInteraction() {
 
 export function useInputLegacy() {
   return useTrait(getSessionEntity(), InputLegacy) ?? DEFAULT_INPUT;
+}
+
+export function useRegionCrossing() {
+  return useTrait(getSessionEntity(), RegionCrossing)?.active ?? null;
 }
