@@ -15,6 +15,8 @@
  * The helper is pure so it can be unit-tested without a DB or a React tree.
  */
 
+import { loadRoadSpine } from '@/world/road-spine';
+
 export type SlotKind = 'overworld' | 'dungeon' | 'town';
 
 /** Minimal shape that getSaveSlotKind needs — avoids importing the full SaveData. */
@@ -24,16 +26,24 @@ export interface SlotKindInput {
 }
 
 /**
+ * Settlement anchor types — anchors with these types are treated as "town"
+ * for save-slot classification purposes.
+ */
+const SETTLEMENT_TYPES = new Set([
+  'VILLAGE_FRIENDLY',
+  'VILLAGE_HOSTILE',
+  'WAYPOINT',
+]);
+
+/**
  * Road distances (in world-units along the Z axis) of settlement anchors.
- * Sourced from content/world/road-spine.json — update here if the spine changes.
+ * Derived at module init from content/world/road-spine.json so this stays in
+ * sync automatically when the spine is updated.
  * Types included: VILLAGE_FRIENDLY, VILLAGE_HOSTILE, WAYPOINT.
  */
-const TOWN_ANCHOR_DISTANCES: readonly number[] = [
-  0, // Ashford         (VILLAGE_FRIENDLY)
-  6000, // Millbrook       (VILLAGE_FRIENDLY)
-  17000, // Ravensgate      (VILLAGE_HOSTILE)
-  21000, // Pilgrim's Rest  (WAYPOINT — monastery with chapel and garden)
-] as const;
+const TOWN_ANCHOR_DISTANCES: readonly number[] = loadRoadSpine()
+  .anchors.filter((a) => SETTLEMENT_TYPES.has(a.type))
+  .map((a) => a.distanceFromStart);
 
 /**
  * A player must be within this many world-units of a town anchor along the
@@ -44,7 +54,7 @@ export const TOWN_RADIUS = 150;
 /**
  * Classify a save slot as 'dungeon', 'town', or 'overworld'.
  *
- * @param save  Full SaveData object (from loadFromSlot or from listSaveSlots).
+ * @param save  Any object matching the minimal SlotKindInput shape (position + activeDungeon).
  */
 export function getSaveSlotKind(save: SlotKindInput): SlotKind {
   // Dungeon takes highest priority — even if somehow near a town anchor.

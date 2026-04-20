@@ -48,8 +48,8 @@ describe('getSaveSlotKind — town (Ashford, z=0)', () => {
     expect(getSaveSlotKind(makeSave(TOWN_RADIUS))).toBe('town');
   });
 
-  it('returns "town" within TOWN_RADIUS behind Ashford (clamped to 0)', () => {
-    // Negative z is behind start; still within radius of anchor at 0.
+  it('returns "town" within TOWN_RADIUS behind Ashford (z=0 anchor)', () => {
+    // Negative z is behind start; still within radius of the z=0 Ashford anchor.
     expect(getSaveSlotKind(makeSave(-TOWN_RADIUS))).toBe('town');
   });
 
