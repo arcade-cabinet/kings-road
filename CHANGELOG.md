@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.4](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.3...kings-road-v1.5.4) (2026-04-20)
+
+
+### Fixed
+
+* **save:** skip corrupt slots in listSaveSlots instead of crashing ([#166](https://github.com/arcade-cabinet/kings-road/issues/166)) ([eb9262a](https://github.com/arcade-cabinet/kings-road/commit/eb9262ad60a76a847694cd65e6ab0580cad8598c))
+
 ## [1.5.3](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.2...kings-road-v1.5.3) (2026-04-20)
 
 
