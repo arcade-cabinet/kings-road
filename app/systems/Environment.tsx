@@ -96,13 +96,30 @@ export function DayNightCycle() {
 
     // Update sun light — base intensity from biome if available, else default
     if (sunLightRef.current) {
-      sunLightRef.current.position.set(
-        camera.position.x + Math.cos(theta) * 100,
-        Math.max(10, sunY * 100),
-        camera.position.z + Math.sin(theta) * 30,
-      );
+      const sunX = camera.position.x + Math.cos(theta) * 100;
+      const sunYPos = Math.max(10, sunY * 100);
+      const sunZ = camera.position.z + Math.sin(theta) * 30;
+      sunLightRef.current.position.set(sunX, sunYPos, sunZ);
       sunLightRef.current.target.position.copy(camera.position);
       sunLightRef.current.target.updateMatrixWorld();
+
+      // Dynamic shadow frustum far plane — the static JSX value (180m) is
+      // the floor, but at dawn/dusk when the sun drops near the horizon the
+      // camera-to-light distance can exceed 180m (XZ offset stays the same
+      // while Y approaches 10m minimum). A clipped far plane makes objects
+      // 30–50m from the player pop in and out of shadow as the sun sweeps
+      // (audit bug #12). Extend to the actual light distance + 60m so the
+      // far edge always clears the shadow-receiving area.
+      const dxL = sunX - camera.position.x;
+      const dyL = sunYPos - camera.position.y;
+      const dzL = sunZ - camera.position.z;
+      const lightDist = Math.sqrt(dxL * dxL + dyL * dyL + dzL * dzL);
+      const shadowCam = sunLightRef.current.shadow.camera;
+      const wantedFar = Math.max(180, lightDist + 60);
+      if (Math.abs(shadowCam.far - wantedFar) > 1) {
+        shadowCam.far = wantedFar;
+        shadowCam.updateProjectionMatrix();
+      }
 
       // BiomeService is synchronously initialized at App module load
       // (see App.tsx), so getCurrentBiome() must return a valid biome here.
