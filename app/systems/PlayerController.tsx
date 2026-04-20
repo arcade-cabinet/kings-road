@@ -48,6 +48,30 @@ const BASE_SPEED = 5.5;
 const SPRINT_MULTIPLIER = 1.8;
 const FRICTION = 20.0;
 
+// Stamina cost per jump (deducted on leading edge of jump input).
+// At 12/100 the player gets ~8 consecutive jumps from full stamina, which
+// keeps normal traversal feeling free while making sprint-jump chains
+// meaningfully drain the bar. Below this threshold the jump is blocked
+// entirely — no partial "weak hop" — for simpler gameplay legibility.
+export const JUMP_STAMINA_COST = 12;
+
+/**
+ * Pure helper: determine whether a jump attempt succeeds given current stamina.
+ * Returns `{ allowed: true, newStamina }` when the jump can proceed, or
+ * `{ allowed: false }` when stamina is too low.
+ *
+ * Exported for unit testing only — call-site in useFrame is the only consumer.
+ */
+export function resolveJump(
+  currentStamina: number,
+  cost: number = JUMP_STAMINA_COST,
+): { allowed: true; newStamina: number } | { allowed: false } {
+  if (currentStamina >= cost) {
+    return { allowed: true, newStamina: currentStamina - cost };
+  }
+  return { allowed: false };
+}
+
 // Camera constants
 const PITCH_MIN = -Math.PI / 2.5;
 const PITCH_MAX = Math.PI / 2.5;
@@ -175,7 +199,11 @@ export function PlayerController() {
     let isSprinting = false;
     let maxSpeed = BASE_SPEED;
 
+    // Snapshot stamina before any drain/regen so that jump eligibility is
+    // evaluated against the value the player "had" at the start of this tick,
+    // not the post-sprint-drain residual (update-order independence).
     const { stamina } = getPlayer();
+    const staminaAtFrameStart = stamina;
     if (input.sprint && hasMovement && stamina > 0) {
       isSprinting = true;
       setStamina(stamina - dt * 25);
@@ -225,7 +253,16 @@ export function PlayerController() {
     // Jump — use Rapier ground detection
     const isGrounded = controllerRef.current.computedGrounded();
     if (input.jump && isGrounded) {
-      velocityYRef.current = JUMP_FORCE;
+      // input.jump is already leading-edge (one-shot per keypress), so
+      // resolveJump() is called at most once per button press.
+      // Use staminaAtFrameStart so jump eligibility is independent of
+      // whether sprint drain already ran this tick.
+      const result = resolveJump(staminaAtFrameStart);
+      if (result.allowed) {
+        velocityYRef.current = JUMP_FORCE;
+        setStamina(result.newStamina);
+      }
+      // allowed === false: no-op — jump is silently blocked.
     }
 
     // Gravity (applied manually since body is kinematic)
