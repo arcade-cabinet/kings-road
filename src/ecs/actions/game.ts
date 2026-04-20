@@ -302,6 +302,10 @@ export function enterDungeon(dungeon: ActiveDungeon): void {
     currentChunkName: `${dungeon.name}: ${roomName}`,
     currentChunkType: 'DUNGEON' as ChunkRoleTag,
   });
+  // The save schema's `dungeon` field persists the active dungeon.
+  // Without this, entering a dungeon and crashing before any other
+  // durable write drops the player back in the overworld on reload.
+  scheduleAutoSave();
 }
 export function exitDungeon(): void {
   const d = ensure(DungeonSession);
@@ -329,6 +333,9 @@ export function exitDungeon(): void {
   });
   f.set(GameFlags, { ...f.get(GameFlags)!, inDungeon: false });
   d.set(DungeonSession, { activeDungeon: null });
+  // Overworld position + dungeon=null are both durable. Persist so a
+  // reload after exit lands on the overworld, not back inside.
+  scheduleAutoSave();
 }
 export function moveToRoom(roomIndex: number): void {
   const d = ensure(DungeonSession);
@@ -347,6 +354,10 @@ export function moveToRoom(roomIndex: number): void {
     ...cs.get(ChunkState)!,
     currentChunkName: `${cur.activeDungeon.name}: ${room.room.name}`,
   });
+  // currentRoomIndex is persisted by snapshotGameState; without an
+  // autosave, room progress is lost if the player closes the tab
+  // between rooms.
+  scheduleAutoSave();
 }
 
 // ── Interaction / dialogue ──────────────────────────────────────────────
