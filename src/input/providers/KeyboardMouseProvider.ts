@@ -31,6 +31,7 @@ export class KeyboardMouseProvider implements IInputProvider {
   private handleMouseMove: (e: MouseEvent) => void;
   private handleMouseDown: (e: MouseEvent) => void;
   private handleMouseUp: (e: MouseEvent) => void;
+  private handleWindowBlur: () => void;
 
   constructor() {
     this.handleKeyDown = (e: KeyboardEvent) => {
@@ -74,11 +75,22 @@ export class KeyboardMouseProvider implements IInputProvider {
       if (e.button === 0) this.attackHeld = false;
     };
 
+    // Clear all held state when the window loses focus — otherwise a key
+    // held down at the moment of alt-tab stays in `keysDown` forever (the
+    // keyup event fires on the app that now owns focus, not on us), so
+    // the player resumes walking on return without touching the keyboard.
+    // Same story for mouse buttons held during focus loss.
+    this.handleWindowBlur = () => {
+      this.keysDown.clear();
+      this.attackHeld = false;
+    };
+
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
     window.addEventListener('mousemove', this.handleMouseMove);
     window.addEventListener('mousedown', this.handleMouseDown);
     window.addEventListener('mouseup', this.handleMouseUp);
+    window.addEventListener('blur', this.handleWindowBlur);
   }
 
   poll(_dt: number): Partial<InputFrame> {
@@ -126,6 +138,7 @@ export class KeyboardMouseProvider implements IInputProvider {
     window.removeEventListener('mousemove', this.handleMouseMove);
     window.removeEventListener('mousedown', this.handleMouseDown);
     window.removeEventListener('mouseup', this.handleMouseUp);
+    window.removeEventListener('blur', this.handleWindowBlur);
     this.keysDown.clear();
   }
 }
