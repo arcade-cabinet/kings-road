@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import '@/lib/configure-gltf';
 import App from './App.tsx';
 import { hasReportedError } from './runtime-error-bus';
+import { ErrorOverlay } from './views/ErrorOverlay';
 import '@/index.css';
 
 // Dev-only playtesting console: window.__DEV__
@@ -42,12 +43,15 @@ function showGlobalError(error: Error | string, source: string) {
   container.id = 'global-error-overlay';
   document.body.appendChild(container);
 
-  // Lazy import to avoid circular deps — this is a crash handler
-  import('./views/ErrorOverlay').then(({ ErrorOverlay }) => {
-    ReactDOM.createRoot(container).render(
-      <ErrorOverlay error={errorObj} source={source} />,
-    );
-  });
+  // ErrorOverlay is statically imported above — App.tsx and ErrorBoundary
+  // already pull it into the main bundle, so a dynamic import here doesn't
+  // save bytes (Vite even warns about it: "dynamic import will not move
+  // module into another chunk"). Using the static import keeps the crash
+  // path synchronous so there's no window where the error fires and the
+  // overlay is still resolving its import.
+  ReactDOM.createRoot(container).render(
+    <ErrorOverlay error={errorObj} source={source} />,
+  );
 }
 
 window.addEventListener('error', (event) => {

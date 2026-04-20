@@ -54,7 +54,7 @@ export function getChunkRoleFromKingdom(
   settlement?: Settlement;
 } | null {
   const tile = getKingdomTile(kingdomMap, cx, cz);
-  if (!tile || !tile.isLand) return null;
+  if (!tile?.isLand) return null;
 
   // Check for settlement at this tile
   const settlement = getSettlementAt(kingdomMap, cx, cz);
@@ -146,7 +146,7 @@ export function getTerrainHeight(
 /** Get elevation for a single grid tile. Returns 0 for ocean/out-of-bounds. */
 function tileElevation(map: KingdomMap, gx: number, gy: number): number {
   const tile = getKingdomTile(map, gx, gy);
-  if (!tile || !tile.isLand) return 0;
+  if (!tile?.isLand) return 0;
   return tile.elevation;
 }
 

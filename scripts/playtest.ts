@@ -341,7 +341,7 @@ class PlaytestAgent {
     }
 
     const tile = getKingdomTile(this.map, this.pos[0], this.pos[1]);
-    if (!tile || !tile.isLand) return;
+    if (!tile?.isLand) return;
 
     const chunkType = tile.hasRoad ? ('ROAD' as const) : ('WILD' as const);
     const settlement = this.checkSettlement();

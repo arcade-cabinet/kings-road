@@ -1,5 +1,5 @@
 import { useProgress } from '@react-three/drei';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useFlags, useSeed, useChunkState } from '@/ecs/hooks/useGameSession';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
@@ -30,6 +30,25 @@ export function LoadingOverlay() {
   const [fadeOut, setFadeOut] = useState(false);
   const [chunkStageIndex, setChunkStageIndex] = useState(0);
   const [startTime, setStartTime] = useState(0);
+  // The fade-out effect schedules an 800ms DOM-removal timer inside its
+  // own setTimeout callback. Hold that handle in a ref so the component-
+  // level unmount effect can cancel it without the fade-out effect's
+  // per-render cleanup also clearing it (the effect re-runs when fadeOut
+  // flips, and we need the 800ms timer to survive that re-run).
+  const fadeOutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancel the pending fade-out DOM-removal timer on unmount only. Fires
+  // when the whole overlay is torn down mid-fade (e.g. the user quits to
+  // main menu during the 800ms fade) so the deferred setState calls don't
+  // land on an unmounted component.
+  useEffect(() => {
+    return () => {
+      if (fadeOutTimerRef.current !== null) {
+        clearTimeout(fadeOutTimerRef.current);
+        fadeOutTimerRef.current = null;
+      }
+    };
+  }, []);
 
   // Show overlay when generation begins or when a significant asset load is triggered
   useEffect(() => {
@@ -67,16 +86,15 @@ export function LoadingOverlay() {
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, MIN_DISPLAY_MS - elapsed);
 
-    let innerTimeout: ReturnType<typeof setTimeout> | null = null;
     const timeout = setTimeout(() => {
       setFadeOut(true);
-      // Remove from DOM after fade animation — track the inner timer so
-      // it can be cancelled on unmount if the overlay is torn down during
-      // the 800ms fade (e.g. user quits to main menu mid-fade). Previously
-      // the inner timer fired on an unmounted component and logged a
-      // setState-on-unmounted warning.
-      innerTimeout = setTimeout(() => {
-        innerTimeout = null;
+      // Detach the DOM-removal timer: this effect re-runs when `fadeOut`
+      // flips to true and its cleanup would otherwise clear the inner
+      // timeout we just scheduled. The component-level unmount effect
+      // below owns the cancellation instead — that only fires on real
+      // unmount, not on dep-driven re-runs.
+      fadeOutTimerRef.current = setTimeout(() => {
+        fadeOutTimerRef.current = null;
         setVisible(false);
         setFadeOut(false);
       }, 800);
@@ -84,7 +102,6 @@ export function LoadingOverlay() {
 
     return () => {
       clearTimeout(timeout);
-      if (innerTimeout !== null) clearTimeout(innerTimeout);
     };
   }, [
     visible,
