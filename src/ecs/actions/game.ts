@@ -8,6 +8,7 @@
 
 import type { Entity, Trait } from 'koota';
 import type * as THREE from 'three';
+import { scheduleAutoSave } from '@/db/autosave';
 import {
   type ActiveDungeon,
   CameraState,
@@ -251,6 +252,10 @@ export function collectGem(chunkKey: string, gemId: number): void {
   if (!deltas[chunkKey].gems.includes(gemId)) deltas[chunkKey].gems.push(gemId);
   cs.set(ChunkState, { ...chunk, chunkDeltas: deltas });
   es.set(EnvironmentState, { ...env, gemsCollected: env.gemsCollected + 1 });
+  // Durable mutation — without scheduling an autosave, picking up a relic
+  // and then refreshing the tab resurrects it. Same pattern as quest
+  // progress in src/ecs/actions/quest.ts (#154).
+  scheduleAutoSave();
 }
 
 // ── Combat ───────────────────────────────────────────────────────────────
