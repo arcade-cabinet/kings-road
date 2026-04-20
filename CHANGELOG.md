@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.17](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.16...kings-road-v1.5.17) (2026-04-20)
+
+
+### Fixed
+
+* **save:** autosave on enterDungeon/exitDungeon/moveToRoom ([#214](https://github.com/arcade-cabinet/kings-road/issues/214)) ([dad1f8e](https://github.com/arcade-cabinet/kings-road/commit/dad1f8ee884d136f9f8229f715d5f67103f4fe8f))
+
 ## [1.5.16](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.15...kings-road-v1.5.16) (2026-04-20)
 
 
