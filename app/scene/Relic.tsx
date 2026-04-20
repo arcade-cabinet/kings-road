@@ -40,6 +40,22 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
     if (collected) setIsCollected(true);
   }, [collected]);
 
+  // Track imperative DOM pickup overlays + their timers so unmount (e.g. the
+  // chunk unloads while the pickup flash is still fading) doesn't leak them.
+  const pickupOverlaysRef = useRef<{
+    nodes: HTMLElement[];
+    timers: ReturnType<typeof setTimeout>[];
+  }>({ nodes: [], timers: [] });
+
+  useEffect(() => {
+    return () => {
+      const { nodes, timers } = pickupOverlaysRef.current;
+      for (const timer of timers) clearTimeout(timer);
+      for (const node of nodes) node.remove();
+      pickupOverlaysRef.current = { nodes: [], timers: [] };
+    };
+  }, []);
+
   useFrame((_state, delta) => {
     if (!meshRef.current) return;
     elapsedRef.current += delta;
@@ -183,15 +199,26 @@ export function Relic({ chunkKey, gemId, position, collected }: RelicProps) {
       notification.textContent = '+1 Ancient Relic';
       document.body.appendChild(notification);
 
-      setTimeout(() => {
+      pickupOverlaysRef.current.nodes.push(flash, notification);
+
+      const fadeTimer = setTimeout(() => {
         flash.style.opacity = '0';
         notification.style.opacity = '0';
         notification.style.transform = 'translateX(-50%) translateY(-20px)';
-        setTimeout(() => {
+        const removeTimer = setTimeout(() => {
           flash.remove();
           notification.remove();
+          const { nodes, timers } = pickupOverlaysRef.current;
+          pickupOverlaysRef.current.nodes = nodes.filter(
+            (n) => n !== flash && n !== notification,
+          );
+          pickupOverlaysRef.current.timers = timers.filter(
+            (t) => t !== removeTimer && t !== fadeTimer,
+          );
         }, 600);
+        pickupOverlaysRef.current.timers.push(removeTimer);
       }, 100);
+      pickupOverlaysRef.current.timers.push(fadeTimer);
     }
   });
 
