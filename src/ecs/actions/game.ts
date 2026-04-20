@@ -30,6 +30,7 @@ import {
   type WeatherState,
 } from '@/ecs/traits/session-game';
 import { getSessionEntity } from '@/ecs/world';
+import { DAY_DURATION } from '@/lib/time';
 import type {
   AABB,
   ActiveEncounter,
@@ -240,9 +241,9 @@ export function getEnvironment() {
   return read(EnvironmentState);
 }
 
-// One in-game hour in real-time ms. DAY_DURATION in Environment.tsx is
-// 600 s (10 real minutes = 1 game day), so 1 game hour = 600/24 = 25 s.
-const TIME_OF_DAY_THROTTLE_MS = (600 / 24) * 1_000; // 25_000 ms
+// One in-game hour in real-time ms. DAY_DURATION is imported from
+// @/lib/time so this derivation stays in sync if the day length changes.
+const TIME_OF_DAY_THROTTLE_MS = (DAY_DURATION / 24) * 1_000; // 25_000 ms
 
 export function setTimeOfDay(time: number): void {
   const e = ensure(EnvironmentState);
