@@ -4,6 +4,7 @@ import {
   ChromaticAberrationEffect,
   EffectComposer,
   EffectPass,
+  HueSaturationEffect,
   NoiseEffect,
   RenderPass,
   ToneMappingEffect,
@@ -17,10 +18,12 @@ import { getPlayer } from '@/ecs/actions/game';
 import { useEnvironment } from '@/ecs/hooks/useGameSession';
 import { GameFlags } from '@/ecs/traits/session-game';
 import { getSessionEntity } from '@/ecs/world';
+import { getBiomeWarmth } from '@/world/biome-visuals';
 import { useTraitEffect } from 'koota/react';
 import type { BiomeConfig } from '@/biome';
 import type { DungeonVignetteState } from './dungeonVignette';
 import { combineDungeonVignette, lerpDungeonVignette } from './dungeonVignette';
+import { type WarmthState, lerpWarmth, warmthToHue } from './biomeWarmth';
 
 /** 0–1 time-of-day → dawn/noon/dusk/night bucket string. */
 function tod(timeOfDay: number): 'dawn' | 'noon' | 'dusk' | 'night' {
@@ -120,6 +123,8 @@ export function BiomePostProcessing() {
   // smooth regardless of biome changes happening at the same time.
   const dungeonStateRef = useRef<DungeonVignetteState>({ darkness: 0, offset: 0 });
   const combinedRef = useRef<DungeonVignetteState>({ darkness: 0, offset: 0 });
+  // Color-temperature warmth — lerped toward the current biome's target.
+  const warmthStateRef = useRef<WarmthState>({ warmth: 0, saturation: 0 });
 
   const pipeline = useMemo(() => {
     // HalfFloatType framebuffer preserves HDR range from the HDRI-lit
@@ -159,6 +164,10 @@ export function BiomePostProcessing() {
     const noise = new NoiseEffect({ premultiply: true });
     noise.blendMode.opacity.value = 0.015;
     const vignette = new VignetteEffect({ offset: 0.35, darkness: 0.45 });
+    // Color-temperature shift per biome. Starts neutral; warmth lerp drives
+    // hue and saturation each frame via warmthStateRef. Placed before
+    // ToneMappingEffect so the tone curve maps the already-shifted colours.
+    const hueSaturation = new HueSaturationEffect({ hue: 0, saturation: 0 });
     // ACES tone mapping + warmer exposure — bloom now triggers on
     // luminance > 0.6 instead of 0.85, so HDRI sky + lit wet stone
     // actually glow. Bloom intensity 0.15 → 0.55 for a visible soft
@@ -170,10 +179,10 @@ export function BiomePostProcessing() {
     });
 
     composer.addPass(
-      new EffectPass(camera, bloom, chroma, noise, vignette, toneMapping),
+      new EffectPass(camera, bloom, chroma, noise, hueSaturation, toneMapping, vignette),
     );
 
-    return { composer, bloom, chroma, noise, vignette };
+    return { composer, bloom, chroma, noise, vignette, hueSaturation };
   }, [gl, scene, camera]);
 
   useEffect(() => {
@@ -230,12 +239,23 @@ export function BiomePostProcessing() {
       dungeonStateRef.current.offset,
     );
 
+    // Color-temperature warmth — biome lookup then lerp in place.
+    const warmthEntry = getBiomeWarmth(biome.id);
+    lerpWarmth(
+      warmthStateRef.current,
+      warmthEntry.warmth,
+      warmthEntry.saturation,
+      delta,
+    );
+
     pipeline.bloom.intensity = bloomIntRef.current;
     pipeline.bloom.luminanceMaterial.threshold = bloomThreshRef.current;
     pipeline.vignette.offset = combinedRef.current.offset;
     pipeline.vignette.darkness = combinedRef.current.darkness;
     pipeline.chroma.offset.set(chromaRef.current, chromaRef.current);
     pipeline.noise.blendMode.opacity.value = noiseRef.current;
+    pipeline.hueSaturation.hue = warmthToHue(warmthStateRef.current.warmth);
+    pipeline.hueSaturation.saturation = warmthStateRef.current.saturation;
 
     pipeline.composer.render(delta);
   }, 1);
