@@ -57,7 +57,7 @@ export function GlbInstancer({
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const gltf = useGLTF(assetUrl(`/assets/${glb}`));
 
-  const { geometry, material } = useMemo(() => {
+  const { geometry, material, materialIsClone } = useMemo(() => {
     const mesh = findFirstMesh(gltf.scene);
     if (!mesh) {
       throw new Error(
@@ -65,6 +65,7 @@ export function GlbInstancer({
       );
     }
     let material: THREE.Material = materialOverride ?? (mesh.material as THREE.Material);
+    let materialIsClone = false;
 
     // Re-tint untextured PSX-mega and ruin GLBs by asset class so they
     // read at distance instead of blending into biome fog. Applies
@@ -126,11 +127,23 @@ export function GlbInstancer({
         cloned.color.setHex(tint);
         cloned.roughness = roughness;
         material = cloned;
+        materialIsClone = true;
       }
     }
 
-    return { geometry: mesh.geometry, material };
+    return { geometry: mesh.geometry, material, materialIsClone };
   }, [gltf.scene, glb, materialOverride]);
+
+  // Dispose the tint clone when the chunk unmounts or when the memoized
+  // material changes. The clone owns no textures of its own — `.clone()`
+  // shares texture refs with the drei-cached source, so we must NOT dispose
+  // those. Only the clone's GPU program + uniforms leak if we skip this.
+  useEffect(() => {
+    if (!materialIsClone) return;
+    return () => {
+      material.dispose();
+    };
+  }, [material, materialIsClone]);
 
   const itemCount = items?.length ?? 0;
 
