@@ -20,6 +20,29 @@ import { useFlags } from '@/ecs/hooks/useGameSession';
 import { TouchOverlay } from '@/input/providers/TouchProvider';
 import { useInputManager } from '@/input/useInputManager';
 
+/**
+ * Walk up from the touch target looking for an element that is actually
+ * scrollable (overflow-y auto/scroll AND content that overflows). Returns
+ * that element if found, null otherwise. Used by the touchmove guard to
+ * let modal pages like SettingsPanel and PauseMenu still finger-scroll
+ * on mobile while the 3D canvas below stays locked.
+ */
+function findScrollableAncestor(el: HTMLElement): HTMLElement | null {
+  let current: HTMLElement | null = el;
+  while (current && current !== document.body) {
+    const style = window.getComputedStyle(current);
+    const overflowY = style.overflowY;
+    if (
+      (overflowY === 'auto' || overflowY === 'scroll') &&
+      current.scrollHeight > current.clientHeight
+    ) {
+      return current;
+    }
+    current = current.parentElement;
+  }
+  return null;
+}
+
 export function Game() {
   // Register all input providers (keyboard/mouse, gamepad, touch)
   useInputManager();
@@ -79,12 +102,21 @@ export function Game() {
     };
   }, []);
 
-  // Prevent default touch behaviors
+  // Prevent default touch behaviors — kills the overscroll bounce /
+  // pull-to-refresh / pinch-zoom on the 3D canvas and gesture joystick.
+  // Allows the event through for:
+  //   - buttons (tap targets)
+  //   - scrollable ancestors (overflow-y: auto/scroll with overflowing
+  //     content) so modal pages like SettingsPanel, PauseMenu save-slot
+  //     list, and InventoryScreen can still finger-scroll on touch.
   useEffect(() => {
     const preventDefaults = (e: TouchEvent) => {
-      if (e.target instanceof HTMLElement && e.target.closest('button')) {
+      if (!(e.target instanceof HTMLElement)) {
+        e.preventDefault();
         return;
       }
+      if (e.target.closest('button')) return;
+      if (findScrollableAncestor(e.target)) return;
       e.preventDefault();
     };
 
