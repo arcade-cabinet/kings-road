@@ -31,7 +31,7 @@ describe('pickMeleeTarget', () => {
     expect(id).toBeNull();
   });
 
-  it("includes the monster's radius in the effective range", () => {
+  it('includes the body radius in the effective range', () => {
     const forward = { x: 0, y: 0, z: 1 };
     // 3m away but radius 1.0 → effective range 2.5 + 1.0 = 3.5 → hit.
     const id = pickMeleeTarget(player, forward, [target('big', 0, 3, 1)]);

@@ -7,18 +7,21 @@
  * the first alive monster every PLAYER_ATTACK_INTERVAL regardless of aim
  * (bug #19 in docs/bugs/2026-04-20-audit-log.md).
  *
- * The predicate is a forward cone: within `range` metres AND within
- * `coneHalfAngleRad` of the camera's forward vector. We also require the
- * camera-to-monster distance in XZ to be at least the monster's body
- * radius so the player can't damage a monster they've clipped into from
- * behind. Pure, no Three.js, no R3F — the caller supplies plain vectors.
+ * The predicate is a forward cone: within `range` metres (extended by the
+ * target's body radius so a large creature registers at its near edge, not
+ * its center) AND within `coneHalfAngleRad` of the camera's forward vector.
+ * Pure, no Three.js, no R3F — the caller supplies plain vectors.
+ *
+ * Note: a monster the player is standing inside (XZ distance < 1e-6) is
+ * treated as an unambiguous hit rather than rejected, since the cone test
+ * would otherwise divide by zero.
  */
 
 export interface HitTarget {
   id: string;
   /** World position `[x, y, z]` matching SpawnedMonster.position. */
   position: readonly [number, number, number];
-  /** Body radius in metres for the hit sphere. Fallback: 0.8. */
+  /** Body radius in metres for the hit sphere. */
   radius: number;
 }
 
@@ -73,9 +76,9 @@ export function pickMeleeTarget(
     const dx = t.position[0] - playerPos.x;
     const dz = t.position[2] - playerPos.z;
     const dist = Math.hypot(dx, dz);
-    // effectiveRange extends by the target's radius — a 1m-wide wraith
-    // registered at 2.5m away should still be a hit because its near edge
-    // is 1.5m from the player.
+    // effectiveRange extends by the target's radius — a wraith with radius
+    // 1m whose center sits 3m away should still be a hit because its near
+    // edge is only 2m from the player (< default 2.5m range).
     const effectiveRange = range + t.radius;
     if (dist > effectiveRange) continue;
     if (dist < 1e-6) {
