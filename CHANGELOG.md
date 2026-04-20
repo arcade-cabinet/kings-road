@@ -12,6 +12,25 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.21...kings-road-v1.6.0) (2026-04-20)
+
+
+### Added
+
+* **autosave:** throttle on setTimeOfDay — once per in-game hour ([#232](https://github.com/arcade-cabinet/kings-road/issues/232)) ([4bfec2b](https://github.com/arcade-cabinet/kings-road/commit/4bfec2bf5d5ba4408d9a8aa1e6e17e888f22c5cc))
+* **autosave:** throttled scheduler for per-frame mutators ([#225](https://github.com/arcade-cabinet/kings-road/issues/225)) ([2176ef3](https://github.com/arcade-cabinet/kings-road/commit/2176ef3a3b1a681da4ceabc36f85f8e7ffb1d37d))
+* **movement:** jump now costs stamina ([#234](https://github.com/arcade-cabinet/kings-road/issues/234)) ([780754b](https://github.com/arcade-cabinet/kings-road/commit/780754b4ab3ee8d5ac765b8d663c8737b137a0bd))
+* **region-banner:** show biome region name when crossing boundaries ([#237](https://github.com/arcade-cabinet/kings-road/issues/237)) ([f6d8037](https://github.com/arcade-cabinet/kings-road/commit/f6d8037613b050ca22b51987d676c20684749c18))
+* **rendering:** vignette darkens in dungeons ([#235](https://github.com/arcade-cabinet/kings-road/issues/235)) ([8a8caee](https://github.com/arcade-cabinet/kings-road/commit/8a8caee076417585e316cd3f3a3f28631da995c2))
+* **validate-content:** add --strict flag + soft warning channel ([#223](https://github.com/arcade-cabinet/kings-road/issues/223)) ([5a9a6b0](https://github.com/arcade-cabinet/kings-road/commit/5a9a6b01c0f9131dbd0cf1fda4e0e81843703a74))
+* **world:** road mile-markers every 2km ([#242](https://github.com/arcade-cabinet/kings-road/issues/242)) ([8e1d909](https://github.com/arcade-cabinet/kings-road/commit/8e1d909561c2d4d9b941a74203c1c0f51aabe789))
+
+
+### Documentation
+
+* **audit:** add frontmatter audit script + fix missing frontmatter ([#224](https://github.com/arcade-cabinet/kings-road/issues/224)) ([313138c](https://github.com/arcade-cabinet/kings-road/commit/313138cc8ff635c86c6c0009e2878218b33c6839))
+* **state:** weekly snapshot ([#233](https://github.com/arcade-cabinet/kings-road/issues/233)) ([718c4ee](https://github.com/arcade-cabinet/kings-road/commit/718c4eea95d00e501596b8019d34ccd4bfd94d2a))
+
 ## [1.5.21](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.20...kings-road-v1.5.21) (2026-04-20)
 
 
