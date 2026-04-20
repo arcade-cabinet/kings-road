@@ -1,5 +1,6 @@
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useCallback, useEffect, useRef } from 'react';
+import * as THREE from 'three';
 import {
   getEncounterTable,
   getMonster,
@@ -44,9 +45,10 @@ import {
   initCombat,
   isCombatOver,
   monstersTurn,
-  playerAttackNearest,
+  playerAttack,
   resolveCombat,
 } from '@/combat-resolver';
+import { pickMeleeTarget, type HitTarget } from '@/combat/hit-test';
 
 // --- Constants ---
 
@@ -126,6 +128,12 @@ export function EncounterSystem() {
   const { activeEncounter } = useCombatSession();
   const { currentChunkType } = useChunkState();
   const kingdomMap = useWorldSession().kingdomMap;
+  // Camera is needed for forward-cone hit detection; the swing originates
+  // at the player body but aim direction is the camera's forward vector.
+  const { camera } = useThree();
+  // Scratch vector reused every swing — allocating a Vector3 per frame
+  // would slow combat on mobile.
+  const forwardRef = useRef(new THREE.Vector3());
 
   const combatUI = useTrait(getSessionEntity(), CombatUI);
   const combatPhase = combatUI?.phase ?? 'idle';
@@ -162,11 +170,38 @@ export function EncounterSystem() {
     }
   }, [inCombat, activeEncounter, seedPhrase]);
 
-  // Handle attack — player attacks nearest alive monster
+  // Handle attack — swing the sword and damage the monster in the forward
+  // cone, if any. Before the bug #19 fix this called playerAttackNearest()
+  // which applied damage every PLAYER_ATTACK_INTERVAL regardless of aim;
+  // now the swing only connects on a real spatial hit so the player has
+  // to face their target.
   const doPlayerAttack = useCallback(() => {
-    if (!combatRngRef.current) return;
+    if (!combatRngRef.current || !activeEncounter) return;
 
-    const result = playerAttackNearest(
+    const { playerPosition } = getPlayer();
+    const forward = camera.getWorldDirection(forwardRef.current);
+
+    // Only alive monsters are valid hit candidates. Radius derives from
+    // the archetype `size` (0.3–5.0m) scaled by 0.5 to approximate a
+    // torso radius — size is the full body diameter-ish.
+    const alive = new Set(
+      getCombatMonsters()
+        .filter((m) => m.currentHp > 0)
+        .map((m) => m.id),
+    );
+    const targets: HitTarget[] = activeEncounter.monsters
+      .filter((m) => alive.has(m.id))
+      .map((m) => ({
+        id: m.id,
+        position: m.position,
+        radius: Math.max(0.4, (m.archetype.size ?? 1) * 0.5),
+      }));
+
+    const hitId = pickMeleeTarget(playerPosition, forward, targets);
+    if (!hitId) return;
+
+    const result = playerAttack(
+      hitId,
       playerAttackDamage,
       combatRngRef.current,
     );
@@ -184,7 +219,7 @@ export function EncounterSystem() {
     if (result.isDead) {
       addDamagePopup('Defeated!', '#66bb6a', popupX, popupY - 0.05, false, true);
     }
-  }, [playerAttackDamage]);
+  }, [activeEncounter, camera, playerAttackDamage]);
 
   useFrame((_, delta) => {
     if (!gameActive || inDialogue || paused || !kingdomMap || isDead) return;
