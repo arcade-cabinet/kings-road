@@ -40,7 +40,7 @@
     "@capacitor-community/sqlite": "^7.0.0",
     "@capacitor/android": "^7.4.0",
     "@capacitor/app": "^7.0.0",
-    "@capacitor/cli": "^7.4.0",
+    "@capacitor/cli": "^8.3.1",
     "@capacitor/core": "^7.4.0",
     "@capacitor/haptics": "^7.0.0",
     "@capacitor/ios": "^7.4.0",
