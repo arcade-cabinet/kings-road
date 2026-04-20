@@ -58,9 +58,7 @@ import {
  * `{ mock: { instances: unknown[] } }` and each instance is the return value
  * of the `function () { this.foo = vi.fn(); }` constructor set up in vi.mock.
  */
-function lastInstance(
-  ctor: unknown,
-): { dispose: ReturnType<typeof vi.fn> } {
+function lastInstance(ctor: unknown): { dispose: ReturnType<typeof vi.fn> } {
   const mock = ctor as { mock: { instances: unknown[] } };
   const instance = mock.mock.instances.at(-1);
   return instance as { dispose: ReturnType<typeof vi.fn> };
