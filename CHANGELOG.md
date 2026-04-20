@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.16](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.15...kings-road-v1.5.16) (2026-04-20)
+
+
+### Fixed
+
+* **save:** autosave on collectGem — relic pickups were not persisted ([#212](https://github.com/arcade-cabinet/kings-road/issues/212)) ([6d06399](https://github.com/arcade-cabinet/kings-road/commit/6d063997bd7301384c438b23ddd1ea1ab518435d))
+
 ## [1.5.15](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.14...kings-road-v1.5.15) (2026-04-20)
 
 
