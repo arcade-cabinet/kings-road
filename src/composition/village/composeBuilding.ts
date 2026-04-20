@@ -49,15 +49,16 @@ function pickWall(footprint: VillageFootprint, rng: () => number): VillagePart {
   return pickRandom(fits.length > 0 ? fits : allWalls, rng);
 }
 
-function pickRoof(wall: VillagePart, rng: () => number): VillagePart {
+function pickRoof(wall: VillagePart, rng: () => number): VillagePart | null {
   const allRoofs = getPartsByRole('roof');
+  if (allRoofs.length === 0) return null;
   const covering = allRoofs.filter(
     (r) =>
       r.footprint.width >= wall.footprint.width &&
       r.footprint.depth >= wall.footprint.depth,
   );
   if (covering.length > 0) return pickRandom(covering, rng);
-  // Fallback: the largest roof by area.
+  // Fallback: the largest roof by area. Safe because allRoofs is non-empty here.
   return allRoofs.reduce((best, r) =>
     r.footprint.width * r.footprint.depth >
     best.footprint.width * best.footprint.depth
@@ -84,13 +85,15 @@ export function composeBuilding(
   });
 
   const roof = pickRoof(wall, rng);
-  placements.push({
-    assetId: assetId(roof),
-    position: { x: 0, y: WALL_HEIGHT, z: 0 },
-    rotation: wallRotY,
-    scale: 1,
-    role: 'roof',
-  });
+  if (roof !== null) {
+    placements.push({
+      assetId: assetId(roof),
+      position: { x: 0, y: WALL_HEIGHT, z: 0 },
+      rotation: wallRotY,
+      scale: 1,
+      role: 'roof',
+    });
+  }
 
   if (rng() < CHIMNEY_PROB) {
     const chimney = VILLAGE_PARTS.chimny;
@@ -112,17 +115,25 @@ export function composeBuilding(
   if (SHELL_WALL_IDS.has(wall.id)) {
     const door = VILLAGE_PARTS['door-1'];
     const windowPart = VILLAGE_PARTS['window-full'];
+    // Inserts sit on the wall's +X face in unrotated building-local space.
+    // Rotate the offset by wallRotY so they follow the wall after rotation;
+    // GlbInstancer composes position+rotation as T·R and does not rotate the
+    // translation vector itself, so we have to pre-rotate the offset here.
     const faceX = wall.footprint.width / 2;
+    const cos = Math.cos(wallRotY);
+    const sin = Math.sin(wallRotY);
+    const offX = faceX * cos;
+    const offZ = faceX * sin;
     placements.push({
       assetId: assetId(door),
-      position: { x: faceX, y: 0, z: 0 },
+      position: { x: offX, y: 0, z: offZ },
       rotation: wallRotY,
       scale: 1,
       role: 'door',
     });
     placements.push({
       assetId: assetId(windowPart),
-      position: { x: faceX, y: 1.5, z: 0 },
+      position: { x: offX, y: 1.5, z: offZ },
       rotation: wallRotY,
       scale: 1,
       role: 'window',

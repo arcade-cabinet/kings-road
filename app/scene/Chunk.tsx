@@ -119,9 +119,11 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
       };
       const layoutRng = createRng(`village-layout:${key}:${seedPhrase}`);
       const slots = composeTownLayout(villageConfig, layoutRng);
-      const villagePlacements: BuildingPlacement[] = slots.flatMap((slot) => {
+      const villagePlacements: BuildingPlacement[] = slots.flatMap((slot, slotIndex) => {
+        // Use slotIndex + full-precision coords to keep the seed unique even
+        // when two slots happen to quantize to the same 0.01m cell.
         const buildingRng = createRng(
-          `village-building:${slot.position.x.toFixed(2)}:${slot.position.z.toFixed(2)}:${seedPhrase}`,
+          `village-building:${slotIndex}:${slot.position.x}:${slot.position.z}:${slot.rotationY}:${seedPhrase}`,
         );
         return composeBuilding(slot.footprint, buildingRng).map((p) => ({
           ...p,

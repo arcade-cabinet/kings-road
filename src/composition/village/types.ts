@@ -33,7 +33,7 @@ export interface TownBuildingSlot {
 
 /** Input config for composeTownLayout. */
 export interface VillageTownConfig {
-  /** Unique identifier — used in RNG seed for determinism. */
+  /** Unique identifier available to callers for deterministic RNG seeding. */
   id: string;
   /** World-space center of the town layout area. */
   center: { x: number; z: number };
