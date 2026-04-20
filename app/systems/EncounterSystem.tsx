@@ -261,9 +261,13 @@ export function EncounterSystem() {
         return;
       }
 
-      // Player attacks on cooldown when action key is held
+      // Player attacks on cooldown when the attack key is held. `interact`
+      // was historically folded in here but that let E-to-interact double
+      // as an attack trigger during combat, so a player reaching for a
+      // dialogue/pickup mid-fight would mash swings. Attack is bound
+      // specifically to the attack input; interact should only interact.
       const input = inputManager.poll(0);
-      if (input.attack || input.interact) {
+      if (input.attack) {
         playerAttackTimerRef.current += dt;
         if (playerAttackTimerRef.current >= PLAYER_ATTACK_INTERVAL) {
           playerAttackTimerRef.current = 0;
