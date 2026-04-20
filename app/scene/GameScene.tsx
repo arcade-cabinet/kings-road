@@ -165,6 +165,12 @@ export function GameScene() {
           // squashes highlights twice, producing the blown-out milky sky
           // and muddy midtones visible on cb=131.
           toneMapping: THREE.NoToneMapping,
+          // Pin the swap-chain color space to sRGB explicitly. Three.js
+          // defaults to SRGBColorSpace today, but making it explicit
+          // protects against a future default change silently turning the
+          // composer's HalfFloatType linear output into a double-encoded
+          // gamma write on the canvas. (Audit entry #15.)
+          outputColorSpace: THREE.SRGBColorSpace,
         }}
         style={{
           width: '100vw',
