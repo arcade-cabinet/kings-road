@@ -15,7 +15,11 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    force: true,
+    // force: false — the previous `force: true` re-bundled on every run
+    // and produced 10+ minute cold-start hangs in Vitest browser mode,
+    // especially under CI parallel port contention. Hash-based cache
+    // eviction is sufficient.
+    force: false,
     include: [
       'react',
       'react-dom',
