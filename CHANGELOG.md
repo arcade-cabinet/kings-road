@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.21](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.20...kings-road-v1.5.21) (2026-04-20)
+
+
+### Fixed
+
+* **pause-menu:** cancel setState on unmount for listSaveSlots ([#220](https://github.com/arcade-cabinet/kings-road/issues/220)) ([7c35c91](https://github.com/arcade-cabinet/kings-road/commit/7c35c9199a3536cd09e935907835175fb07619aa))
+
 ## [1.5.20](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.19...kings-road-v1.5.20) (2026-04-20)
 
 
