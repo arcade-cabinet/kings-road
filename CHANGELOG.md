@@ -12,6 +12,14 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.12](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.11...kings-road-v1.5.12) (2026-04-20)
+
+
+### Fixed
+
+* **combat-vfx:** dispose pooled sphere geo + SDF materials on unmount ([#202](https://github.com/arcade-cabinet/kings-road/issues/202)) ([4103013](https://github.com/arcade-cabinet/kings-road/commit/4103013e24a4be13a291a0315138403a0cfb2b1a))
+* **ocean:** dispose PlaneGeometry + ShaderMaterial on unmount ([#199](https://github.com/arcade-cabinet/kings-road/issues/199)) ([d45c06f](https://github.com/arcade-cabinet/kings-road/commit/d45c06f5e480078a82379b966e99de45b0341dbe))
+
 ## [1.5.11](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.10...kings-road-v1.5.11) (2026-04-20)
 
 
