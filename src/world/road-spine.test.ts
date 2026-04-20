@@ -4,6 +4,7 @@ import {
   getAnchorAtDistance,
   getAnchorById,
   getNextAnchor,
+  getRegionAtDistance,
   loadRoadSpine,
 } from './road-spine';
 
@@ -152,6 +153,62 @@ describe('road-spine loader', () => {
         const found = getAnchorById(expected.id);
         expect(found).not.toBeNull();
         expect(found!.name).toBe(expected.name);
+      }
+    });
+  });
+
+  describe('getRegionAtDistance', () => {
+    it('returns the first region at the start of the road', () => {
+      const region = getRegionAtDistance(0);
+      expect(region).not.toBeNull();
+      expect(region!.id).toBe('ashford-meadows');
+      expect(region!.name).toBe('Ashford Meadows');
+      expect(region!.biome).toBe('MEADOW');
+    });
+
+    it('returns the correct region mid-way through it', () => {
+      // Ashford Meadows spans 0–6000; distance 3000 should be well inside.
+      const region = getRegionAtDistance(3000);
+      expect(region).not.toBeNull();
+      expect(region!.id).toBe('ashford-meadows');
+    });
+
+    it('returns the second region just past its start anchor', () => {
+      // Millbrook Forests starts at 6000; 6001 should be inside it.
+      const region = getRegionAtDistance(6001);
+      expect(region).not.toBeNull();
+      expect(region!.id).toBe('millbrook-forests');
+    });
+
+    it('returns the last region at the final anchor distance', () => {
+      // Grailsend Highlands ends at anchor-05 (28000).
+      const region = getRegionAtDistance(28000);
+      expect(region).not.toBeNull();
+      expect(region!.id).toBe('grailsend-highlands');
+    });
+
+    it('returns null beyond the last region boundary', () => {
+      // 30000 is totalDistance but beyond the last anchor at 28000.
+      const region = getRegionAtDistance(30000);
+      expect(region).toBeNull();
+    });
+
+    it('covers all five regions in the road spine', () => {
+      const spine = loadRoadSpine();
+      const regions = spine.regions ?? [];
+      expect(regions.length).toBe(5);
+
+      // Sample each region at its midpoint.
+      const anchorDist = new Map(
+        spine.anchors.map((a) => [a.id, a.distanceFromStart]),
+      );
+      for (const r of regions) {
+        const start = anchorDist.get(r.anchorRange[0]) ?? 0;
+        const end = anchorDist.get(r.anchorRange[1]) ?? 0;
+        const mid = Math.floor((start + end) / 2);
+        const found = getRegionAtDistance(mid);
+        expect(found).not.toBeNull();
+        expect(found!.id).toBe(r.id);
       }
     });
   });

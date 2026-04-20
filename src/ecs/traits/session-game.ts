@@ -126,6 +126,21 @@ export const InteractionState = trait(() => ({
   dialogueType: 'wanderer',
 }));
 
+// ── Region crossing banner ────────────────────────────────────────────────
+// Transient state written by RegionCrossingSystem when the player crosses a
+// biome boundary. RegionBanner reads this via useTrait to display the name.
+// null means no crossing is in progress.
+export interface RegionCrossingState {
+  regionId: string;
+  regionName: string;
+  /** playerPosition.x at the moment the crossing was detected. */
+  crossingDistance: number;
+}
+
+export const RegionCrossing = trait(() => ({
+  active: null as RegionCrossingState | null,
+}));
+
 // ── Legacy input (kept for InteractionSystem's `keys.action` + touch) ─────
 export const InputLegacy = trait(() => ({
   keys: {

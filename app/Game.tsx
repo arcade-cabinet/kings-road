@@ -8,6 +8,7 @@ import { FunctionalHud } from '@app/views/Gameplay/FunctionalHud';
 import { GameplayFrame } from '@app/views/Gameplay/GameplayFrame';
 import { InventoryScreen } from '@app/views/Gameplay/InventoryScreen';
 import { LoadingOverlay } from '@app/views/Gameplay/LoadingOverlay';
+import { RegionBanner } from '@app/views/Gameplay/RegionBanner';
 import { MainMenu } from '@app/views/MainMenu/MainMenu';
 import { PauseMenu } from '@app/views/Gameplay/PauseMenu';
 import { QuestLog } from '@app/views/Gameplay/QuestLog';
@@ -137,6 +138,7 @@ export function Game() {
       {/* UI Layers — ordered by z-stack (front-most last) */}
       <MainMenu />
       <LoadingOverlay />
+      <RegionBanner />
 
       {/*
         Diegetic gameplay HUD: minimal top band (region fade-in + pause quill),

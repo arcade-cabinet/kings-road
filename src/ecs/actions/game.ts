@@ -26,6 +26,8 @@ import {
   InteractionState,
   PlayerState,
   PlayTime,
+  RegionCrossing,
+  type RegionCrossingState,
   SeedState,
   type WeatherState,
 } from '@/ecs/traits/session-game';
@@ -579,6 +581,18 @@ export function getGameSnapshot() {
         }
       : null,
   };
+}
+
+// ── Region crossing ───────────────────────────────────────────────────────
+
+export function setRegionCrossing(state: RegionCrossingState | null): void {
+  const e = ensure(RegionCrossing);
+  e.set(RegionCrossing, { active: state });
+}
+
+export function getRegionCrossing(): RegionCrossingState | null {
+  const e = ensure(RegionCrossing);
+  return e.get(RegionCrossing)?.active ?? null;
 }
 
 // Merge-style setState used by the restore path — assigns only provided keys.

@@ -11,4 +11,6 @@ export {
   Stamina,
 } from './player';
 export { IsQuestGiver, QuestLog } from './quest';
+export type { RegionCrossingState } from './session-game';
+export { RegionCrossing } from './session-game';
 export { Position, Rotation, Velocity } from './spatial';
