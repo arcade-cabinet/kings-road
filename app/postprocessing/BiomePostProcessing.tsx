@@ -179,7 +179,7 @@ export function BiomePostProcessing() {
     });
 
     composer.addPass(
-      new EffectPass(camera, bloom, chroma, noise, vignette, hueSaturation, toneMapping),
+      new EffectPass(camera, bloom, chroma, noise, hueSaturation, toneMapping, vignette),
     );
 
     return { composer, bloom, chroma, noise, vignette, hueSaturation };

@@ -6,9 +6,11 @@
  *    0.0  = neutral (no color shift)
  *   -1.0  = maximum cool tint (blue-grey fog)
  *
- * Values are keyed by biome id as registered in BiomeService. Aliases
- * (e.g. "farmland" → "meadow") inherit the canonical biome's warmth via
- * getBiomeWarmth's fallback chain.
+ * Keys are canonical biome ids as registered in BiomeService (meadow,
+ * forest, thornfield, moor, ocean). getBiomeWarmth() does a direct Map
+ * lookup and returns NEUTRAL for any id that is not present here — new
+ * biomes won't crash, they will simply carry no warmth shift until an
+ * entry is added.
  *
  * Design rationale (road progression, distance 0–28000):
  *   - meadow (Ashford 0–6000): warmest. Golden pastoral morning light,
@@ -32,30 +34,23 @@ export interface BiomeWarmthEntry {
   saturation: number;
 }
 
-const BIOME_WARMTH: Record<string, BiomeWarmthEntry> = {
-  meadow: { warmth: 0.15, saturation: 0.08 },
-  forest: { warmth: 0.05, saturation: 0.04 },
-  thornfield: { warmth: -0.08, saturation: -0.05 },
-  moor: { warmth: -0.2, saturation: -0.1 },
-  ocean: { warmth: -0.1, saturation: 0.06 },
-  // Alias targets — mirror the canonical biome so the lookup never fails
-  // for the extended biome ids that BiomeService.BIOME_ALIASES remaps.
-  farmland: { warmth: 0.15, saturation: 0.08 }, // → meadow
-  riverside: { warmth: 0.1, saturation: 0.05 }, // → meadow, water glint
-  coast: { warmth: -0.08, saturation: 0.06 }, // → meadow/ocean blend
-  swamp: { warmth: -0.15, saturation: -0.08 }, // → moor
-  hills: { warmth: -0.08, saturation: -0.04 }, // → moor (Thornfield hills)
-  highland: { warmth: -0.1, saturation: -0.06 }, // → moor
-  mountain: { warmth: -0.18, saturation: -0.1 }, // → moor
-  deep_forest: { warmth: 0.03, saturation: 0.02 }, // → forest
+const BIOME_WARMTH: Record<string, Readonly<BiomeWarmthEntry>> = {
+  meadow: Object.freeze({ warmth: 0.15, saturation: 0.08 }),
+  forest: Object.freeze({ warmth: 0.05, saturation: 0.04 }),
+  thornfield: Object.freeze({ warmth: -0.08, saturation: -0.05 }),
+  moor: Object.freeze({ warmth: -0.2, saturation: -0.1 }),
+  ocean: Object.freeze({ warmth: -0.1, saturation: 0.06 }),
 };
 
-const NEUTRAL: BiomeWarmthEntry = { warmth: 0, saturation: 0 };
+const NEUTRAL: Readonly<BiomeWarmthEntry> = Object.freeze({
+  warmth: 0,
+  saturation: 0,
+});
 
 /**
- * Return the warmth/saturation entry for a biome id.
+ * Returns the warmth entry for a canonical biome ID, or NEUTRAL if unknown.
  * Falls back to neutral if the id is unknown (new biomes shouldn't crash).
  */
-export function getBiomeWarmth(biomeId: string): BiomeWarmthEntry {
+export function getBiomeWarmth(biomeId: string): Readonly<BiomeWarmthEntry> {
   return BIOME_WARMTH[biomeId] ?? NEUTRAL;
 }
