@@ -11,13 +11,15 @@ import type { DungeonKitPlacement } from '@/composition/dungeon-kit';
 import type { RuinsPlacement } from '@/composition/ruins';
 import type { StoryPropPlacement } from '@/composition/story-props';
 import type { VegetationPlacement } from '@/composition/vegetation';
+import type { BuildingPlacement } from '@/composition/village';
 import { GlbInstancer } from './GlbInstancer';
 
 type AnyPlacement =
   | VegetationPlacement
   | RuinsPlacement
   | StoryPropPlacement
-  | DungeonKitPlacement;
+  | DungeonKitPlacement
+  | BuildingPlacement;
 
 interface CompositionLayerProps {
   placements: AnyPlacement[];

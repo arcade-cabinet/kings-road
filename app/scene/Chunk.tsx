@@ -8,13 +8,18 @@ import { composeRuins } from '@/composition/ruins';
 import { composeVegetation } from '@/composition/vegetation';
 import { composeStoryProps } from '@/composition/story-props';
 import { composeDungeonRoom } from '@/composition/dungeon-kit';
+import { composeBuilding, composeTownLayout } from '@/composition/village';
 import type { DungeonKitRoom } from '@/composition/dungeon-kit';
 import type { TownConfig } from '@/composition/ruins';
+import type {
+  BuildingPlacement,
+  VillageTownConfig,
+} from '@/composition/village';
 import type { HeightSampler } from '@/composition/vegetation';
 import { useWorldSession } from '@/ecs/hooks/useWorldSession';
 import type { ChunkData } from '@/types/game';
 import { getTerrainHeight, CHUNK_SIZE, BLOCK_SIZE, MAX_TERRAIN_HEIGHT } from '@/utils/worldGen';
-import { cyrb128, mulberry32 } from '@/core';
+import { createRng, cyrb128, mulberry32 } from '@/core';
 import { Building } from './Building';
 import { CompositionLayer } from './CompositionLayer';
 import { Feature } from './Feature';
@@ -74,27 +79,67 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
 
     if (type === 'TOWN' && hasConfigTown) {
       const townCenter = { x: oX + CHUNK_SIZE / 2, z: oZ + CHUNK_SIZE / 2 };
-      const townConfig: TownConfig = {
+      const isThornfield = biomeConfig?.id === 'thornfield';
+
+      if (isThornfield) {
+        // Thornfield is "dead forest wrapped around ruins" — keep the
+        // existing ruins + overgrown foliage path. No procedural village.
+        const townConfig: TownConfig = {
+          id: key,
+          center: { x: townCenter.x, y: 0, z: townCenter.z },
+          radius: CHUNK_SIZE / 2,
+        };
+        const ruinPlacements = biomeConfig
+          ? composeRuins(biomeConfig, townConfig, seedPhrase)
+          : [];
+        const townVegPlacements = biomeConfig
+          ? composeVegetation(biomeConfig, cx, cz, heightSampler, seedPhrase, {
+              clearCenter: townCenter,
+              clearRadius: 30,
+            })
+          : [];
+        return [...ruinPlacements, ...townVegPlacements];
+      }
+
+      // Other biomes: Phase B procedural village from authored parts.
+      const villageConfig: VillageTownConfig = {
         id: key,
-        center: { x: townCenter.x, y: 0, z: townCenter.z },
+        center: townCenter,
         radius: CHUNK_SIZE / 2,
+        roles: [
+          'landmark',
+          'tavern',
+          'house',
+          'house',
+          'barn',
+          'house',
+          'house',
+          'house',
+        ],
       };
-      // Ruins + overgrown foliage — biomes like Thornfield are
-      // explicitly "dead forest wrapped around ruins" per the biome
-      // description, so a TOWN chunk without vegetation reads as a bare
-      // stone clearing. Compose both, merge the arrays. Carve out a
-      // 30 m clearance around the town centre so trees don't spawn on
-      // top of the buildings and NPCs.
-      const ruinPlacements = biomeConfig
-        ? composeRuins(biomeConfig, townConfig, seedPhrase)
-        : [];
+      const layoutRng = createRng(`village-layout:${key}:${seedPhrase}`);
+      const slots = composeTownLayout(villageConfig, layoutRng);
+      const villagePlacements: BuildingPlacement[] = slots.flatMap((slot) => {
+        const buildingRng = createRng(
+          `village-building:${slot.position.x.toFixed(2)}:${slot.position.z.toFixed(2)}:${seedPhrase}`,
+        );
+        return composeBuilding(slot.footprint, buildingRng).map((p) => ({
+          ...p,
+          position: {
+            x: p.position.x + slot.position.x,
+            y: p.position.y + slot.position.y,
+            z: p.position.z + slot.position.z,
+          },
+          rotation: p.rotation + slot.rotationY,
+        }));
+      });
       const townVegPlacements = biomeConfig
         ? composeVegetation(biomeConfig, cx, cz, heightSampler, seedPhrase, {
             clearCenter: townCenter,
             clearRadius: 30,
           })
         : [];
-      return [...ruinPlacements, ...townVegPlacements];
+      return [...villagePlacements, ...townVegPlacements];
     }
 
     if (type === 'DUNGEON') {
