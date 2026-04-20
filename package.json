@@ -1,7 +1,7 @@
 {
   "name": "kings-road",
   "private": true,
-  "version": "1.5.8",
+  "version": "1.5.9",
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "scripts": {
@@ -94,7 +94,7 @@
     "drizzle-kit": "^0.31.10",
     "gltfjsx": "^6.5.3",
     "happy-dom": "^20.9.0",
-    "jsdom": "^29.0.2",
+    "jsdom": "^28.1.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",

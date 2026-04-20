@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.9](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.8...kings-road-v1.5.9) (2026-04-20)
+
+
+### Fixed
+
+* **touch:** let scrollable modals finger-scroll on mobile ([#194](https://github.com/arcade-cabinet/kings-road/issues/194)) ([781bd9b](https://github.com/arcade-cabinet/kings-road/commit/781bd9b949265db804d29070e429748b5dbe5fdf))
+
 ## [1.5.8](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.7...kings-road-v1.5.8) (2026-04-20)
 
 
