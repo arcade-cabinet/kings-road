@@ -353,8 +353,14 @@ export function DialogueBox() {
   }, [isClosing]);
 
   const handleClick = () => {
+    // First tap/click/backdrop fast-forwards the typewriter; a subsequent
+    // tap (after reveal) dismisses. Prevents thumb-spam dismissing unread
+    // dialogue while still keeping a one-tap "got it" dismissal once the
+    // player has seen the message.
     if (!isComplete) {
       skip();
+    } else {
+      handleClose();
     }
   };
 
@@ -365,11 +371,19 @@ export function DialogueBox() {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        handleClose();
+        // Escape skips an in-flight typewriter before closing, so a
+        // single jab doesn't dismiss unread text on slow-typing NPCs.
+        if (!isComplete) {
+          skip();
+        } else {
+          handleClose();
+        }
       } else if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         if (!isComplete) {
           skip();
+        } else {
+          handleClose();
         }
       }
     };
@@ -397,9 +411,9 @@ export function DialogueBox() {
         className="absolute inset-0 pointer-events-auto cursor-pointer"
         role="button"
         tabIndex={0}
-        onClick={handleClose}
+        onClick={handleClick}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') handleClose();
+          if (e.key === 'Enter' || e.key === ' ') handleClick();
         }}
         style={{
           background:
@@ -537,14 +551,20 @@ export function DialogueBox() {
               )}
             </div>
 
-            {/* Choice buttons area — future dialogue tree support */}
-            {/* For now we show a single "Farewell" action */}
+            {/* Choice buttons area — future dialogue tree support.
+                Only render once the typewriter completes so the player
+                can't thumb-skip through dialogue before reading it. The
+                text itself remains click-to-skip-typewriter (via the
+                container's onClick), but the dismissal action gates
+                behind full reveal. */}
             <div className="flex flex-col gap-1.5 mb-3">
-              <ChoiceButton
-                text="Farewell, friend."
-                onClick={handleClose}
-                index={0}
-              />
+              {isComplete && (
+                <ChoiceButton
+                  text="Farewell, friend."
+                  onClick={handleClose}
+                  index={0}
+                />
+              )}
             </div>
 
             {/* Footer hints */}
