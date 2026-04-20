@@ -12,6 +12,20 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.0...kings-road-v1.5.1) (2026-04-20)
+
+
+### Fixed
+
+* dynamic shadow frustum far at dawn/dusk ([#12](https://github.com/arcade-cabinet/kings-road/issues/12)) ([#157](https://github.com/arcade-cabinet/kings-road/issues/157)) ([f31f0bd](https://github.com/arcade-cabinet/kings-road/commit/f31f0bded6865e6dd626ae792993fdda2a7e7e71))
+* pause simulation on tab-hidden ([#21](https://github.com/arcade-cabinet/kings-road/issues/21)) ([#153](https://github.com/arcade-cabinet/kings-road/issues/153)) ([acab934](https://github.com/arcade-cabinet/kings-road/commit/acab9345eebc9e971f641f2022f0cf63fbf01c08))
+* pin Canvas outputColorSpace to sRGB explicitly ([#15](https://github.com/arcade-cabinet/kings-road/issues/15)) ([#158](https://github.com/arcade-cabinet/kings-road/issues/158)) ([7551301](https://github.com/arcade-cabinet/kings-road/commit/755130180152e4fc82b733b91e34565a1e46e622))
+
+
+### Documentation
+
+* add 2026-04-20 hidden-behavior audit log ([#156](https://github.com/arcade-cabinet/kings-road/issues/156)) ([2ba3971](https://github.com/arcade-cabinet/kings-road/commit/2ba3971f71cdbf3a07419ff04c25702c649a1912))
+
 ## [1.5.0](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.4.0...kings-road-v1.5.0) (2026-04-20)
 
 
