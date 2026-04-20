@@ -12,6 +12,14 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.20](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.19...kings-road-v1.5.20) (2026-04-20)
+
+
+### Fixed
+
+* **combat:** decouple attack trigger from interact key ([#222](https://github.com/arcade-cabinet/kings-road/issues/222)) ([76a919a](https://github.com/arcade-cabinet/kings-road/commit/76a919a097f91d61190f9b3a56a5cf64a8b0625b))
+* **dialogue:** gate Farewell choice behind typewriter completion ([#221](https://github.com/arcade-cabinet/kings-road/issues/221)) ([375d44e](https://github.com/arcade-cabinet/kings-road/commit/375d44eec170f0e39a6591a50d2c1f7e60a53e02))
+
 ## [1.5.19](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.18...kings-road-v1.5.19) (2026-04-20)
 
 
