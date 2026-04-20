@@ -176,6 +176,17 @@ export function RoadSurface({
     };
   }, [roadType]);
 
+  // Dispose the cloned material + its cloned textures when React swaps
+  // to a new material (e.g. roadType changes) or when the component
+  // unmounts (chunk unloads from view-distance). React fires the cleanup
+  // with the previous `material` captured in scope; the new material is
+  // owned by the next render.
+  useEffect(() => {
+    return () => {
+      disposeRoadMaterial(material);
+    };
+  }, [material]);
+
   const geometry = useMemo(() => {
     const gx = kingdomTile.x;
     const gy = kingdomTile.y;
@@ -251,9 +262,35 @@ export function RoadSurface({
     return merged;
   }, [oX, oZ, kingdomTile, kingdomMap, roadType]);
 
+  // Dispose merged geometry on unmount or when a new one is computed. The
+  // chunk manager unmounts RoadSurface when the player walks out of
+  // view-distance — without this effect the BufferGeometry leaks once per
+  // unloaded chunk.
+  useEffect(() => {
+    return () => {
+      geometry?.dispose();
+    };
+  }, [geometry]);
+
   if (!geometry || !material) return null;
 
   return <mesh geometry={geometry} material={material} receiveShadow />;
+}
+
+/**
+ * Dispose a cloned road material and its cloned textures. The PBR loader
+ * hands out shared cached materials; RoadSurface clones them (and the
+ * individual maps) so it can set per-instance tiling. Those clones must
+ * be released explicitly — the shared cache keeps the originals alive.
+ */
+function disposeRoadMaterial(
+  mat: THREE.MeshStandardMaterial | null | undefined,
+): void {
+  if (!mat) return;
+  mat.map?.dispose();
+  mat.normalMap?.dispose();
+  mat.roughnessMap?.dispose();
+  mat.dispose();
 }
 
 /**
