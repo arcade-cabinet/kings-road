@@ -98,6 +98,13 @@ function BenchmarkFrameSampler({ route }: { route: BenchmarkRoute }) {
     return () => clearTimeout(t);
   }, [route.id]);
 
+  // priority=2: runs AFTER BiomePostProcessing's useFrame(cb, 1). R3F
+  // processes lower priorities first. The composer does its work at
+  // priority 1 via composer.render(delta), which is what actually feeds
+  // gl.info.render. If we sampled at priority 0 (default), gl.info
+  // would report the state BEFORE the composer drew anything — which is
+  // why cb=149 reported avgDrawCalls=1, avgTriangles=1 despite the
+  // scene clearly rendering dozens of instanced meshes + terrain + UI.
   useFrame(() => {
     if (doneRef.current) return;
     const capture = captureRef.current;
@@ -118,7 +125,8 @@ function BenchmarkFrameSampler({ route }: { route: BenchmarkRoute }) {
     setKey('action', frame.attack || frame.interact);
     setKey('shift', frame.sprint);
 
-    // Sample renderer metrics
+    // Sample renderer metrics — runs AFTER composer.render(delta) because
+    // this callback is priority 2 and the composer is priority 1.
     capture.sample(gl.info);
 
     if (elapsed >= route.durationSeconds) {
@@ -129,7 +137,7 @@ function BenchmarkFrameSampler({ route }: { route: BenchmarkRoute }) {
       setKey('shift', false);
       finalizeRun(capture, route);
     }
-  });
+  }, 2);
 
   return null;
 }

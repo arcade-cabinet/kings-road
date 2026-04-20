@@ -236,6 +236,19 @@ export function WeatherSystem() {
   // Scratch color objects to avoid allocations
   const fogColorTarget = useMemo(() => new THREE.Color(), []);
 
+  // Cache the biome-authored fog distances so per-frame modulation writes
+  // a fresh base × factor rather than scaling the previously-scaled value.
+  // Today Environment.Fog re-asserts scene.fog.near/far every frame (see
+  // Environment.tsx Fog()), so the `externallyRewritten` check below fires
+  // every frame and rebase-base continuously picks up the authored biome
+  // values — that IS the correct outcome. The ref structure is a safety
+  // net against a future refactor that makes Environment re-assert only on
+  // biome change; without it, scaling would compound across frames.
+  const baseFogNearRef = useRef<number | null>(null);
+  const baseFogFarRef = useRef<number | null>(null);
+  const lastWrittenNearRef = useRef<number | null>(null);
+  const lastWrittenFarRef = useRef<number | null>(null);
+
   useFrame((_, delta) => {
     const { gameActive } = getFlags();
     if (!gameActive) return;
@@ -297,11 +310,25 @@ export function WeatherSystem() {
     if (scene.fog instanceof THREE.Fog) {
       const densityFactor = 1 - currentFogDensity.current * 0.5;
 
-      // Shorten near/far proportionally to density — keep the biome's
-      // authored base distances (Environment.tsx writes them each biome
-      // change, we just scale the current values every frame).
-      scene.fog.near *= densityFactor;
-      scene.fog.far *= densityFactor;
+      // Rebase whenever the fog has been rewritten since our last write —
+      // today Environment.Fog re-asserts near/far every frame so this fires
+      // every frame and is functionally equivalent to writing
+      // `sceneNear * densityFactor` directly. If Environment ever switches
+      // to biome-change-only writes, this still prevents compounding.
+      const externallyRewritten =
+        lastWrittenNearRef.current === null ||
+        scene.fog.near !== lastWrittenNearRef.current ||
+        scene.fog.far !== lastWrittenFarRef.current;
+      if (externallyRewritten) {
+        baseFogNearRef.current = scene.fog.near;
+        baseFogFarRef.current = scene.fog.far;
+      }
+      const nextNear = (baseFogNearRef.current ?? scene.fog.near) * densityFactor;
+      const nextFar = (baseFogFarRef.current ?? scene.fog.far) * densityFactor;
+      scene.fog.near = nextNear;
+      scene.fog.far = nextFar;
+      lastWrittenNearRef.current = nextNear;
+      lastWrittenFarRef.current = nextFar;
 
       // Condition-based desaturation: storms wash the scene grey, clear
       // days leave the biome color untouched. Capped so the biome identity
