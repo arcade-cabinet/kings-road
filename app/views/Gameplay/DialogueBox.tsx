@@ -537,14 +537,20 @@ export function DialogueBox() {
               )}
             </div>
 
-            {/* Choice buttons area — future dialogue tree support */}
-            {/* For now we show a single "Farewell" action */}
+            {/* Choice buttons area — future dialogue tree support.
+                Only render once the typewriter completes so the player
+                can't thumb-skip through dialogue before reading it. The
+                text itself remains click-to-skip-typewriter (via the
+                container's onClick), but the dismissal action gates
+                behind full reveal. */}
             <div className="flex flex-col gap-1.5 mb-3">
-              <ChoiceButton
-                text="Farewell, friend."
-                onClick={handleClose}
-                index={0}
-              />
+              {isComplete && (
+                <ChoiceButton
+                  text="Farewell, friend."
+                  onClick={handleClose}
+                  index={0}
+                />
+              )}
             </div>
 
             {/* Footer hints */}
