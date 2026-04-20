@@ -1,129 +1,110 @@
 ---
 title: State
-updated: 2026-04-18
+updated: 2026-04-20
 status: current
 domain: context
 ---
 
 # State
 
-Current development state as of 2026-04-18 — v1.4.0 (v1 beta milestone) released.
+Current development state as of 2026-04-20. Tracking progress toward v1.0.0 release via macro/meso/micro roadmap.
 
-## Most Recent Milestone: v1.4.0 (v1 beta)
+**Current release**: kings-road-v1.5.21
 
-Shipped 2026-04-18 via release-please. Web deployed to GitHub Pages, Android debug APK + iOS artifacts attached to the release. This marks the end of the v1 beta work stream; v1.5+ is the next planning horizon.
+## Recent Merged PRs
+
+**Infra & Quality:**
+- Frontmatter audit script added; fixed missing frontmatter on 8 docs (#224)
+- `validate-content` now has `--strict` flag for soft warnings (#223)
+- Autosave throttled scheduler for per-frame mutations (#225)
+
+**Bug Fixes:**
+- Pause menu setState-on-unmount cleaned up (#220)
+- Combat attack decoupled from interact key (#222)
+- Dialogue "Farewell" choice gated behind typewriter completion (#221)
+- Save flush forced on tab hide/unload (#205)
+- Memory leaks: wall materials, ocean shader, combat VFX, road geometry (#203, #202, #199, #200)
+
+**Content & Docs:**
+- Path-to-1.0 PRD published with 15 macros + meso/micro tier (#218)
+- Bug-hunt audit entries 23–32 logged (#216)
 
 ## What Is Done
 
-### Engine Core
+### Engine & ECS
+- Koota ECS (pmndrs): all game state in traits; Zustand removed
+- SQLite + Drizzle ORM: content compiled at build, saves persisted via Capacitor
+- React Three Fiber + rapier: instanced meshes, PBR textures, kinematic controller, postprocessing (SMAA/bloom/vignette)
 
-- Config-driven content pipeline: Zod schemas validate JSON content trove
-- SQLite content database: `compile-content-db.ts` compiles all content to SQLite at build time; Drizzle ORM provides type-safe queries
-- Save system: Capacitor SQLite on web (via `jeep-sqlite`) and native — single-table `save_slots(slotId, payload)` JSON upsert
-- Koota ECS (pmndrs): all session game state lives in traits (no more Zustand). Subpackages: traits/, actions/, hooks/, world, item-registry
-- React Three Fiber rendering: instanced meshes, authored PBR Polyhaven textures, SMAA/bloom/vignette postprocessing, @react-three/rapier kinematic character controller
+### World & Generation
+- Road spine: 6 anchors spanning 30km, Ashford at 0km, Grailsend at 28km
+- Pacing engine: deterministic feature placement
+- Dungeons: procedural room system complete; authored dungeon content (5+ unique themed dungeons) in progress
+- Kingdom gen: one-time at New Game from seed
+- Chunk streaming: 120-unit chunks within view distance
 
-### World Generation
-
-- Road spine: 6 anchor points from Ashford (0) to Grailsend (28,000)
-- Pacing engine: deterministic feature placement along the road
-- Dungeon generator: procedural room graphs assigned to dungeon anchors
-- Town layout: building placement from archetype configs
-- Kingdom gen: `generateKingdom()` runs once at New Game, deterministic from (seed, kingdom-config.json)
-- Road network: connection graph between anchors
-- Terrain gen: simplex noise heightmap
-- Chunk streaming: 120-unit chunks loaded within VIEW_DISTANCE of player
-
-### Authored Assets (pure, no procgen appearance)
-
-- 99 GLBs across 8 asset categories in `public/assets/` — Fantasy Mega Pack buildings/villagers/knight/bat/skeleton/bottles/books/crates/mine-props/nature/weapons, PSX Horror-Fantasy Megapack monsters, traps, hands
-- 7 Polyhaven CC0 PBR texture sets (1k, diffuse + normal + roughness) at `public/textures/` — plaster, stone_block, thatch, wood, road, grass, cobblestone
-- All NPCs driven by authored GLBs via `NPCDefinition.archetype` → `content/npcs/`
-- All monsters driven by `MonsterArchetype.glb` → `content/monsters/`
-- No runtime mesh/texture generation remains (chibi/face-texture/npc-factory procgen deleted)
-
-### ECS Actions (Koota)
-
-- Player: movement, combat, stamina/health, camera, input
-- World/Kingdom: generation progress, tile queries
-- Inventory / Equipment: slots, gold, equipped items
-- Quest: active/completed/triggered lists with step progression
-- Combat: encounter state, damage popups, loot summary
-- Settings: audio/display persisted via `@capacitor/preferences` (debounced)
+### Assets
+- 99 GLBs (Fantasy Mega Pack, PSX Horror-Fantasy)
+- 7 Polyhaven PBR texture sets (diffuse/normal/roughness, 1k)
+- All NPCs + monsters driven by authored GLBs (no procgen appearance)
 
 ### Game Systems
+- PlayerController, ChunkManager, Environment (day/night, sun/moon, lantern, weather)
+- InteractionSystem, QuestSystem, EncounterSystem, DungeonEntrySystem
+- AudioSystem (Tone.js ambient), WeatherSystem
 
-- PlayerController: rapier-driven movement, camera, sprint/walk/jump
-- ChunkManager: chunk streaming, entity spawn/despawn
-- Environment: day/night cycle, sun/moon arc, player lantern, weather
-- InteractionSystem: raycasting NPC detection, dialogue trigger
-- QuestSystem: quest step execution, branch tracking
-- EncounterSystem: weighted encounter rolls from content DB
-- DungeonEntrySystem: dungeon transitions
-- AudioSystem: Tone.js ambient layer management
-- WeatherSystem: weather state transitions
+### UI & HUD
+- Diegetic HUD: vignette, breath fog, heartbeat, belt pips (no chrome)
+- MainMenu (Continue card), DialogueBox (illuminated bubbles)
+- PauseMenu, SettingsPanel, QuestLog, Inventory, Death/Loading/Error Overlays
 
-### UI Components
+### Testing & CI/CD
+- 946+ unit/component tests (Vitest + browser mode)
+- Playwright E2E
+- 80% coverage thresholds
+- GitHub Pages deployment + release artifacts (web, Android APK, iOS)
 
-- MainMenu with 21st.dev-inspired Continue card
-- Diegetic HUD (DiegeticLayer): wound vignette, breath fog, heartbeat, belt pips — no chrome bars
-- DialogueBox (illuminated-manuscript speech bubbles)
-- PauseMenu, SettingsPanel, QuestLog, InventoryScreen, DeathOverlay, LoadingOverlay, ErrorOverlay, Portrait3D
-- Responsive scaling — clamps to viewport on mobile + web
+## What Is Next (Path to 1.0)
 
-### Testing
+### Immediate P0 Blockers (Macros M1–M7, M12–M15)
+1. **M1 — Native persistence harden**: Tie save flush to Capacitor `pause` event on native; web stays `visibilitychange`
+2. **M2 — Perf budget + regression harness**: Benchmark on Pixel 6a / iPhone; set p95 frame-time targets; CI gate
+3. **M3 — Content volume**: ≥ 40 unique NPC blueprints, ≥ 15 macros, ≥ 40 mesos, ≥ 100 micros; schema-valid, zero orphans
+4. **M4 — Combat feel**: Weapon reach/arcs, hit-pause (60–80ms), screen shake, monster stagger + i-frames; death rate target 15–25%
+5. **M5 — Onboarding**: Intro cinematic → Ashford grounding → first pilgrim encounter; diegetic tutorial (rune highlights, compass pip glows)
+6. **M6 — Mobile UX**: Dual-stick tuning, haptics on hit/pickup/quest/menu, touch targets ≥ 44pt, safe-area insets
+7. **M7 — Audio identity**: Biome-specific ambient, combat music swell, dialogue ducking (−12dB), Grail-theme cue at anchors
+8. **M12 — Narrative completion**: Grailsend ending (canonical / branching / open-ended); credits screen; post-ending save
+9. **M13 — Real-device beta**: ≥ 3 playthroughs to Grailsend by external testers; P0/P1 bugs triaged to zero
+10. **M14 — Store-ready assets**: Icon (1024×1024 + adaptive), splash, store screenshots, OG tags, app description, privacy policy, credits
+11. **M15 — Release automation**: `release.yml` builds web/Android/iOS; signing via secrets; SBOM + attestation; RC tag convention
 
-- 946+ unit/component tests via Vitest
-- Vitest browser mode for WebGL smoke + component integration
-- Playwright for E2E (`e2e/game.spec.ts`)
-- Content integration tests
-- 80% coverage thresholds enforced by CI
+### Next Meso Clusters
+- **Gameplay loop** (G1–G7): PlayerController tuning, stamina/health systems, encounter variety, loot tables, XP+levelling, pickup feedback
+- **World + content** (W1–W4): Anchor settlements (inn/smith/chapel/3+ houses), road pacing events, biome transitions, 5+ dungeons
+- **UX/HUD** (U1–U7): Final menu layouts (New/Continue/Load/Settings/Credits/Quit), Settings panel, Loading overlay timing, Death+respawn, Quest log, Dialogue polish
 
-### Build and Deployment
+### Known Risks (Top 3)
+| Risk | Mitigation |
+|------|-----------|
+| Content volume underestimated | Use LLM-pass variant + curator review; track word count weekly |
+| Combat feel requires iteration loops | Budget 2× estimate; ship playable-rough then polish |
+| Real-device perf blows budget | Fallback quality tier + dynamic LOD |
 
-- Vite 7 + Capacitor 7 for web and native (`vite build`)
-- GitHub Actions CI on PRs: lint, type-check, test, content validation, web build, APK build
-- GitHub Actions CD on push to main: deploy to GitHub Pages
-- GitHub Actions Release on release-please tag: publish web bundle, Android APK, iOS artifacts
-- Dependabot: weekly dependency updates
+## Active Plans
 
-### Error Handling Policy
+- [Path to 1.0](./plans/2026-04-20-path-to-1.0.prq.md) — Full macro/meso/micro roadmap to 1.0.0 (15 macros, 40+ mesos, 30+ micros)
+- [Visual Fixtures](./plans/2026-04-19-visual-fixtures.prq.md) — Shader + environment visual baseline
+- [Procedural Village](./plans/2026-04-19-procedural-village.prq.md) — Procedural town layout algorithm
+- [v1.0 Beta Release](./plans/2026-04-18-v1.0-beta-release.prq.md) — Prior beta mechanics PRD (still valid for Phase 0–3)
+- [Diegetic HUD](./plans/2026-04-18-diegetic-hud.md) — HUD philosophy (in-world, no chrome)
+- [Koota Migration](./plans/2026-04-18-koota-migration.md) — ECS architecture
+- [Procgen to Authored](./plans/2026-04-18-procgen-to-authored.md) — Asset pipeline migration
+- [Standards & Capacitor](./plans/2026-04-17-standards-and-capacitor.prq.md) — Vite + Capacitor stack hardening
 
-Hard-fail to `ErrorBoundary` → `ErrorOverlay`. No silent fallbacks. Missing textures throw, corrupt saves throw, missing dungeon entrance rooms throw.
+## Acceptance Gate for 1.0
 
-### Content Trove
-
-- 26 monsters, 55 items, 5 encounter tables, 5 loot tables, 40 named NPCs, 21 NPC pools, 19 building archetypes, 6 towns, 25 features, 28 quests, 2 dungeons, 41 encounters — all schema-validated and compiled to `config/game.db` (500 KB) + `config/game-content.json` (268 KB)
-
-## What Is Next (Post-Beta)
-
-### P1 — Content Volume
-
-Expand quest density (target per `content/CONTRIBUTING.md`: 1-2 micro quests per 1,000 road units, 1 meso quest per anchor, macro quests tied to main story chapters). Current trove is schema-valid but sparse in places.
-
-### P2 — Save Slot Picker UI
-
-Save service supports 4 slots (0 auto, 1-3 manual) but the slot picker UI before game start isn't implemented yet. Main menu shows only Continue for the most recent save.
-
-### P3 — Combat Depth
-
-Combat resolver + EncounterSystem are functional but the skill tree isn't wired to combat modifiers yet. Skills JSON exists; needs EncounterSystem hooks.
-
-### P4 — Gear Equip Flow
-
-Weapon/armor GLBs are integrated into inventory but the equip-from-menu flow has no polish pass. Viewmodel swap on equip works in dev; production polish pending.
-
-### P5 — Audio Polish
-
-Ambient layers are defined per-chunk-type via content JSON; dynamic mixing during combat/dialogue is minimal. Needs ducking rules.
-
-## Architecture Status
-
-| Area | Status |
-|------|--------|
-| Zustand → Koota migration | **Complete** (zustand removed from package.json in PR #48) |
-| Procgen appearance → authored GLBs | **Complete** (chibi/face/npc factories deleted) |
-| Canvas textures → Polyhaven PBR | **Complete** (PR #50 / v1.4.0) |
-| IndexedDB saves → Capacitor SQLite | **Complete** |
-| Panel HUD → Diegetic HUD | **Complete** (DiegeticLayer landed in v1.3.0) |
-| Expo/Metro web → Vite+Capacitor | **Complete** |
+**Functional**: New Game → Ashford → Grailsend → ending → credits → 15h content, 3+ external playthroughs  
+**Performance**: Pixel 6a p95 < 33ms, Desktop p95 < 16.6ms, bundle < 2MB (gzipped)  
+**Quality**: Zero P0/P1 bugs, WCAG 2.2 AA accessibility, asset attribution complete  
+**Release**: RC tag, 7-day dogfood, Privacy Policy, Store listing, Changelog reviewed
