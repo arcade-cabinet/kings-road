@@ -21,6 +21,18 @@ import { updateWindowEmissive } from '@/utils/textures';
 const DAY_DURATION = 600.0; // 10 real minutes = 1 game day
 const CLOUD_TEXTURE = assetUrl('/assets/cloud.svg');
 
+/**
+ * Minimum shadow camera far plane (metres). The sun light sits ~100m off the
+ * camera horizontally; a static 180m far plane clipped the mid-field at
+ * dawn/dusk when the sun dropped to Y=10 and the camera-to-light distance
+ * exceeded the plane. Runtime code extends this up to
+ * `SHADOW_CAMERA_FAR_MIN + SHADOW_CAMERA_FAR_SLACK + lightDistExcess`; the
+ * JSX prop below uses this same value as the initial allocation so the two
+ * stay in sync.
+ */
+const SHADOW_CAMERA_FAR_MIN = 180;
+const SHADOW_CAMERA_FAR_SLACK = 60;
+
 // Pre-computed cloud configurations to avoid array index keys.
 // Placed inside the default fogFar=120 ring so clouds actually render —
 // the previous ±180 m horizontal spread fell outside Thornfield's
@@ -96,13 +108,34 @@ export function DayNightCycle() {
 
     // Update sun light — base intensity from biome if available, else default
     if (sunLightRef.current) {
-      sunLightRef.current.position.set(
-        camera.position.x + Math.cos(theta) * 100,
-        Math.max(10, sunY * 100),
-        camera.position.z + Math.sin(theta) * 30,
-      );
+      const sunX = camera.position.x + Math.cos(theta) * 100;
+      const sunYPos = Math.max(10, sunY * 100);
+      const sunZ = camera.position.z + Math.sin(theta) * 30;
+      sunLightRef.current.position.set(sunX, sunYPos, sunZ);
       sunLightRef.current.target.position.copy(camera.position);
       sunLightRef.current.target.updateMatrixWorld();
+
+      // Dynamic shadow frustum far plane — the JSX allocation sets the
+      // initial value to SHADOW_CAMERA_FAR_MIN, which is also the floor
+      // here. At dawn/dusk when the sun drops near the horizon the
+      // camera-to-light distance can exceed that floor (XZ offset stays
+      // ~100m while Y bottoms out at 10m). A clipped far plane makes
+      // objects 30–50m from the player pop in and out of shadow as the
+      // sun sweeps (audit bug #12). Extend to the actual light distance
+      // + slack so the far edge always clears the shadow-receiving area.
+      const dxL = sunX - camera.position.x;
+      const dyL = sunYPos - camera.position.y;
+      const dzL = sunZ - camera.position.z;
+      const lightDist = Math.sqrt(dxL * dxL + dyL * dyL + dzL * dzL);
+      const shadowCam = sunLightRef.current.shadow.camera;
+      const wantedFar = Math.max(
+        SHADOW_CAMERA_FAR_MIN,
+        lightDist + SHADOW_CAMERA_FAR_SLACK,
+      );
+      if (Math.abs(shadowCam.far - wantedFar) > 1) {
+        shadowCam.far = wantedFar;
+        shadowCam.updateProjectionMatrix();
+      }
 
       // BiomeService is synchronously initialized at App module load
       // (see App.tsx), so getCurrentBiome() must return a valid biome here.
@@ -178,7 +211,7 @@ export function DayNightCycle() {
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
         shadow-camera-near={0.5}
-        shadow-camera-far={180}
+        shadow-camera-far={SHADOW_CAMERA_FAR_MIN}
         shadow-camera-left={-60}
         shadow-camera-right={60}
         shadow-camera-top={60}
