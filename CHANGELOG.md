@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.6](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.5...kings-road-v1.5.6) (2026-04-20)
+
+
+### Documentation
+
+* **debug:** correct README — applyDebugSpawn runs in prod ([#172](https://github.com/arcade-cabinet/kings-road/issues/172)) ([1ddf35e](https://github.com/arcade-cabinet/kings-road/commit/1ddf35ea30dd8c5d1ae35260b3a825c18d199130))
+
 ## [1.5.5](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.4...kings-road-v1.5.5) (2026-04-20)
 
 
