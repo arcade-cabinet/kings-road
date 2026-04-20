@@ -60,6 +60,16 @@ export function useRuntimeError(): RuntimeError | null {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
+/**
+ * Non-hook accessor used by the main.tsx crash fallback to decide whether
+ * to render its own `#global-error-overlay`. If the bus has already latched
+ * an error, the App-level `<ErrorOverlay>` is showing it and stacking a
+ * second DOM overlay on top is just visual noise.
+ */
+export function hasReportedError(): boolean {
+  return current !== null;
+}
+
 /** Test-only reset. Do not call from production code. */
 export function unsafe_resetRuntimeError(): void {
   current = null;
