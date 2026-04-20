@@ -581,13 +581,21 @@ export function PauseMenu() {
             Auto-saved
           </div>
 
-          {/* Hint */}
-          <p className="text-center text-yellow-800/50 text-xs tracking-wider mt-2">
-            Press <span className="font-bold text-yellow-800/70">ESC</span> to
-            resume
-          </p>
+          {/* Hint — desktop-only. On touch devices ESC doesn't exist; the
+              resume button above is the canonical way to close the menu. */}
+          {!isTouchDevice() && (
+            <p className="text-center text-yellow-800/50 text-xs tracking-wider mt-2">
+              Press <span className="font-bold text-yellow-800/70">ESC</span> to
+              resume
+            </p>
+          )}
         </div>
       )}
     </div>
   );
+}
+
+function isTouchDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
