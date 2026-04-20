@@ -239,12 +239,21 @@ export function removeGlobalInteractables(list: Interactable[]): void {
 export function getEnvironment() {
   return read(EnvironmentState);
 }
+
+// One in-game hour in real-time ms. DAY_DURATION in Environment.tsx is
+// 600 s (10 real minutes = 1 game day), so 1 game hour = 600/24 = 25 s.
+const TIME_OF_DAY_THROTTLE_MS = (600 / 24) * 1_000; // 25_000 ms
+
 export function setTimeOfDay(time: number): void {
   const e = ensure(EnvironmentState);
   e.set(EnvironmentState, {
     ...e.get(EnvironmentState)!,
     timeOfDay: time % 1,
   });
+  // Throttled — called from DayNightCycle's useFrame every TIME_SYNC_INTERVAL
+  // (2 s); without throttling the debounce resets on every call and never
+  // flushes. One save per in-game hour is granular enough for time-of-day.
+  scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
 }
 export function setCurrentWeather(weather: WeatherState): void {
   const e = ensure(EnvironmentState);
