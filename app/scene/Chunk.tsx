@@ -162,6 +162,29 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
     return [];
   }, [type, biomeConfig, cx, cz, key, oX, oZ, seedPhrase, hasConfigTown, heightSampler]);
 
+  // Settlement signpost — memoized per chunk coords so it doesn't recompute on every render.
+  const signpostElement = useMemo(() => {
+    if (type !== 'TOWN') return null;
+    const spine = loadRoadSpine();
+    const anchorDist = cz * CHUNK_SIZE;
+    const anchor = getAnchorAtDistance(anchorDist, CHUNK_SIZE / 2);
+    if (!anchor) return null;
+    const anchorIndex = spine.anchors.findIndex((a) => a.id === anchor.id);
+    if (anchorIndex === -1) return null;
+    const labels = generateSignpostText(spine.anchors, anchorIndex);
+    // Place the signpost at the chunk's south entrance (low Z edge + offset).
+    const signX = oX + CHUNK_SIZE / 2;
+    const signZ = oZ + SIGNPOST_OFFSET_M;
+    const signY = heightSampler(signX, signZ);
+    return (
+      <SettlementSignpost
+        key={`signpost-${anchor.id}`}
+        position={[signX, signY, signZ]}
+        labels={labels}
+      />
+    );
+  }, [type, cx, cz, oX, oZ, heightSampler]);
+
   // Seeded deterministic gem positions — collectedGems is the collected set, not spawn list.
   const gems = useMemo(() => {
     if (type !== 'DUNGEON') return [];
@@ -234,26 +257,7 @@ export function Chunk({ chunkData, seedPhrase }: ChunkProps) {
         ))}
 
       {/* Settlement signpost — rendered for TOWN chunks that are road-spine anchors */}
-      {type === 'TOWN' && (() => {
-        const spine = loadRoadSpine();
-        const anchorDist = cz * CHUNK_SIZE;
-        const anchor = getAnchorAtDistance(anchorDist, CHUNK_SIZE / 2);
-        if (!anchor) return null;
-        const anchorIndex = spine.anchors.findIndex((a) => a.id === anchor.id);
-        if (anchorIndex === -1) return null;
-        const labels = generateSignpostText(spine.anchors, anchorIndex);
-        // Place the signpost at the chunk's south entrance (low Z edge + offset).
-        const signX = oX + CHUNK_SIZE / 2;
-        const signZ = oZ + SIGNPOST_OFFSET_M;
-        const signY = heightSampler(signX, signZ);
-        return (
-          <SettlementSignpost
-            key={`signpost-${anchor.id}`}
-            position={[signX, signY, signZ]}
-            labels={labels}
-          />
-        );
-      })()}
+      {signpostElement}
 
       {/* NPCs */}
       {npcBlueprints && npcBlueprints.length > 0

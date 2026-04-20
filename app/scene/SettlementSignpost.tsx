@@ -18,7 +18,7 @@
  */
 
 import { useGLTF } from '@react-three/drei';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { assetUrl } from '@/lib/assets';
 import type { SignpostLabels } from '@/world/signpost-text';
@@ -113,31 +113,28 @@ export function SettlementSignpost({
   const glbPath = glbForLabels(labels);
   const gltf = useGLTF(assetUrl(`/assets/${glbPath}`));
 
-  // Dispose canvas textures on unmount via a stable ref.
-  const leftTexRef = useRef<THREE.CanvasTexture | null>(null);
-  const rightTexRef = useRef<THREE.CanvasTexture | null>(null);
-
   const leftTex = useMemo<THREE.CanvasTexture | null>(() => {
-    leftTexRef.current?.dispose();
-    if (!labels.left) {
-      leftTexRef.current = null;
-      return null;
-    }
-    const t = makeArmTexture(labels.left);
-    leftTexRef.current = t;
-    return t;
+    if (!labels.left) return null;
+    return makeArmTexture(labels.left);
   }, [labels.left]);
 
   const rightTex = useMemo<THREE.CanvasTexture | null>(() => {
-    rightTexRef.current?.dispose();
-    if (!labels.right) {
-      rightTexRef.current = null;
-      return null;
-    }
-    const t = makeArmTexture(labels.right);
-    rightTexRef.current = t;
-    return t;
+    if (!labels.right) return null;
+    return makeArmTexture(labels.right);
   }, [labels.right]);
+
+  // Dispose canvas textures when they change or on unmount.
+  useEffect(() => {
+    return () => {
+      leftTex?.dispose();
+    };
+  }, [leftTex]);
+
+  useEffect(() => {
+    return () => {
+      rightTex?.dispose();
+    };
+  }, [rightTex]);
 
   const sceneClone = useMemo(() => {
     const clone = gltf.scene.clone(true);
@@ -165,8 +162,6 @@ export function SettlementSignpost({
         >
           <meshBasicMaterial
             map={leftTex}
-            transparent
-            depthWrite={false}
             side={THREE.DoubleSide}
           />
         </mesh>
@@ -182,8 +177,6 @@ export function SettlementSignpost({
         >
           <meshBasicMaterial
             map={rightTex}
-            transparent
-            depthWrite={false}
             side={THREE.DoubleSide}
           />
         </mesh>
