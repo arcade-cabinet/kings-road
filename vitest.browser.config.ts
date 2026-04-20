@@ -36,7 +36,10 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    include: ['app/**/__tests__/**/*.browser.test.{ts,tsx}'],
+    include: [
+      'app/**/__tests__/**/*.browser.test.{ts,tsx}',
+      'app/**/__tests__/**/*.fixture.test.{ts,tsx}',
+    ],
     fileParallelism: false,
     testTimeout: 30000,
     browser: {

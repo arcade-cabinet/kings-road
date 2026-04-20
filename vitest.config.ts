@@ -21,6 +21,9 @@ export default defineConfig({
       '**/*.ct.{ts,tsx}',
       '**/*.story.{ts,tsx}',
       '**/*.browser.test.{ts,tsx}',
+      // Fixture tests import @vitest/browser/context which only works
+      // in browser mode. They're picked up by vitest.browser.config.ts.
+      '**/*.fixture.test.{ts,tsx}',
     ],
     coverage: {
       provider: 'v8',
