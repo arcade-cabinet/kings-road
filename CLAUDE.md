@@ -76,7 +76,6 @@ src/                        # Logical subpackages (no game/ subdirectory)
 ├── schemas/                # Zod schemas for all content types
 ├── ecs/                    # Koota world, traits, actions
 ├── db/                     # Drizzle ORM schema, DB loader, save service
-├── stores/                 # Zustand stores (game, world, quest, combat, inventory, settings)
 ├── types/                  # Shared TypeScript types
 ├── world/                  # Road spine, pacing engine, dungeon gen, kingdom gen
 ├── factories/              # Building, NPC, monster, chibi-generator factories
@@ -108,7 +107,7 @@ Quest tiers: `macro` (1-2h, must branch), `meso` (15-45min, must branch), `micro
 
 - **Biome** for formatting and linting (not Prettier/ESLint)
 - **Single quotes**, semicolons always, 2-space indent
-- **Koota traits** for new game state (not Zustand). Zustand stores are being migrated — do not add new state to them; see `docs/plans/2026-04-18-koota-migration.md`.
+- **Koota traits** for all game state. Zustand migration is complete — no `src/stores/` directory exists and `zustand` is not a dependency.
 - **`useFrame`** for game logic, never `setInterval`/`setTimeout`
 - **`THREE.InstancedMesh`** for repeated geometry, never individual meshes
 - **Zod `z.infer<typeof Schema>`** for TypeScript types derived from schemas
