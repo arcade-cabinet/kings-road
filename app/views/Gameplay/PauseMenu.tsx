@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as THREE from 'three';
+import { reportRuntimeError } from '@app/runtime-error-bus';
 import {
   listSaveSlots,
   loadFromSlot,
@@ -239,9 +240,25 @@ function SaveGamePage({
   const [saving, setSaving] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
 
-  // Load slot summaries
+  // Load slot summaries. Guarded with a `cancelled` flag so a quick
+  // close of the save menu (unmount before the IndexedDB query resolves)
+  // doesn't trigger a setState-on-unmounted-component warning.
+  // Rejections route through the runtime error bus so a broken save
+  // layer surfaces as an ErrorOverlay instead of a silent empty list
+  // + unhandledrejection in the console.
   useEffect(() => {
-    listSaveSlots().then(setSlots);
+    let cancelled = false;
+    listSaveSlots()
+      .then((s) => {
+        if (!cancelled) setSlots(s);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        reportRuntimeError(err, 'PauseMenu.listSaveSlots');
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const slotMap = new Map(slots.map((s) => [s.slotId, s]));
@@ -339,7 +356,18 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    listSaveSlots().then(setSlots);
+    let cancelled = false;
+    listSaveSlots()
+      .then((s) => {
+        if (!cancelled) setSlots(s);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        reportRuntimeError(err, 'LoadGamePage.listSaveSlots');
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const slotMap = new Map(slots.map((s) => [s.slotId, s]));
