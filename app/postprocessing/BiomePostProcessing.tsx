@@ -15,7 +15,12 @@ import * as THREE from 'three';
 import { BiomeService } from '@/biome';
 import { getPlayer } from '@/ecs/actions/game';
 import { useEnvironment } from '@/ecs/hooks/useGameSession';
+import { GameFlags } from '@/ecs/traits/session-game';
+import { getSessionEntity } from '@/ecs/world';
+import { useTraitEffect } from 'koota/react';
 import type { BiomeConfig } from '@/biome';
+import type { DungeonVignetteState } from './dungeonVignette';
+import { combineDungeonVignette, lerpDungeonVignette } from './dungeonVignette';
 
 /** 0–1 time-of-day → dawn/noon/dusk/night bucket string. */
 function tod(timeOfDay: number): 'dawn' | 'noon' | 'dusk' | 'night' {
@@ -99,6 +104,11 @@ function paramsForBiomeAndTime(
 export function BiomePostProcessing() {
   const { gl, scene, camera, size } = useThree();
   const { timeOfDay } = useEnvironment();
+  // Narrow ref: only re-renders when inDungeon changes, not on isGrounded/isSprinting.
+  const inDungeonRef = useRef(false);
+  useTraitEffect(getSessionEntity(), GameFlags, (flags) => {
+    inDungeonRef.current = flags?.inDungeon ?? false;
+  });
 
   const bloomIntRef = useRef(0.3);
   const bloomThreshRef = useRef(0.8);
@@ -106,6 +116,10 @@ export function BiomePostProcessing() {
   const vigDarkRef = useRef(0.35);
   const chromaRef = useRef(0.0004);
   const noiseRef = useRef(0.04);
+  // Dungeon vignette contribution — lerped independently so transitions are
+  // smooth regardless of biome changes happening at the same time.
+  const dungeonStateRef = useRef<DungeonVignetteState>({ darkness: 0, offset: 0 });
+  const combinedRef = useRef<DungeonVignetteState>({ darkness: 0, offset: 0 });
 
   const pipeline = useMemo(() => {
     // HalfFloatType framebuffer preserves HDR range from the HDRI-lit
@@ -200,10 +214,26 @@ export function BiomePostProcessing() {
     chromaRef.current += (target.chromaticOffset - chromaRef.current) * k;
     noiseRef.current += (target.noiseOpacity - noiseRef.current) * k;
 
+    // Dungeon vignette — lerped separately at TRANSITION_SPEED (~0.4s).
+    // Mutates dungeonStateRef in place — no per-frame allocation.
+    lerpDungeonVignette(dungeonStateRef.current, inDungeonRef.current, delta);
+
+    // Combine biome + dungeon contributions before writing to the effect.
+    // Mutates combinedRef in place — no per-frame allocation.
+    // Health vignette is a separate CSS layer (DiegeticLayer) and always
+    // renders on top of the WebGL canvas — no interaction needed here.
+    combineDungeonVignette(
+      combinedRef.current,
+      vigDarkRef.current,
+      vigOffRef.current,
+      dungeonStateRef.current.darkness,
+      dungeonStateRef.current.offset,
+    );
+
     pipeline.bloom.intensity = bloomIntRef.current;
     pipeline.bloom.luminanceMaterial.threshold = bloomThreshRef.current;
-    pipeline.vignette.offset = vigOffRef.current;
-    pipeline.vignette.darkness = vigDarkRef.current;
+    pipeline.vignette.offset = combinedRef.current.offset;
+    pipeline.vignette.darkness = combinedRef.current.darkness;
     pipeline.chroma.offset.set(chromaRef.current, chromaRef.current);
     pipeline.noise.blendMode.opacity.value = noiseRef.current;
 
