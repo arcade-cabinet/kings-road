@@ -77,6 +77,33 @@ function scheduleFlush(db: SqlJsDatabase): void {
   }, FLUSH_DEBOUNCE_MS);
 }
 
+/**
+ * Flush any pending debounced write immediately. Called when the tab is
+ * about to become hidden/unloaded — without this, closing the tab within
+ * FLUSH_DEBOUNCE_MS of a save loses the write. Browsers guarantee that
+ * IndexedDB transactions opened from `visibilitychange` or `pagehide` run
+ * to completion even after the tab is gone.
+ */
+function flushNow(): void {
+  if (flushTimer === null || !webDb) return;
+  clearTimeout(flushTimer);
+  flushTimer = null;
+  idbSet(IDB_KEY, webDb.export()).catch((err) =>
+    console.warn('[save-db] Immediate flush failed:', err),
+  );
+}
+
+// Wire the flush to tab-lifecycle signals. `visibilitychange→hidden` is the
+// reliable signal across desktop + mobile; `pagehide` catches older Safari.
+// One-time install at module load so every save-db caller benefits without
+// having to register their own listener.
+if (IS_WEB && typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushNow();
+  });
+  window.addEventListener('pagehide', flushNow);
+}
+
 async function openWebDb(): Promise<SqlJsDatabase> {
   if (webDbPromise) return webDbPromise;
   webDbPromise = (async () => {
