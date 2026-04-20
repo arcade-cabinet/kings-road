@@ -239,9 +239,17 @@ function SaveGamePage({
   const [saving, setSaving] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
 
-  // Load slot summaries
+  // Load slot summaries. Guarded with a `cancelled` flag so a quick
+  // close of the save menu (unmount before the IndexedDB query resolves)
+  // doesn't trigger a setState-on-unmounted-component warning.
   useEffect(() => {
-    listSaveSlots().then(setSlots);
+    let cancelled = false;
+    listSaveSlots().then((s) => {
+      if (!cancelled) setSlots(s);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const slotMap = new Map(slots.map((s) => [s.slotId, s]));
@@ -339,7 +347,13 @@ function LoadGamePage({ onBack }: { onBack: () => void }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    listSaveSlots().then(setSlots);
+    let cancelled = false;
+    listSaveSlots().then((s) => {
+      if (!cancelled) setSlots(s);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const slotMap = new Map(slots.map((s) => [s.slotId, s]));
