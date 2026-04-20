@@ -57,6 +57,13 @@ describe('parseSpawnParam', () => {
     const { parseSpawnParam } = await import('./spawn');
     expect(parseSpawnParam()).toBe('thornfield_ruins');
   });
+
+  it('treats ?benchmark=<biome> as an implicit spawn param (task #22)', async () => {
+    window.history.replaceState({}, '', '/?benchmark=thornfield');
+    const { parseSpawnParam, isBenchmarkSpawn } = await import('./spawn');
+    expect(parseSpawnParam()).toBe('thornfield');
+    expect(isBenchmarkSpawn()).toBe(true);
+  });
 });
 
 describe('applyDebugSpawn', () => {
@@ -116,6 +123,27 @@ describe('applyDebugSpawn', () => {
     expect(gameMod.startGame).toHaveBeenCalledWith(
       'debug-thornfield-seed',
       expect.objectContaining({ x: 6052, z: 12078 }),
+      0,
+    );
+  });
+
+  it('pins the player to (2, 1.6, 24) when ?benchmark=<biome> is active', async () => {
+    window.history.replaceState({}, '', '/?benchmark=thornfield');
+    const gameMod = await import('@/ecs/actions/game');
+    const { applyDebugSpawn, BENCHMARK_SPAWN_POSITION } = await import(
+      './spawn'
+    );
+
+    expect(applyDebugSpawn()).toBe(true);
+    for (let i = 0; i < 5; i++) await Promise.resolve();
+
+    expect(gameMod.startGame).toHaveBeenCalledWith(
+      'debug-thornfield-seed',
+      expect.objectContaining({
+        x: BENCHMARK_SPAWN_POSITION.x,
+        y: BENCHMARK_SPAWN_POSITION.y,
+        z: BENCHMARK_SPAWN_POSITION.z,
+      }),
       0,
     );
   });

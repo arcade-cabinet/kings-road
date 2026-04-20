@@ -3,6 +3,7 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import { Suspense, useLayoutEffect } from 'react';
 import * as THREE from 'three';
+import { BenchmarkHUD, BenchmarkRunner, parseBenchParam } from '@/benchmark';
 import { BloodMetaballsEffect, ImpactDeformerEffect } from './combat';
 import { CombatParticles } from './CombatParticles';
 import { DungeonRenderer } from './DungeonRenderer';
@@ -120,6 +121,11 @@ function SceneContent() {
           {/* First-person viewmodel — renders the equipped weapon */}
           <FPSViewmodel />
 
+          {/* Benchmark harness — observer-only; mounts only when
+              `?bench=<route>` or `?benchmark=<biome>` is present. No render
+              cost outside benchmark runs (parseBenchParam() returns null). */}
+          {parseBenchParam() && <BenchmarkRunner />}
+
           {/*
             Biome-driven post-processing — bloom, chroma aberration,
             vignette, ACES tone mapping. Uses the raw `postprocessing`
@@ -190,6 +196,10 @@ export function GameScene() {
           <Preload all />
         </Suspense>
       </Canvas>
+
+      {/* Benchmark HUD — fixed-position overlay outside Canvas. No-op when
+          no benchmark param is active. */}
+      <BenchmarkHUD />
 
       {/* Loading indicator */}
       <Loader

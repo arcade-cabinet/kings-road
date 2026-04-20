@@ -40,6 +40,16 @@ function walkScript(durationSeconds: number): ScriptedEvent[] {
 
 export const BENCHMARK_ROUTES: BenchmarkRoute[] = [
   {
+    // Task #22: deterministic forward-flight benchmark — the route
+    // targeted by the ?benchmark=thornfield alias. Pure observer of a
+    // scene-wide forward walk from spawn (2, 1.6, 24).
+    id: 'walk-thornfield-forward',
+    label: 'Thornfield forward flight (60s, deterministic)',
+    spawnBiome: 'thornfield',
+    durationSeconds: 60,
+    script: [{ t: 0, frame: { moveZ: 1 } }],
+  },
+  {
     id: 'walk-village-perimeter',
     label: 'Walk village perimeter (60s)',
     spawnBiome: 'thornfield',

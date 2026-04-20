@@ -50,4 +50,31 @@ describe('BenchmarkCapture', () => {
     expect(summary.peakDrawCalls).toBe(42);
     expect(summary.peakTriangles).toBe(9999);
   });
+
+  it('reports avg draw/triangle/texture counts + frame-time percentiles', () => {
+    const cap = new BenchmarkCapture('test-route');
+    cap.sample(fakeInfo); // baseline
+    // Push 10 samples so the p50/p95/p99 indices all resolve to distinct rows.
+    for (let i = 0; i < 10; i++) {
+      cap.sample({
+        render: { calls: 10 + i, triangles: 1000 + i * 100 },
+        memory: { geometries: 1, textures: 4 + i },
+      });
+    }
+    const summary = cap.finish();
+    expect(summary.frameCount).toBe(10);
+    // avg = arithmetic mean over real frames (calls 10..19 = mean 14.5)
+    expect(summary.avgDrawCalls).toBeCloseTo(14.5, 5);
+    expect(summary.avgTriangles).toBeCloseTo(1450, 0);
+    // textures 4..13 = mean 8.5
+    expect(summary.avgTextures).toBeCloseTo(8.5, 5);
+    // frame-time percentiles are finite + non-negative
+    expect(summary.p50FrameTimeMs).toBeGreaterThanOrEqual(0);
+    expect(summary.p95FrameTimeMs).toBeGreaterThanOrEqual(
+      summary.p50FrameTimeMs,
+    );
+    expect(summary.p99FrameTimeMs).toBeGreaterThanOrEqual(
+      summary.p95FrameTimeMs,
+    );
+  });
 });
