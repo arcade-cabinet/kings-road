@@ -156,7 +156,7 @@ function runPlaytest(seed: string) {
 
     for (const [tx, ty] of tilesToCheck) {
       const tile = getKingdomTile(map, tx, ty);
-      if (!tile || !tile.isLand) continue;
+      if (!tile?.isLand) continue;
       const nearSettlement = getSettlementAt(map, tx, ty, 2);
       if (nearSettlement) continue;
 

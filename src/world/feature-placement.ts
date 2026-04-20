@@ -447,8 +447,7 @@ export function generateFeaturePlacementsWithDensity(
       for (let x = minX; x <= maxX; x++) {
         const idx = y * map.width + x;
         const tile = map.tiles[idx];
-        if (!tile || !tile.isLand || tile.hasRoad || settlementTiles.has(idx))
-          continue;
+        if (!tile?.isLand || tile.hasRoad || settlementTiles.has(idx)) continue;
         candidates.push([x, y]);
       }
     }
