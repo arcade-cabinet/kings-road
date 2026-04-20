@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '@/lib/configure-gltf';
 import App from './App.tsx';
+import { hasReportedError } from './runtime-error-bus';
 import '@/index.css';
 
 // Dev-only playtesting console: window.__DEV__
@@ -12,16 +13,29 @@ if (import.meta.env.DEV) {
 }
 
 /**
- * Global error handlers — catch anything that escapes React error boundaries.
- * Renders a standalone error overlay into a dedicated DOM node so errors
- * are ALWAYS visible, never swallowed.
+ * Crash-level global error fallback — renders a standalone error overlay
+ * into a dedicated DOM node outside the React root so errors are ALWAYS
+ * visible even if React itself is wedged.
+ *
+ * App.tsx registers its own `window.error` / `unhandledrejection` listeners
+ * earlier in module-eval order (imported from this file at line 4), so they
+ * fire first and latch the runtime-error-bus. This fallback skips when the
+ * bus already has an error — the App-level `<ErrorOverlay>` inside the React
+ * tree handles it with richer styling. This fallback only kicks in when the
+ * App-level listener couldn't latch (bus module failed to load, React root
+ * never mounted, etc.).
  */
 function showGlobalError(error: Error | string, source: string) {
   console.error(`[GlobalError:${source}]`, error);
 
+  // App.tsx's listener ran first and the runtime-error-bus has latched —
+  // the App-level ErrorOverlay will render inside the React tree.
+  if (hasReportedError()) return;
+
   const errorObj = typeof error === 'string' ? new Error(error) : error;
 
-  // If there's already an error overlay, don't stack them
+  // Still guard against multiple DOM overlays from repeated throws in the
+  // same tick while the React tree is actually down.
   if (document.getElementById('global-error-overlay')) return;
 
   const container = document.createElement('div');
