@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.10](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.9...kings-road-v1.5.10) (2026-04-20)
+
+
+### Fixed
+
+* **deps:** align jsdom specifier with lockfile to fix frozen-install drift ([#196](https://github.com/arcade-cabinet/kings-road/issues/196)) ([4be12e4](https://github.com/arcade-cabinet/kings-road/commit/4be12e407b446951d69e516d272df1a23eb01ad4))
+
 ## [1.5.9](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.8...kings-road-v1.5.9) (2026-04-20)
 
 
