@@ -16,7 +16,7 @@ export interface InputFrame {
   lookDeltaY: number; // pitch
 
   // Actions (binary, combined across all providers via OR)
-  interact: boolean; // E / A button / tap — talk to NPC, pick up item, attack in combat
+  interact: boolean; // E / A button / tap — talk to NPC, pick up item (NOT attack; use `attack`)
   sprint: boolean; // Shift / LS click / joystick full-tilt
   jump: boolean; // Space / A button
   pause: boolean; // Escape / Start button
