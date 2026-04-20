@@ -12,6 +12,75 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.4.0...kings-road-v1.5.0) (2026-04-20)
+
+
+### Added
+
+* **benchmark:** automated route runner + capture + Playwright CI (task [#20](https://github.com/arcade-cabinet/kings-road/issues/20)) ([#70](https://github.com/arcade-cabinet/kings-road/issues/70)) ([0c17c08](https://github.com/arcade-cabinet/kings-road/commit/0c17c08d4925024011e1a4634c7f9ac2b4d59104))
+* **benchmark:** Thornfield performance harness (task [#22](https://github.com/arcade-cabinet/kings-road/issues/22)) ([#148](https://github.com/arcade-cabinet/kings-road/issues/148)) ([d1bf784](https://github.com/arcade-cabinet/kings-road/commit/d1bf784c0fdd88b5f68e843bb575ffbf7116dd3e))
+* **biome:** scaffold src/biome/ Layer-2a package ([#60](https://github.com/arcade-cabinet/kings-road/issues/60)) ([7425e77](https://github.com/arcade-cabinet/kings-road/commit/7425e77bd9c2778cd83e01006da569c6da361551))
+* **ci:** package boundary enforcement ([#65](https://github.com/arcade-cabinet/kings-road/issues/65)) ([c7541bb](https://github.com/arcade-cabinet/kings-road/commit/c7541bbe45e84f3f3104ed41325eabc06fe10564))
+* **composition/ruins:** Thornfield dead-town compositor + 33 ruin assets ([#61](https://github.com/arcade-cabinet/kings-road/issues/61)) ([bcb0cd8](https://github.com/arcade-cabinet/kings-road/commit/bcb0cd8198993a4ef3cd96890690cca6eb9fdd9d))
+* **composition/story-props:** narrative seed-layer compositor, 8 archetypes ([#63](https://github.com/arcade-cabinet/kings-road/issues/63)) ([b9d69ac](https://github.com/arcade-cabinet/kings-road/commit/b9d69aca4c15fc7394f10aa9f072ab97180b8034))
+* **composition:** dungeon-kit compositor — Layer-3 modular dungeon composer ([#71](https://github.com/arcade-cabinet/kings-road/issues/71)) ([5a4cdd9](https://github.com/arcade-cabinet/kings-road/commit/5a4cdd984a3779ce267b4320f1e927232ad62e45))
+* **composition:** vegetation compositor — biome-aware Poisson-disk foliage placement ([#74](https://github.com/arcade-cabinet/kings-road/issues/74)) ([2bfaf9e](https://github.com/arcade-cabinet/kings-road/commit/2bfaf9e1d3541594e96073ef9d0571dd28660ebe))
+* **content:** Thornfield biome — 15 PBR + 2 HDRIs + palette + config (task [#6](https://github.com/arcade-cabinet/kings-road/issues/6)) ([#80](https://github.com/arcade-cabinet/kings-road/issues/80)) ([a2d6418](https://github.com/arcade-cabinet/kings-road/commit/a2d641815c6edf3812499345b3f2b31fc535c071))
+* **core:** scaffold src/core/ Layer-0 package ([#57](https://github.com/arcade-cabinet/kings-road/issues/57)) ([fe4bd7d](https://github.com/arcade-cabinet/kings-road/commit/fe4bd7daa46c13e726fb6c89906e3bc9194d9f67))
+* **debug:** src/debug/ — spawn override + live-fire helpers (task [#8](https://github.com/arcade-cabinet/kings-road/issues/8)) ([#66](https://github.com/arcade-cabinet/kings-road/issues/66)) ([e248adf](https://github.com/arcade-cabinet/kings-road/commit/e248adf2cd9b21793eba440c1ca34e123c400583))
+* **errors:** runtime error bus + remove silent fallbacks ([#144](https://github.com/arcade-cabinet/kings-road/issues/144)) ([c2c3806](https://github.com/arcade-cabinet/kings-road/commit/c2c3806603dc430c511a7206baef5a11f01e4a94))
+* **fixtures:** Phase A+B1 — FixtureStage + weapons + ruins visual tests ([#150](https://github.com/arcade-cabinet/kings-road/issues/150)) ([135d998](https://github.com/arcade-cabinet/kings-road/commit/135d998af53c6d31f88854bb43c6faa1bdd4dbc1))
+* **hud:** concrete functional HUD + recenter FPS viewmodel for mobile ([#102](https://github.com/arcade-cabinet/kings-road/issues/102)) ([d038ecc](https://github.com/arcade-cabinet/kings-road/commit/d038ecc3c03d71d93cb6fbdf6fd7bd5860aab268))
+* **pages:** default Thornfield spawn + post-processing on GH Pages ([#97](https://github.com/arcade-cabinet/kings-road/issues/97)) ([244dfa3](https://github.com/arcade-cabinet/kings-road/commit/244dfa31bd6ddda3531ee222ac6faa28e95decbc))
+* **scene/dungeon:** kit renderer + AccumulativeShadows + bake (task [#15](https://github.com/arcade-cabinet/kings-road/issues/15)) ([#84](https://github.com/arcade-cabinet/kings-road/issues/84)) ([93ed17d](https://github.com/arcade-cabinet/kings-road/commit/93ed17d8327993c0e80c27cf21994479717ed6ba))
+* **scene/environment:** HDRI IBL + biome-driven sky (task [#14](https://github.com/arcade-cabinet/kings-road/issues/14)) ([#79](https://github.com/arcade-cabinet/kings-road/issues/79)) ([afa9b32](https://github.com/arcade-cabinet/kings-road/commit/afa9b32554d25cc0c857545172ed5d4933819873))
+* **scene/terrain:** TerrainChunk + SplatBlendMaterial (task [#13](https://github.com/arcade-cabinet/kings-road/issues/13)) ([#85](https://github.com/arcade-cabinet/kings-road/issues/85)) ([5ba62b9](https://github.com/arcade-cabinet/kings-road/commit/5ba62b96072ebe1103ddc613530c87b42d89185f))
+* **scene:** rewire Chunk.tsx to consume composition output (task [#16](https://github.com/arcade-cabinet/kings-road/issues/16)) ([#89](https://github.com/arcade-cabinet/kings-road/issues/89)) ([79945b0](https://github.com/arcade-cabinet/kings-road/commit/79945b026b3922dce4ff9a3db5f44a19424736db))
+* VFX pipeline — SDF combat effects, biome postprocessing, mobile perf guard ([#17](https://github.com/arcade-cabinet/kings-road/issues/17)+[#18](https://github.com/arcade-cabinet/kings-road/issues/18)+[#19](https://github.com/arcade-cabinet/kings-road/issues/19)) ([#86](https://github.com/arcade-cabinet/kings-road/issues/86)) ([2029fd0](https://github.com/arcade-cabinet/kings-road/commit/2029fd0ffbf9c75f14d9c744ab30025059b367fa))
+* **village:** Phase A — authored village parts catalog + schema ([#147](https://github.com/arcade-cabinet/kings-road/issues/147)) ([361924b](https://github.com/arcade-cabinet/kings-road/commit/361924bf4351f79ebe23243977401a690859e013))
+* **village:** Phase B — procedural composer + Chunk integration ([#151](https://github.com/arcade-cabinet/kings-road/issues/151)) ([25646a6](https://github.com/arcade-cabinet/kings-road/commit/25646a6b4a35f262e07c957d7715cd571303bf84))
+* **world/terrain:** heightmap loader + displaced geometry + splat-map (task [#7](https://github.com/arcade-cabinet/kings-road/issues/7)) ([#68](https://github.com/arcade-cabinet/kings-road/issues/68)) ([50d89b0](https://github.com/arcade-cabinet/kings-road/commit/50d89b05cc7ac9761087c6417e92c8fe382df09e))
+
+
+### Fixed
+
+* **assets:** harden loader + ingest scripts against traversal and concurrent loads ([#87](https://github.com/arcade-cabinet/kings-road/issues/87)) ([5a62669](https://github.com/arcade-cabinet/kings-road/commit/5a6266982b18e67b8d1f97e070c794c7dead2a7f))
+* **assets:** ingest whole pack dirs, AmbientCG native filenames ([#67](https://github.com/arcade-cabinet/kings-road/issues/67)) ([be71fd6](https://github.com/arcade-cabinet/kings-road/commit/be71fd68a2f5899bc3bff28d4e0aa194203a4847))
+* auto-persist quest progress ([#20](https://github.com/arcade-cabinet/kings-road/issues/20)) ([#154](https://github.com/arcade-cabinet/kings-road/issues/154)) ([e885333](https://github.com/arcade-cabinet/kings-road/commit/e88533323a8842b7c1faf3c13b5319e5d5c36fca))
+* **benchmark:** use settlement-relative spawn so scene actually renders ([#149](https://github.com/arcade-cabinet/kings-road/issues/149)) ([ff2c5f3](https://github.com/arcade-cabinet/kings-road/commit/ff2c5f335461a0a7756bfc6cd9d076f0701a4ef6))
+* **biome:** schema cross-validation + same-biome short-circuit + ChunkRoleTag rename ([#91](https://github.com/arcade-cabinet/kings-road/issues/91)) ([1beb43c](https://github.com/arcade-cabinet/kings-road/commit/1beb43cdaf511767887851de415c2bccc576b246))
+* **ci:** actually run browser tests — install playwright, fail on errors ([#145](https://github.com/arcade-cabinet/kings-road/issues/145)) ([6462447](https://github.com/arcade-cabinet/kings-road/commit/6462447beda31e7b01625a5c60e4193fbba4ab4f))
+* **db:** replace jeep-sqlite web path with sql.js, fix wasm LinkError ([#92](https://github.com/arcade-cabinet/kings-road/issues/92)) ([8535d50](https://github.com/arcade-cabinet/kings-road/commit/8535d50a92232ea628d63e147a2de813dae8b317))
+* **debug:** load content DB + generate kingdom in applyDebugSpawn ([#95](https://github.com/arcade-cabinet/kings-road/issues/95)) ([4477c29](https://github.com/arcade-cabinet/kings-road/commit/4477c29c9c1460addb06ce91625f088bbaaa5636))
+* **dungeon:** dark background when inDungeon so sky-blue doesn't flash through ([#104](https://github.com/arcade-cabinet/kings-road/issues/104)) ([3bef4f9](https://github.com/arcade-cabinet/kings-road/commit/3bef4f95e641dcefc4d444e20934ad7f9d4b34a9))
+* **env:** wire fog to biome config ([#106](https://github.com/arcade-cabinet/kings-road/issues/106)) ([6f066db](https://github.com/arcade-cabinet/kings-road/commit/6f066dbe8f18d7d5f5b432eae2b1911567eaf179))
+* fog decay + benchmark sampler priority ([#152](https://github.com/arcade-cabinet/kings-road/issues/152)) ([7d119c6](https://github.com/arcade-cabinet/kings-road/commit/7d119c6f8ccf242dfc4ab1dd3135aff6e9a7c16d))
+* gate sword swings on forward-cone hit test ([#19](https://github.com/arcade-cabinet/kings-road/issues/19)) ([#155](https://github.com/arcade-cabinet/kings-road/issues/155)) ([f515d8e](https://github.com/arcade-cabinet/kings-road/commit/f515d8e361a17ed8c2462da28c732a7f86fe41a2))
+* **gltf:** disable frustum culling on InstancedMesh so grass actually renders ([#117](https://github.com/arcade-cabinet/kings-road/issues/117)) ([e66f7d4](https://github.com/arcade-cabinet/kings-road/commit/e66f7d475458b7342c483e46b8786d75a1ca6e9c))
+* **gltf:** duck-type MeshStandardMaterial check so tint actually fires ([#114](https://github.com/arcade-cabinet/kings-road/issues/114)) ([846d3d3](https://github.com/arcade-cabinet/kings-road/commit/846d3d38a067ea4010f9d353a077bf4ab6015e08))
+* **gltf:** set InstancedMesh.frustumCulled imperatively in useEffect ([#118](https://github.com/arcade-cabinet/kings-road/issues/118)) ([d3b3be4](https://github.com/arcade-cabinet/kings-road/commit/d3b3be4879d225c263ec9d51967e09419b6e1329))
+* **lint:** biome organize-imports + formatting in ruins/compose ([#93](https://github.com/arcade-cabinet/kings-road/issues/93)) ([0155818](https://github.com/arcade-cabinet/kings-road/commit/01558184a3e246037529fb4140f7a7e0cadc7a93))
+* **pages:** disable post-processing until render-loop interaction is resolved ([#99](https://github.com/arcade-cabinet/kings-road/issues/99)) ([67389f1](https://github.com/arcade-cabinet/kings-road/commit/67389f1f2f1be2c8fcade48783497abb626d3e40))
+* **pbr:** AO + displacement maps now actually affect the render ([#146](https://github.com/arcade-cabinet/kings-road/issues/146)) ([d91c048](https://github.com/arcade-cabinet/kings-road/commit/d91c048c641c4c14e25f3431e669e8676bc72967))
+* **player:** correct the inverted right-vector so strafe goes the right way ([#101](https://github.com/arcade-cabinet/kings-road/issues/101)) ([356481f](https://github.com/arcade-cabinet/kings-road/commit/356481f23afe75953fb3348a7e1c92ce29cfac36))
+* **postprocessing:** bypass @react-three/postprocessing to stop JSON cycle crash ([#98](https://github.com/arcade-cabinet/kings-road/issues/98)) ([dcbfce3](https://github.com/arcade-cabinet/kings-road/commit/dcbfce388115701ccb6646d29e9ae7e561156d8a))
+* **road:** stop floating + bind PBR material instead of flat colour ([#100](https://github.com/arcade-cabinet/kings-road/issues/100)) ([1b14180](https://github.com/arcade-cabinet/kings-road/commit/1b14180ee93a7126b6de8cf3c8d35c58445703b7))
+* **ruins:** scale ruin assets + denser placement for Thornfield ([#109](https://github.com/arcade-cabinet/kings-road/issues/109)) ([3ad7f85](https://github.com/arcade-cabinet/kings-road/commit/3ad7f85f018cf5a38d8556372bf5f007c6f9a925))
+* **scene+hud:** scale foliage, orient sword, add HUD frame ([#108](https://github.com/arcade-cabinet/kings-road/issues/108)) ([9c5ce86](https://github.com/arcade-cabinet/kings-road/commit/9c5ce866dbd3adb13ca59ec88990c0fb989fb04d))
+* **scripts:** replace top-level file loop with fs.cpSync in ingest scripts ([#83](https://github.com/arcade-cabinet/kings-road/issues/83)) ([62182a7](https://github.com/arcade-cabinet/kings-road/commit/62182a788669bc8e5cfb86f07424c738cc10989a))
+* task [#21](https://github.com/arcade-cabinet/kings-road/issues/21) integration blockers — unreferenced assets + postprocessing crash + spawn wiring ([#94](https://github.com/arcade-cabinet/kings-road/issues/94)) ([a0a8273](https://github.com/arcade-cabinet/kings-road/commit/a0a8273ea39af2400fb39622174f8dc96442e30c))
+* **terrain:** correct MAX_TERRAIN_HEIGHT to match rendered displacement ([#107](https://github.com/arcade-cabinet/kings-road/issues/107)) ([54f1796](https://github.com/arcade-cabinet/kings-road/commit/54f17968e1b663ceec33dc077fc7e09ef06f0159))
+* **thornfield:** land PBR + shader + spawn + viewmodel fixes for visible world ([#96](https://github.com/arcade-cabinet/kings-road/issues/96)) ([42f261a](https://github.com/arcade-cabinet/kings-road/commit/42f261a211c1bb28b3ef5fd4815837ff6a3a0a12))
+
+
+### Documentation
+
+* asset size budget + CI gate (100 MB baked-in ceiling) ([#76](https://github.com/arcade-cabinet/kings-road/issues/76)) ([e026ce5](https://github.com/arcade-cabinet/kings-road/commit/e026ce5560677ee5babe4bcbd9448652a550ce5d))
+* PBR Material Standard + Thornfield curation picks ([#72](https://github.com/arcade-cabinet/kings-road/issues/72)) ([74a068f](https://github.com/arcade-cabinet/kings-road/commit/74a068fe158566e87f3894333d86cfd414988736))
+* refresh STATE + ARCHITECTURE post-v1.4.0, archive asset-inventory ([#52](https://github.com/arcade-cabinet/kings-road/issues/52)) ([85e58ee](https://github.com/arcade-cabinet/kings-road/commit/85e58ee0d4a164b888b3868fa0fa9d1f852a0bfa))
+* refresh visual-bugs.md post-v1.4.0 ([#54](https://github.com/arcade-cabinet/kings-road/issues/54)) ([77d7081](https://github.com/arcade-cabinet/kings-road/commit/77d70810136a9fabde74d3f1fc06a73f74d8479b))
+* rewrite ASSET_SIZE_BUDGET around per-chunk resident memory ([#82](https://github.com/arcade-cabinet/kings-road/issues/82)) ([c00ea09](https://github.com/arcade-cabinet/kings-road/commit/c00ea090576ff889f968edf9057308c4bffc4a8e))
+
 ## [1.4.0](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.3.0...kings-road-v1.4.0) (2026-04-18)
 
 
