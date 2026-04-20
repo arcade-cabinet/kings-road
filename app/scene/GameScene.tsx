@@ -9,6 +9,7 @@ import { CombatParticles } from './CombatParticles';
 import { DungeonRenderer } from './DungeonRenderer';
 import { EnvironmentIBL } from './environment';
 import { FPSViewmodel } from './FPSViewmodel';
+import { MileMarkers } from './MileMarkers';
 import { OceanPlane } from './OceanPlane';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { BiomePostProcessing } from '@app/postprocessing';
@@ -97,6 +98,9 @@ function SceneContent() {
               {/* World */}
               <OceanPlane />
               <ChunkManager />
+              <Suspense fallback={null}>
+                <MileMarkers />
+              </Suspense>
 
               {/* Overworld-only systems */}
               <InteractionSystem />
