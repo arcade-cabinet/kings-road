@@ -1,5 +1,5 @@
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { WaterConfig } from '@/shaders/gerstner-water';
 import { createWaterMaterial } from '@/shaders/gerstner-water';
@@ -51,6 +51,17 @@ export function OceanPlane() {
       ),
     [],
   );
+
+  // Dispose GPU resources on unmount. `useMemo` created them without a
+  // dispose path; when the player ends a session and starts a new game,
+  // R3F unmounts this component but PlaneGeometry + ShaderMaterial leak
+  // unless we release them explicitly.
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+      waterMaterial.dispose();
+    };
+  }, [geometry, waterMaterial]);
 
   useFrame((_, delta) => {
     // Animate waves
