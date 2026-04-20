@@ -604,10 +604,7 @@ function formatIndexSummary(index: IdIndex): string {
  *     quest reward, encounter reward, or loot table entry. Item authors
  *     commonly forget to wire newly-added items into a drop path.
  */
-function collectWarnings(
-  contentDir: string,
-  index: IdIndex,
-): string[] {
+function collectWarnings(contentDir: string, index: IdIndex): string[] {
   const warnings: string[] = [];
 
   // Collect every item ID referenced anywhere in the trove. Walks the
@@ -724,9 +721,7 @@ function main() {
   const totalErrors = schemaErrors + xrefErrors.length;
   const strictFail = strict && warnings.length > 0;
   if (strictFail) {
-    console.log(
-      '\x1b[33m--strict mode: treating warnings as errors\x1b[0m',
-    );
+    console.log('\x1b[33m--strict mode: treating warnings as errors\x1b[0m');
   }
   process.exit(totalErrors > 0 || strictFail ? 1 : 0);
 }
