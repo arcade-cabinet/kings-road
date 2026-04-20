@@ -132,6 +132,17 @@ function DungeonRoomMesh({
     return mat;
   }, [roomColor]);
 
+  // Release the per-room wall material clone on unmount or when the
+  // memoized material changes (e.g. roomColor shifts). React fires the
+  // cleanup with the *previous* `tintedWallMaterial` captured in scope,
+  // so both swap and unmount are handled in one effect. The module-level
+  // `wallMaterial` is shared across rooms and is NOT disposed here.
+  useEffect(() => {
+    return () => {
+      tintedWallMaterial.dispose();
+    };
+  }, [tintedWallMaterial]);
+
   const halfSize = ROOM_SIZE / 2;
 
   // Only render current room and adjacent rooms for performance
