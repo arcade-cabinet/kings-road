@@ -247,14 +247,24 @@ export function collectGem(chunkKey: string, gemId: number): void {
   const es = ensure(EnvironmentState);
   const chunk = cs.get(ChunkState)!;
   const env = es.get(EnvironmentState)!;
+  // Idempotency guard. The Relic component's useFrame proximity check
+  // can fire before React has flushed `setIsCollected(true)`, so the
+  // same (chunkKey, gemId) may arrive here twice in back-to-back
+  // frames. Without this guard we'd double-increment gemsCollected
+  // and schedule a redundant autosave — and since `gems` tracks
+  // collected ids as a set-like array, the second write is a no-op
+  // that still bumps the counter.
+  const existing = chunk.chunkDeltas[chunkKey]?.gems ?? [];
+  if (existing.includes(gemId)) return;
+
   const deltas = { ...chunk.chunkDeltas };
-  if (!deltas[chunkKey]) deltas[chunkKey] = { gems: [] };
-  if (!deltas[chunkKey].gems.includes(gemId)) deltas[chunkKey].gems.push(gemId);
+  deltas[chunkKey] = { gems: [...existing, gemId] };
   cs.set(ChunkState, { ...chunk, chunkDeltas: deltas });
   es.set(EnvironmentState, { ...env, gemsCollected: env.gemsCollected + 1 });
-  // Durable mutation — without scheduling an autosave, picking up a relic
-  // and then refreshing the tab resurrects it. Same pattern as quest
-  // progress in src/ecs/actions/quest.ts (#154).
+  // Durable mutation — without scheduling an autosave, picking up a
+  // relic (aka a `gem` in the chunkDeltas schema) and then refreshing
+  // the tab resurrects it. Same pattern as quest progress in
+  // src/ecs/actions/quest.ts (#154).
   scheduleAutoSave();
 }
 
