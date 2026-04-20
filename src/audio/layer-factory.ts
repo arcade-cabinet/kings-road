@@ -14,6 +14,13 @@ export interface AudioLayer {
   gain: Tone.Gain;
   start: () => void;
   stop: () => void;
+  /**
+   * Release every Tone node this layer owns. `stop()` only halts the
+   * source's clock; without this, Filter/Tremolo/FMSynth nodes stay
+   * connected to the AudioContext graph and leak for the tab's
+   * lifetime. Callers must invoke this on teardown.
+   */
+  dispose: () => void;
 }
 
 export function createWindLayer(): AudioLayer {
@@ -28,6 +35,11 @@ export function createWindLayer(): AudioLayer {
     gain,
     start: () => noise.start(),
     stop: () => noise.stop(),
+    dispose: () => {
+      noise.dispose();
+      filter.dispose();
+      gain.dispose();
+    },
   };
 }
 
@@ -63,7 +75,18 @@ export function createBirdsLayer(): AudioLayer {
       );
     },
     stop: () => {
-      if (intervalId) clearInterval(intervalId);
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    },
+    dispose: () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      synth.dispose();
+      gain.dispose();
     },
   };
 }
@@ -80,6 +103,11 @@ export function createInsectsLayer(): AudioLayer {
     gain,
     start: () => noise.start(),
     stop: () => noise.stop(),
+    dispose: () => {
+      noise.dispose();
+      filter.dispose();
+      gain.dispose();
+    },
   };
 }
 
@@ -95,6 +123,11 @@ export function createCricketsLayer(): AudioLayer {
     gain,
     start: () => osc.start(),
     stop: () => osc.stop(),
+    dispose: () => {
+      osc.dispose();
+      tremolo.dispose();
+      gain.dispose();
+    },
   };
 }
 
@@ -110,6 +143,11 @@ export function createWaterLayer(): AudioLayer {
     gain,
     start: () => noise.start(),
     stop: () => noise.stop(),
+    dispose: () => {
+      noise.dispose();
+      filter.dispose();
+      gain.dispose();
+    },
   };
 }
 
@@ -125,6 +163,11 @@ export function createVegetationLayer(): AudioLayer {
     gain,
     start: () => noise.start(),
     stop: () => noise.stop(),
+    dispose: () => {
+      noise.dispose();
+      filter.dispose();
+      gain.dispose();
+    },
   };
 }
 
