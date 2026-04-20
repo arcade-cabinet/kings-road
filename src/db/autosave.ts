@@ -92,11 +92,16 @@ export function scheduleAutoSave(): void {
  *   - Subsequent calls within the window → no-op
  *   - Window expires → next call fires again
  */
-export function scheduleAutoSaveThrottled(
-  key: string,
-  windowMs: number,
-): void {
+export function scheduleAutoSaveThrottled(key: string, windowMs: number): void {
   if (suppressCount > 0 || provider === null) return;
+  // Guard against NaN/non-finite/negative windows — a 0ms or negative
+  // window would make the throttle ineffective (every call passes), which
+  // would reintroduce the per-frame footgun this wrapper exists to prevent.
+  if (!Number.isFinite(windowMs) || windowMs <= 0) {
+    throw new Error(
+      `scheduleAutoSaveThrottled: windowMs must be a positive finite number, got ${windowMs}`,
+    );
+  }
   const now = Date.now();
   const last = throttleLastFiredAt.get(key);
   if (last !== undefined && now - last < windowMs) return;
@@ -123,7 +128,12 @@ export function cancelPendingAutoSave(): void {
   }
 }
 
-/** Reset all throttle keys. Test helper; also used on game reset. */
+/**
+ * Reset all throttle keys. Called from `resetGame()` so a new session
+ * starts with fresh throttle windows (otherwise a late-session throttle
+ * entry could suppress an autosave on the first seconds of the next
+ * session). Also used by tests.
+ */
 export function resetAutoSaveThrottle(): void {
   throttleLastFiredAt.clear();
 }

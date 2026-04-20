@@ -8,7 +8,11 @@
 
 import type { Entity, Trait } from 'koota';
 import type * as THREE from 'three';
-import { scheduleAutoSave, scheduleAutoSaveThrottled } from '@/db/autosave';
+import {
+  resetAutoSaveThrottle,
+  scheduleAutoSave,
+  scheduleAutoSaveThrottled,
+} from '@/db/autosave';
 import {
   type ActiveDungeon,
   CameraState,
@@ -478,6 +482,10 @@ export function resetGame(): void {
   });
   const pt = ensure(PlayTime);
   pt.set(PlayTime, { playTimeSeconds: 0 });
+  // Clear any stale throttle windows so the new session's first
+  // health/stamina/time-of-day tick isn't suppressed by a leftover
+  // timestamp from the previous session.
+  resetAutoSaveThrottle();
 }
 
 export function startGame(
