@@ -220,15 +220,20 @@ export async function listSaveSlots(): Promise<SaveSlotSummary[]> {
   );
   const summaries: SaveSlotSummary[] = [];
   for (const row of rows) {
+    // A single corrupt slot must not hide the user's good slots. Skip it
+    // with a warning; `loadFromSlot` still throws loudly when the user
+    // explicitly selects the bad slot so the corruption remains visible
+    // at the point it actually affects the user.
     let data: SaveData;
     try {
       data = JSON.parse(row.payload) as SaveData;
     } catch (err) {
-      throw new Error(
-        `Save slot ${row.slotId} payload is corrupt: ${
+      console.warn(
+        `[save-service] skipping corrupt slot ${row.slotId}: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
+      continue;
     }
     summaries.push({
       slotId: row.slotId,
