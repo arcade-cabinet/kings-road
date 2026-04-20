@@ -1,3 +1,10 @@
+---
+title: Project Structure
+updated: 2026-04-20
+status: current
+domain: technical
+---
+
 # Project Structure
 
 ```

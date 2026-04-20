@@ -1,3 +1,10 @@
+---
+title: 'Product: King''s Road'
+updated: 2026-04-20
+status: current
+domain: product
+---
+
 # Product: King's Road
 
 Config-driven 3D RPG engine. The player walks a 30km pilgrimage — the King's Road — from the farming village of Ashford to the ancient temple of Grailsend, seeking the Holy Grail.

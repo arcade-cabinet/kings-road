@@ -2,6 +2,7 @@
 title: PBR Material Library
 updated: 2026-04-18
 status: current
+domain: technical
 ---
 
 # PBR Material Library
