@@ -67,16 +67,25 @@ export function LoadingOverlay() {
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, MIN_DISPLAY_MS - elapsed);
 
+    let innerTimeout: ReturnType<typeof setTimeout> | null = null;
     const timeout = setTimeout(() => {
       setFadeOut(true);
-      // Remove from DOM after fade animation
-      setTimeout(() => {
+      // Remove from DOM after fade animation — track the inner timer so
+      // it can be cancelled on unmount if the overlay is torn down during
+      // the 800ms fade (e.g. user quits to main menu mid-fade). Previously
+      // the inner timer fired on an unmounted component and logged a
+      // setState-on-unmounted warning.
+      innerTimeout = setTimeout(() => {
+        innerTimeout = null;
         setVisible(false);
         setFadeOut(false);
       }, 800);
     }, remaining);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      if (innerTimeout !== null) clearTimeout(innerTimeout);
+    };
   }, [
     visible,
     fadeOut,
