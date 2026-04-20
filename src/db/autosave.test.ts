@@ -1,67 +1,64 @@
-import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SaveData } from './save-service';
 
-// Hoisted mocks so the modules under test import these.
+// Mock save-service so the tests don't touch the SQL layer.
 const saveToSlotMock = vi.fn().mockResolvedValue(undefined);
-const getGameSnapshotMock = vi.fn();
-const getPlayTimeSecondsMock = vi.fn(() => 0);
-const getInventorySnapshotMock = vi.fn();
-const getQuestStateMock = vi.fn();
-
 vi.mock('./save-service', async () => {
   const actual =
     await vi.importActual<typeof import('./save-service')>('./save-service');
   return {
     ...actual,
-    saveToSlot: (slot: number, data: unknown) => saveToSlotMock(slot, data),
+    saveToSlot: (slot: number, data: SaveData) => saveToSlotMock(slot, data),
   };
 });
-
-vi.mock('@/ecs/actions/game', () => ({
-  getGameSnapshot: () => getGameSnapshotMock(),
-  getPlayTimeSeconds: () => getPlayTimeSecondsMock(),
-}));
-
-vi.mock('@/ecs/actions/inventory-ui', () => ({
-  getInventorySnapshot: () => getInventorySnapshotMock(),
-}));
-
-vi.mock('@/ecs/actions/quest', () => ({
-  getQuestState: () => getQuestStateMock(),
-}));
 
 import {
   AUTO_SAVE_SLOT,
   cancelPendingAutoSave,
   flushAutoSave,
+  registerAutoSaveProvider,
   scheduleAutoSave,
   suppressAutoSave,
 } from './autosave';
 
-function setupActiveGame() {
-  getGameSnapshotMock.mockReturnValue({
+function makeSaveData(overrides: Partial<SaveData> = {}): SaveData {
+  return {
     seedPhrase: 'Seed Phrase Test',
-    playerPosition: new THREE.Vector3(1, 2, 3),
-    cameraYaw: 0,
-    health: 100,
-    stamina: 100,
-    timeOfDay: 0.5,
-    gemsCollected: 0,
+    displayName: 'Seed Phrase Test',
+    savedAt: '2026-04-20T00:00:00.000Z',
+    playTimeSeconds: 42,
+    player: {
+      position: { x: 1, y: 2, z: 3 },
+      cameraYaw: 0,
+      health: 100,
+      stamina: 100,
+      level: 1,
+      xp: 0,
+      timeOfDay: 0.5,
+      gemsCollected: 0,
+    },
+    inventory: {
+      items: [],
+      gold: 0,
+      equipment: {
+        head: null,
+        chest: null,
+        legs: null,
+        feet: null,
+        weapon: null,
+        shield: null,
+        accessory: null,
+      },
+    },
+    quests: {
+      activeQuests: [{ questId: 'q1', currentStep: 1 }],
+      completedQuests: ['q0'],
+      triggeredQuests: ['q0', 'q1'],
+    },
     chunkDeltas: {},
-    inDungeon: false,
-    activeDungeon: null,
-  });
-  getPlayTimeSecondsMock.mockReturnValue(42);
-  getInventorySnapshotMock.mockReturnValue({
-    items: [],
-    gold: 0,
-    equipped: {},
-  });
-  getQuestStateMock.mockReturnValue({
-    activeQuests: [{ questId: 'q1', currentStep: 1 }],
-    completedQuests: ['q0'],
-    triggeredQuests: ['q0', 'q1'],
-  });
+    unlockedPerks: [],
+    ...overrides,
+  };
 }
 
 describe('autosave', () => {
@@ -69,42 +66,30 @@ describe('autosave', () => {
     vi.useFakeTimers();
     saveToSlotMock.mockClear();
     cancelPendingAutoSave();
+    registerAutoSaveProvider(null);
   });
 
-  it('does not write when the game has not started (seedPhrase empty)', async () => {
-    getGameSnapshotMock.mockReturnValue({
-      seedPhrase: '',
-      playerPosition: new THREE.Vector3(),
-      cameraYaw: 0,
-      health: 0,
-      stamina: 0,
-      timeOfDay: 0,
-      gemsCollected: 0,
-      chunkDeltas: {},
-      inDungeon: false,
-      activeDungeon: null,
-    });
+  it('does not write when no provider is registered', async () => {
     await flushAutoSave();
     expect(saveToSlotMock).not.toHaveBeenCalled();
   });
 
-  it('flushAutoSave writes current state to AUTO_SAVE_SLOT', async () => {
-    setupActiveGame();
+  it('does not write when the provider returns null (game not ready)', async () => {
+    registerAutoSaveProvider(() => null);
+    await flushAutoSave();
+    expect(saveToSlotMock).not.toHaveBeenCalled();
+  });
+
+  it('flushAutoSave writes provider output to AUTO_SAVE_SLOT', async () => {
+    const data = makeSaveData();
+    registerAutoSaveProvider(() => data);
     await flushAutoSave();
     expect(saveToSlotMock).toHaveBeenCalledTimes(1);
-    const [slot, data] = saveToSlotMock.mock.calls[0];
-    expect(slot).toBe(AUTO_SAVE_SLOT);
-    expect(data).toMatchObject({
-      seedPhrase: 'Seed Phrase Test',
-      quests: {
-        activeQuests: [{ questId: 'q1', currentStep: 1 }],
-        completedQuests: ['q0'],
-      },
-    });
+    expect(saveToSlotMock).toHaveBeenCalledWith(AUTO_SAVE_SLOT, data);
   });
 
   it('debounces back-to-back schedules into a single write', async () => {
-    setupActiveGame();
+    registerAutoSaveProvider(() => makeSaveData());
     scheduleAutoSave();
     scheduleAutoSave();
     scheduleAutoSave();
@@ -114,7 +99,7 @@ describe('autosave', () => {
   });
 
   it('suppressAutoSave blocks scheduled + direct writes inside the block', async () => {
-    setupActiveGame();
+    registerAutoSaveProvider(() => makeSaveData());
     suppressAutoSave(() => {
       scheduleAutoSave();
     });
@@ -122,5 +107,18 @@ describe('autosave', () => {
     expect(saveToSlotMock).not.toHaveBeenCalled();
     await flushAutoSave();
     expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('suppression is re-entrant (nested blocks compose)', async () => {
+    registerAutoSaveProvider(() => makeSaveData());
+    suppressAutoSave(() => {
+      suppressAutoSave(() => {
+        scheduleAutoSave();
+      });
+      // Inner block exited but outer is still suppressing — must stay blocked.
+      scheduleAutoSave();
+    });
+    await vi.advanceTimersByTimeAsync(500);
+    expect(saveToSlotMock).not.toHaveBeenCalled();
   });
 });
