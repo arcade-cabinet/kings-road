@@ -2,6 +2,7 @@
 title: PBR Loader Test Fixtures
 updated: 2026-04-18
 status: current
+domain: quality
 ---
 
 # PBR Loader Test Fixtures

@@ -1,3 +1,10 @@
+---
+title: Tech Stack
+updated: 2026-04-20
+status: current
+domain: technical
+---
+
 # Tech Stack
 
 ## Core

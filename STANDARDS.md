@@ -111,6 +111,27 @@ Do not use:
 - Textures: procedural canvas textures via `src/utils/textures.ts`
 - CHUNK_SIZE = 120 units, BLOCK_SIZE = 5 units
 
+## Documentation
+
+### Markdown Frontmatter
+
+Every tracked `.md` file in the repository (excluding vendored directories
+like `pending-integration/`, `public/`, `android/`, `ios/`, `node_modules/`,
+`.claude/`) must carry a YAML frontmatter block with these four fields:
+
+```yaml
+---
+title: <title>
+updated: YYYY-MM-DD
+status: current | draft | stale | archived
+domain: technical | product | quality | ops | creative | context
+---
+```
+
+Enforced by `scripts/audit-frontmatter.ts`. Run locally with
+`npx tsx scripts/audit-frontmatter.ts`; the script exits 1 on any
+violation.
+
 ## CI Requirements
 
 All PRs must pass:
@@ -118,6 +139,7 @@ All PRs must pass:
 2. `pnpm tsc --noEmit` -- no TypeScript errors
 3. `pnpm test:coverage` -- coverage thresholds met (80%)
 4. `npx tsx scripts/validate-content.ts` -- all content validates
+5. `npx tsx scripts/audit-frontmatter.ts` -- frontmatter on every tracked .md
 
 ## Dependency Policy
 

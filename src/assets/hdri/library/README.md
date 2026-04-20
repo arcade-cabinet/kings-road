@@ -2,6 +2,7 @@
 title: HDRI Library
 updated: 2026-04-18
 status: current
+domain: technical
 ---
 
 # HDRI Library

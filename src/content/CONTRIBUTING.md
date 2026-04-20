@@ -1,3 +1,10 @@
+---
+title: Content Trove Contributing Guide
+updated: 2026-04-20
+status: current
+domain: creative
+---
+
 # Content Trove Contributing Guide
 
 This guide documents how to author content for King's Road -- a pastoral medieval pilgrimage RPG where the player walks the King's Road seeking the Holy Grail.
