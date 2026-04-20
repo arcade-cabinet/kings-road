@@ -236,12 +236,14 @@ export function WeatherSystem() {
   // Scratch color objects to avoid allocations
   const fogColorTarget = useMemo(() => new THREE.Color(), []);
 
-  // Cache the biome-authored fog distances so per-frame modulation multiplies
-  // a fresh base×factor instead of compounding *= every frame (which walks
-  // near/far toward zero over minutes of play — #132 regression).
-  // Environment.tsx owns fog identity and rewrites scene.fog.near/far on
-  // biome change; we detect that by comparing against the last value we
-  // wrote, and rebase when they differ.
+  // Cache the biome-authored fog distances so per-frame modulation writes
+  // a fresh base × factor rather than scaling the previously-scaled value.
+  // Today Environment.Fog re-asserts scene.fog.near/far every frame (see
+  // Environment.tsx Fog()), so the `externallyRewritten` check below fires
+  // every frame and rebase-base continuously picks up the authored biome
+  // values — that IS the correct outcome. The ref structure is a safety
+  // net against a future refactor that makes Environment re-assert only on
+  // biome change; without it, scaling would compound across frames.
   const baseFogNearRef = useRef<number | null>(null);
   const baseFogFarRef = useRef<number | null>(null);
   const lastWrittenNearRef = useRef<number | null>(null);
@@ -308,10 +310,11 @@ export function WeatherSystem() {
     if (scene.fog instanceof THREE.Fog) {
       const densityFactor = 1 - currentFogDensity.current * 0.5;
 
-      // Rebase when Environment.tsx (or anything else) has rewritten the fog
-      // distances since our last write — that signals a biome change brought
-      // fresh authored values. Otherwise apply base × factor off the cached
-      // biome baseline so we never compound.
+      // Rebase whenever the fog has been rewritten since our last write —
+      // today Environment.Fog re-asserts near/far every frame so this fires
+      // every frame and is functionally equivalent to writing
+      // `sceneNear * densityFactor` directly. If Environment ever switches
+      // to biome-change-only writes, this still prevents compounding.
       const externallyRewritten =
         lastWrittenNearRef.current === null ||
         scene.fog.near !== lastWrittenNearRef.current ||
