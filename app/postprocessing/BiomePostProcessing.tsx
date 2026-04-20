@@ -14,8 +14,9 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { BiomeService } from '@/biome';
 import { getPlayer } from '@/ecs/actions/game';
-import { useEnvironment } from '@/ecs/hooks/useGameSession';
+import { useEnvironment, useFlags } from '@/ecs/hooks/useGameSession';
 import type { BiomeConfig } from '@/biome';
+import { combineDungeonVignette, lerpDungeonVignette } from './dungeonVignette';
 
 /** 0–1 time-of-day → dawn/noon/dusk/night bucket string. */
 function tod(timeOfDay: number): 'dawn' | 'noon' | 'dusk' | 'night' {
@@ -99,6 +100,7 @@ function paramsForBiomeAndTime(
 export function BiomePostProcessing() {
   const { gl, scene, camera, size } = useThree();
   const { timeOfDay } = useEnvironment();
+  const { inDungeon } = useFlags();
 
   const bloomIntRef = useRef(0.3);
   const bloomThreshRef = useRef(0.8);
@@ -106,6 +108,10 @@ export function BiomePostProcessing() {
   const vigDarkRef = useRef(0.35);
   const chromaRef = useRef(0.0004);
   const noiseRef = useRef(0.04);
+  // Dungeon vignette contribution — lerped independently so transitions are
+  // smooth regardless of biome changes happening at the same time.
+  const dungeonDarkRef = useRef(0);
+  const dungeonOffRef = useRef(0);
 
   const pipeline = useMemo(() => {
     // HalfFloatType framebuffer preserves HDR range from the HDRI-lit
@@ -200,10 +206,30 @@ export function BiomePostProcessing() {
     chromaRef.current += (target.chromaticOffset - chromaRef.current) * k;
     noiseRef.current += (target.noiseOpacity - noiseRef.current) * k;
 
+    // Dungeon vignette — lerped separately at TRANSITION_SPEED (~0.4s)
+    const dungeon = lerpDungeonVignette(
+      dungeonDarkRef.current,
+      dungeonOffRef.current,
+      inDungeon,
+      delta,
+    );
+    dungeonDarkRef.current = dungeon.darkness;
+    dungeonOffRef.current = dungeon.offset;
+
+    // Combine biome + dungeon contributions before writing to the effect.
+    // Health vignette is a separate CSS layer (DiegeticLayer) and always
+    // renders on top of the WebGL canvas — no interaction needed here.
+    const combined = combineDungeonVignette(
+      vigDarkRef.current,
+      vigOffRef.current,
+      dungeonDarkRef.current,
+      dungeonOffRef.current,
+    );
+
     pipeline.bloom.intensity = bloomIntRef.current;
     pipeline.bloom.luminanceMaterial.threshold = bloomThreshRef.current;
-    pipeline.vignette.offset = vigOffRef.current;
-    pipeline.vignette.darkness = vigDarkRef.current;
+    pipeline.vignette.offset = combined.offset;
+    pipeline.vignette.darkness = combined.darkness;
     pipeline.chroma.offset.set(chromaRef.current, chromaRef.current);
     pipeline.noise.blendMode.opacity.value = noiseRef.current;
 
