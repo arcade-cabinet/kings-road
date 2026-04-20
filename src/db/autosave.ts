@@ -30,6 +30,10 @@ export type AutoSaveProvider = () => SaveData | null;
 
 let provider: AutoSaveProvider | null = null;
 let pendingTimer: ReturnType<typeof setTimeout> | null = null;
+// Throttle state: key → last-fired timestamp (ms since epoch). Distinct from
+// the debounced `pendingTimer` because throttled callers come from per-frame
+// systems that would otherwise keep resetting the debounce indefinitely.
+const throttleLastFiredAt = new Map<string, number>();
 // Counter rather than boolean so nested `suppressAutoSave` calls compose
 // correctly — only the outermost restore unsuppresses.
 let suppressCount = 0;
@@ -74,6 +78,33 @@ export function scheduleAutoSave(): void {
 }
 
 /**
+ * Throttled scheduler — fires on the leading edge, then ignores calls
+ * until `windowMs` has elapsed. Use this for per-frame / high-rate
+ * mutators (health ticks, position updates) where the debounced
+ * `scheduleAutoSave` would be reset forever and never actually fire.
+ *
+ * `key` is a caller-supplied namespace so different hot loops maintain
+ * independent windows (e.g. 'player.health' vs 'env.timeOfDay').
+ *
+ * Semantics:
+ *   - First call within a window → schedule via scheduleAutoSave()
+ *     (still respects the 400ms debounce, so a burst coalesces)
+ *   - Subsequent calls within the window → no-op
+ *   - Window expires → next call fires again
+ */
+export function scheduleAutoSaveThrottled(
+  key: string,
+  windowMs: number,
+): void {
+  if (suppressCount > 0 || provider === null) return;
+  const now = Date.now();
+  const last = throttleLastFiredAt.get(key);
+  if (last !== undefined && now - last < windowMs) return;
+  throttleLastFiredAt.set(key, now);
+  scheduleAutoSave();
+}
+
+/**
  * Immediately write the current state to slot 0 without debouncing.
  * Used by tests and callers that need a synchronous guarantee.
  */
@@ -90,4 +121,9 @@ export function cancelPendingAutoSave(): void {
     clearTimeout(pendingTimer);
     pendingTimer = null;
   }
+}
+
+/** Reset all throttle keys. Test helper; also used on game reset. */
+export function resetAutoSaveThrottle(): void {
+  throttleLastFiredAt.clear();
 }
