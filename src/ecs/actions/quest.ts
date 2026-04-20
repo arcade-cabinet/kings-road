@@ -1,3 +1,4 @@
+import { scheduleAutoSave } from '@/db/autosave';
 import {
   getAllQuests as getAllQuestsFromStore,
   getQuest,
@@ -65,6 +66,7 @@ export function activateQuest(questId: string, branch?: 'A' | 'B'): void {
       ? cur.triggeredQuests
       : [...cur.triggeredQuests, questId],
   });
+  scheduleAutoSave();
 }
 
 export function advanceQuestStep(questId: string): void {
@@ -74,6 +76,7 @@ export function advanceQuestStep(questId: string): void {
       q.questId === questId ? { ...q, currentStep: q.currentStep + 1 } : q,
     ),
   });
+  scheduleAutoSave();
 }
 
 export function chooseQuestBranch(questId: string, branch: 'A' | 'B'): void {
@@ -83,6 +86,7 @@ export function chooseQuestBranch(questId: string, branch: 'A' | 'B'): void {
       q.questId === questId ? { ...q, branch, currentStep: 0 } : q,
     ),
   });
+  scheduleAutoSave();
 }
 
 export function completeQuest(questId: string): void {
@@ -93,6 +97,7 @@ export function completeQuest(questId: string): void {
       ? cur.completedQuests
       : [...cur.completedQuests, questId],
   });
+  scheduleAutoSave();
 }
 
 export function failQuest(questId: string): void {
@@ -100,12 +105,14 @@ export function failQuest(questId: string): void {
   patch({
     activeQuests: cur.activeQuests.filter((q) => q.questId !== questId),
   });
+  scheduleAutoSave();
 }
 
 export function markQuestTriggered(questId: string): void {
   const cur = getQuestState();
   if (cur.triggeredQuests.includes(questId)) return;
   patch({ triggeredQuests: [...cur.triggeredQuests, questId] });
+  scheduleAutoSave();
 }
 
 export function recordDialogue(npcArchetype: string, npcName: string): void {
