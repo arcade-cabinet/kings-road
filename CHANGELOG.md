@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.11](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.10...kings-road-v1.5.11) (2026-04-20)
+
+
+### Fixed
+
+* **relic:** clean up imperative pickup overlays on unmount ([#198](https://github.com/arcade-cabinet/kings-road/issues/198)) ([11bd889](https://github.com/arcade-cabinet/kings-road/commit/11bd8896aa4f50d7d6c20b0ac78024731d47d758))
+
 ## [1.5.10](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.9...kings-road-v1.5.10) (2026-04-20)
 
 
