@@ -127,23 +127,23 @@ describe('applyDebugSpawn', () => {
     );
   });
 
-  it('pins the player to (2, 1.6, 24) when ?benchmark=<biome> is active', async () => {
+  it('uses settlement-relative spawn when ?benchmark=<biome> is active', async () => {
+    // Benchmark shares the QA spawn path — the seeded kingdom map
+    // guarantees reproducibility without needing hardcoded coords. The
+    // earlier hardcoded (2, 1.6, 24) put the player in an empty tile
+    // (verified on cb=148 Pages: blank frame).
     window.history.replaceState({}, '', '/?benchmark=thornfield');
     const gameMod = await import('@/ecs/actions/game');
-    const { applyDebugSpawn, BENCHMARK_SPAWN_POSITION } = await import(
-      './spawn'
-    );
+    const { applyDebugSpawn } = await import('./spawn');
 
     expect(applyDebugSpawn()).toBe(true);
     for (let i = 0; i < 5; i++) await Promise.resolve();
 
+    // Same coords as the ?spawn=thornfield test above — proves the
+    // benchmark now hits the same rich, populated view.
     expect(gameMod.startGame).toHaveBeenCalledWith(
       'debug-thornfield-seed',
-      expect.objectContaining({
-        x: BENCHMARK_SPAWN_POSITION.x,
-        y: BENCHMARK_SPAWN_POSITION.y,
-        z: BENCHMARK_SPAWN_POSITION.z,
-      }),
+      expect.objectContaining({ x: 6052, z: 12078 }),
       0,
     );
   });
