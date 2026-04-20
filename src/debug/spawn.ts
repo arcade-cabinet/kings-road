@@ -9,6 +9,14 @@ import type { KingdomMap } from '@/schemas/kingdom.schema';
 import { CHUNK_SIZE, PLAYER_HEIGHT } from '@/utils/worldCoords';
 
 /**
+ * Deterministic benchmark spawn position for task #22. Matches the
+ * default <Canvas camera> position in `app/scene/GameScene.tsx` so the
+ * benchmark run starts with a known identical view every time, regardless
+ * of how the kingdom-gen pins the biome's settlement this seed.
+ */
+export const BENCHMARK_SPAWN_POSITION = new Vector3(2, 1.6, 24);
+
+/**
  * URL spawn id → kingdom-settlement id. Settlement ids in
  * `content/world/kingdom-config.json` use hyphens (e.g. "thornfield-ruins")
  * but URL params normalize to underscores. This map picks the settlement
@@ -78,13 +86,25 @@ function resolveSpawnPosition(
  * Thornfield by default).
  */
 export function parseSpawnParam(): string | null {
-  const fromUrl = new URLSearchParams(window.location.search).get('spawn');
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = params.get('spawn');
   if (fromUrl) return fromUrl.toLowerCase().replace(/-/g, '_');
+
+  // `?benchmark=<biome>` implies `?spawn=<biome>` so the harness can boot
+  // the scene with a single param. Resolved here rather than in
+  // @/benchmark so the app-startup path has one source of truth.
+  const fromBenchmark = params.get('benchmark');
+  if (fromBenchmark) return fromBenchmark.toLowerCase().replace(/-/g, '_');
 
   const fromEnv = import.meta.env.VITE_DEBUG_SPAWN;
   if (fromEnv) return (fromEnv as string).toLowerCase().replace(/-/g, '_');
 
   return null;
+}
+
+/** True when the active spawn was triggered by the task #22 `?benchmark=` alias. */
+export function isBenchmarkSpawn(): boolean {
+  return new URLSearchParams(window.location.search).has('benchmark');
 }
 
 /**
@@ -139,7 +159,13 @@ export function applyDebugSpawn(): boolean {
       const map = await generateWorld(devSeed);
       resolveNarrative(devSeed);
 
-      const pos = resolveSpawnPosition(biomeId, map);
+      // Benchmark runs (task #22) pin the spawn to the Canvas's default
+      // camera coords so frame-time captures start from a byte-identical
+      // view every run. Settlement-relative spawn is useful for QA but
+      // drifts with kingdom-gen seed changes and would ruin comparability.
+      const pos = isBenchmarkSpawn()
+        ? BENCHMARK_SPAWN_POSITION.clone()
+        : resolveSpawnPosition(biomeId, map);
       // Yaw=0 (north) — combined with the +25 m X offset in
       // resolveSpawnPosition, this puts the settlement ruins diagonally
       // across the forward view. A previous revision set yaw=π/4 at

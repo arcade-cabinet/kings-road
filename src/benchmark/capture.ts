@@ -23,8 +23,20 @@ export interface BenchmarkSummary {
   p5Fps: number;
   peakFrameTimeMs: number;
   avgFrameTimeMs: number;
+  /** 50th percentile frame time (median), in milliseconds. */
+  p50FrameTimeMs: number;
+  /** 95th percentile frame time, in milliseconds. */
+  p95FrameTimeMs: number;
+  /** 99th percentile frame time (worst hitches), in milliseconds. */
+  p99FrameTimeMs: number;
   peakDrawCalls: number;
+  /** Mean draw calls per frame across the capture. */
+  avgDrawCalls: number;
   peakTriangles: number;
+  /** Mean triangles rendered per frame across the capture. */
+  avgTriangles: number;
+  /** Mean textures bound per frame across the capture. */
+  avgTextures: number;
   peakJsHeapMb: number;
   frames: FrameSample[];
 }
@@ -94,7 +106,11 @@ export class BenchmarkCapture {
   finish(): BenchmarkSummary {
     const fps = this.frames.map((f) => f.fps);
     const fts = this.frames.map((f) => f.frameTimeMs);
+    const draws = this.frames.map((f) => f.drawCalls);
+    const tris = this.frames.map((f) => f.triangles);
+    const textures = this.frames.map((f) => f.textures);
     const sortedFps = [...fps].sort((a, b) => a - b);
+    const sortedFts = [...fts].sort((a, b) => a - b);
 
     return {
       route: this.route,
@@ -111,14 +127,14 @@ export class BenchmarkCapture {
       p5Fps: percentile(sortedFps, 5),
       peakFrameTimeMs: fts.length > 0 ? Math.max(...fts) : 0,
       avgFrameTimeMs: mean(fts),
-      peakDrawCalls:
-        this.frames.length > 0
-          ? Math.max(...this.frames.map((f) => f.drawCalls))
-          : 0,
-      peakTriangles:
-        this.frames.length > 0
-          ? Math.max(...this.frames.map((f) => f.triangles))
-          : 0,
+      p50FrameTimeMs: percentile(sortedFts, 50),
+      p95FrameTimeMs: percentile(sortedFts, 95),
+      p99FrameTimeMs: percentile(sortedFts, 99),
+      peakDrawCalls: draws.length > 0 ? Math.max(...draws) : 0,
+      avgDrawCalls: mean(draws),
+      peakTriangles: tris.length > 0 ? Math.max(...tris) : 0,
+      avgTriangles: mean(tris),
+      avgTextures: mean(textures),
       peakJsHeapMb:
         this.frames.length > 0
           ? Math.max(...this.frames.map((f) => f.jsHeapMb))

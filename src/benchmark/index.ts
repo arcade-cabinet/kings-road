@@ -4,4 +4,10 @@ export { exportBenchmarkJson } from './export';
 export { buildMarkdownReport } from './report';
 export type { BenchmarkRoute, ScriptedEvent } from './routes';
 export { BENCHMARK_ROUTES, getFrameAtTime, getRoute } from './routes';
-export { BenchmarkRunner, parseBenchParam } from './runner';
+export {
+  BENCHMARK_STORAGE_KEY,
+  BenchmarkHUD,
+  BenchmarkRunner,
+  isBenchmarkAliasRoute,
+  parseBenchParam,
+} from './runner';
