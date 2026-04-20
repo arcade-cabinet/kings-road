@@ -586,8 +586,39 @@ function formatIndexSummary(index: IdIndex): string {
 // Main
 // ---------------------------------------------------------------------------
 
+/**
+ * Soft-fail checks. These surface content smells that are not definitionally
+ * broken (CI passes) but are suspicious — unused NPC archetypes, unreferenced
+ * monsters, etc. Gated behind `--strict` so the nightly CI job can flag them
+ * without breaking ordinary PR merges on in-progress content.
+ *
+ * Keep this list small and objective. "Interesting enough that an author
+ * probably wants to know" is the bar; taste calls go in code review, not here.
+ */
+function collectWarnings(index: IdIndex): string[] {
+  const warnings: string[] = [];
+
+  // Orphan NPC archetype — defined but no NPC references it. Either dead
+  // content or a typo somewhere. Low-cost to review.
+  // (This is a best-effort check using only the current IdIndex; deeper
+  // reverse-reference analysis would need a richer index.)
+  for (const archetype of index.npcArchetypes) {
+    const referenced = Array.from(index.npcIds).some((id) =>
+      id.includes(archetype),
+    );
+    if (!referenced) {
+      warnings.push(
+        `Orphan NPC archetype "${archetype}" — no NPC IDs appear to use it`,
+      );
+    }
+  }
+
+  return warnings;
+}
+
 function main() {
   const verbose = process.argv.includes('--verbose');
+  const strict = process.argv.includes('--strict');
   const contentDir = path.resolve(process.cwd(), 'src/content');
 
   if (!fs.existsSync(contentDir)) {
@@ -642,16 +673,33 @@ function main() {
     console.log(`  \x1b[32m\u2713\x1b[0m All cross-references valid.`);
   }
 
+  // Phase 3: soft warnings (only reported; gated for exit code on --strict)
+  const warnings = collectWarnings(index);
+  if (warnings.length > 0) {
+    console.log('\nPhase 3: Soft warnings...');
+    for (const warning of warnings) {
+      console.log(`  \x1b[33m!\x1b[0m ${warning}`);
+    }
+    console.log(`\n  ${warnings.length} warning(s).`);
+  }
+
   // Summary
   console.log('\n--- Summary ---');
   console.log(`Files validated: ${troveReport.summary.totalFiles}`);
   console.log(`Schema errors: ${schemaErrors}`);
   console.log(`Cross-reference errors: ${xrefErrors.length}`);
+  console.log(`Warnings: ${warnings.length}`);
   console.log(`\nContent index:\n${formatIndexSummary(index)}`);
   console.log('');
 
   const totalErrors = schemaErrors + xrefErrors.length;
-  process.exit(totalErrors > 0 ? 1 : 0);
+  const strictFail = strict && warnings.length > 0;
+  if (strictFail) {
+    console.log(
+      '\x1b[33m--strict mode: treating warnings as errors\x1b[0m',
+    );
+  }
+  process.exit(totalErrors > 0 || strictFail ? 1 : 0);
 }
 
 main();
