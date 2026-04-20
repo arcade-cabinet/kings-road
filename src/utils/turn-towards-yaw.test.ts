@@ -79,7 +79,23 @@ describe('turnTowardsYaw', () => {
 
   it('(d) reaches target when current equals target', () => {
     const result = turnTowardsYaw(1.23, 1.23, TURN_RATE, 0.016);
-    expect(result).toBe(1.23);
+    expect(result).toBeCloseTo(1.23);
+  });
+
+  it('(e) snap with unbounded currentYaw does not jump by multiple π', () => {
+    // currentYaw = 5π is physically the same as π (same orientation mod 2π).
+    // targetYaw = 0 means "face forward". A large-step snap should land near 0
+    // (mod 2π), not teleport to the raw value 0 — which would be a ~5π jump
+    // in the accumulated angle the caller was tracking.
+    const result = turnTowardsYaw(5 * Math.PI, 0, 100, 1);
+    // The result must be in [-π, π] (normaliseAngle output range) …
+    expect(result).toBeGreaterThanOrEqual(-Math.PI);
+    expect(result).toBeLessThanOrEqual(Math.PI);
+    // … and must represent the same physical facing as 0 (i.e. near 0 mod 2π).
+    const physical = ((result % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    // physical is in [0, 2π); values near 0 or 2π are both "facing forward"
+    const nearZero = Math.min(physical, 2 * Math.PI - physical);
+    expect(nearZero).toBeCloseTo(0, 5);
   });
 
   it('advances by exactly turnRate*delta when gap is large', () => {

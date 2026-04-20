@@ -42,8 +42,11 @@ export function turnTowardsYaw(
   const maxStep = turnRate * delta;
 
   if (Math.abs(diff) <= maxStep) {
-    // Close enough — snap to target so we don't oscillate
-    return targetYaw;
+    // Close enough — snap to target so we don't oscillate.
+    // Use currentYaw + diff rather than raw targetYaw so that an unbounded
+    // accumulated currentYaw (e.g. 5.5π) doesn't cause a multi-π jump when
+    // the physical orientation is already aligned modulo 2π.
+    return normaliseAngle(currentYaw + diff);
   }
 
   return currentYaw + Math.sign(diff) * maxStep;

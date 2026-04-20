@@ -15,6 +15,8 @@ const TURN_SPEED_SCAN = 1.5;
 const TURN_SPEED_ENGAGE = 3.5;
 // Distance threshold (world units) that switches between scan and engage rates.
 const ENGAGE_DISTANCE = 8;
+// Squared form — avoids sqrt in the hot path (compare distSq instead of dist).
+const ENGAGE_DISTANCE_SQ = ENGAGE_DISTANCE * ENGAGE_DISTANCE;
 
 interface MonsterProps {
   archetype: MonsterArchetype;
@@ -125,9 +127,9 @@ export function Monster({ archetype, position }: MonsterProps) {
       facingYawRef.current = targetYaw;
     }
 
-    const dist = Math.sqrt(dx * dx + dz * dz);
+    const distSq = dx * dx + dz * dz;
     const turnSpeed =
-      dist <= ENGAGE_DISTANCE ? TURN_SPEED_ENGAGE : TURN_SPEED_SCAN;
+      distSq <= ENGAGE_DISTANCE_SQ ? TURN_SPEED_ENGAGE : TURN_SPEED_SCAN;
 
     facingYawRef.current = turnTowardsYaw(
       facingYawRef.current,
