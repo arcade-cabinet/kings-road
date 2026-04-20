@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.1...kings-road-v1.5.2) (2026-04-20)
+
+
+### Fixed
+
+* dispose tinted material clones in GlbInstancer ([#16](https://github.com/arcade-cabinet/kings-road/issues/16)) ([#160](https://github.com/arcade-cabinet/kings-road/issues/160)) ([cb1e3c8](https://github.com/arcade-cabinet/kings-road/commit/cb1e3c8c3f31fbce1a8e89f0d94919b6d3a65427))
+
 ## [1.5.1](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.0...kings-road-v1.5.1) (2026-04-20)
 
 
