@@ -2,7 +2,7 @@
 title: Contributing
 updated: 2026-04-20
 status: current
-domain: process
+domain: ops
 ---
 
 # Contributing to King's Road
@@ -30,7 +30,7 @@ cd .claude/worktrees/<slug>
 
 Replace `<slug>` with a short task identifier (e.g., `feat-npc-dialogue`, `fix-save-bug`). Worktrees are gitignored — changes land in the branch, not the main tree.
 
-**Never `cd` out of the worktree once you're in it.** Use absolute paths if you need to reference files outside.
+**Stay in the worktree while you work on the task.** Use absolute paths if you need to reference files outside. Once the PR is merged, switch back to the main worktree (repo root) before running cleanup commands.
 
 ### 2. Commit Rules
 
@@ -107,13 +107,23 @@ gh pr merge <PR-number> --squash --delete-branch
 
 ### 6. Cleanup
 
-After merge:
+After merge, run cleanup from the **main worktree** (repo root) — not from inside the worktree you're removing:
 
 ```bash
+# 1. Switch to the main worktree first
+cd /path/to/kings-road   # repo root, not the worktree
+
+# 2. Remove the worktree and local branch
 git worktree remove .claude/worktrees/<slug> --force
 git branch -D <branch-name>
-git fetch origin && git reset --hard origin/main
+
+# 3. Sync main with the remote
+git pull --ff-only origin main
 ```
+
+> **Sync after a squash-merge**: `git pull --ff-only` will fail if your local `main` has diverged (this happens when the PR was squash-merged and git sees the commits as different). In that case only, use:
+> `git fetch origin && git reset --hard origin/main`
+> ⚠️ Run from the main worktree ONLY — this is destructive. If you have unmerged local changes, commit or stash them first.
 
 ## Code & Design Standards
 
