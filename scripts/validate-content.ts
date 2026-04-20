@@ -5,8 +5,12 @@
  * Phase 1: Validates all JSON content files against Zod schemas (via validate-trove).
  * Phase 2: Checks cross-references — verifies that every ID referenced by one content
  *          file actually exists in another content file of the appropriate type.
+ * Phase 3: Soft warnings — content smells that aren't definitionally broken
+ *          (e.g. orphan items). Emitted always; only blocks exit under --strict.
  *
- * Usage: npx tsx scripts/validate-content.ts [--verbose]
+ * Usage: npx tsx scripts/validate-content.ts [--verbose] [--strict]
+ *   --verbose  Print each passing file, not just failures.
+ *   --strict   Exit 1 if any Phase-3 warnings are reported (use in nightly CI).
  */
 
 import * as fs from 'node:fs';
@@ -588,27 +592,52 @@ function formatIndexSummary(index: IdIndex): string {
 
 /**
  * Soft-fail checks. These surface content smells that are not definitionally
- * broken (CI passes) but are suspicious — unused NPC archetypes, unreferenced
- * monsters, etc. Gated behind `--strict` so the nightly CI job can flag them
- * without breaking ordinary PR merges on in-progress content.
+ * broken (CI passes) but are suspicious. Gated behind `--strict` so the
+ * nightly CI job can flag them without breaking ordinary PR merges on
+ * in-progress content.
  *
  * Keep this list small and objective. "Interesting enough that an author
  * probably wants to know" is the bar; taste calls go in code review, not here.
+ *
+ * Current warnings:
+ *   - Orphan items: defined in items/*.json but not referenced by any
+ *     quest reward, encounter reward, or loot table entry. Item authors
+ *     commonly forget to wire newly-added items into a drop path.
  */
-function collectWarnings(index: IdIndex): string[] {
+function collectWarnings(
+  contentDir: string,
+  index: IdIndex,
+): string[] {
   const warnings: string[] = [];
 
-  // Orphan NPC archetype — defined but no NPC references it. Either dead
-  // content or a typo somewhere. Low-cost to review.
-  // (This is a best-effort check using only the current IdIndex; deeper
-  // reverse-reference analysis would need a richer index.)
-  for (const archetype of index.npcArchetypes) {
-    const referenced = Array.from(index.npcIds).some((id) =>
-      id.includes(archetype),
-    );
-    if (!referenced) {
+  // Collect every item ID referenced anywhere in the trove. Walks the
+  // same files the xref checker visits but only harvests outbound refs.
+  const referencedItems = new Set<string>();
+  const collectItemRefs = (value: unknown): void => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) {
+      for (const v of value) collectItemRefs(v);
+      return;
+    }
+    const obj = value as Record<string, unknown>;
+    for (const [key, v] of Object.entries(obj)) {
+      if (key === 'itemId' && typeof v === 'string') referencedItems.add(v);
+      collectItemRefs(v);
+    }
+  };
+  for (const file of findJsonFiles(contentDir)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(file, 'utf8')) as unknown;
+      collectItemRefs(parsed);
+    } catch {
+      // Parse errors are already surfaced by schema validation; skip here.
+    }
+  }
+
+  for (const itemId of index.items) {
+    if (!referencedItems.has(itemId)) {
       warnings.push(
-        `Orphan NPC archetype "${archetype}" — no NPC IDs appear to use it`,
+        `Orphan item "${itemId}" — not referenced by any quest reward, encounter reward, or loot table`,
       );
     }
   }
@@ -674,7 +703,7 @@ function main() {
   }
 
   // Phase 3: soft warnings (only reported; gated for exit code on --strict)
-  const warnings = collectWarnings(index);
+  const warnings = collectWarnings(contentDir, index);
   if (warnings.length > 0) {
     console.log('\nPhase 3: Soft warnings...');
     for (const warning of warnings) {
