@@ -99,7 +99,12 @@ export function loadPbrMaterial(
           tex.wrapS = THREE.RepeatWrapping;
           tex.wrapT = THREE.RepeatWrapping;
           mat.displacementMap = tex;
-          mat.displacementScale = 0.0;
+          // Previously set to 0.0 — that loaded the texture over the wire
+          // but never applied it. 0.02m (2cm) is a subtle bake-in that
+          // adds surface relief on grazing angles without causing vertex
+          // skinning issues on low-poly meshes.
+          mat.displacementScale = 0.02;
+          mat.displacementBias = -0.01;
         })
         .catch(() => {
           /* displacement is optional */
@@ -109,6 +114,13 @@ export function loadPbrMaterial(
           tex.wrapS = THREE.RepeatWrapping;
           tex.wrapT = THREE.RepeatWrapping;
           mat.aoMap = tex;
+          mat.aoMapIntensity = 1.0;
+          // MeshStandardMaterial reads AO from uv2 (second UV channel),
+          // NOT uv. If the geometry only has one UV set, the AO sampler
+          // silently reads garbage and AO has no visible effect — the
+          // map was loaded for nothing. Consumers MUST either clone uv
+          // → uv2 at geometry build time, or run `applyPbrMaterialToMesh`
+          // (see below) which does the copy automatically.
         })
         .catch(() => {
           /* AO is optional */
@@ -145,4 +157,30 @@ function applyOptions(
   const clone = base.clone();
   clone.displacementScale = scale;
   return clone;
+}
+
+/**
+ * Bind a loaded PBR material to a mesh AND ensure the geometry has the
+ * second UV channel that MeshStandardMaterial.aoMap requires. If the
+ * geometry has `uv` but no `uv2`, clone `uv` → `uv2` in place so the AO
+ * sampler reads real data instead of silently sampling nothing.
+ *
+ * Without this step, any call-site that sets `mesh.material = pbrMat`
+ * directly loses the AO contribution even though the texture loaded
+ * successfully — a silent correctness bug that's invisible in DevTools
+ * (the texture slot is bound) but obvious in side-by-side renders
+ * against a reference.
+ *
+ * Always use this function; never assign a PBR material directly unless
+ * you've already verified the mesh geometry carries uv2.
+ */
+export function applyPbrMaterialToMesh(
+  mesh: THREE.Mesh,
+  mat: THREE.MeshStandardMaterial,
+): void {
+  const geo = mesh.geometry;
+  if (geo && geo.attributes.uv && !geo.attributes.uv2) {
+    geo.setAttribute('uv2', geo.attributes.uv);
+  }
+  mesh.material = mat;
 }

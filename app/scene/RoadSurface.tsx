@@ -392,7 +392,14 @@ function mergeGeometries(
   const merged = new THREE.BufferGeometry();
   merged.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   merged.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
-  merged.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  const uvAttr = new THREE.BufferAttribute(uvs, 2);
+  merged.setAttribute('uv', uvAttr);
+  // MeshStandardMaterial's aoMap samples from uv2, not uv. Without this
+  // alias the PBR loader's loaded AO texture applies to no pixel. Share
+  // the same underlying buffer — road tiling is uniform across all
+  // channels, so a second identical UV set is correct and costs zero
+  // extra memory beyond the attribute header.
+  merged.setAttribute('uv2', uvAttr);
   if (indices.length > 0) {
     merged.setIndex(indices);
   }
