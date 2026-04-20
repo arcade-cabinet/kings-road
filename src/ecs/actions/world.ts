@@ -66,43 +66,53 @@ export async function generateWorld(seed: string): Promise<KingdomMap> {
     generationPhase: 'Unrolling the realm parchment...',
   });
 
-  const map = await generateKingdomAsync(
-    seed,
-    kingdomConfig,
-    (progress, phase) => {
-      patch({ generationProgress: progress, generationPhase: phase });
-    },
-  );
+  try {
+    const map = await generateKingdomAsync(
+      seed,
+      kingdomConfig,
+      (progress, phase) => {
+        patch({ generationProgress: progress, generationPhase: phase });
+      },
+    );
 
-  const regionDensities = new Map<string, 'sparse' | 'normal' | 'dense'>();
-  for (const authoredRegion of kingdomConfig.regions ?? []) {
-    regionDensities.set(authoredRegion.id, authoredRegion.featureDensity);
+    const regionDensities = new Map<string, 'sparse' | 'normal' | 'dense'>();
+    for (const authoredRegion of kingdomConfig.regions ?? []) {
+      regionDensities.set(authoredRegion.id, authoredRegion.featureDensity);
+    }
+    const placements = generateFeaturePlacementsWithDensity(
+      map,
+      seed,
+      regionDensities,
+    );
+    const index = buildFeatureIndex(placements);
+
+    map.features = placements.map((p) => ({
+      id: p.id,
+      featureId: p.definition.id,
+      tier: p.definition.tier,
+      position: p.gridPosition,
+      regionId: p.regionId,
+    }));
+
+    patch({
+      kingdomMap: map,
+      isGenerating: false,
+      generationProgress: 1,
+      generationPhase: '',
+      featurePlacements: placements,
+      featureIndex: index,
+    });
+
+    return map;
+  } catch (err) {
+    // Any failure after the initial patch must clear `isGenerating` before
+    // the throw propagates, or the loading overlay strands the user on a
+    // permanent spinner waiting for the caller's error path to run.
+    // Callers (e.g. useMenuOrchestrator) also reset this in their catch,
+    // but defence in depth — a future caller that forgets won't softlock.
+    patch({ isGenerating: false, generationProgress: 0, generationPhase: '' });
+    throw err;
   }
-  const placements = generateFeaturePlacementsWithDensity(
-    map,
-    seed,
-    regionDensities,
-  );
-  const index = buildFeatureIndex(placements);
-
-  map.features = placements.map((p) => ({
-    id: p.id,
-    featureId: p.definition.id,
-    tier: p.definition.tier,
-    position: p.gridPosition,
-    regionId: p.regionId,
-  }));
-
-  patch({
-    kingdomMap: map,
-    isGenerating: false,
-    generationProgress: 1,
-    generationPhase: '',
-    featurePlacements: placements,
-    featureIndex: index,
-  });
-
-  return map;
 }
 
 export function clearWorld(): void {
