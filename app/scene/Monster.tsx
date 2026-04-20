@@ -6,6 +6,15 @@ import { SkeletonUtils } from 'three-stdlib';
 import { assetUrl } from '@/lib/assets';
 import type { MonsterArchetype } from '@/schemas/monster.schema';
 import { hashString } from '@/core';
+import { getPlayer } from '@/ecs/actions/game';
+import { turnTowardsYaw } from '@/utils/turn-towards-yaw';
+
+// Turn speed (rad/s) when the player is far away — monsters slowly scan.
+const TURN_SPEED_SCAN = 1.5;
+// Turn speed (rad/s) when the player is within combat range — more aggressive.
+const TURN_SPEED_ENGAGE = 3.5;
+// Distance threshold (world units) that switches between scan and engage rates.
+const ENGAGE_DISTANCE = 8;
 
 interface MonsterProps {
   archetype: MonsterArchetype;
@@ -52,6 +61,9 @@ export function Monster({ archetype, position }: MonsterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
   const elapsedRef = useRef(0);
+  // Accumulated facing yaw — initialised toward the player spawn direction
+  // so the monster doesn't do a full 360 on first frame.
+  const facingYawRef = useRef<number | null>(null);
 
   const skeleton = useGLTF(SKELETON_PATH);
   const bat = useGLTF(BAT_PATH);
@@ -102,9 +114,33 @@ export function Monster({ archetype, position }: MonsterProps) {
     elapsedRef.current += delta;
     const t = elapsedRef.current;
 
-    // Base idle rotation/bob
-    groupRef.current.rotation.y = Math.sin(t * 0.6) * 0.08;
+    // ── Slow-turn facing toward player ──────────────────────────────
+    const { playerPosition } = getPlayer();
+    const dx = playerPosition.x - position[0];
+    const dz = playerPosition.z - position[2];
+    const targetYaw = Math.atan2(dx, dz);
 
+    // Initialise facing yaw on first frame to avoid a snap from 0.
+    if (facingYawRef.current === null) {
+      facingYawRef.current = targetYaw;
+    }
+
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    const turnSpeed =
+      dist <= ENGAGE_DISTANCE ? TURN_SPEED_ENGAGE : TURN_SPEED_SCAN;
+
+    facingYawRef.current = turnTowardsYaw(
+      facingYawRef.current,
+      targetYaw,
+      turnSpeed,
+      Math.min(delta, 0.1),
+    );
+
+    // Apply facing yaw plus a gentle idle sway on top.
+    groupRef.current.rotation.y =
+      facingYawRef.current + Math.sin(t * 0.6) * 0.08;
+
+    // ── Idle bob / hover ────────────────────────────────────────────
     if (modelRef.current) {
       if (HOVER_ARCHETYPES.has(archetype.id)) {
         // Hover/Fluttering movement
