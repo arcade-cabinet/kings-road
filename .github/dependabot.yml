@@ -6,17 +6,27 @@ updates:
       interval: weekly
     open-pull-requests-limit: 10
     groups:
+      # Ecosystem groups — keep related packages in lockstep. Major bumps
+      # still open standalone PRs so we can read the CHANGELOG before
+      # merging; minor/patch bumps batch into the named group so CI only
+      # runs once per ecosystem per week.
       react:
         patterns:
           - "react"
           - "react-dom"
           - "@types/react*"
+        update-types:
+          - "minor"
+          - "patch"
       three:
         patterns:
           - "three"
           - "@types/three"
           - "@react-three/*"
           - "postprocessing"
+        update-types:
+          - "minor"
+          - "patch"
       testing:
         patterns:
           - "vitest"
@@ -24,15 +34,36 @@ updates:
           - "@testing-library/*"
           - "@playwright/*"
           - "happy-dom"
+        update-types:
+          - "minor"
+          - "patch"
       build:
         patterns:
           - "vite"
           - "@vitejs/*"
           - "typescript"
           - "@biomejs/*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Catch-all for everything else — still batches minor/patch, leaves
+      # majors to stand alone.
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
