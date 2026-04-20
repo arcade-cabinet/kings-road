@@ -79,7 +79,7 @@ export function PlayerController() {
   const strafeSpeedRef = useRef(0);
 
   // Reactive subscriptions — only what we need for render/early-return logic
-  const { inDialogue, inCombat, paused, gameActive } = useFlags();
+  const { inDialogue, inCombat, paused, gameActive, tabHidden } = useFlags();
   const inventoryOpen = useTrait(getSessionEntity(), InventoryUI)?.isOpen ?? false;
 
   // Create Rapier character controller
@@ -126,23 +126,24 @@ export function PlayerController() {
       }
     }
 
-    // Don't process movement when game is paused/inactive/in menus/dead
+    // Don't process movement when game is paused/inactive/in menus/dead,
+    // or when the tab is backgrounded (prevents the accumulated-delta
+    // teleport-on-resume bug #21).
     const { isDead } = getFlags();
     const inBlockingState =
       !gameActive ||
       paused ||
+      tabHidden ||
       inDialogue ||
       inCombat ||
       inventoryOpen ||
       isDead;
 
     // Play-time ticks whenever the player is alive and the game isn't
-    // paused. We deliberately continue ticking during dialogue, combat,
-    // and while the inventory is open — those are all states the player
-    // is actively playing in, just not moving through the world. Only
-    // the pause menu, game-not-active (menus/title), and death state
-    // stop the clock.
-    if (gameActive && !paused && !isDead) {
+    // paused (user-initiated OR tab-hidden). Dialogue, combat, and the
+    // inventory are all states the player is actively playing in, so
+    // we keep ticking during those.
+    if (gameActive && !paused && !tabHidden && !isDead) {
       tickPlayTime(dt);
     }
 

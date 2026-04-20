@@ -75,6 +75,10 @@ export function togglePause(): void {
   const cur = e.get(GameFlags)!;
   e.set(GameFlags, { ...cur, paused: !cur.paused });
 }
+export function setTabHidden(tabHidden: boolean): void {
+  const e = ensure(GameFlags);
+  e.set(GameFlags, { ...e.get(GameFlags)!, tabHidden });
+}
 export function setIsSprinting(sprinting: boolean): void {
   const e = ensure(GameFlags);
   e.set(GameFlags, { ...e.get(GameFlags)!, isSprinting: sprinting });
