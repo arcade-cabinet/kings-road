@@ -161,7 +161,13 @@ export function RoadSurface({
         // Roughness locked to max — weathered, non-reflective.
         mat.roughness = 0.98;
 
-        setMaterial(mat);
+        setMaterial((prev) => {
+          // Cloned textures + material from a previous roadType change
+          // never reach the GC without explicit disposal; release them
+          // when we swap in the new one.
+          disposeRoadMaterial(prev);
+          return mat;
+        });
       })
       .catch((err) => {
         if (cancelled) return;
@@ -175,6 +181,14 @@ export function RoadSurface({
       cancelled = true;
     };
   }, [roadType]);
+
+  // Release the cloned material + its cloned textures when the component
+  // unmounts (chunk unloads from view-distance).
+  useEffect(() => {
+    return () => {
+      disposeRoadMaterial(material);
+    };
+  }, [material]);
 
   const geometry = useMemo(() => {
     const gx = kingdomTile.x;
@@ -251,9 +265,35 @@ export function RoadSurface({
     return merged;
   }, [oX, oZ, kingdomTile, kingdomMap, roadType]);
 
+  // Dispose merged geometry on unmount or when a new one is computed. The
+  // chunk manager unmounts RoadSurface when the player walks out of
+  // view-distance — without this effect the BufferGeometry leaks once per
+  // unloaded chunk.
+  useEffect(() => {
+    return () => {
+      geometry?.dispose();
+    };
+  }, [geometry]);
+
   if (!geometry || !material) return null;
 
   return <mesh geometry={geometry} material={material} receiveShadow />;
+}
+
+/**
+ * Dispose a cloned road material and its cloned textures. The PBR loader
+ * hands out shared cached materials; RoadSurface clones them (and the
+ * individual maps) so it can set per-instance tiling. Those clones must
+ * be released explicitly — the shared cache keeps the originals alive.
+ */
+function disposeRoadMaterial(
+  mat: THREE.MeshStandardMaterial | null | undefined,
+): void {
+  if (!mat) return;
+  mat.map?.dispose();
+  mat.normalMap?.dispose();
+  mat.roughnessMap?.dispose();
+  mat.dispose();
 }
 
 /**
