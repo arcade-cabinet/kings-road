@@ -85,10 +85,16 @@ export class BenchmarkCapture {
 
     const fps = frameTimeMs > 0 ? 1000 / frameTimeMs : 0;
 
-    const jsHeapMb =
-      typeof (performance as any).memory !== 'undefined'
-        ? (performance as any).memory.usedJSHeapSize / (1024 * 1024)
-        : 0;
+    // Chrome/Edge expose `performance.memory` as a non-standard API; Safari
+    // and Firefox don't. Feature-detect narrowly instead of casting through
+    // `any`, and fall back to 0 so cross-browser benchmark runs still emit a
+    // complete row.
+    const perfWithMemory = performance as Performance & {
+      memory?: { usedJSHeapSize: number };
+    };
+    const jsHeapMb = perfWithMemory.memory
+      ? perfWithMemory.memory.usedJSHeapSize / (1024 * 1024)
+      : 0;
 
     this.frames.push({
       t: now,
