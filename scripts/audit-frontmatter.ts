@@ -1,57 +1,50 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S npx tsx
 /**
- * Frontmatter audit — ensures every tracked .md in the project carries the
- * YAML frontmatter block required by STANDARDS.md (title, updated, status,
- * domain). Exits 1 if any file is missing frontmatter or required fields.
+ * Frontmatter audit — ensures every tracked .md file in the project carries
+ * the YAML frontmatter block (title, updated, status, domain). Exits 1 if
+ * any file is missing frontmatter or required fields.
+ *
+ * Why these fields: `docs/DESIGN.md` and the other domain docs use
+ * frontmatter for at-a-glance freshness + categorization (technical,
+ * product, quality, ops, creative, context). Keeping every .md in line
+ * lets tooling filter and index docs consistently.
  *
  * Scope:
- *   - Root-level docs (CLAUDE.md, README.md, CHANGELOG.md, STANDARDS.md, AGENTS.md)
- *   - docs/** recursive
- *   - src/** and app/** *.md (READMEs, CONTRIBUTING guides)
- *   - .kiro/steering/*.md (AI-tool steering)
- *
- * Skipped:
- *   - node_modules, .git, pending-integration, public, android/ios, .claude
+ *   Uses `git ls-files '*.md'` so only tracked markdown is audited.
+ *   Excludes vendored and tooling directories via a skip list.
  *
  * Usage:
  *   npx tsx scripts/audit-frontmatter.ts
- *   npx tsx scripts/audit-frontmatter.ts --fix   (prints the stub that should be added)
  */
 
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
-import path from 'node:path';
 
 const REQUIRED_FIELDS = ['title', 'updated', 'status', 'domain'] as const;
 
-const SKIP_DIRS = new Set([
-  'node_modules',
-  '.git',
-  'pending-integration',
-  'public',
-  'android',
-  'ios',
-  'dist',
-  'coverage',
-]);
+// Prefix-based skip list, normalized to forward-slash form. git ls-files
+// emits forward slashes on every platform, so path-separator handling
+// isn't needed here.
+const SKIP_PREFIXES = [
+  '.claude/',
+  'node_modules/',
+  'pending-integration/',
+  'public/',
+  'android/',
+  'ios/',
+  'dist/',
+  'coverage/',
+];
 
-// Exclude .claude by path rather than basename — state files live there.
-const SKIP_PATH_PREFIXES = ['.claude/'];
-
-function walk(dir: string, acc: string[] = []): string[] {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (entry.name.startsWith('.') && entry.name !== '.kiro') continue;
-    if (SKIP_DIRS.has(entry.name)) continue;
-    const full = path.join(dir, entry.name);
-    const rel = path.relative(process.cwd(), full);
-    if (SKIP_PATH_PREFIXES.some((p) => rel.startsWith(p))) continue;
-    if (entry.isDirectory()) {
-      walk(full, acc);
-    } else if (entry.isFile() && entry.name.endsWith('.md')) {
-      acc.push(rel);
-    }
-  }
-  return acc;
+function listTrackedMarkdown(): string[] {
+  const out = execFileSync('git', ['ls-files', '*.md'], {
+    encoding: 'utf8',
+  });
+  return out
+    .split('\n')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .filter((f) => !SKIP_PREFIXES.some((p) => f.startsWith(p)));
 }
 
 interface AuditResult {
@@ -69,7 +62,6 @@ function audit(file: string): AuditResult {
     return { file, issues };
   }
 
-  // Find closing ---
   let closeIdx = -1;
   for (let i = 1; i < lines.length; i++) {
     if (lines[i] === '---') {
@@ -92,17 +84,21 @@ function audit(file: string): AuditResult {
   return { file, issues };
 }
 
-function main() {
-  const files = walk(process.cwd()).sort();
+function main(): void {
+  const files = listTrackedMarkdown().sort();
   const results = files.map(audit);
   const failing = results.filter((r) => r.issues.length > 0);
 
   if (failing.length === 0) {
-    console.log(`\u2713 ${files.length} .md files — all have required frontmatter.`);
+    console.log(
+      `\u2713 ${files.length} .md files — all have required frontmatter.`,
+    );
     process.exit(0);
   }
 
-  console.log(`\u2717 ${failing.length} / ${files.length} .md files have frontmatter issues:\n`);
+  console.log(
+    `\u2717 ${failing.length} / ${files.length} .md files have frontmatter issues:\n`,
+  );
   for (const r of failing) {
     console.log(`  ${r.file}`);
     for (const issue of r.issues) {
