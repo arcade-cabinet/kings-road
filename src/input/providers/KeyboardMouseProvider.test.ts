@@ -262,7 +262,10 @@ describe('KeyboardMouseProvider', () => {
     it('removes event listeners', () => {
       const spy = vi.spyOn(window, 'removeEventListener');
       provider.dispose();
-      expect(spy).toHaveBeenCalledTimes(5);
+      // 6 = keydown, keyup, mousemove, mousedown, mouseup, blur.
+      // blur was added to clear held keys/mouse buttons on focus loss
+      // (see ghost-key fix in #207).
+      expect(spy).toHaveBeenCalledTimes(6);
       spy.mockRestore();
     });
   });
