@@ -484,6 +484,8 @@ export function resetGame(): void {
   });
   const pt = ensure(PlayTime);
   pt.set(PlayTime, { playTimeSeconds: 0 });
+  const rc = ensure(RegionCrossing);
+  rc.set(RegionCrossing, { active: null });
   // Clear any stale throttle windows so the new session's first
   // health/stamina/time-of-day tick isn't suppressed by a leftover
   // timestamp from the previous session.

@@ -23,7 +23,7 @@ const SAMPLE_INTERVAL_S = 0.25;
  * Placed alongside the other always-active systems in GameScene.
  */
 export function RegionCrossingSystem() {
-  const lastRegionId = useRef<string>('');
+  const lastRegionId = useRef<string | null>(null);
   const sampleAccRef = useRef(0);
 
   useFrame((_, delta) => {
@@ -36,7 +36,13 @@ export function RegionCrossingSystem() {
 
     const roadDist = getPlayer().playerPosition?.x ?? 0;
     const region = getRegionAtDistance(roadDist);
-    if (!region) return;
+
+    if (!region) {
+      // Player is outside every defined region (spine has no regions).
+      // Reset so re-entry into any region fires again.
+      lastRegionId.current = null;
+      return;
+    }
 
     if (region.id === lastRegionId.current) return;
 

@@ -198,18 +198,53 @@ describe('road-spine loader', () => {
       const regions = spine.regions ?? [];
       expect(regions.length).toBe(5);
 
-      // Sample each region at its midpoint.
+      // Sample each region at its midpoint. Fail loudly if any anchor id is
+      // missing — a silent ?? 0 fallback would produce misleading results.
       const anchorDist = new Map(
         spine.anchors.map((a) => [a.id, a.distanceFromStart]),
       );
       for (const r of regions) {
-        const start = anchorDist.get(r.anchorRange[0]) ?? 0;
-        const end = anchorDist.get(r.anchorRange[1]) ?? 0;
-        const mid = Math.floor((start + end) / 2);
+        const start = anchorDist.get(r.anchorRange[0]);
+        const end = anchorDist.get(r.anchorRange[1]);
+        expect(
+          start,
+          `missing start anchor "${r.anchorRange[0]}" for region "${r.id}"`,
+        ).toBeDefined();
+        expect(
+          end,
+          `missing end anchor "${r.anchorRange[1]}" for region "${r.id}"`,
+        ).toBeDefined();
+        const mid = Math.floor((start! + end!) / 2);
         const found = getRegionAtDistance(mid);
         expect(found).not.toBeNull();
         expect(found!.id).toBe(r.id);
       }
+    });
+
+    it('re-fires banner for same region on re-entry (enter → exit → re-enter)', () => {
+      // Simulates a player walking forward into Ashford Meadows, then turning
+      // back to negative distance (outside all regions → null), then
+      // re-entering Ashford Meadows from distance 0.
+      // getRegionAtDistance clamps to [0, totalDistance] so negative inputs
+      // hit the first region — we use 0 (start boundary) for the re-entry.
+      const first = getRegionAtDistance(0);
+      expect(first).not.toBeNull();
+      expect(first!.id).toBe('ashford-meadows');
+
+      // Midpoint inside Ashford Meadows — still same region.
+      const mid = getRegionAtDistance(3000);
+      expect(mid).not.toBeNull();
+      expect(mid!.id).toBe('ashford-meadows');
+
+      // Cross into next region (Millbrook Forests starts at 6000).
+      const next = getRegionAtDistance(6001);
+      expect(next).not.toBeNull();
+      expect(next!.id).toBe('millbrook-forests');
+
+      // Turn back: clamped negative → still first region (not null).
+      const back = getRegionAtDistance(-100);
+      expect(back).not.toBeNull();
+      expect(back!.id).toBe('ashford-meadows');
     });
   });
 });

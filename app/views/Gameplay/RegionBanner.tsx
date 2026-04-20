@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPlayer, setRegionCrossing } from '@/ecs/actions/game';
 import { useFlags, useRegionCrossing } from '@/ecs/hooks/useGameSession';
 
 /** How long the banner stays fully visible before the fade-out starts (ms). */
 const BANNER_DISPLAY_MS = 2000;
+
+/** Fade-in animation duration (ms) — matches CSS transition-duration. */
+const FADE_IN_MS = 400;
 
 /** Fade-out animation duration (ms) — matches CSS transition-duration. */
 const FADE_OUT_MS = 700;
@@ -36,7 +39,7 @@ export function RegionBanner() {
   const [bannerName, setBannerName] = useState<string | null>(null);
   const [fading, setFading] = useState(false);
 
-  const lastShownId = useRef<string>('');
+  const lastShownId = useRef<string | null>(null);
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const crossingDistanceRef = useRef<number>(0);
@@ -51,15 +54,53 @@ export function RegionBanner() {
     };
   }, []);
 
+  const clearAllTimers = useCallback(() => {
+    if (dismissTimerRef.current !== null) {
+      clearTimeout(dismissTimerRef.current);
+      dismissTimerRef.current = null;
+    }
+    if (fadeTimerRef.current !== null) {
+      clearTimeout(fadeTimerRef.current);
+      fadeTimerRef.current = null;
+    }
+    if (checkIntervalRef.current !== null) {
+      clearInterval(checkIntervalRef.current);
+      checkIntervalRef.current = null;
+    }
+  }, []);
+
+  const beginFade = useCallback(() => {
+    // Stop the distance-poll interval immediately so it cannot race and call
+    // beginFade a second time while the fade-out is already in progress.
+    if (checkIntervalRef.current !== null) {
+      clearInterval(checkIntervalRef.current);
+      checkIntervalRef.current = null;
+    }
+
+    setFading(true);
+    // Clear the crossing trait so the system is free to write a new crossing
+    // event. De-duplication is keyed on lastShownId, which is cleared when
+    // the banner fully dismisses, so the same region will show again if the
+    // player u-turns and re-enters.
+    setRegionCrossing(null);
+    fadeTimerRef.current = setTimeout(() => {
+      fadeTimerRef.current = null;
+      setBannerName(null);
+      setFading(false);
+      // Allow the same region to trigger the banner again on re-entry.
+      lastShownId.current = null;
+    }, FADE_OUT_MS);
+  }, []);
+
   // Reset when game becomes inactive.
   useEffect(() => {
     if (!gameActive) {
       clearAllTimers();
       setBannerName(null);
       setFading(false);
-      lastShownId.current = '';
+      lastShownId.current = null;
     }
-  }, [gameActive]);
+  }, [gameActive, clearAllTimers]);
 
   // React to new crossings from the Koota trait.
   useEffect(() => {
@@ -85,39 +126,10 @@ export function RegionBanner() {
     checkIntervalRef.current = setInterval(() => {
       const roadDist = getPlayer().playerPosition?.x ?? 0;
       if (Math.abs(roadDist - crossingDistanceRef.current) >= AUTO_DISMISS_DISTANCE) {
-        clearInterval(checkIntervalRef.current!);
-        checkIntervalRef.current = null;
         beginFade();
       }
     }, 250);
-  }, [crossing, gameActive]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function clearAllTimers() {
-    if (dismissTimerRef.current !== null) {
-      clearTimeout(dismissTimerRef.current);
-      dismissTimerRef.current = null;
-    }
-    if (fadeTimerRef.current !== null) {
-      clearTimeout(fadeTimerRef.current);
-      fadeTimerRef.current = null;
-    }
-    if (checkIntervalRef.current !== null) {
-      clearInterval(checkIntervalRef.current);
-      checkIntervalRef.current = null;
-    }
-  }
-
-  function beginFade() {
-    setFading(true);
-    // Clear the crossing trait so it can fire again for the same region if
-    // the player u-turns and re-enters.
-    setRegionCrossing(null);
-    fadeTimerRef.current = setTimeout(() => {
-      fadeTimerRef.current = null;
-      setBannerName(null);
-      setFading(false);
-    }, FADE_OUT_MS);
-  }
+  }, [crossing, gameActive, clearAllTimers, beginFade]);
 
   if (!bannerName) return null;
 
@@ -130,7 +142,7 @@ export function RegionBanner() {
         opacity: fading ? 0 : 1,
         transition: fading
           ? `opacity ${FADE_OUT_MS}ms ease-out`
-          : 'opacity 400ms ease-in',
+          : `opacity ${FADE_IN_MS}ms ease-in`,
       }}
     >
       <div
@@ -141,7 +153,10 @@ export function RegionBanner() {
         }}
       >
         {/* Decorative top rule with "entering" label */}
-        <div className="flex items-center gap-3 w-full justify-center mb-1">
+        <div
+          aria-hidden="true"
+          className="flex items-center gap-3 w-full justify-center mb-1"
+        >
           <span
             className="block h-px flex-1 max-w-[80px]"
             style={{
@@ -175,7 +190,10 @@ export function RegionBanner() {
         </h2>
 
         {/* Decorative bottom rule */}
-        <div className="flex items-center gap-3 w-full justify-center mt-1">
+        <div
+          aria-hidden="true"
+          className="flex items-center gap-3 w-full justify-center mt-1"
+        >
           <span
             className="block h-px flex-1 max-w-[80px]"
             style={{
