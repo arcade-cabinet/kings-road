@@ -4,6 +4,7 @@ import { LoadingOverlay } from '@app/views/Gameplay/LoadingOverlay';
 import { setGameActive, setSeedPhrase } from '@/ecs/actions/game';
 import { setWorldState } from '@/ecs/actions/world';
 import { unsafe_resetSessionEntity } from '@/ecs/world';
+import { KootaProvider } from './test-utils';
 
 beforeEach(() => {
   unsafe_resetSessionEntity();
@@ -17,6 +18,10 @@ test('LoadingOverlay renders when game is active and generating', async () => {
     generationProgress: 0.3,
     generationPhase: 'Shaping the terrain...',
   });
-  const screen = await render(<LoadingOverlay />);
+  const screen = await render(
+    <KootaProvider>
+      <LoadingOverlay />
+    </KootaProvider>,
+  );
   await expect.element(screen.getByText(/Preparing/i)).toBeInTheDocument();
 });

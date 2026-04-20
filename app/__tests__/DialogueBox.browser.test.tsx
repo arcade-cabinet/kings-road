@@ -3,6 +3,7 @@ import { beforeEach, expect, test } from 'vitest';
 import { DialogueBox } from '@app/views/Gameplay/DialogueBox';
 import { setGameActive } from '@/ecs/actions/game';
 import { unsafe_resetSessionEntity } from '@/ecs/world';
+import { KootaProvider } from './test-utils';
 
 beforeEach(() => {
   unsafe_resetSessionEntity();
@@ -10,6 +11,10 @@ beforeEach(() => {
 });
 
 test('DialogueBox returns null when not in dialogue', async () => {
-  const screen = await render(<DialogueBox />);
+  const screen = await render(
+    <KootaProvider>
+      <DialogueBox />
+    </KootaProvider>,
+  );
   expect(screen.container.firstElementChild).toBeNull();
 });

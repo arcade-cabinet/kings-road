@@ -79,3 +79,8 @@ public/assets/terrain/**/*.png
 .playwright-mcp/
 kr-*.png
 kr-*.jpg
+
+# Vitest browser mode local test artifacts — CI uploads its own copy
+.vitest-attachments/
+app/__tests__/__screenshots__/
+__screenshots__/
