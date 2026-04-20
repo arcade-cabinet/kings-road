@@ -12,6 +12,13 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.19](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.18...kings-road-v1.5.19) (2026-04-20)
+
+
+### Documentation
+
+* **plans:** path-to-1.0 PRD with macro/meso/micro tiers ([#218](https://github.com/arcade-cabinet/kings-road/issues/218)) ([06f5f7a](https://github.com/arcade-cabinet/kings-road/commit/06f5f7a8f6e194e7a0ff08633997c1e1e762bf04))
+
 ## [1.5.18](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.17...kings-road-v1.5.18) (2026-04-20)
 
 
