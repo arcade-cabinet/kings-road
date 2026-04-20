@@ -110,7 +110,9 @@ function main(): void {
   console.log('title: <title>');
   console.log('updated: YYYY-MM-DD');
   console.log('status: current | draft | stale | archived');
-  console.log('domain: technical | product | quality | ops | creative | context');
+  console.log(
+    'domain: technical | product | quality | ops | creative | context',
+  );
   console.log('---');
   process.exit(1);
 }
