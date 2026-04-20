@@ -51,7 +51,7 @@
     "@react-three/rapier": "^2.2.0",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/three": "^0.184.0",
-    "@typescript/native-preview": "7.0.0-dev.20260419.1",
+    "@typescript/native-preview": "7.0.0-dev.20260420.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
     "koota": "^0.6.6",
