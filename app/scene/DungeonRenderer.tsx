@@ -132,6 +132,15 @@ function DungeonRoomMesh({
     return mat;
   }, [roomColor]);
 
+  // Release the per-room wall material clone on unmount. `wallMaterial`
+  // (module-level) is shared across rooms and shouldn't be disposed —
+  // but each room's clone lives for just that room's render pass.
+  useEffect(() => {
+    return () => {
+      tintedWallMaterial.dispose();
+    };
+  }, [tintedWallMaterial]);
+
   const halfSize = ROOM_SIZE / 2;
 
   // Only render current room and adjacent rooms for performance
