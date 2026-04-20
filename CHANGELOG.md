@@ -12,6 +12,15 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.13](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.12...kings-road-v1.5.13) (2026-04-20)
+
+
+### Fixed
+
+* **dungeon:** dispose per-room wall material clone on unmount ([#203](https://github.com/arcade-cabinet/kings-road/issues/203)) ([c83e72f](https://github.com/arcade-cabinet/kings-road/commit/c83e72fb786185d08237b6cfa8d73cc9ed790ae1))
+* **road:** dispose merged geometry + cloned material on unmount ([#200](https://github.com/arcade-cabinet/kings-road/issues/200)) ([596e23a](https://github.com/arcade-cabinet/kings-road/commit/596e23a61e94b8212638592eb3fe66d8eb7c6327))
+* **save:** force-flush pending writes on tab hide/unload ([#205](https://github.com/arcade-cabinet/kings-road/issues/205)) ([9f86292](https://github.com/arcade-cabinet/kings-road/commit/9f86292a0f5e3d2bffb7b4dad8bf8df49dc285cd))
+
 ## [1.5.12](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.11...kings-road-v1.5.12) (2026-04-20)
 
 
