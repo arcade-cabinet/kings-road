@@ -6,6 +6,7 @@ import { BiomeService } from '@/biome';
 import type { BiomeConfig } from '@/biome';
 import { BiomeError } from '@/core';
 import { assetUrl } from '@/lib/assets';
+import { DAY_DURATION } from '@/lib/time';
 import {
   getEnvironment,
   getFlags,
@@ -17,8 +18,6 @@ import {
   useFlags,
 } from '@/ecs/hooks/useGameSession';
 import { updateWindowEmissive } from '@/utils/textures';
-
-const DAY_DURATION = 600.0; // 10 real minutes = 1 game day
 const CLOUD_TEXTURE = assetUrl('/assets/cloud.svg');
 
 /**

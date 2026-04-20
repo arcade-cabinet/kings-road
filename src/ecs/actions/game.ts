@@ -30,6 +30,7 @@ import {
   type WeatherState,
 } from '@/ecs/traits/session-game';
 import { getSessionEntity } from '@/ecs/world';
+import { DAY_DURATION } from '@/lib/time';
 import type {
   AABB,
   ActiveEncounter,
@@ -239,12 +240,21 @@ export function removeGlobalInteractables(list: Interactable[]): void {
 export function getEnvironment() {
   return read(EnvironmentState);
 }
+
+// One in-game hour in real-time ms. DAY_DURATION is imported from
+// @/lib/time so this derivation stays in sync if the day length changes.
+const TIME_OF_DAY_THROTTLE_MS = (DAY_DURATION / 24) * 1_000; // 25_000 ms
+
 export function setTimeOfDay(time: number): void {
   const e = ensure(EnvironmentState);
   e.set(EnvironmentState, {
     ...e.get(EnvironmentState)!,
     timeOfDay: time % 1,
   });
+  // Throttled — called from DayNightCycle's useFrame every TIME_SYNC_INTERVAL
+  // (2 s); without throttling the debounce resets on every call and never
+  // flushes. One save per in-game hour is granular enough for time-of-day.
+  scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
 }
 export function setCurrentWeather(weather: WeatherState): void {
   const e = ensure(EnvironmentState);

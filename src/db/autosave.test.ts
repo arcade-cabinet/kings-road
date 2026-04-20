@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DAY_DURATION } from '@/lib/time';
 import type { SaveData } from './save-service';
 
 // Mock save-service so the tests don't touch the SQL layer.
@@ -70,6 +71,71 @@ describe('autosave', () => {
     cancelPendingAutoSave();
     resetAutoSaveThrottle();
     registerAutoSaveProvider(null);
+  });
+
+  // ── setTimeOfDay throttle integration ──────────────────────────────────
+  // These tests exercise the 'env.timeOfDay' key used by
+  // setTimeOfDay in src/ecs/actions/game.ts via the shared
+  // scheduleAutoSaveThrottled infrastructure.
+  describe('env.timeOfDay throttle (mirrors setTimeOfDay behaviour)', () => {
+    // One in-game hour in ms — derived from the shared constant so this
+    // test stays in sync when DAY_DURATION changes.
+    const TIME_OF_DAY_THROTTLE_MS = (DAY_DURATION / 24) * 1_000;
+
+    it('fires on the first call within a window', async () => {
+      registerAutoSaveProvider(() => makeSaveData());
+      scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('swallows subsequent calls inside the same hour window', async () => {
+      registerAutoSaveProvider(() => makeSaveData());
+      // Leading edge fires.
+      scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+
+      // Simulate setTimeOfDay being called every 2 s (TIME_SYNC_INTERVAL)
+      // across the rest of the in-game hour — all should be swallowed.
+      for (let i = 0; i < 10; i++) {
+        scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
+        await vi.advanceTimersByTimeAsync(2_000);
+      }
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('fires again after the hour window expires', async () => {
+      registerAutoSaveProvider(() => makeSaveData());
+      // First in-game hour.
+      scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+
+      // Advance past the full throttle window.
+      await vi.advanceTimersByTimeAsync(TIME_OF_DAY_THROTTLE_MS);
+
+      // Second in-game hour — should fire.
+      scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('is independent from other throttle keys (e.g. player.health)', async () => {
+      registerAutoSaveProvider(() => makeSaveData());
+      scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
+      scheduleAutoSaveThrottled('player.health', 10_000);
+      // Both pass leading-edge; they coalesce into one debounce flush.
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+
+      // Inside the time-of-day window — swallowed.
+      scheduleAutoSaveThrottled('env.timeOfDay', TIME_OF_DAY_THROTTLE_MS);
+      // Inside the health window — also swallowed.
+      scheduleAutoSaveThrottled('player.health', 10_000);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(saveToSlotMock).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('does not write when no provider is registered', async () => {
