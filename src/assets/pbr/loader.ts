@@ -179,7 +179,7 @@ export function applyPbrMaterialToMesh(
   mat: THREE.MeshStandardMaterial,
 ): void {
   const geo = mesh.geometry;
-  if (geo && geo.attributes.uv && !geo.attributes.uv2) {
+  if (geo?.attributes.uv && !geo.attributes.uv2) {
     geo.setAttribute('uv2', geo.attributes.uv);
   }
   mesh.material = mat;
