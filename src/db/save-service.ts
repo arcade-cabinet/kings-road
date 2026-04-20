@@ -13,6 +13,7 @@
 import type * as THREE from 'three';
 import type { EquippedItems, ItemStack } from '@/ecs/traits/inventory';
 import type { ActiveQuest } from '@/ecs/traits/session-quest';
+import { getSaveSlotKind, type SlotKind } from './save-slot-kind';
 
 // ── Serializable types ────────────────────────────────────────────────
 
@@ -61,7 +62,11 @@ export interface SaveSlotSummary {
   savedAt: string;
   playTimeSeconds: number;
   level: number;
+  /** Icon category derived from where the player was when they saved. */
+  slotKind: SlotKind;
 }
+
+export type { SlotKind };
 
 // ── Snapshot: runtime state → SaveData ────────────────────────────────
 
@@ -242,6 +247,7 @@ export async function listSaveSlots(): Promise<SaveSlotSummary[]> {
       savedAt: data.savedAt,
       playTimeSeconds: data.playTimeSeconds,
       level: data.player.level,
+      slotKind: getSaveSlotKind(data),
     });
   }
   return summaries;
