@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
   type ImpactPoint,
@@ -25,6 +25,16 @@ export function ImpactDeformerEffect({ impacts }: ImpactDeformerEffectProps) {
     [],
   );
   const geo = useMemo(() => new THREE.SphereGeometry(0.45, 24, 16), []);
+
+  // Pool geometry + materials never get released when the encounter
+  // system unmounts this component — drop them explicitly so combat
+  // resource churn doesn't accumulate across encounters.
+  useEffect(() => {
+    return () => {
+      geo.dispose();
+      for (const mat of materials) mat.dispose();
+    };
+  }, [geo, materials]);
 
   useFrame(() => {
     const now = performance.now();

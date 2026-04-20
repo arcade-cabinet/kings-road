@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
   type MetaballBurst,
@@ -25,6 +25,15 @@ export function BloodMetaballsEffect({ bursts }: BloodMetaballsEffectProps) {
   );
   // Hull sphere — raymarch is bounded to ~1m radius
   const geo = useMemo(() => new THREE.SphereGeometry(1.0, 8, 6), []);
+
+  // Release pooled geometry + materials on unmount so repeated
+  // encounter lifecycles don't accumulate GPU resources.
+  useEffect(() => {
+    return () => {
+      geo.dispose();
+      for (const mat of materials) mat.dispose();
+    };
+  }, [geo, materials]);
 
   useFrame(() => {
     const now = performance.now();
