@@ -53,18 +53,18 @@ export function Monster({ archetype, position }: MonsterProps) {
   const modelRef = useRef<THREE.Group>(null);
   const elapsedRef = useRef(0);
 
-  const skeleton = useGLTF(SKELETON_PATH) as any;
-  const bat = useGLTF(BAT_PATH) as any;
-  const werewolf = useGLTF(WEREWOLF_PATH) as any;
-  const bloodwraith = useGLTF(BLOODWRAITH_PATH) as any;
-  const plagueDoctor = useGLTF(PLAGUE_DOCTOR_PATH) as any;
-  const devilDemon = useGLTF(DEVIL_DEMON_PATH) as any;
-  const abomination = useGLTF(ABOMINATION_PATH) as any;
-  const goliath = useGLTF(GOLIATH_PATH) as any;
-  const butcher = useGLTF(BUTCHER_PATH) as any;
-  const bigfoot = useGLTF(BIGFOOT_PATH) as any;
-  const elkDemon = useGLTF(ELK_DEMON_PATH) as any;
-  const eyeHead = useGLTF(EYE_HEAD_PATH) as any;
+  const skeleton = useGLTF(SKELETON_PATH);
+  const bat = useGLTF(BAT_PATH);
+  const werewolf = useGLTF(WEREWOLF_PATH);
+  const bloodwraith = useGLTF(BLOODWRAITH_PATH);
+  const plagueDoctor = useGLTF(PLAGUE_DOCTOR_PATH);
+  const devilDemon = useGLTF(DEVIL_DEMON_PATH);
+  const abomination = useGLTF(ABOMINATION_PATH);
+  const goliath = useGLTF(GOLIATH_PATH);
+  const butcher = useGLTF(BUTCHER_PATH);
+  const bigfoot = useGLTF(BIGFOOT_PATH);
+  const elkDemon = useGLTF(ELK_DEMON_PATH);
+  const eyeHead = useGLTF(EYE_HEAD_PATH);
 
   // Use the archetype's declared size as the uniform scale.
   const scale = archetype.size;
@@ -130,7 +130,7 @@ export function Monster({ archetype, position }: MonsterProps) {
         const cloned = SkeletonUtils.clone(skeleton.scene) as THREE.Group;
 
         // Procedural Armor Variety for Skeletons
-        cloned.traverse((child: any) => {
+        cloned.traverse((child) => {
           if (
             child.name.startsWith('Chest_Armor_') ||
             child.name.startsWith('Helmet_')
