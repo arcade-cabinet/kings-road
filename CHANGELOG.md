@@ -12,6 +12,14 @@ All notable changes to King's Road will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.14](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.13...kings-road-v1.5.14) (2026-04-20)
+
+
+### Fixed
+
+* **input:** clear held keys/mouse buttons on window blur ([#207](https://github.com/arcade-cabinet/kings-road/issues/207)) ([f446d91](https://github.com/arcade-cabinet/kings-road/commit/f446d912b1e6ee20a7e4a351d18e76287697015a))
+* **test:** update KeyboardMouseProvider listener count for blur handler ([#209](https://github.com/arcade-cabinet/kings-road/issues/209)) ([7c2b2d7](https://github.com/arcade-cabinet/kings-road/commit/7c2b2d726fc2977df460c7fbf650a451e09612ce))
+
 ## [1.5.13](https://github.com/arcade-cabinet/kings-road/compare/kings-road-v1.5.12...kings-road-v1.5.13) (2026-04-20)
 
 
