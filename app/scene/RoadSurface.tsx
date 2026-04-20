@@ -161,13 +161,7 @@ export function RoadSurface({
         // Roughness locked to max — weathered, non-reflective.
         mat.roughness = 0.98;
 
-        setMaterial((prev) => {
-          // Cloned textures + material from a previous roadType change
-          // never reach the GC without explicit disposal; release them
-          // when we swap in the new one.
-          disposeRoadMaterial(prev);
-          return mat;
-        });
+        setMaterial(mat);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -182,8 +176,11 @@ export function RoadSurface({
     };
   }, [roadType]);
 
-  // Release the cloned material + its cloned textures when the component
-  // unmounts (chunk unloads from view-distance).
+  // Dispose the cloned material + its cloned textures when React swaps
+  // to a new material (e.g. roadType changes) or when the component
+  // unmounts (chunk unloads from view-distance). React fires the cleanup
+  // with the previous `material` captured in scope; the new material is
+  // owned by the next render.
   useEffect(() => {
     return () => {
       disposeRoadMaterial(material);
