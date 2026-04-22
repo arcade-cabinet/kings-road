@@ -1,6 +1,6 @@
 ---
 title: AGENTS.md
-updated: 2026-04-18
+updated: 2026-04-22
 status: current
 domain: technical
 ---
@@ -14,6 +14,27 @@ Extended AI agent operating protocols for King's Road.
 ## Project Overview
 
 King's Road is a mobile-first config-driven 3D RPG. A player walks the King's Road from Ashford to Grailsend seeking the Holy Grail. Content is defined as Zod-validated JSON, compiled into a SQLite database, consumed by a Koota ECS world, and rendered with React Three Fiber on a Vite + Capacitor stack.
+
+## Arcade Consolidation Intake: Aetheria, Aethermoor, Dragon's Labyrinth
+
+King's Road is the RPG consolidation destination for selected ideas from `aetheria`, `aethermoor`, and `dragons-labyrinth`.
+
+Do not merge their engines wholesale. King's Road keeps its current Vite + Capacitor + React Three Fiber + Koota + JSON/Zod/SQLite architecture. Pull concepts, content structure, control lessons, and progression mechanics only when they make the King's Road pilgrimage clearer and more shippable.
+
+Source-specific guidance:
+
+- `aetheria`: use anchor-based procedural world ideas as pilgrimage waystations, relic sites, or regional pressure points. Its class archetypes can inspire orders, relic schools, or enemy factions. Do not import Expo/React Native platform direction or infinite-world scope.
+- `aethermoor`: use direct-address writing, classless weapon-skill progression, diegetic UI thinking, content-density philosophy, and persistence lessons. Do not import adult/full-expression content into King's Road.
+- `dragons-labyrinth`: use distance-as-pressure, geography-driven progression, staged dread/omen systems, and companion stress ideas only where they serve the road pilgrimage. Do not turn King's Road into a horror product and do not import Godot/Python engine direction.
+
+Scope reductions for a shippable King's Road:
+
+- Keep the six road anchors, but ship one main route plus micro and meso side quests first.
+- Defer 60 to 120 minute macro quest chains until the main route is playable and visually coherent.
+- Use procedural generation for encounter texture and replay variation, not as the product identity.
+- Treat companion psychology as optional after the main route, controls, quest readability, and save flow are proven.
+
+Any agent implementing this consolidation should start with a design doc that maps source ideas to King's Road schemas, quest tiers, ECS traits, and presentation changes. Code movement should be the exception; content and system design translation should be the default.
 
 ## Architecture Pipeline
 
