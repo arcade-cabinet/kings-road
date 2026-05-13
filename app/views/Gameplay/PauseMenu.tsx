@@ -46,6 +46,7 @@ import {
 import { generateDungeonLayout } from '@/world/dungeon-generator';
 import { getDungeonById } from '@/world/dungeon-registry';
 import { SettingsPanel } from '@app/views/SettingsPanel';
+import { SaveSlotIcon } from '@app/components/SaveSlotIcon';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -196,7 +197,10 @@ function SaveSlotRow({
       />
       <div className="relative flex items-center justify-between">
         <div>
-          <div className="font-lora text-sm font-semibold tracking-wider text-yellow-900">
+          <div className="flex items-center gap-2 font-lora text-sm font-semibold tracking-wider text-yellow-900">
+            {!isEmpty && (
+              <SaveSlotIcon kind={summary.slotKind} size={14} />
+            )}
             {label}
           </div>
           {isEmpty ? (
