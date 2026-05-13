@@ -83,7 +83,7 @@ content/                  # JSON content trove
 ├── monsters/             # Monster archetypes
 ├── dungeons/             # Dungeon layouts
 ├── encounters/           # Narrative encounter definitions
-└── CONTRIBUTING.md       # Tone guide, schema examples, authoring rules
+└── CONTRIBUTING.md       # Content authoring: tone guide, schema examples, authoring rules
 
 scripts/
 ├── validate-content.ts   # Content validation pipeline
@@ -116,7 +116,7 @@ Desktop keyboard shortcuts exist for development workflow (WASD movement, F to i
 Game content lives in `content/` as JSON. To add quests, NPCs, buildings, or features:
 
 1. Write JSON following the schemas in `src/schemas/`
-2. See `content/CONTRIBUTING.md` for tone guide, authoring rules, and examples
+2. See [content/CONTRIBUTING.md](./content/CONTRIBUTING.md) for tone guide, authoring rules, and examples
 3. Validate: `npx tsx scripts/validate-content.ts`
 4. Content is compiled into SQLite automatically on next `pnpm dev` or `pnpm build`
 
@@ -156,6 +156,11 @@ pnpm exec biome check .    # Lint and format check
 - [Testing](docs/TESTING.md) -- Test strategy and coverage
 - [State](docs/STATE.md) -- What is done, what is next
 - [Lore](docs/LORE.md) -- World lore, narrative, characters
+
+## Contributing
+
+- **Contribution workflow** (worktrees, commits, PRs, reviews, merging): [CONTRIBUTING.md](./CONTRIBUTING.md)
+- **Content authoring** (tone guide, schema examples, authoring rules): [content/CONTRIBUTING.md](./content/CONTRIBUTING.md)
 
 ## License
 
